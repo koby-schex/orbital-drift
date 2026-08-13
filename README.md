@@ -26,4 +26,7 @@ The static smoke suite checks JavaScript parsing, unique element IDs, explicit b
 - Planet discovery, rarity tiers, capture capacity, upgrades, production, and codex records
 - ODF Pioneer construction, upgrades, refueling, sector travel, cosmetics, and fleet missions
 - Procedural sectors, Cosmic Spirit systems, black-hole breaches, Parallel systems, and rare events
+- Ten choice-driven Exploration Encounters with ship, fleet, resource, and reputation requirements
+- Frontier Coalition, Wayfarer Guild, and Echo Collective reputation with permanent faction technologies
+- Three-part Silent Choir storyline, consequential outcomes, and a Captain's Log decision archive
 - Guided onboarding, objective tracking, save/load, settings, touch-control calibration, audio, and performance scaling
