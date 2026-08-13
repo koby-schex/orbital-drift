@@ -1,0 +1,9 @@
+{
+  "name": "orbital-drift",
+  "version": "0.13.0",
+  "private": true,
+  "description": "Portrait mobile gravity-exploration game",
+  "scripts": {
+    "test": "node tests/static-smoke.mjs"
+  }
+}
