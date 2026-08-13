@@ -1069,6 +1069,470 @@
       .mission-reward h2 {
         color: #fef3c7;
       }
+      .encounter-overlay {
+        z-index: 38;
+        padding: max(12px, var(--safeTop)) 12px max(12px, var(--safeBottom));
+        background:
+          radial-gradient(
+            circle at 50% 18%,
+            color-mix(in srgb, var(--encounterColor, #7dd3fc) 18%, transparent),
+            transparent 42%
+          ),
+          rgba(1, 4, 15, 0.88);
+        backdrop-filter: blur(18px) saturate(1.2);
+      }
+      .encounter-dialog {
+        width: min(680px, calc(100vw - 24px));
+        padding: 0;
+        overflow-x: hidden;
+        border-color: color-mix(
+          in srgb,
+          var(--encounterColor, #7dd3fc) 44%,
+          transparent
+        );
+        background:
+          radial-gradient(
+            circle at 92% 4%,
+            color-mix(in srgb, var(--encounterColor, #7dd3fc) 16%, transparent),
+            transparent 34%
+          ),
+          linear-gradient(180deg, rgba(12, 20, 39, 0.985), rgba(2, 6, 23, 0.97));
+        box-shadow:
+          0 30px 90px rgba(0, 0, 0, 0.68),
+          0 0 54px
+            color-mix(in srgb, var(--encounterColor, #7dd3fc) 13%, transparent),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+      .encounter-visual {
+        position: relative;
+        height: clamp(160px, 28vh, 230px);
+        overflow: hidden;
+        isolation: isolate;
+        border-bottom: 1px solid
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 28%, transparent);
+        background:
+          radial-gradient(
+            circle at 50% 48%,
+            color-mix(in srgb, var(--encounterColor, #7dd3fc) 26%, transparent),
+            transparent 24%
+          ),
+          radial-gradient(
+            circle at 14% 18%,
+            rgba(255, 255, 255, 0.32) 0 1px,
+            transparent 2px
+          ),
+          radial-gradient(
+            circle at 79% 24%,
+            rgba(255, 255, 255, 0.24) 0 1px,
+            transparent 2px
+          ),
+          radial-gradient(
+            circle at 66% 76%,
+            rgba(255, 255, 255, 0.2) 0 1px,
+            transparent 2px
+          ),
+          linear-gradient(145deg, #020617, #101a33 58%, #030712);
+      }
+      .encounter-visual:before {
+        content: "";
+        position: absolute;
+        inset: -55% -20%;
+        z-index: -1;
+        background: conic-gradient(
+          from 70deg,
+          transparent,
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 16%, transparent),
+          transparent 28%,
+          rgba(167, 139, 250, 0.12),
+          transparent 60%
+        );
+        animation: encounterNebula 18s linear infinite;
+      }
+      .encounter-visual:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(180deg, transparent 62%, rgba(2, 6, 23, 0.82)),
+          repeating-linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.025) 0,
+            rgba(255, 255, 255, 0.025) 1px,
+            transparent 1px,
+            transparent 5px
+          );
+        mix-blend-mode: screen;
+      }
+      .encounter-object {
+        position: absolute;
+        left: 50%;
+        top: 49%;
+        width: 112px;
+        height: 54px;
+        transform: translate(-50%, -50%) rotate(-8deg);
+        border: 1px solid
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 78%, white 8%);
+        border-radius: 46% 54% 42% 58%;
+        background:
+          linear-gradient(
+            90deg,
+            rgba(2, 6, 23, 0.98),
+            rgba(77, 96, 128, 0.82) 48%,
+            rgba(3, 7, 18, 0.98)
+          ),
+          var(--encounterColor, #7dd3fc);
+        clip-path: polygon(0 42%, 16% 14%, 71% 0, 100% 45%, 78% 100%, 18% 84%);
+        box-shadow:
+          0 0 24px
+            color-mix(in srgb, var(--encounterColor, #7dd3fc) 48%, transparent),
+          inset 0 0 18px rgba(255, 255, 255, 0.12);
+        animation: encounterDrift 4.8s ease-in-out infinite;
+      }
+      .encounter-object:before,
+      .encounter-object:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 24px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--encounterColor, #7dd3fc);
+        box-shadow: 0 0 15px var(--encounterColor, #7dd3fc);
+      }
+      .encounter-object:before {
+        left: 15px;
+      }
+      .encounter-object:after {
+        right: 17px;
+      }
+      .visual-ruin .encounter-object {
+        width: 82px;
+        height: 82px;
+        transform: translate(-50%, -50%) rotate(23deg);
+        clip-path: polygon(
+          50% 0,
+          88% 18%,
+          100% 58%,
+          67% 100%,
+          21% 87%,
+          0 42%,
+          18% 12%
+        );
+        border-radius: 18px;
+      }
+      .visual-signal .encounter-object {
+        width: 66px;
+        height: 108px;
+        transform: translate(-50%, -50%) rotate(4deg);
+        clip-path: polygon(
+          42% 0,
+          62% 0,
+          70% 35%,
+          100% 52%,
+          67% 61%,
+          59% 100%,
+          40% 100%,
+          33% 62%,
+          0 53%,
+          31% 35%
+        );
+      }
+      .visual-comet .encounter-object {
+        width: 92px;
+        height: 76px;
+        clip-path: polygon(14% 18%, 61% 0, 100% 32%, 84% 77%, 38% 100%, 0 68%);
+        border-radius: 44%;
+      }
+      .visual-echo .encounter-object {
+        width: 92px;
+        height: 92px;
+        transform: translate(-50%, -50%) rotate(45deg);
+        clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+        background: rgba(5, 12, 28, 0.76);
+      }
+      .encounter-ring {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 170px;
+        height: 76px;
+        border: 1px solid
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 56%, transparent);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) rotate(-13deg);
+        box-shadow: 0 0 24px
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 16%, transparent);
+        animation: encounterRing 7s linear infinite;
+      }
+      .encounter-ring.ring-two {
+        width: 224px;
+        height: 126px;
+        opacity: 0.42;
+        animation-duration: 11s;
+        animation-direction: reverse;
+      }
+      .encounter-scan {
+        position: absolute;
+        left: 8%;
+        right: 8%;
+        top: 14%;
+        height: 1px;
+        z-index: 3;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--encounterColor, #7dd3fc),
+          transparent
+        );
+        box-shadow: 0 0 15px var(--encounterColor, #7dd3fc);
+        animation: encounterScan 3.2s ease-in-out infinite;
+      }
+      .encounter-visual-label {
+        position: absolute;
+        left: 16px;
+        bottom: 13px;
+        z-index: 4;
+        color: rgba(238, 247, 255, 0.88);
+        font-size: 9px;
+        font-weight: 950;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+      }
+      .encounter-body {
+        padding: 18px;
+      }
+      .encounter-kicker {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 7px;
+        color: var(--encounterColor, #7dd3fc);
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .encounter-faction {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .encounter-faction:before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--encounterColor, #7dd3fc);
+        box-shadow: 0 0 14px var(--encounterColor, #7dd3fc);
+      }
+      .encounter-dialog h2 {
+        margin-bottom: 7px;
+        font-size: clamp(22px, 5vw, 30px);
+        color: #f8fbff;
+      }
+      .encounter-context {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+        margin: 12px 0;
+      }
+      .encounter-context .chip {
+        min-height: 50px;
+        border-color: color-mix(
+          in srgb,
+          var(--encounterColor, #7dd3fc) 22%,
+          transparent
+        );
+        background: color-mix(
+          in srgb,
+          var(--encounterColor, #7dd3fc) 7%,
+          rgba(255, 255, 255, 0.035)
+        );
+      }
+      .encounter-choices {
+        display: grid;
+        gap: 9px;
+      }
+      .encounter-choice {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 7px 12px;
+        width: 100%;
+        min-height: 74px;
+        padding: 12px 13px;
+        text-align: left;
+        border-color: rgba(190, 220, 255, 0.15);
+        background:
+          linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.075),
+            rgba(255, 255, 255, 0.025)
+          ),
+          rgba(6, 12, 27, 0.72);
+      }
+      .encounter-choice:not(:disabled):hover {
+        border-color: color-mix(
+          in srgb,
+          var(--encounterColor, #7dd3fc) 58%,
+          transparent
+        );
+        box-shadow: 0 0 24px
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 13%, transparent);
+      }
+      .encounter-choice strong,
+      .encounter-choice small,
+      .encounter-choice em {
+        display: block;
+      }
+      .encounter-choice strong {
+        color: #eef7ff;
+        font-size: 13px;
+      }
+      .encounter-choice small {
+        grid-column: 1 / -1;
+        color: rgba(203, 213, 225, 0.76);
+        font-size: 10px;
+        line-height: 1.42;
+      }
+      .encounter-choice em {
+        color: var(--encounterColor, #7dd3fc);
+        font-size: 9px;
+        font-style: normal;
+        font-weight: 950;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+      }
+      .encounter-choice:disabled {
+        opacity: 0.48;
+        filter: saturate(0.55);
+      }
+      .encounter-result {
+        display: none;
+        border: 1px solid
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 30%, transparent);
+        border-radius: 17px;
+        padding: 13px;
+        background: color-mix(
+          in srgb,
+          var(--encounterColor, #7dd3fc) 8%,
+          rgba(255, 255, 255, 0.035)
+        );
+      }
+      .encounter-result.show {
+        display: block;
+        animation: rise 0.3s ease both;
+      }
+      .encounter-result h3 {
+        margin: 0 0 6px;
+        color: #f8fbff;
+      }
+      .encounter-result-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+        margin-top: 10px;
+      }
+      .encounter-continue {
+        display: none;
+        width: 100%;
+        margin-top: 10px;
+        min-height: 46px;
+        border-color: color-mix(
+          in srgb,
+          var(--encounterColor, #7dd3fc) 52%,
+          transparent
+        );
+        background: linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--encounterColor, #7dd3fc) 24%, transparent),
+          rgba(255, 255, 255, 0.045)
+        );
+      }
+      .encounter-continue.show {
+        display: block;
+      }
+      .reputation-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+      }
+      .reputation-card {
+        border: 1px solid
+          color-mix(in srgb, var(--factionColor) 28%, transparent);
+        border-radius: 15px;
+        padding: 10px;
+        background: color-mix(
+          in srgb,
+          var(--factionColor) 7%,
+          rgba(255, 255, 255, 0.035)
+        );
+      }
+      .reputation-card b,
+      .reputation-card span {
+        display: block;
+      }
+      .reputation-card b {
+        color: color-mix(in srgb, var(--factionColor) 74%, white 26%);
+        font-size: 11px;
+      }
+      .reputation-card span {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 9px;
+        line-height: 1.35;
+      }
+      .reputation-meter {
+        height: 6px;
+        margin: 8px 0 5px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .reputation-meter div {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--factionColor), white);
+        box-shadow: 0 0 12px var(--factionColor);
+      }
+      .encounter-decision {
+        border-left: 2px solid var(--factionColor, #7dd3fc);
+      }
+      body.encounter-open .toast-wrap {
+        display: none !important;
+      }
+      @keyframes encounterNebula {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes encounterDrift {
+        0%,
+        100% {
+          transform: translate(-50%, -50%) rotate(-8deg) translateY(-3px);
+        }
+        50% {
+          transform: translate(-50%, -50%) rotate(-5deg) translateY(5px);
+        }
+      }
+      @keyframes encounterRing {
+        to {
+          transform: translate(-50%, -50%) rotate(347deg);
+        }
+      }
+      @keyframes encounterScan {
+        0%,
+        100% {
+          top: 14%;
+          opacity: 0.28;
+        }
+        50% {
+          top: 82%;
+          opacity: 0.86;
+        }
+      }
       .codex-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2995,6 +3459,35 @@
           height: 46vh;
           min-height: 300px;
         }
+        .encounter-overlay {
+          align-items: flex-end;
+          padding: 0;
+        }
+        .encounter-dialog {
+          width: 100vw;
+          max-height: 94dvh;
+          border-radius: 24px 24px 0 0;
+          border-bottom: 0;
+        }
+        .encounter-visual {
+          height: min(185px, 24vh);
+        }
+        .encounter-body {
+          padding: 15px 14px calc(15px + var(--safeBottom));
+        }
+        .encounter-context,
+        .reputation-grid {
+          grid-template-columns: 1fr;
+        }
+        .encounter-context {
+          gap: 5px;
+        }
+        .encounter-context .chip {
+          min-height: 0;
+        }
+        .encounter-choice {
+          min-height: 68px;
+        }
       }
     </style>
   </head>
@@ -3431,6 +3924,49 @@
         </div>
       </div>
     </div>
+    <div
+      class="overlay encounter-overlay"
+      id="encounterOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="encounterTitle"
+      aria-describedby="encounterSummary"
+    >
+      <div class="dialog encounter-dialog">
+        <div class="encounter-visual visual-signal" id="encounterVisual">
+          <div class="encounter-scan"></div>
+          <div class="encounter-ring"></div>
+          <div class="encounter-ring ring-two"></div>
+          <div class="encounter-object"></div>
+          <div class="encounter-visual-label" id="encounterVisualLabel">
+            Long-range contact
+          </div>
+        </div>
+        <div class="encounter-body">
+          <div class="encounter-kicker">
+            <span class="encounter-faction" id="encounterFaction"
+              >Unknown Signal</span
+            ><span id="encounterSequence">Exploration Encounter</span>
+          </div>
+          <h2 id="encounterTitle">Signal Detected</h2>
+          <p id="encounterSummary"></p>
+          <div class="encounter-context" id="encounterContext"></div>
+          <div class="encounter-choices" id="encounterChoices"></div>
+          <div class="encounter-result" id="encounterResult" aria-live="polite">
+            <h3 id="encounterResultTitle">Decision Recorded</h3>
+            <p id="encounterResultText"></p>
+            <div class="encounter-result-grid" id="encounterResultGrid"></div>
+          </div>
+          <button
+            class="encounter-continue"
+            id="encounterContinue"
+            type="button"
+          >
+            Return to Flight
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="control-edit-banner" id="controlEditBanner">
       <b>Move Controls</b
       ><span
@@ -3446,7 +3982,7 @@
         ctx = canvas.getContext("2d"),
         TAU = Math.PI * 2,
         SAVE_KEY = "orbital-drift-save-v12",
-        SAVE_VERSION = 13;
+        SAVE_VERSION = 14;
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -3557,6 +4093,20 @@
         missionSummary: $("missionSummary"),
         missionStats: $("missionStats"),
         missionContinue: $("missionContinue"),
+        encounterOverlay: $("encounterOverlay"),
+        encounterVisual: $("encounterVisual"),
+        encounterVisualLabel: $("encounterVisualLabel"),
+        encounterFaction: $("encounterFaction"),
+        encounterSequence: $("encounterSequence"),
+        encounterTitle: $("encounterTitle"),
+        encounterSummary: $("encounterSummary"),
+        encounterContext: $("encounterContext"),
+        encounterChoices: $("encounterChoices"),
+        encounterResult: $("encounterResult"),
+        encounterResultTitle: $("encounterResultTitle"),
+        encounterResultText: $("encounterResultText"),
+        encounterResultGrid: $("encounterResultGrid"),
+        encounterContinue: $("encounterContinue"),
         feedbackFlash: $("feedbackFlash"),
         objectivePill: $("objectivePill"),
         objectivePillTitle: $("objectivePillTitle"),
@@ -4548,6 +5098,493 @@
           need: "Approach carefully. Recovery damages hull slightly.",
         },
       ];
+      const encounterFactions = {
+        coalition: {
+          name: "Frontier Coalition",
+          short: "Coalition",
+          color: "#67e8f9",
+          desc: "Rescue crews and settlement coordinators holding the frontier together.",
+          perk: "Aegis Rescue Plating",
+          perkDesc: "Reduces hull damage from exploration encounters by 50%.",
+        },
+        wayfarers: {
+          name: "Wayfarer Guild",
+          short: "Wayfarers",
+          color: "#fde68a",
+          desc: "Independent navigators, salvagers, and cartographers who trade in safe routes.",
+          perk: "Wayfinder Charts",
+          perkDesc:
+            "Increases all exploration encounter resource rewards by 15%.",
+        },
+        echo: {
+          name: "Echo Collective",
+          short: "Collective",
+          color: "#c4b5fd",
+          desc: "A quiet research network studying memory, gravity, and signals that should not exist.",
+          perk: "Resonance Lens",
+          perkDesc:
+            "Increases Crystal and Data Core encounter rewards by another 25%.",
+        },
+      };
+      const encounterTemplates = [
+        {
+          key: "coalition_distress",
+          faction: "coalition",
+          visual: "signal",
+          title: "The Broken Lifeline",
+          summary:
+            "A colony tender is tumbling through a failing gravity lane. Its reactor is stable, but forty-seven passengers are trapped behind a collapsed docking collar.",
+          choices: [
+            {
+              label: "Lead a direct rescue",
+              tag: "Hull check",
+              desc: "Match the tender's spin and bring survivors across under thruster power.",
+              requirement: { type: "shipSystem", key: "handling", amount: 1 },
+              outcome: {
+                result:
+                  "Starling matches the tender's rotation. Every passenger crosses before the docking collar tears free.",
+                reward: { Alloy: 24, BioGel: 6 },
+                reputation: { coalition: 2 },
+                hullDelta: -6,
+              },
+            },
+            {
+              label: "Deploy a fleet shuttle",
+              tag: "Fleet solution",
+              desc: "Send an available support craft through the debris while you stabilize the lane.",
+              requirement: { type: "fleet", amount: 1 },
+              outcome: {
+                result:
+                  "Your support craft extracts the passengers in three precise runs. Coalition dispatch marks the operation exemplary.",
+                reward: { Titanium: 14, DataCores: 6 },
+                reputation: { coalition: 2, wayfarers: 1 },
+              },
+            },
+            {
+              label: "Recover the emergency beacon",
+              tag: "Low risk",
+              desc: "Transmit the tender's position and recover its beacon for the next rescue crew.",
+              outcome: {
+                result:
+                  "The beacon is relayed to Coalition space. The passengers must wait, but help now has an exact route.",
+                reward: { DataCores: 4, Alloy: 8 },
+                reputation: { coalition: 1 },
+              },
+            },
+          ],
+        },
+        {
+          key: "coalition_quarantine",
+          faction: "coalition",
+          visual: "ruin",
+          title: "Glass Fever",
+          summary:
+            "A sealed research habitat reports a crystalline infection spreading through its life-support membranes. The crew requests medicine, data, or silence.",
+          choices: [
+            {
+              label: "Transfer medical cultures",
+              tag: "Costs 4 Bio-Gel",
+              desc: "Use your reserves to stabilize the habitat before its atmosphere fails.",
+              requirement: { type: "resource", key: "BioGel", amount: 4 },
+              cost: { BioGel: 4 },
+              outcome: {
+                result:
+                  "The cultures bond with the damaged membranes. The outbreak stops, and the habitat transmits its full research archive.",
+                reward: { DataCores: 12, Crystal: 8 },
+                reputation: { coalition: 2, echo: 1 },
+              },
+            },
+            {
+              label: "Run a remote spectral scan",
+              tag: "Scanner Array I",
+              desc: "Map the infection without breaking quarantine.",
+              requirement: { type: "frigate", key: "scanner", amount: 1 },
+              outcome: {
+                result:
+                  "The ODF Pioneer isolates a harmless resonance pattern. Coalition scientists can now manufacture a treatment.",
+                reward: { DataCores: 14, Plasma: 5 },
+                reputation: { coalition: 1, echo: 2 },
+              },
+            },
+            {
+              label: "Honor the quarantine",
+              tag: "Withdraw",
+              desc: "Leave a relay buoy and keep the contamination isolated.",
+              outcome: {
+                result:
+                  "You leave a warning buoy in high orbit. The habitat remains sealed, its fate unresolved.",
+                reward: { Alloy: 5 },
+                reputation: { coalition: 0 },
+              },
+            },
+          ],
+        },
+        {
+          key: "coalition_refuge",
+          faction: "coalition",
+          visual: "signal",
+          title: "A City Without a Sun",
+          summary:
+            "A generation habitat has lost its navigation star. Thousands of residents are safe, but their maps end at the edge of this sector.",
+          choices: [
+            {
+              label: "Share a charted route",
+              tag: "Coalition trust",
+              desc: "Give the habitat a verified path to the nearest stable system.",
+              requirement: {
+                type: "reputation",
+                faction: "coalition",
+                amount: 1,
+              },
+              outcome: {
+                result:
+                  "The habitat accepts your navigation authority and begins a careful burn toward Coalition space.",
+                reward: { Helium3: 16, Alloy: 18 },
+                reputation: { coalition: 2, wayfarers: 1 },
+              },
+            },
+            {
+              label: "Donate reactor fuel",
+              tag: "Costs 8 Helium-3",
+              desc: "Give the habitat enough fuel to choose its own destination.",
+              requirement: { type: "resource", key: "Helium3", amount: 8 },
+              cost: { Helium3: 8 },
+              outcome: {
+                result:
+                  "The habitat's engines return to full power. Its council names Starling an honorary pathfinder.",
+                reward: { Titanium: 16, BioGel: 5 },
+                reputation: { coalition: 2 },
+              },
+            },
+            {
+              label: "Record their signal",
+              tag: "Archive",
+              desc: "Preserve the habitat's location for a future expedition.",
+              outcome: {
+                result:
+                  "The coordinates enter the Captain's Log. Coalition rescue crews will eventually find the habitat.",
+                reward: { DataCores: 5 },
+                reputation: { coalition: 1 },
+              },
+            },
+          ],
+        },
+        {
+          key: "wayfarer_derelict",
+          faction: "wayfarers",
+          visual: "derelict",
+          title: "The Ship That Kept Sailing",
+          summary:
+            "A century-old courier still follows its route with no crew aboard. Its navigation core repeats the same final delivery request.",
+          choices: [
+            {
+              label: "Complete the delivery",
+              tag: "Cargo Bay I",
+              desc: "Take the sealed package and honor the courier's final route.",
+              requirement: { type: "shipSystem", key: "cargo", amount: 1 },
+              outcome: {
+                result:
+                  "The package contains a lost Wayfarer charter. Returning it restores three erased routes to the Guild atlas.",
+                reward: { DataCores: 12, Helium3: 9 },
+                reputation: { wayfarers: 2 },
+              },
+            },
+            {
+              label: "Salvage the navigation core",
+              tag: "High value",
+              desc: "End the courier's route and recover its intact guidance lattice.",
+              outcome: {
+                result:
+                  "The courier goes dark. Its guidance lattice is valuable, though the Guild records your choice without comment.",
+                reward: { Titanium: 18, DataCores: 8 },
+                reputation: { wayfarers: -1, echo: 1 },
+                hullDelta: -10,
+              },
+            },
+            {
+              label: "Mark it as a memorial",
+              tag: "Respectful",
+              desc: "Leave the vessel intact and publish a safe exclusion route.",
+              outcome: {
+                result:
+                  "Wayfarer pilots begin leaving small signal lights beside the courier as they pass.",
+                reward: { Crystal: 6 },
+                reputation: { wayfarers: 1 },
+              },
+            },
+          ],
+        },
+        {
+          key: "wayfarer_comet",
+          faction: "wayfarers",
+          visual: "comet",
+          title: "The Lantern Comet",
+          summary:
+            "A comet burns with internal geometric light. Wayfarer prospectors are chasing it, but their ships cannot survive its gravity wake.",
+          choices: [
+            {
+              label: "Ride the gravity wake",
+              tag: "Acceleration I",
+              desc: "Use Starling's tuned drive to skim the comet and recover a luminous sample.",
+              requirement: { type: "shipSystem", key: "accel", amount: 1 },
+              outcome: {
+                result:
+                  "Starling crosses the wake at the exact moment it folds. The sample hums in sync with your flight recorder.",
+                reward: { Crystal: 15, Plasma: 10 },
+                reputation: { wayfarers: 2, echo: 1 },
+              },
+            },
+            {
+              label: "Map a safe intercept",
+              tag: "Scanner Array I",
+              desc: "Guide the prospectors through a slower but survivable approach.",
+              requirement: { type: "frigate", key: "scanner", amount: 1 },
+              outcome: {
+                result:
+                  "The prospectors reach the comet together and split the recovered material according to Guild custom.",
+                reward: { Crystal: 10, Helium3: 12, Alloy: 12 },
+                reputation: { wayfarers: 2 },
+              },
+            },
+            {
+              label: "Observe from a safe orbit",
+              tag: "Survey",
+              desc: "Record the comet's passage without risking your ship.",
+              outcome: {
+                result:
+                  "The comet disappears beyond sensor range, leaving a precise new gravity model in your archive.",
+                reward: { DataCores: 6 },
+                reputation: { echo: 1 },
+              },
+            },
+          ],
+        },
+        {
+          key: "wayfarer_cartographer",
+          faction: "wayfarers",
+          visual: "signal",
+          title: "The Cartographer's Wager",
+          summary:
+            "A Wayfarer navigator offers a dangerous shortcut in exchange for one of your Echo routes. Her coordinates cross a dark gravity seam.",
+          choices: [
+            {
+              label: "Trade an Echo route",
+              tag: "Requires harvested Echo",
+              desc: "Exchange route memory for the navigator's hidden sector chart.",
+              requirement: { type: "echoes", amount: 1 },
+              outcome: {
+                result:
+                  "The navigator overlays both routes. Together they reveal a stable corridor neither chart contained alone.",
+                reward: { DataCores: 14, Plasma: 8 },
+                reputation: { wayfarers: 2, echo: 1 },
+              },
+            },
+            {
+              label: "Buy the chart",
+              tag: "Costs 6 Crystal",
+              desc: "Keep your route private and pay the Guild's asking price.",
+              requirement: { type: "resource", key: "Crystal", amount: 6 },
+              cost: { Crystal: 6 },
+              outcome: {
+                result:
+                  "The chart is genuine. Its corrections make the next leg of your expedition markedly safer.",
+                reward: { Helium3: 18, DataCores: 8 },
+                reputation: { wayfarers: 1 },
+                fuelPct: 0.2,
+              },
+            },
+            {
+              label: "Decline the wager",
+              tag: "Keep your route",
+              desc: "Preserve your data and continue on the known lane.",
+              outcome: {
+                result:
+                  "The navigator salutes and vanishes into the seam. Your route remains exclusively yours.",
+                reward: {},
+                reputation: { wayfarers: 0 },
+              },
+            },
+          ],
+        },
+        {
+          key: "echo_vault",
+          faction: "echo",
+          visual: "ruin",
+          title: "The Unopened Room",
+          summary:
+            "A black geometric chamber hangs motionless between gravity wells. Its door displays a recording of Starling arriving—made decades ago.",
+          choices: [
+            {
+              label: "Answer with Data Cores",
+              tag: "Costs 5 Data Cores",
+              desc: "Feed the chamber enough structured memory to complete its impossible recording.",
+              requirement: { type: "resource", key: "DataCores", amount: 5 },
+              cost: { DataCores: 5 },
+              outcome: {
+                result:
+                  "The recording catches up to the present. The door opens onto a room full of crystallized flight paths.",
+                reward: { Crystal: 16, DarkMatter: 1 },
+                reputation: { echo: 2 },
+              },
+            },
+            {
+              label: "Scan the recording loop",
+              tag: "Scanner Array II",
+              desc: "Study the chamber without allowing its prediction to finish.",
+              requirement: { type: "frigate", key: "scanner", amount: 2 },
+              outcome: {
+                result:
+                  "The scan reveals that the chamber is not predicting Starling—it remembers a version of the ship from somewhere else.",
+                reward: { DataCores: 16, Plasma: 7 },
+                reputation: { echo: 2 },
+              },
+            },
+            {
+              label: "Break the loop and leave",
+              tag: "Cautious",
+              desc: "Transmit random noise until the recording collapses.",
+              outcome: {
+                result:
+                  "The image of Starling fractures into static. The chamber closes and drifts into darkness.",
+                reward: { Alloy: 7 },
+                reputation: { echo: -1, coalition: 1 },
+              },
+            },
+          ],
+        },
+        {
+          key: "silent_choir_1",
+          faction: "echo",
+          visual: "echo",
+          story: true,
+          chapter: "Silent Choir • I",
+          title: "A Voice in Your Wake",
+          summary:
+            "Your last three flight paths begin playing back at once. Beneath the engine noise, a layered voice asks Starling to remember a route you have never flown.",
+          choices: [
+            {
+              label: "Record the impossible route",
+              tag: "Story choice",
+              desc: "Let the Echo Collective isolate the voice and preserve its coordinates.",
+              outcome: {
+                result:
+                  "The route writes itself into your archive. Its final coordinate is inside a system that has no registered star.",
+                reward: { DataCores: 10, Crystal: 8 },
+                reputation: { echo: 2 },
+                storyStage: 1,
+                flag: "choir_listened",
+              },
+            },
+            {
+              label: "Share it with Coalition command",
+              tag: "Story choice",
+              desc: "Treat the signal as a navigation hazard and request containment.",
+              outcome: {
+                result:
+                  "Coalition command classifies the route, but the voice remains in Starling's private recorder.",
+                reward: { Alloy: 14, DataCores: 6 },
+                reputation: { coalition: 2, echo: 1 },
+                storyStage: 1,
+                flag: "choir_contained",
+              },
+            },
+          ],
+        },
+        {
+          key: "silent_choir_2",
+          faction: "echo",
+          visual: "ruin",
+          story: true,
+          chapter: "Silent Choir • II",
+          title: "The Starless Observatory",
+          summary:
+            "The impossible coordinate leads to an observatory orbiting empty space. Inside, thousands of dormant receivers are aimed at Starling.",
+          choices: [
+            {
+              label: "Wake the receiver array",
+              tag: "Costs 6 Plasma",
+              desc: "Power the observatory long enough to hear what it has been waiting for.",
+              requirement: { type: "resource", key: "Plasma", amount: 6 },
+              cost: { Plasma: 6 },
+              outcome: {
+                result:
+                  "Every receiver activates. The Silent Choir is not one voice—it is a network of lost expeditions calling home across different realities.",
+                reward: { DataCores: 18, Crystal: 12 },
+                reputation: { echo: 2 },
+                storyStage: 2,
+                flag: "choir_awakened",
+              },
+            },
+            {
+              label: "Send a fleet survey team",
+              tag: "Fleet solution",
+              desc: "Keep Starling outside while a support craft maps the observatory.",
+              requirement: { type: "fleet", amount: 1 },
+              outcome: {
+                result:
+                  "The survey team finds names etched into the receivers—including the name of your fleet craft, written long before it was built.",
+                reward: { Titanium: 18, DataCores: 12 },
+                reputation: { wayfarers: 1, echo: 2 },
+                storyStage: 2,
+                flag: "choir_surveyed",
+              },
+            },
+            {
+              label: "Seal the observatory",
+              tag: "Coalition protocol",
+              desc: "Prevent anyone else from activating an unknown cross-reality network.",
+              outcome: {
+                result:
+                  "The doors fuse shut. As you leave, one receiver turns by itself and follows Starling across the sky.",
+                reward: { Alloy: 16 },
+                reputation: { coalition: 2, echo: -1 },
+                storyStage: 2,
+                flag: "choir_sealed",
+              },
+            },
+          ],
+        },
+        {
+          key: "silent_choir_3",
+          faction: "echo",
+          visual: "echo",
+          story: true,
+          chapter: "Silent Choir • Finale",
+          title: "The Last Note Home",
+          summary:
+            "The Choir opens a temporary gravity corridor. It can carry one message to every lost expedition—or pull one impossible artifact back into your universe.",
+          choices: [
+            {
+              label: "Send the way home",
+              tag: "Final decision",
+              desc: "Broadcast your safest charted routes so the lost expeditions can navigate toward familiar space.",
+              outcome: {
+                result:
+                  "Across the corridor, hundreds of distant engines answer. The Choir becomes a beacon instead of a warning.",
+                reward: { DataCores: 24, Crystal: 20, DarkMatter: 2 },
+                reputation: { coalition: 2, wayfarers: 2, echo: 2 },
+                storyStage: 3,
+                flag: "choir_guided_home",
+                finale: "Choir Key",
+              },
+            },
+            {
+              label: "Recover the impossible artifact",
+              tag: "Final decision",
+              desc: "Use the corridor once to retrieve a device built by a version of the ODF Pioneer that never returned.",
+              outcome: {
+                result:
+                  "A cold prism crosses the corridor. It contains navigation memories from a thousand unrealized journeys.",
+                reward: { DataCores: 30, DarkMatter: 3, Plasma: 18 },
+                reputation: { echo: 3, coalition: -1 },
+                storyStage: 3,
+                flag: "choir_artifact_recovered",
+                finale: "Choir Key",
+              },
+            },
+          ],
+        },
+      ];
       const dailyTemplates = [
         {
           type: "capture",
@@ -4863,6 +5900,45 @@
         skin: "Frontier Fleet",
         stats: { built: 0, completed: 0, matched: 0 },
       });
+      const defaultEncounterState = () => ({
+        reputation: { coalition: 0, wayfarers: 0, echo: 0 },
+        decisions: [],
+        completed: new Set(),
+        unlockedPerks: new Set(),
+        flags: new Set(),
+        storyStage: 0,
+        storyComplete: false,
+      });
+      function hydrateEncounterState(raw = {}) {
+        const base = defaultEncounterState();
+        return {
+          reputation: {
+            ...base.reputation,
+            ...(raw.reputation || {}),
+          },
+          decisions: Array.isArray(raw.decisions)
+            ? raw.decisions.slice(0, 60)
+            : [],
+          completed: new Set(raw.completed || []),
+          unlockedPerks: new Set(raw.unlockedPerks || []),
+          flags: new Set(raw.flags || []),
+          storyStage: clamp(Number(raw.storyStage || 0), 0, 3),
+          storyComplete:
+            !!raw.storyComplete || Number(raw.storyStage || 0) >= 3,
+        };
+      }
+      function serializeEncounterState() {
+        const state = game.encounters || defaultEncounterState();
+        return {
+          reputation: { ...state.reputation },
+          decisions: (state.decisions || []).slice(0, 60),
+          completed: [...(state.completed || new Set())],
+          unlockedPerks: [...(state.unlockedPerks || new Set())],
+          flags: [...(state.flags || new Set())],
+          storyStage: Number(state.storyStage || 0),
+          storyComplete: !!state.storyComplete,
+        };
+      }
       const defaultShipSystems = () => ({
         thrust: 0,
         fuel: 0,
@@ -4953,6 +6029,8 @@
           productionClaimed: 0,
           mythicDiscoveries: 0,
           eventsCompleted: 0,
+          encountersResolved: 0,
+          factionPerksUnlocked: 0,
           dailyCompleted: 0,
           milestonesCompleted: 0,
           rareDiscoveries: 0,
@@ -4986,6 +6064,7 @@
         unlockedAchievements: new Set(),
         captainLog: defaultLog(),
         specialRewards: { cosmicSpirit: [], parallel: [] },
+        encounters: defaultEncounterState(),
         encounteredIceWorld: false,
         ownedShipSkins: new Set(["High Tech"]),
         ownedFrigateSkins: new Set(["Frigate Standard"]),
@@ -5098,6 +6177,22 @@
           () => game.captainLog.parallelVisits >= 1,
           "Reward: Parallel Chaos hull + 8 Dark Matter",
           { DarkMatter: 8, DataCores: 30, Plasma: 24 },
+        ],
+        [
+          "firstContact",
+          "First Contact",
+          "Resolve your first Exploration Encounter.",
+          () => (game.captainLog.encountersResolved || 0) >= 1,
+          "Reward: 8 Data Cores",
+          { DataCores: 8 },
+        ],
+        [
+          "silentChoir",
+          "The Silent Choir",
+          "Complete the three-part Silent Choir storyline.",
+          () => !!game.encounters?.storyComplete,
+          "Reward: Choir Key technology + 3 Dark Matter",
+          { DarkMatter: 3, Crystal: 18 },
         ],
         [
           "producer",
@@ -5243,6 +6338,7 @@
             save: "#bfdbfe",
             settings: "#c4b5fd",
             travel: "#fbcfe8",
+            encounter: "#c4b5fd",
             audio: "#67e8f9",
             system: "#93c5fd",
             warning: "#fca5a5",
@@ -6234,6 +7330,7 @@
         game.unlockedAchievements = new Set();
         game.captainLog = defaultLog();
         game.specialRewards = { cosmicSpirit: [], parallel: [] };
+        game.encounters = defaultEncounterState();
         game.collapsedBlackHoles = new Set();
         game.encounteredIceWorld = false;
         game.ownedShipSkins = new Set(["High Tech"]);
@@ -6658,6 +7755,7 @@
           dailyOps: game.dailyOps,
           milestonesClaimed: [...game.milestonesClaimed],
           captainLog: game.captainLog,
+          encounters: serializeEncounterState(),
           specialRewards: game.specialRewards || {
             cosmicSpirit: [],
             parallel: [],
@@ -6866,6 +7964,7 @@
             : [];
           game.sectorJumps = Number(d.sectorJumps || 0);
           game.captainLog = { ...defaultLog(), ...(d.captainLog || {}) };
+          game.encounters = hydrateEncounterState(d.encounters || {});
           game.specialRewards = {
             cosmicSpirit: [...((d.specialRewards || {}).cosmicSpirit || [])],
             parallel: [...((d.specialRewards || {}).parallel || [])],
@@ -6918,6 +8017,7 @@
           game.negotiationAnomaly = createAnomaly(currentSystemIndex);
           game.sectorEvent =
             d.sectorEvent || createSectorEvent(currentSystemIndex);
+          ensureSectorEventEncounter(game.sectorEvent);
           lastSaveMeta = d.meta || saveMeta(d);
           lastSaveMessage =
             "Loaded save from " +
@@ -9342,13 +10442,412 @@
           factory: entries.filter((e) => e.factory).length,
         };
       }
+      function encounterState() {
+        if (!game.encounters) game.encounters = defaultEncounterState();
+        if (!(game.encounters.completed instanceof Set))
+          game.encounters = hydrateEncounterState(game.encounters);
+        return game.encounters;
+      }
+      function encounterByKey(key) {
+        return encounterTemplates.find((entry) => entry.key === key) || null;
+      }
+      function selectEncounterKey(seed = 1, type = "probe") {
+        const state = encounterState(),
+          resolved = state.decisions.length;
+        if (state.storyStage === 0 && resolved >= 1) return "silent_choir_1";
+        if (state.storyStage === 1 && resolved >= 3) return "silent_choir_2";
+        if (state.storyStage === 2 && resolved >= 5) return "silent_choir_3";
+        const pools = {
+            distress: [
+              "coalition_distress",
+              "coalition_refuge",
+              "wayfarer_derelict",
+            ],
+            vault: ["echo_vault", "wayfarer_derelict"],
+            comet: ["wayfarer_comet", "wayfarer_cartographer"],
+            probe: ["wayfarer_cartographer", "echo_vault", "coalition_refuge"],
+            hazard: [
+              "coalition_quarantine",
+              "wayfarer_derelict",
+              "wayfarer_comet",
+            ],
+          },
+          recent = new Set(state.decisions.slice(0, 2).map((d) => d.key)),
+          pool =
+            pools[type] ||
+            encounterTemplates.filter((e) => !e.story).map((e) => e.key),
+          fresh = pool.filter((key) => !recent.has(key)),
+          choices = fresh.length ? fresh : pool;
+        return choices[Math.floor(rand(seed + resolved * 71) * choices.length)];
+      }
+      function ensureSectorEventEncounter(event = game.sectorEvent) {
+        if (!event) return null;
+        if (!encounterByKey(event.encounterKey))
+          event.encounterKey = selectEncounterKey(
+            (game.system?.seed || 1) + 5581,
+            event.type,
+          );
+        const template = encounterByKey(event.encounterKey);
+        if (template) {
+          event.name = template.title;
+          event.desc = template.summary;
+          event.need = "Approach the signal and choose how Starling responds.";
+        }
+        return template;
+      }
+      function encounterRequirementState(requirement) {
+        if (!requirement) return { met: true, label: "Available" };
+        const amount = Number(requirement.amount || 0);
+        if (requirement.type === "resource") {
+          const have = Math.floor(game.resources[requirement.key] || 0);
+          return {
+            met: have >= amount,
+            label: label(requirement.key) + ": " + have + " / " + amount,
+          };
+        }
+        if (requirement.type === "shipSystem") {
+          const have = Number(game.shipSystems?.[requirement.key] || 0);
+          return {
+            met: have >= amount,
+            label:
+              label(requirement.key) + " subsystem: " + have + " / " + amount,
+          };
+        }
+        if (requirement.type === "frigate") {
+          const have = Number(game.frigate?.[requirement.key + "Level"] || 0);
+          return {
+            met: !!game.frigate?.built && have >= amount,
+            label:
+              (frigateSystemDefs()[requirement.key]?.name ||
+                label(requirement.key)) +
+              ": " +
+              have +
+              " / " +
+              amount,
+          };
+        }
+        if (requirement.type === "fleet") {
+          const have = (game.fleet?.ships || []).filter(
+            (ship) => ship.status !== "mission",
+          ).length;
+          return {
+            met: have >= amount,
+            label: "Available fleet ships: " + have + " / " + amount,
+          };
+        }
+        if (requirement.type === "echoes") {
+          const have = Number(game.echoStats?.harvested || 0);
+          return {
+            met: have >= amount,
+            label: "Harvested Echoes: " + have + " / " + amount,
+          };
+        }
+        if (requirement.type === "reputation") {
+          const faction = encounterFactions[requirement.faction],
+            have = Number(
+              encounterState().reputation[requirement.faction] || 0,
+            );
+          return {
+            met: have >= amount,
+            label:
+              (faction?.short || "Faction") +
+              " trust: " +
+              have +
+              " / " +
+              amount,
+          };
+        }
+        return { met: true, label: "Available" };
+      }
+      function encounterRewardPreview(choice) {
+        const reward = fmt(choice?.outcome?.reward || {}),
+          rep = Object.entries(choice?.outcome?.reputation || {})
+            .filter(([, value]) => value)
+            .map(
+              ([key, value]) =>
+                (encounterFactions[key]?.short || label(key)) +
+                " " +
+                (value > 0 ? "+" : "") +
+                value,
+            )
+            .join(" • ");
+        return [reward ? "Possible: " + reward : "No resource reward", rep]
+          .filter(Boolean)
+          .join(" • ");
+      }
+      function reputationRank(value = 0) {
+        if (value >= 8) return "Allied";
+        if (value >= 3) return "Trusted";
+        if (value >= 1) return "Recognized";
+        if (value <= -3) return "Hostile";
+        if (value < 0) return "Wary";
+        return "Unknown";
+      }
+      function checkFactionPerks() {
+        const state = encounterState(),
+          unlocked = [],
+          grants = {
+            coalition: { Titanium: 12, BioGel: 6 },
+            wayfarers: { Helium3: 18, DataCores: 8 },
+            echo: { Crystal: 16, DataCores: 12 },
+          };
+        for (const [key, faction] of Object.entries(encounterFactions)) {
+          if (
+            Number(state.reputation[key] || 0) < 3 ||
+            state.unlockedPerks.has(key)
+          )
+            continue;
+          state.unlockedPerks.add(key);
+          game.captainLog.factionPerksUnlocked =
+            (game.captainLog.factionPerksUnlocked || 0) + 1;
+          Object.entries(grants[key] || {}).forEach(
+            ([resource, amount]) =>
+              (game.resources[resource] =
+                (game.resources[resource] || 0) + amount),
+          );
+          unlocked.push(faction.perk + " • " + fmt(grants[key]));
+          addActivity(
+            "encounter",
+            faction.perk + " unlocked",
+            faction.perkDesc,
+          );
+        }
+        return unlocked;
+      }
+      function scaledEncounterReward(reward = {}) {
+        const state = encounterState(),
+          routeBoost = state.unlockedPerks.has("wayfarers") ? 1.15 : 1,
+          echoBoost = state.unlockedPerks.has("echo") ? 1.25 : 1,
+          choirBoost = state.flags.has("choir_key") ? 1.1 : 1,
+          sectorBoost = game.system?.modifier?.reward || 1,
+          out = {};
+        for (const [key, value] of Object.entries(reward || {})) {
+          const specialist =
+            key === "Crystal" || key === "DataCores" ? echoBoost : 1;
+          out[key] = Math.max(
+            0,
+            Math.round(
+              Number(value || 0) *
+                routeBoost *
+                specialist *
+                choirBoost *
+                sectorBoost,
+            ),
+          );
+        }
+        return out;
+      }
+      function openExplorationEncounter() {
+        const n = nearestSectorEvent();
+        if (!n || n.d > 115) return toast("Move closer to the signal.");
+        const event = n.event,
+          template = ensureSectorEventEncounter(event);
+        if (!template) return toast("The signal could not be decoded.");
+        event.opened = true;
+        closeMenu();
+        paused = true;
+        modalFreeze = true;
+        keys.clear();
+        document.body.classList.add("encounter-open");
+        const faction = encounterFactions[template.faction];
+        ui.encounterOverlay.style.setProperty(
+          "--encounterColor",
+          faction?.color || "#7dd3fc",
+        );
+        ui.encounterVisual.className =
+          "encounter-visual visual-" + (template.visual || "signal");
+        ui.encounterVisualLabel.textContent =
+          (faction?.short || "Unknown") + " contact • " + game.system.name;
+        ui.encounterFaction.textContent = faction?.name || "Unknown Signal";
+        ui.encounterSequence.textContent =
+          template.chapter || "Exploration Encounter";
+        ui.encounterTitle.textContent = template.title;
+        ui.encounterSummary.textContent = template.summary;
+        const rep = Number(encounterState().reputation[template.faction] || 0);
+        ui.encounterContext.innerHTML =
+          '<div class="chip"><b>Sector</b><br>' +
+          esc(game.system.name) +
+          '</div><div class="chip"><b>Standing</b><br>' +
+          esc(reputationRank(rep) + " • " + rep) +
+          '</div><div class="chip"><b>Technology</b><br>' +
+          esc(
+            encounterState().unlockedPerks.has(template.faction)
+              ? faction.perk + " active"
+              : "Trust 3 unlocks " + faction.perk,
+          ) +
+          "</div>";
+        ui.encounterChoices.innerHTML = template.choices
+          .map((choice, index) => {
+            const requirement = encounterRequirementState(choice.requirement),
+              reason = requirement.met
+                ? encounterRewardPreview(choice)
+                : "Locked • " + requirement.label;
+            return (
+              '<button class="encounter-choice" type="button" data-encounter-choice="' +
+              index +
+              '" ' +
+              (requirement.met ? "" : "disabled") +
+              "><strong>" +
+              esc(choice.label) +
+              "</strong><em>" +
+              esc(choice.tag || "Decision") +
+              "</em><small>" +
+              esc(choice.desc + " " + reason) +
+              "</small></button>"
+            );
+          })
+          .join("");
+        ui.encounterResult.classList.remove("show");
+        ui.encounterContinue.classList.remove("show");
+        ui.encounterChoices.style.display = "grid";
+        ui.encounterOverlay.classList.add("show");
+        playSound("event");
+        requestAnimationFrame(() =>
+          ui.encounterChoices.querySelector("button:not(:disabled)")?.focus(),
+        );
+      }
+      function resolveExplorationEncounter(choiceIndex = 0) {
+        const event = game.sectorEvent,
+          template = ensureSectorEventEncounter(event),
+          choice = template?.choices?.[Number(choiceIndex)];
+        if (!event || event.complete || !template || !choice)
+          return toast("That encounter decision is no longer available.");
+        const requirement = encounterRequirementState(choice.requirement);
+        if (!requirement.met) return errorToast(requirement.label);
+        for (const [key, amount] of Object.entries(choice.cost || {}))
+          game.resources[key] = Math.max(
+            0,
+            (game.resources[key] || 0) - Number(amount || 0),
+          );
+        const state = encounterState(),
+          outcome = choice.outcome || {},
+          reward = scaledEncounterReward(outcome.reward || {});
+        Object.entries(reward).forEach(
+          ([key, amount]) =>
+            (game.resources[key] = (game.resources[key] || 0) + amount),
+        );
+        let hullChange = Number(outcome.hullDelta || 0);
+        if (hullChange < 0 && state.unlockedPerks.has("coalition"))
+          hullChange = Math.ceil(hullChange * 0.5);
+        if (hullChange && game.ship)
+          game.ship.hull = clamp(
+            (game.ship.hull || HULL_MAX) + hullChange,
+            1,
+            HULL_MAX,
+          );
+        if (outcome.fuelPct && game.ship)
+          game.ship.fuel = Math.min(
+            game.ship.maxFuel,
+            game.ship.fuel + game.ship.maxFuel * Number(outcome.fuelPct),
+          );
+        const repChanges = {};
+        for (const [key, amount] of Object.entries(outcome.reputation || {})) {
+          const before = Number(state.reputation[key] || 0),
+            after = clamp(before + Number(amount || 0), -5, 10);
+          state.reputation[key] = after;
+          repChanges[key] = after - before;
+        }
+        if (outcome.flag) state.flags.add(outcome.flag);
+        if (Number(outcome.storyStage || 0) > state.storyStage)
+          state.storyStage = Number(outcome.storyStage);
+        if (outcome.finale || state.storyStage >= 3) {
+          state.storyComplete = true;
+          state.flags.add("choir_key");
+        }
+        state.completed.add(template.key);
+        const decision = {
+          id: event.id + "-" + Date.now(),
+          key: template.key,
+          title: template.title,
+          faction: template.faction,
+          choice: choice.label,
+          result: outcome.result || "Decision recorded.",
+          reward,
+          reputation: repChanges,
+          sector: game.system.name,
+          time: Date.now(),
+          story: !!template.story,
+        };
+        state.decisions.unshift(decision);
+        state.decisions = state.decisions.slice(0, 60);
+        event.complete = true;
+        event.opened = true;
+        game.captainLog.eventsCompleted =
+          (game.captainLog.eventsCompleted || 0) + 1;
+        game.captainLog.encountersResolved =
+          (game.captainLog.encountersResolved || 0) + 1;
+        trackDaily("event", 1);
+        const perks = checkFactionPerks(),
+          repText = Object.entries(repChanges)
+            .filter(([, amount]) => amount)
+            .map(
+              ([key, amount]) =>
+                (encounterFactions[key]?.short || label(key)) +
+                " " +
+                (amount > 0 ? "+" : "") +
+                amount,
+            )
+            .join(" • ");
+        addActivity(
+          "encounter",
+          template.title + " resolved",
+          choice.label +
+            (repText ? " • " + repText : "") +
+            (fmt(reward) ? " • " + fmt(reward) : ""),
+        );
+        ui.encounterChoices.style.display = "none";
+        ui.encounterResultTitle.textContent = outcome.finale
+          ? outcome.finale + " Unlocked"
+          : "Decision Recorded";
+        ui.encounterResultText.textContent = outcome.result;
+        const rows = [
+          ["Resources", fmt(reward) || "No resource change"],
+          ["Reputation", repText || "No standing change"],
+          [
+            "Ship",
+            hullChange
+              ? "Hull " + hullChange
+              : outcome.fuelPct
+                ? "Fuel recovered"
+                : "No damage",
+          ],
+          ["Captain's Log", "Encounter archived"],
+          ...perks.map((perk) => ["Technology Unlocked", perk]),
+        ];
+        ui.encounterResultGrid.innerHTML = rows
+          .map(
+            ([key, value]) =>
+              '<div class="chip"><b>' +
+              esc(key) +
+              "</b><br>" +
+              esc(value) +
+              "</div>",
+          )
+          .join("");
+        ui.encounterResult.classList.add("show");
+        ui.encounterContinue.classList.add("show");
+        feedbackPulse("upgrade");
+        checkMilestones();
+        checkAchievements();
+        saveGame(false);
+        renderMenu();
+        ui.encounterContinue.focus();
+      }
+      function closeExplorationEncounter() {
+        if (!game.sectorEvent?.complete)
+          return toast("Choose a response before leaving the encounter.");
+        ui.encounterOverlay.classList.remove("show");
+        document.body.classList.remove("encounter-open");
+        modalFreeze = false;
+        if (canResumePlay()) paused = false;
+      }
       function createSectorEvent(i = currentSystemIndex) {
         if (i === 0) return null;
         const seed = (systems[i]?.seed || 1) + 5500,
           type = rareEventTypes[Math.floor(rand(seed) * rareEventTypes.length)],
           ang = between(seed + 11, 0, TAU),
           rad = between(seed + 12, 520, 1250);
-        return {
+        const event = {
           id: i + "-" + type.key,
           type: type.key,
           name: type.name,
@@ -9360,6 +10859,8 @@
           complete: false,
           opened: false,
         };
+        ensureSectorEventEncounter(event);
+        return event;
       }
       function nearestSectorEvent() {
         const e = game.sectorEvent;
@@ -9370,32 +10871,7 @@
         };
       }
       function completeSectorEvent() {
-        const n = nearestSectorEvent();
-        if (!n || n.d > 115) return toast("Move closer to the sector event.");
-        const e = n.event;
-        if (e.type === "vault" && (game.resources.DataCores || 0) < 4)
-          return toast("Ancient Vault requires 4 Data Cores to open.");
-        if (e.type === "vault") game.resources.DataCores -= 4;
-        if (e.type === "hazard")
-          game.ship.hull = Math.max(15, (game.ship.hull || HULL_MAX) - 10);
-        e.complete = true;
-        e.opened = true;
-        Object.entries(e.reward || {}).forEach(
-          ([k, v]) => (game.resources[k] = (game.resources[k] || 0) + v),
-        );
-        game.captainLog.eventsCompleted++;
-        trackDaily("event", 1);
-        playSound("event");
-        feedbackPulse("upgrade");
-        toast("Event complete: " + e.name + ". Reward: " + fmt(e.reward) + ".");
-        addActivity(
-          "system",
-          "Sector event complete",
-          e.name + " • " + fmt(e.reward),
-        );
-        checkMilestones();
-        saveGame(false);
-        renderMenu();
+        openExplorationEncounter();
       }
       function rerollContracts() {
         generateContracts(Date.now() % 100000);
@@ -10108,7 +11584,7 @@
           };
         if (ev && ev.d < 115)
           return {
-            title: "Complete Sector Event",
+            title: "Investigate Signal",
             sub: ev.event.name,
             menu: "system",
           };
@@ -12180,8 +13656,8 @@
                 btn("New Contracts", "rerollContracts"),
             ) +
             card(
-              "Rare Sector Event",
-              "Each non-tutorial sector can contain a signal, vault, comet, probe, or hazard cache.",
+              "Exploration Encounter",
+              "Each non-tutorial sector contains a choice-driven contact. Ship systems, fleet support, resources, reputation, and earlier decisions unlock different responses.",
               '<div class="list">' + rareEventHtml() + "</div>",
             ) +
             card(
@@ -12192,6 +13668,8 @@
             atlasHtml();
         } else if (tab === "records") {
           html +=
+            reputationHtml() +
+            encounterStoryHtml() +
             collectionHtml() +
             questHtml() +
             achievementsHtml() +
@@ -12557,6 +14035,105 @@
             "</div></div>",
         );
       }
+      function reputationHtml() {
+        const state = encounterState();
+        return card(
+          "Frontier Reputation",
+          "Your decisions shape how each faction responds. Reach Trust 3 with a faction to unlock its permanent exploration technology.",
+          '<div class="reputation-grid">' +
+            Object.entries(encounterFactions)
+              .map(([key, faction]) => {
+                const value = Number(state.reputation[key] || 0),
+                  width = clamp(((value + 5) / 15) * 100, 0, 100),
+                  unlocked = state.unlockedPerks.has(key);
+                return (
+                  '<div class="reputation-card" style="--factionColor:' +
+                  esc(faction.color) +
+                  '"><b>' +
+                  esc(faction.name) +
+                  '</b><div class="reputation-meter"><div style="width:' +
+                  width +
+                  '%"></div></div><span>' +
+                  esc(reputationRank(value) + " • " + value + " / 10") +
+                  "</span><span>" +
+                  esc(
+                    unlocked
+                      ? faction.perk + " active"
+                      : "Trust 3: " + faction.perk,
+                  ) +
+                  "</span></div>"
+                );
+              })
+              .join("") +
+            "</div>",
+        );
+      }
+      function encounterStoryHtml() {
+        const state = encounterState(),
+          stage = Number(state.storyStage || 0),
+          chapters = [
+            "Undetected",
+            "A Voice in Your Wake resolved",
+            "The Starless Observatory resolved",
+            "The Last Note Home resolved",
+          ];
+        return card(
+          "The Silent Choir",
+          state.storyComplete
+            ? "Story complete. The Choir Key is active, increasing all future encounter resource rewards by 10%. The lost expeditions have heard your final decision."
+            : "A three-part storyline emerges through exploration encounters. New chapters surface as you resolve other signals.",
+          '<div class="grid"><div class="chip"><b>Story Progress</b><br>' +
+            stage +
+            ' / 3</div><div class="chip"><b>Current Record</b><br>' +
+            esc(chapters[stage] || chapters[0]) +
+            '</div><div class="chip"><b>Final Technology</b><br>' +
+            (state.storyComplete ? "Choir Key unlocked" : "Classified") +
+            "</div></div>",
+        );
+      }
+      function encounterDecisionHtml(limit = 10) {
+        const decisions = encounterState().decisions.slice(0, limit);
+        if (!decisions.length)
+          return '<div class="log"><b>No Encounter Decisions Yet</b><span>Build the ODF Pioneer, travel beyond Sol, and investigate a nearby signal.</span></div>';
+        return (
+          '<div class="list encounter-history">' +
+          decisions
+            .map((decision) => {
+              const faction = encounterFactions[decision.faction],
+                rep = Object.entries(decision.reputation || {})
+                  .filter(([, value]) => value)
+                  .map(
+                    ([key, value]) =>
+                      (encounterFactions[key]?.short || label(key)) +
+                      " " +
+                      (value > 0 ? "+" : "") +
+                      value,
+                  )
+                  .join(" • ");
+              return (
+                '<div class="log encounter-decision" style="--factionColor:' +
+                esc(faction?.color || "#7dd3fc") +
+                '"><b>' +
+                esc(decision.title) +
+                "</b><span>" +
+                esc(decision.choice) +
+                " • " +
+                esc(faction?.name || "Unknown Contact") +
+                "</span><span>" +
+                esc(decision.result) +
+                "</span><span>" +
+                esc(
+                  [decision.sector, rep, fmt(decision.reward)]
+                    .filter(Boolean)
+                    .join(" • "),
+                ) +
+                "</span></div>"
+              );
+            })
+            .join("") +
+          "</div>"
+        );
+      }
       function blackHoleHtml() {
         const n = nearestBlackHole(),
           bh = game.system?.blackHole;
@@ -12582,9 +14159,11 @@
       }
       function rareEventHtml() {
         const n = nearestSectorEvent(),
-          e = game.sectorEvent;
+          e = game.sectorEvent,
+          encounter = ensureSectorEventEncounter(e),
+          faction = encounterFactions[encounter?.faction];
         if (!e)
-          return '<div class="log"><b>No Sector Event</b><span>Rare events begin appearing beyond Sol.</span></div>';
+          return '<div class="log"><b>No Exploration Encounter</b><span>Choice-driven encounters begin appearing beyond Sol.</span></div>';
         return (
           '<div class="quest ' +
           (e.complete ? "done" : "") +
@@ -12592,16 +14171,19 @@
           esc(e.complete ? "✓ " : "") +
           esc(e.name) +
           "</b><span>" +
+          esc(faction?.name || "Unknown Contact") +
+          " • " +
+          esc(encounter?.chapter || "Exploration Encounter") +
+          "</span><span>" +
           esc(e.desc) +
           "</span><span>" +
           esc(e.need) +
           " Distance: " +
           (n ? Math.round(n.d) : "unknown") +
-          "u</span><span>Reward: " +
-          esc(fmt(e.reward)) +
+          "u</span><span>Outcome: Your choice affects resources, reputation, technology, and the Captain's Log." +
           '</span><div class="actions">' +
           btnWhy(
-            e.complete ? "Completed" : "Complete Event",
+            e.complete ? "Decision Recorded" : "Open Encounter",
             "completeSectorEvent",
             null,
             !!(n && n.d <= 115 && !e.complete),
@@ -12658,6 +14240,10 @@
             (l.blackHolesEntered || 0) +
             "<br>Events: " +
             (l.eventsCompleted || 0) +
+            " • Encounters: " +
+            (l.encountersResolved || 0) +
+            " • Faction technologies: " +
+            (l.factionPerksUnlocked || 0) +
             " • Daily Ops: " +
             (l.dailyCompleted || 0) +
             " • Planet upgrades: " +
@@ -12669,7 +14255,14 @@
         ui.menuContent.innerHTML =
           card(
             "Captain Log",
-            "A shipboard record of captures, upgrades, jumps, saves, Echoes, and major fleet events.",
+            "A shipboard record of exploration decisions, faction standing, captures, upgrades, jumps, Echoes, and major fleet events.",
+          ) +
+          reputationHtml() +
+          encounterStoryHtml() +
+          card(
+            "Encounter Decision Archive",
+            "Every consequential contact is preserved with your response, outcome, reward, and reputation change.",
+            encounterDecisionHtml(12),
           ) +
           (items.length
             ? '<div class="list activity-log">' +
@@ -12824,6 +14417,14 @@
             "The ODF Pioneer is your mobile base. Build it at Earth Factory, then upgrade its reactor, hangar, scanner, capacity, and Fleet Command systems. Once built, it can push endlessly into newly generated sectors.",
           ],
           [
+            "Exploration Encounters",
+            "Every sector beyond Sol contains a contact with multiple responses. Approach its signal, then choose based on your ship systems, fleet, resources, faction standing, and earlier decisions. Outcomes are permanent and recorded in the Captain's Log.",
+          ],
+          [
+            "Faction Reputation",
+            "Rescue and research decisions build standing with the Frontier Coalition, Wayfarer Guild, and Echo Collective. Trust 3 unlocks a permanent faction technology. The Silent Choir storyline unfolds across three encounters.",
+          ],
+          [
             "Rarities",
             "Worlds can be Common, Unusual, Rare, Exotic, or Mythic. Higher rarity worlds usually have better bonuses and more unusual visuals.",
           ],
@@ -12901,6 +14502,14 @@
               String(jumpSystem).includes("currentSystemIndex+1"),
           },
           {
+            group: "Gameplay",
+            label: "Exploration encounters and factions available",
+            pass:
+              encounterTemplates.length >= 10 &&
+              Object.keys(encounterFactions).length === 3 &&
+              typeof resolveExplorationEncounter === "function",
+          },
+          {
             group: "Save",
             label: "Save metadata exists",
             pass: typeof saveMeta === "function",
@@ -12974,6 +14583,10 @@
           [
             "Frigate",
             "Your orbital base and progression hub. It unlocks sector travel, upgrades, and deeper customization.",
+          ],
+          [
+            "Exploration Encounters",
+            "Investigate the marked signal in each non-tutorial sector. Choices can require upgrades, fleet support, resources, Echoes, or faction trust and may affect hull, rewards, reputation, and story progression.",
           ],
           [
             "Factory Worlds",
@@ -13476,7 +15089,7 @@
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
         if (ev && ev.d < 115)
           return {
-            label: "Complete Event",
+            label: "Investigate Signal",
             run: completeSectorEvent,
             show: true,
           };
@@ -13646,6 +15259,7 @@
           !ui.discoveryOverlay.classList.contains("show") &&
           !ui.choiceOverlay.classList.contains("show") &&
           !ui.confirmOverlay.classList.contains("show") &&
+          !ui.encounterOverlay.classList.contains("show") &&
           !ui.missionOverlay.classList.contains("show") &&
           !ui.upgradeOverlay.classList.contains("show")
         );
@@ -16928,9 +18542,11 @@
       function drawSectorEvent() {
         const e = game.sectorEvent;
         if (!e || e.complete) return;
+        const encounter = ensureSectorEventEncounter(e),
+          faction = encounterFactions[encounter?.faction];
         const p = screen(e.x, e.y),
           pulse = 18 + Math.sin(t * 0.08) * 4,
-          color = game.system?.modifier?.color || "#fde68a";
+          color = faction?.color || game.system?.modifier?.color || "#fde68a";
         ctx.save();
         ctx.globalCompositeOperation = "screen";
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 96);
@@ -16952,6 +18568,9 @@
         ctx.font = "900 11px Inter, system-ui";
         ctx.textAlign = "center";
         ctx.fillText(e.name, p.x, p.y - 28);
+        ctx.fillStyle = rgba(color, 0.9);
+        ctx.font = "800 8px Inter, system-ui";
+        ctx.fillText("EXPLORATION ENCOUNTER", p.x, p.y - 17);
         ctx.restore();
       }
       function drawAnomaly() {
@@ -18536,7 +20155,7 @@
 
         ok(
           "Save schema is current",
-          SAVE_VERSION === 13 && SAVE_KEY === "orbital-drift-save-v12",
+          SAVE_VERSION === 14 && SAVE_KEY === "orbital-drift-save-v12",
         );
         const serialized = saveState();
         ok(
@@ -18560,6 +20179,12 @@
           !!serialized.dailyOps &&
             Array.isArray(serialized.milestonesClaimed) &&
             !!serialized.captainLog,
+        );
+        ok(
+          "Save state contains exploration encounters",
+          !!serialized.encounters &&
+            Array.isArray(serialized.encounters.decisions) &&
+            Array.isArray(serialized.encounters.unlockedPerks),
         );
         ok(
           "Save metadata is available",
@@ -18692,6 +20317,22 @@
             "checkMilestones",
             "checkAchievements",
           ]),
+        );
+        ok(
+          "Exploration encounter and reputation systems exist",
+          encounterTemplates.length >= 10 &&
+            Object.keys(encounterFactions).length === 3 &&
+            hasFunctions([
+              "selectEncounterKey",
+              "openExplorationEncounter",
+              "resolveExplorationEncounter",
+              "checkFactionPerks",
+              "reputationHtml",
+            ]),
+        );
+        ok(
+          "Silent Choir storyline has three chapters",
+          encounterTemplates.filter((entry) => entry.story).length === 3,
         );
         ok(
           "Codex and activity systems exist",
@@ -19373,6 +21014,9 @@
         rerollContracts,
         harvestEcho,
         completeSectorEvent,
+        openExplorationEncounter,
+        resolveExplorationEncounter,
+        closeExplorationEncounter,
         claimDaily,
         saveGame,
         loadGame,
@@ -19416,6 +21060,12 @@
       addEventListener("keydown", (e) => {
         const k = e.key.toLowerCase();
         if (k === "escape") {
+          if (ui.encounterOverlay.classList.contains("show")) {
+            e.preventDefault();
+            if (game.sectorEvent?.complete) closeExplorationEncounter();
+            else toast("Choose a response before leaving the encounter.");
+            return;
+          }
           paused ? closePause() : openPause();
           return;
         }
@@ -19705,6 +21355,14 @@
         modalFreeze = false;
         if (canResumePlay()) paused = false;
       };
+      ui.encounterChoices.addEventListener("click", (e) => {
+        const button = e.target.closest("button[data-encounter-choice]");
+        if (!button || button.disabled) return;
+        resumeAudio();
+        playSound("click");
+        resolveExplorationEncounter(button.dataset.encounterChoice);
+      });
+      ui.encounterContinue.onclick = closeExplorationEncounter;
       ui.objectivePill.onclick = openObjectiveAction;
       ui.objectivePill.onkeydown = (e) => {
         if (e.key === "Enter" || e.key === " ") {

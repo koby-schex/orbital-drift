@@ -6,9 +6,14 @@ const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
 const markup = html.slice(0, html.indexOf("<script>"));
 
 assert.equal(scripts.length, 1, "Expected one game script");
-assert.doesNotThrow(() => new Function(scripts[0][1]), "Game script must parse");
+assert.doesNotThrow(
+  () => new Function(scripts[0][1]),
+  "Game script must parse",
+);
 
-const ids = [...markup.matchAll(/\bid=["']([^"']+)["']/g)].map((match) => match[1]);
+const ids = [...markup.matchAll(/\bid=["']([^"']+)["']/g)].map(
+  (match) => match[1],
+);
 assert.equal(ids.length, new Set(ids).size, "HTML ids must be unique");
 
 const staticButtons = [...markup.matchAll(/<button\b([^>]*)>/gi)];
@@ -26,15 +31,30 @@ for (const required of [
   "function jumpRandomSystem(",
   "function placeShipAtFrigate(",
   "function markIceWorldEncountered(",
+  "function openExplorationEncounter(",
+  "function resolveExplorationEncounter(",
+  "function reputationHtml(",
   "function runTests(",
-  'SAVE_VERSION = 13',
-  'height: 100dvh',
-  'prefers-reduced-motion',
+  "SAVE_VERSION = 14",
+  'key: "silent_choir_3"',
+  "height: 100dvh",
+  "prefers-reduced-motion",
 ]) {
-  assert.ok(html.includes(required), `Missing required implementation: ${required}`);
+  assert.ok(
+    html.includes(required),
+    `Missing required implementation: ${required}`,
+  );
 }
 
-assert.ok(!html.includes("ORBITAL DRIFT GAMEPLAY PATCH"), "Legacy monkey patch must stay removed");
-assert.ok(!html.includes("window.ODGameplayPatch"), "Legacy runtime patch global must stay removed");
+assert.ok(
+  !html.includes("ORBITAL DRIFT GAMEPLAY PATCH"),
+  "Legacy monkey patch must stay removed",
+);
+assert.ok(
+  !html.includes("window.ODGameplayPatch"),
+  "Legacy runtime patch global must stay removed",
+);
 
-console.log(`Orbital Drift static smoke tests passed (${ids.length} unique ids).`);
+console.log(
+  `Orbital Drift static smoke tests passed (${ids.length} unique ids).`,
+);
