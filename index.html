@@ -386,6 +386,54 @@
         backdrop-filter: blur(18px);
         box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
       }
+      .menu-nav {
+        position: sticky;
+        top: 45px;
+        z-index: 3;
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+        margin: -4px -4px 12px;
+        padding: 5px 4px 10px;
+        scrollbar-width: none;
+        background: linear-gradient(
+          180deg,
+          rgba(8, 13, 30, 0.97),
+          rgba(6, 10, 23, 0.82),
+          rgba(6, 10, 23, 0)
+        );
+      }
+      .menu-nav::-webkit-scrollbar {
+        display: none;
+      }
+      .menu-nav button {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 39px;
+        padding: 8px 11px;
+        border-radius: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+        scroll-snap-align: center;
+      }
+      .menu-nav button span {
+        color: #dbeafe;
+        font-size: 14px;
+      }
+      .menu-nav button.active {
+        color: #f8fbff;
+        border-color: rgba(125, 211, 252, 0.5);
+        background: linear-gradient(
+          180deg,
+          rgba(125, 211, 252, 0.24),
+          rgba(167, 139, 250, 0.1)
+        );
+        box-shadow:
+          0 0 20px rgba(125, 211, 252, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      }
       .menu h3,
       .card h4 {
         margin: 0;
@@ -1616,7 +1664,7 @@
         display: none;
         position: fixed;
         right: 14px;
-        bottom: calc(74px + var(--safeBottom));
+        bottom: calc(var(--miniMapSize) + 30px + var(--safeBottom));
         z-index: 18;
         min-width: 132px;
         min-height: 50px;
@@ -1630,6 +1678,17 @@
       }
       .smart.show {
         display: block;
+      }
+      .smart.travel {
+        border-color: rgba(134, 239, 172, 0.58);
+        background: linear-gradient(
+          180deg,
+          rgba(34, 197, 94, 0.32),
+          rgba(14, 165, 233, 0.18)
+        );
+        box-shadow:
+          0 0 28px rgba(134, 239, 172, 0.16),
+          inset 0 1px 0 rgba(255, 255, 255, 0.16);
       }
       .overlay {
         display: none;
@@ -2177,6 +2236,89 @@
         opacity: 0.55;
         box-shadow: 0 0 8px rgba(224, 242, 254, 0.45);
       }
+      .cosmetic-loadout {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin-bottom: 12px;
+      }
+      .cosmetic-slot,
+      .cosmetic-card {
+        position: relative;
+        border: 1px solid rgba(190, 220, 255, 0.14);
+        border-radius: 18px;
+        padding: 11px;
+        background: linear-gradient(
+          145deg,
+          rgba(15, 23, 42, 0.86),
+          rgba(6, 10, 23, 0.78)
+        );
+      }
+      .cosmetic-card.owned {
+        border-color: rgba(134, 239, 172, 0.26);
+      }
+      .cosmetic-card.equipped {
+        border-color: rgba(125, 211, 252, 0.56);
+        box-shadow:
+          0 0 28px rgba(125, 211, 252, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+      .cosmetic-card > b,
+      .cosmetic-slot > b {
+        display: block;
+        color: #f8fbff;
+      }
+      .cosmetic-card > span {
+        display: block;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.42;
+      }
+      .cosmetic-preview-live {
+        position: relative;
+        height: 128px;
+        margin: 9px 0;
+        overflow: hidden;
+        border: 1px solid rgba(125, 211, 252, 0.18);
+        border-radius: 16px;
+        background: #020617;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.07),
+          0 12px 30px rgba(0, 0, 0, 0.24);
+      }
+      .cosmetic-preview-live canvas {
+        position: static;
+        inset: auto;
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .cosmetic-preview-label {
+        position: absolute;
+        left: 9px;
+        bottom: 8px;
+        padding: 4px 7px;
+        border-radius: 999px;
+        background: rgba(2, 6, 23, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #dbeafe;
+        font-size: 8px;
+        font-weight: 950;
+        letter-spacing: 0.55px;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+      .cosmetic-card .tag {
+        margin: 8px 5px 0 0;
+      }
+      @media (max-width: 620px) {
+        .cosmetic-loadout {
+          grid-template-columns: 1fr;
+        }
+        .cosmetic-preview-live {
+          height: 142px;
+        }
+      }
       .title-feature {
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
@@ -2386,7 +2528,7 @@
       }
       .section-tabs {
         position: sticky;
-        top: 45px;
+        top: 96px;
         z-index: 3;
         display: flex;
         gap: 7px;
@@ -2463,8 +2605,19 @@
         flex: 0 0 auto;
       }
       @media (max-width: 900px) {
-        .section-tabs {
+        .menu-nav {
           top: calc(44px + var(--safeTop));
+          margin-left: -10px;
+          margin-right: -10px;
+          padding-left: 10px;
+          padding-right: 10px;
+          scroll-snap-type: x proximity;
+        }
+        .menu-nav button {
+          min-height: 42px;
+        }
+        .section-tabs {
+          top: calc(98px + var(--safeTop));
           margin-left: -10px;
           margin-right: -10px;
           padding-left: 10px;
@@ -4102,6 +4255,7 @@
         <h3 id="menuTitle">Menu</h3>
         <button id="menuClose" type="button">Close</button>
       </div>
+      <nav class="menu-nav" id="menuNav" aria-label="Command sections"></nav>
       <div class="content" id="menuContent"></div>
     </div>
     <button
@@ -4611,6 +4765,7 @@
         missionTracker: $("missionTracker"),
         menu: $("menu"),
         menuTitle: $("menuTitle"),
+        menuNav: $("menuNav"),
         menuContent: $("menuContent"),
         menuClose: $("menuClose"),
         menuBack: $("menuBack"),
@@ -6307,6 +6462,62 @@
           "Build the ODF Pioneer, follow Echo routes, discover rare worlds, and jump to new sectors.",
         ],
       ];
+      const tutorialObjectives = [
+        {
+          title: "First Orbit",
+          action: "Capture Mars",
+          text: "Fly to Mars, enter orbit with LOCK, then use the Capture action above the Nav Map.",
+          menu: "flight",
+          target: "Mars",
+        },
+        {
+          title: "Flight Systems",
+          action: "Upgrade the Starling",
+          text: "Return to Earth Factory and install one starship subsystem upgrade.",
+          menu: "upgrades",
+          target: "Earth",
+        },
+        {
+          title: "Working Outpost",
+          action: "Develop Mars",
+          text: "Return to Mars and raise the captured outpost to Level 2.",
+          menu: "upgrades",
+          target: "Mars",
+        },
+        {
+          title: "Deep Scan",
+          action: "Survey Venus",
+          text: "Fly close enough to Venus for the scanner to identify it. Capture is optional.",
+          menu: "planets",
+          target: "Venus",
+        },
+        {
+          title: "Fleet Foundation",
+          action: "Build the ODF Pioneer",
+          text: "Return to Earth Factory and construct your frigate.",
+          menu: "frigate",
+          target: "Earth",
+        },
+        {
+          title: "Pioneer Rendezvous",
+          action: "Dock with the Pioneer",
+          text: "Target the frigate, fly close, and LOCK into orbit around it.",
+          menu: "flight",
+          target: "__FRIGATE__",
+        },
+        {
+          title: "First Expedition",
+          action: "Jump to a new system",
+          text: "While orbiting the Pioneer, use the on-screen Jump Outward action.",
+          menu: "system",
+          target: "__FRIGATE__",
+        },
+      ];
+      function tutorialObjective(stage = game.missionStage || 0) {
+        return tutorialObjectives[
+          clamp(Math.floor(stage), 0, tutorialObjectives.length - 1)
+        ];
+      }
       const badWords = [
         "fuck",
         "shit",
@@ -8180,6 +8391,11 @@
       function jumpSystem(i = null) {
         if (!game.frigate.built)
           return toast("System travel locked. Build the ODF Pioneer first.");
+        const leavingTutorial = !!game.system?.isTutorial;
+        if (leavingTutorial && !orbitingFrigate())
+          return toast(
+            "Complete the Pioneer rendezvous first: fly to the frigate and LOCK orbit.",
+          );
         const targetIndex =
           i === null
             ? currentSystemIndex + 1
@@ -8230,6 +8446,7 @@
         if (game.system.specialType === "cosmicSpirit")
           unlockCosmicSpiritRewards();
         game.sectorJumps++;
+        if (leavingTutorial) game.missionStage = tutorialObjectives.length;
         trackDaily("sector", 1);
         generateContracts(game.system.seed);
         if (game.sectorJumps === 1)
@@ -10115,6 +10332,23 @@
               : b.name) +
             ".",
         );
+        if (
+          b.type === "frigate" &&
+          game.system?.isTutorial &&
+          game.missionStage === 5
+        ) {
+          game.missionStage = 6;
+          showMissionPanel(
+            "Pioneer Rendezvous Complete!",
+            "The jump drive is synchronized. Continue, then use the green Jump Outward action while you remain in frigate orbit.",
+            [
+              ["Orbit", "ODF Pioneer locked"],
+              ["Travel", "Jump drive ready"],
+              ["Next", "Jump Outward"],
+            ],
+          );
+          saveGame(false);
+        }
       }
       function releaseOrbit(boost = true) {
         feedbackPulse("slingshot");
@@ -10752,18 +10986,18 @@
         game.missionStage = 5;
         showMissionPanel(
           "ODF Pioneer Constructed!",
-          "Your frigate is online. Sector travel, deeper upgrades, and long-term exploration are unlocked.",
+          "Your frigate is online. Complete a rendezvous with the Pioneer to synchronize its jump drive.",
           [
-            ["Unlocked", "System travel"],
+            ["Unlocked", "Pioneer rendezvous"],
             ["Base", game.frigate.name],
-            ["Next", "Jump to a new sector"],
+            ["Next", "Target Pioneer, approach, then LOCK"],
           ],
         );
-        toast("ODF Pioneer constructed. System travel unlocked.");
+        toast("ODF Pioneer constructed. Rendezvous with it to unlock travel.");
         addActivity(
           "upgrade",
           "ODF Pioneer constructed",
-          "Frigate base online. Sector travel unlocked.",
+          "Frigate base online. Pioneer rendezvous is the next objective.",
         );
         triggerUpgradeEffect("frigate", "Earth");
         feedbackPulse("upgrade");
@@ -11868,16 +12102,22 @@
           : game.ownedFrigateSkins.has(key);
       }
       function setShipSkin(k) {
+        refreshSkins(false);
         if (!owns("ship", k)) return toast(k + " is locked.");
         game.frigate.shipSkin = k;
-        toast("Ship skin equipped: " + k);
+        feedbackPulse("upgrade");
+        playSound("upgrade");
+        toast("Equipped on " + game.shipName + ": " + k + ".");
         saveGame(false);
         renderMenu();
       }
       function setFrigateSkin(k) {
+        refreshSkins(false);
         if (!owns("frigate", k)) return toast(k + " is locked.");
         game.frigate.skin = k;
-        toast("Frigate skin equipped: " + k);
+        feedbackPulse("upgrade");
+        playSound("upgrade");
+        toast("Equipped on " + (game.frigate.name || "ODF Pioneer") + ": " + k + ".");
         saveGame(false);
         renderMenu();
       }
@@ -11980,40 +12220,21 @@
           const m = body(manualTargetName);
           if (m) return m;
         }
-        if (game.system.isTutorial) {
-          if (game.missionStage === 0)
-            return (
-              body("Mars") ||
-              body("Earth") ||
-              game.system.bodies.find((b) => b.type !== "star") ||
-              game.system.bodies[0]
-            );
-          if (game.missionStage === 1)
-            return (
-              body("Earth") ||
-              game.system.bodies.find((b) => b.type !== "star") ||
-              game.system.bodies[0]
-            );
-          if (game.missionStage === 2)
-            return (
-              body("Mars") ||
-              body("Earth") ||
-              game.system.bodies.find((b) => b.type !== "star") ||
-              game.system.bodies[0]
-            );
-          if (game.missionStage === 3)
-            return (
-              body("Venus") ||
-              body("Mars") ||
-              game.system.bodies.find((b) => b.type !== "star") ||
-              game.system.bodies[0]
-            );
-          if (game.missionStage === 4 || !game.frigate.built)
-            return (
-              body("Earth") ||
-              game.system.bodies.find((b) => b.type !== "star") ||
-              game.system.bodies[0]
-            );
+        if (
+          game.system.isTutorial &&
+          game.missionStage < tutorialObjectives.length
+        ) {
+          const objective = tutorialObjective();
+          if (objective.target === "__FRIGATE__") {
+            const frigate = frigatePosition();
+            if (frigate) return frigate;
+          }
+          return (
+            body(objective.target) ||
+            body("Earth") ||
+            game.system.bodies.find((b) => b.type !== "star") ||
+            game.system.bodies[0]
+          );
         }
         return (
           game.system.bodies.find(
@@ -12030,7 +12251,7 @@
         return (
           !!game.system &&
           game.system.isTutorial &&
-          (!game.frigate.built || game.missionStage < 5)
+          game.missionStage < tutorialObjectives.length
         );
       }
       function setTarget(name = selectedPlanetName) {
@@ -12049,9 +12270,26 @@
         renderMenu();
       }
       function questList() {
-        return game.frigate.built ? postQuests : earlyQuests;
+        if (game.system?.isTutorial)
+          return tutorialObjectives.map((objective, index) => ({
+            label: objective.action,
+            done: () => game.missionStage > index,
+          }));
+        return postQuests;
       }
       function questProgress() {
+        if (game.system?.isTutorial) {
+          const done = clamp(
+            Math.floor(game.missionStage || 0),
+            0,
+            tutorialObjectives.length,
+          );
+          return {
+            done,
+            total: tutorialObjectives.length,
+            pct: (done / tutorialObjectives.length) * 100,
+          };
+        }
         const q = questList(),
           done = q.filter((x) => x.done()).length;
         return {
@@ -12063,6 +12301,11 @@
       function recommended(target) {
         if (!target) return "Explore nearby space.";
         if (target.type === "frigate")
+          if (game.system?.isTutorial && game.missionStage === 6)
+            return orbitingFrigate()
+              ? "Jump drive ready. Use Jump Outward."
+              : "Return to Pioneer orbit to restore the jump link.";
+          else
           return orbitingFrigate()
             ? "Frigate Base online. Open Frigate systems."
             : "Fly close and LOCK orbit to access Frigate Base.";
@@ -12096,43 +12339,33 @@
             sub: n.body ? "Nearest: " + n.body.name : "Find a captured planet",
             menu: "resources",
           };
-        if (game.system.isTutorial && game.missionStage === 0)
-          return {
-            title: "Capture Mars",
-            sub: target
-              ? "Distance: " +
-                Math.round(
-                  Math.max(0, dist(game.ship, target) - visualRadius(target)),
-                ) +
-                " km"
-              : "Tap LOCK near Mars",
-            menu: "planets",
-          };
-        if (game.system.isTutorial && game.missionStage === 1)
-          return {
-            title: "Upgrade Starship System",
-            sub:
-              upgradeReady().label === "Starship system ready"
-                ? "Ready now"
-                : "Need resources",
-            menu: "upgrades",
-          };
-        if (game.system.isTutorial && game.missionStage === 2)
-          return {
-            title: "Upgrade Mars Outpost",
-            sub: canUpgradePlanet(body("Mars")) ? "Ready now" : "Open Upgrades",
-            menu: "upgrades",
-          };
         if (
           game.system.isTutorial &&
-          game.missionStage === 4 &&
-          !game.frigate.built
-        )
-          return {
-            title: "Build ODF Pioneer",
-            sub: canAfford(buildCost()) ? "Ready now" : "Need build resources",
-            menu: "frigate",
-          };
+          game.missionStage < tutorialObjectives.length
+        ) {
+          const objective = tutorialObjective();
+          let sub = objective.title + " • Step " + (game.missionStage + 1) + "/" + tutorialObjectives.length;
+          if (game.missionStage === 0 && target)
+            sub =
+              "Mars distance: " +
+              Math.round(
+                Math.max(0, dist(game.ship, target) - visualRadius(target)),
+              ) +
+              "u";
+          else if (game.missionStage === 1)
+            sub = upgradeReady().any ? "Upgrade ready now" : "Collect the listed resources";
+          else if (game.missionStage === 2)
+            sub = canUpgradePlanet(body("Mars")) ? "Mars upgrade ready" : "Review Mars requirements";
+          else if (game.missionStage === 3)
+            sub = target ? "Venus distance: " + Math.round(Math.max(0, dist(game.ship, target) - visualRadius(target))) + "u" : "Follow the Venus target";
+          else if (game.missionStage === 4)
+            sub = canAfford(buildCost()) ? "Pioneer construction ready" : "Gather the build resources";
+          else if (game.missionStage === 5)
+            sub = target ? "Pioneer distance: " + Math.round(Math.max(0, dist(game.ship, target) - (target.radius || 42))) + "u" : "Set the Pioneer target";
+          else if (game.missionStage === 6)
+            sub = orbitingFrigate() ? "Jump drive synchronized" : "Return to Pioneer orbit";
+          return { title: objective.action, sub, menu: objective.menu };
+        }
         if (h && h.d < 70 && !h.echo.harvested)
           return {
             title: "Harvest Echo",
@@ -12751,10 +12984,12 @@
       function normalizeMenuName(name = "hub") {
         const allowed = new Set([
           "hub",
+          "flight",
           "resources",
           "planets",
           "upgrades",
           "frigate",
+          "cosmetics",
           "system",
           "echoes",
           "codex",
@@ -12792,6 +13027,7 @@
         layoutDrag = null;
         ui.menu.classList.remove("open", "in-section");
         ui.menuTitle.textContent = "Menu";
+        ui.menuNav.innerHTML = "";
         ui.menuContent.innerHTML = "";
         document.body.classList.remove("menu-open", "menu-section-open");
         document
@@ -12815,10 +13051,12 @@
         ui.menuTitle.textContent =
           {
             hub: "Command Menu",
+            flight: "Flight Control",
             resources: "Resources",
             planets: "Planet Network",
             upgrades: "Upgrade Center",
             frigate: "Frigate Base",
+            cosmetics: "Cosmetic Hangar",
             system: "System",
             echoes: "Orbital Echoes",
             codex: "Planet Codex",
@@ -12826,13 +13064,16 @@
             guide: "Pilot Manual",
             help: "Help / Glossary",
           }[activeMenu] || "Command Menu";
+        ui.menuNav.innerHTML = menuNavigationHtml();
         (
           ({
             hub: renderHub,
+            flight: renderFlight,
             resources: renderResources,
             planets: renderPlanets,
             upgrades: renderUpgrades,
             frigate: renderFrigate,
+            cosmetics: renderCosmetics,
             system: renderSystem,
             echoes: renderEchoes,
             codex: renderCodex,
@@ -12844,6 +13085,33 @@
         addMobileMenuFooter();
         hydrateSettingsControls();
         wireMenuButtons();
+        requestAnimationFrame(renderSkinPreviews);
+      }
+      function menuNavigationHtml() {
+        const sections = [
+          ["hub", "⌂", "Home"],
+          ["flight", "✦", "Flight"],
+          ["planets", "●", "Worlds"],
+          ["resources", "◆", "Cargo"],
+          ["upgrades", "▲", "Upgrades"],
+          ["frigate", "▰", "Pioneer"],
+          ["cosmetics", "◇", "Style"],
+          ["system", "◎", "Records"],
+        ];
+        return sections
+          .map(
+            (section) =>
+              '<button type="button" class="' +
+              (activeMenu === section[0] ? "active" : "") +
+              '" data-action="openSection" data-arg="' +
+              esc(JSON.stringify(section[0])) +
+              '"><span>' +
+              section[1] +
+              "</span>" +
+              esc(section[2]) +
+              "</button>",
+          )
+          .join("");
       }
       function addMobileMenuFooter() {
         if (
@@ -12870,7 +13138,7 @@
       }
       function openRecommendedMenu() {
         const next = nextBestAction()?.menu || "hub",
-          target = next === "flight" ? "hub" : next;
+          target = next;
         if (target === activeMenu) {
           const title = nextBestAction()?.title || "Recommended action";
           toast(title + " is already open.");
@@ -12974,6 +13242,13 @@
             : 0,
           core = [
             [
+              "flight",
+              "✦",
+              "Flight",
+              "Orbit, navigation, targeting, and contextual actions.",
+              0,
+            ],
+            [
               "resources",
               "◆",
               "Resources",
@@ -13001,6 +13276,13 @@
               "Build, upgrade, customize, manage fleet ships, and travel outward.",
               rs.frigate,
             ],
+            [
+              "cosmetics",
+              "◇",
+              "Cosmetic Hangar",
+              "Preview and equip every owned starship and frigate hull.",
+              0,
+            ],
           ],
           explore = [
             [
@@ -13025,6 +13307,20 @@
               "System",
               "Daily Ops, Pilot Rank, events, save, settings, and star atlas.",
               rs.system,
+            ],
+            [
+              "activity",
+              "≡",
+              "Captain Log",
+              "Review discoveries, upgrades, encounters, and travel history.",
+              0,
+            ],
+            [
+              "guide",
+              "△",
+              "Pilot Manual",
+              "Tutorial guidance and system explanations.",
+              0,
             ],
             ["help", "?", "Help", "Controls, glossary, and how to play.", 0],
           ];
@@ -13079,11 +13375,12 @@
       function menuLabel(k) {
         return (
           {
-            flight: "Command Menu",
+            flight: "Flight",
             resources: "Resources",
             planets: "Planets",
             upgrades: "Upgrades",
             frigate: "Frigate",
+            cosmetics: "Cosmetic Hangar",
             system: "System",
             echoes: "Echoes",
             codex: "Codex",
@@ -13097,59 +13394,22 @@
       function guideStep() {
         if (
           !game.system?.isTutorial ||
-          (game.frigate.built && game.sectorJumps > 0)
+          game.missionStage >= tutorialObjectives.length
         )
           return null;
-        const steps = [
-          [
-            "Capture Mars",
-            "Fly to Mars, tap LOCK near the planet, then use the on-screen Capture action.",
-            "planets",
-            () => game.captured.has("Mars"),
-          ],
-          [
-            "Upgrade Starship System",
-            "Return to Earth Factory and install any starship subsystem upgrade.",
-            "upgrades",
-            () => shipSystemLevelTotal() >= 1,
-          ],
-          [
-            "Upgrade Mars Outpost",
-            "Select Mars in the Upgrade Center and raise it to Level 2.",
-            "upgrades",
-            () => ((body("Mars") || {}).level || 0) >= 2,
-          ],
-          [
-            "Survey Venus",
-            "Travel to Venus and let the scanner identify it, then target or capture it when ready.",
-            "planets",
-            () => game.discovered.has("Venus") || game.captured.has("Venus"),
-          ],
-          [
-            "Build the ODF Pioneer",
-            "Return to Earth Factory and build your frigate.",
-            "frigate",
-            () => game.frigate.built,
-          ],
-          [
-            "Jump Sectors",
-            "Use the System menu to jump beyond Sol.",
-            "system",
-            () => game.sectorJumps > 0,
-          ],
-        ];
-        const idx = steps.findIndex((s) => !s[3]());
-        if (idx < 0) return null;
-        const s = steps[idx];
-        return s
-          ? {
-              index: idx + 1,
-              total: steps.length,
-              title: s[0],
-              text: s[1],
-              menu: s[2],
-            }
-          : null;
+        const idx = clamp(
+            Math.floor(game.missionStage || 0),
+            0,
+            tutorialObjectives.length - 1,
+          ),
+          objective = tutorialObjectives[idx];
+        return {
+          index: idx + 1,
+          total: tutorialObjectives.length,
+          title: objective.action,
+          text: objective.text,
+          menu: objective.menu,
+        };
       }
       function guidedTutorialCard() {
         const s = guideStep();
@@ -13930,6 +14190,7 @@
             "Frigate Base Locked",
             "The Frigate Base is only accessible while your starship is orbit-locked around the frigate. Use the mini-map to find it, fly close, then tap LOCK.",
             btn("Set Frigate Target", "setFrigateTarget") +
+              btn("Open Cosmetic Hangar", "openSection", "cosmetics") +
               btn("Back to Menu", "openSection", "hub"),
           );
           return;
@@ -14061,11 +14322,13 @@
             '<div class="list">' + upgradeRows + "</div>",
           );
         else if (tab === "cosmetics")
-          html += card(
-            "Cosmetic Store",
-            "Hull bay. Unlock and equip cosmetic designs for your starship, frigate, and fleet escorts.",
-            storeHtml() + fleetSkinsHtml(),
-          );
+          html +=
+            storeHtml() +
+            card(
+              "Fleet Escort Designs",
+              "Unlock and equip cosmetic designs for your fleet escorts.",
+              fleetSkinsHtml(),
+            );
         else
           html +=
             overview +
@@ -14087,12 +14350,66 @@
             );
         ui.menuContent.innerHTML = html;
       }
+      function cosmeticPreviewHtml(kind, key, label = "Live hull preview") {
+        return (
+          '<div class="cosmetic-preview-live"><canvas data-skin-kind="' +
+          esc(kind) +
+          '" data-skin-key="' +
+          esc(key) +
+          '" role="img" aria-label="' +
+          esc(key + " " + kind + " preview") +
+          '"></canvas><span class="cosmetic-preview-label">' +
+          esc(label) +
+          "</span></div>"
+        );
+      }
+      function renderCosmetics() {
+        refreshSkins(false);
+        const ship = activeShipSkin(),
+          frigate = activeFrigateSkin(),
+          owned = game.ownedShipSkins.size + game.ownedFrigateSkins.size,
+          total = shipSkins.length + frigateSkins.length;
+        ui.menuContent.innerHTML =
+          tabIntro(
+            "Cosmetic Hangar",
+            "Preview the exact in-game hull geometry and equip owned designs from anywhere. Cosmetics never change ship stats.",
+            '<div class="chip">Owned: ' +
+              owned +
+              " / " +
+              total +
+              '</div><div class="chip">Active Starship: ' +
+              esc(ship.key) +
+              '</div><div class="chip">Active Frigate: ' +
+              esc(frigate.key) +
+              "</div>",
+          ) +
+          '<div class="cosmetic-loadout"><div class="cosmetic-slot"><b>' +
+          esc(game.shipName) +
+          " • " +
+          esc(ship.key) +
+          "</b>" +
+          cosmeticPreviewHtml("ship", ship.key, "Equipped starship") +
+          '</div><div class="cosmetic-slot"><b>' +
+          esc(game.frigate.name || "ODF Pioneer") +
+          " • " +
+          esc(frigate.key) +
+          "</b>" +
+          cosmeticPreviewHtml("frigate", frigate.key, "Equipped frigate") +
+          "</div></div>" +
+          storeHtml() +
+          card(
+            "Fleet Escort Designs",
+            "Fleet escort skins remain managed here alongside the two primary hulls.",
+            fleetSkinsHtml(),
+          );
+      }
       function storeHtml() {
         return (
-          '<div class="grid">' +
+          '<div class="card"><h4>Complete Hull Sets</h4><p>Unlock matching designs for both command ships.</p><div class="grid">' +
           skinCombos
-            .map(
-              (c) =>
+            .map((c) => {
+              const owned = owns("ship", c.ship) && owns("frigate", c.frigate);
+              return (
                 '<div class="shop"><b>' +
                 esc(c.key) +
                 "</b><span>" +
@@ -14101,19 +14418,24 @@
                 esc(c.frigate) +
                 '</span><div class="actions">' +
                 btn(
-                  c.type === "achievement" ? "Earn" : "Unlock $" + c.price,
-                  "buyCombo",
-                  c.key,
-                  c.type !== "achievement",
+                  owned
+                    ? "Owned Set"
+                    : c.type === "achievement"
+                      ? "Earn in Exploration"
+                      : "Unlock $" + c.price,
+                  owned ? "noop" : "buyCombo",
+                  owned ? null : c.key,
+                  !owned && c.type !== "achievement",
                 ) +
-                "</div></div>",
-            )
+                "</div></div>"
+              );
+            })
             .join("") +
-          '</div><h4>Starship Skins</h4><div class="grid">' +
+          '</div></div><div class="card"><h4>Starship Skins</h4><p>Designs for the Starling command ship.</p><div class="grid">' +
           shipSkins.map((s) => skinHtml(s, "ship")).join("") +
-          '</div><h4>Frigate Skins</h4><div class="grid">' +
+          '</div></div><div class="card"><h4>Frigate Skins</h4><p>Capital hulls for the ODF Pioneer.</p><div class="grid">' +
           frigateSkins.map((s) => skinHtml(s, "frigate")).join("") +
-          "</div>"
+          "</div></div>"
         );
       }
       function skinHtml(s, kind) {
@@ -14122,10 +14444,7 @@
             kind === "ship"
               ? game.frigate.shipSkin === s.key
               : game.frigate.skin === s.key,
-          primary = s.primary || "#94a3b8",
-          accent = s.accent || "#7dd3fc",
-          secondary = s.secondary || "#0f172a",
-          glow = s.glow || accent;
+          stateClass = active ? " equipped" : own ? " owned" : " locked";
         let action = own
           ? btn(
               active ? "Equipped" : "Equip",
@@ -14144,23 +14463,13 @@
               ? btn("Buy Combo", "buyCombo", "Ancient Hunter Combo")
               : btn("Unlock $" + s.price, "buySkinKind", kind + "|" + s.key);
         return (
-          '<div class="shop"><b>' +
+          '<div class="cosmetic-card' +
+          stateClass +
+          '"><b>' +
           esc(s.key) +
-          '</b><div class="shop-preview ' +
-          esc(kind) +
-          " rarity-" +
-          esc(String(s.rarity || "Unusual").toLowerCase()) +
-          " motif-" +
-          esc(s.motif || "standard") +
-          '" style="--skinPrimary:' +
-          esc(primary) +
-          ";--skinSecondary:" +
-          esc(secondary) +
-          ";--skinAccent:" +
-          esc(accent) +
-          ";--skinGlow:" +
-          esc(rgba(glow, 0.55)) +
-          '"><i></i><i></i><i></i><i></i></div><span>' +
+          "</b>" +
+          cosmeticPreviewHtml(kind, s.key, active ? "Equipped" : own ? "Owned" : "Preview") +
+          "<span>" +
           esc(s.desc) +
           '</span><span class="tag rarity-unusual">' +
           esc(s.rarity || "Unusual") +
@@ -14176,6 +14485,76 @@
           action +
           "</div></div>"
         );
+      }
+      function renderSkinPreviews() {
+        if (!ui.menu?.classList.contains("open")) return;
+        ui.menuContent
+          .querySelectorAll("canvas[data-skin-kind][data-skin-key]")
+          .forEach((canvas) => {
+            const kind = canvas.dataset.skinKind,
+              key = canvas.dataset.skinKey,
+              skin =
+                (kind === "ship" ? shipSkins : frigateSkins).find(
+                  (item) => item.key === key,
+                ) || (kind === "ship" ? activeShipSkin() : activeFrigateSkin()),
+              rect = canvas.getBoundingClientRect(),
+              width = Math.max(220, Math.round(rect.width || 320)),
+              height = Math.max(110, Math.round(rect.height || 128)),
+              dpr = Math.min(2, window.devicePixelRatio || 1),
+              c = canvas.getContext("2d");
+            canvas.width = Math.round(width * dpr);
+            canvas.height = Math.round(height * dpr);
+            c.setTransform(dpr, 0, 0, dpr, 0, 0);
+            c.clearRect(0, 0, width, height);
+            const backdrop = c.createRadialGradient(
+              width * 0.67,
+              height * 0.42,
+              2,
+              width * 0.52,
+              height * 0.5,
+              width * 0.72,
+            );
+            backdrop.addColorStop(0, rgba(skin.glow || skin.accent, 0.2));
+            backdrop.addColorStop(0.46, rgba(skin.secondary || "#0f172a", 0.72));
+            backdrop.addColorStop(1, "#020617");
+            c.fillStyle = backdrop;
+            c.fillRect(0, 0, width, height);
+            const seed = [...key].reduce(
+              (sum, ch, index) => sum + ch.charCodeAt(0) * (index + 3),
+              0,
+            );
+            for (let i = 0; i < 24; i++) {
+              const x = (seed * (i + 7) * 17) % width,
+                y = (seed * (i + 11) * 29) % height,
+                size = i % 7 === 0 ? 1.3 : 0.65;
+              c.fillStyle = i % 5 === 0 ? rgba(skin.accent, 0.7) : "rgba(255,255,255,.42)";
+              c.fillRect(x, y, size, size);
+            }
+            c.save();
+            c.translate(width * 0.52, height * 0.48);
+            if (kind === "ship") {
+              c.rotate(-0.08);
+              drawShipVisual(
+                c,
+                Math.min(width / 145, height / 72),
+                skin,
+                false,
+              );
+            } else {
+              drawFrigateVisual(
+                c,
+                Math.min(width / 430, height / 190),
+                skin,
+              );
+            }
+            c.restore();
+            const shade = c.createLinearGradient(0, 0, 0, height);
+            shade.addColorStop(0, "rgba(255,255,255,.035)");
+            shade.addColorStop(0.62, "rgba(0,0,0,0)");
+            shade.addColorStop(1, "rgba(2,6,23,.5)");
+            c.fillStyle = shade;
+            c.fillRect(0, 0, width, height);
+          });
       }
       function setFrigateTarget() {
         const f = frigatePosition();
@@ -14430,22 +14809,28 @@
         const target = currentTarget(),
           q = questList()
             .map(
-              (x) =>
+              (x, index) =>
                 '<div class="quest ' +
                 (x.done() ? "done" : "") +
                 '"><b>' +
                 (x.done() ? "✓ " : "") +
                 esc(x.label) +
                 "</b><span>" +
-                (x.done() ? "Complete" : "In progress") +
+                (x.done()
+                  ? "Complete"
+                  : game.system?.isTutorial
+                    ? index === game.missionStage
+                      ? "Current objective"
+                      : "Locked until the previous step"
+                    : "In progress") +
                 "</span></div>",
             )
             .join("");
         return card(
-          "Quest Log",
-          (game.frigate.built
-            ? "Post-tutorial infinite exploration loop."
-            : "Tutorial: complete Sol objectives and build the frigate.") +
+          game.system?.isTutorial ? "Training Flight" : "Quest Log",
+          (game.system?.isTutorial
+            ? "One objective is active at a time. Complete each step in order before leaving Sol."
+            : "Post-tutorial infinite exploration loop.") +
             " Current target: " +
             (target ? esc(target.name) : "None") +
             ".",
@@ -15456,7 +15841,10 @@
       }
       function qaMissionNext() {
         if (!DEV_BUILD) return;
-        game.missionStage = Math.min(5, (game.missionStage || 0) + 1);
+        game.missionStage = Math.min(
+          tutorialObjectives.length,
+          (game.missionStage || 0) + 1,
+        );
         toast("QA mission advanced to " + game.missionStage + ".");
         renderMenu();
       }
@@ -15618,25 +16006,21 @@
           "/" +
           prog.total +
           " objectives complete</span>";
-        if (game.system.isTutorial && game.missionStage === 0)
-          ui.missionBox.innerHTML =
-            "<b>Mission:</b> Reach Mars, tap <b>LOCK</b> near the planet, then tap the on-screen <b>Capture</b> action while locked.";
-        else if (game.system.isTutorial && game.missionStage === 1)
-          ui.missionBox.innerHTML =
-            "<b>Mission:</b> Return to Earth Factory, open <b>Menu → Upgrades</b>, then install your first starship subsystem upgrade.";
-        else if (game.system.isTutorial && game.missionStage === 2)
-          ui.missionBox.innerHTML =
-            "<b>Mission:</b> Return to Mars, open <b>Menu → Planets</b> or <b>Menu → Upgrades</b>, then upgrade the Mars outpost.";
-        else if (game.system.isTutorial && game.missionStage === 3)
-          ui.missionBox.innerHTML =
-            "<b>Mission:</b> Travel to Venus and let the scanner identify it. Use the on-screen action if capture becomes available.";
-        else if (
+        if (
           game.system.isTutorial &&
-          (game.missionStage === 4 || !game.frigate.built)
-        )
+          game.missionStage < tutorialObjectives.length
+        ) {
+          const objective = tutorialObjective();
           ui.missionBox.innerHTML =
-            "<b>Mission:</b> Return to Earth Factory, open <b>Menu → Frigate</b>, then build the <b>ODF Pioneer</b> frigate.";
-        else
+            '<b>Training ' +
+            (game.missionStage + 1) +
+            "/" +
+            tutorialObjectives.length +
+            ": " +
+            esc(objective.action) +
+            "</b><br>" +
+            esc(objective.text);
+        } else
           ui.missionBox.innerHTML =
             "<b>Mission:</b> Explore, capture worlds with on-screen actions, upgrade from the menu, and record Echo routes.";
         const ready = Object.values(unclaimedProduction).reduce(
@@ -15649,6 +16033,7 @@
           ready > 99 ? "99+" : String(ready || "!");
         const action = smartAction();
         ui.smartBtn.textContent = action.label;
+        ui.smartBtn.classList.toggle("travel", action.tone === "travel");
         ui.smartBtn.classList.toggle(
           "show",
           !!(action.show && controlsVisible),
@@ -15667,6 +16052,13 @@
           bh = nearestBlackHole();
         if (game.ship.fuel <= 0.5)
           return { label: "Recover Ship", run: recoverShip, show: true };
+        if (orbitingFrigate())
+          return {
+            label: "Jump Outward",
+            run: jumpSystem,
+            show: true,
+            tone: "travel",
+          };
         if (h && h.d < 70 && !h.echo.harvested)
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
