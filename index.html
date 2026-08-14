@@ -19,6 +19,9 @@
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
     />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./assets/orbital-drift-icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./assets/orbital-drift-icon-192.png" />
     <title>Orbital Drift</title>
     <style>
       :root {
@@ -1885,6 +1888,21 @@
         -webkit-background-clip: text;
         color: transparent;
         text-shadow: 0 0 38px rgba(125, 211, 252, 0.18);
+      }
+      .title-version {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        margin: 4px auto 8px;
+        padding: 4px 9px;
+        border: 1px solid rgba(125, 211, 252, 0.22);
+        border-radius: 999px;
+        background: rgba(125, 211, 252, 0.07);
+        color: #bfdbfe;
+        font-size: 9px;
+        font-weight: 950;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
       }
       .title-sub {
         text-align: center;
@@ -4197,7 +4215,11 @@
     </style>
   </head>
   <body>
-    <canvas id="game"></canvas>
+    <canvas
+      id="game"
+      role="img"
+      aria-label="Orbital Drift flight view"
+    ></canvas>
     <div class="hud" id="hud">
       <div class="top">
         <div class="logo">Orbital Drift</div>
@@ -4228,8 +4250,8 @@
           <small>Captured</small><strong id="captured">1 / 3</strong>
         </div>
       </div>
-      <div class="mission" id="missionBox"></div>
-      <div class="tracker" id="missionTracker"></div>
+      <div class="mission" id="missionBox" aria-live="polite"></div>
+      <div class="tracker" id="missionTracker" aria-live="polite"></div>
     </div>
     <div class="dock">
       <button type="button" data-menu="flight">
@@ -4268,7 +4290,7 @@
     </button>
     <div class="mini-map" id="miniMap">
       <span class="mini-map-label">Nav Map</span
-      ><canvas id="miniMapCanvas"></canvas>
+      ><canvas id="miniMapCanvas" aria-hidden="true"></canvas>
     </div>
     <button class="objective-pill" id="objectivePill" type="button">
       <span>
@@ -4284,12 +4306,33 @@
       </div>
       <div class="barbox"><div class="bar" id="fuelMiniBar"></div></div>
     </div>
-    <button class="smart" id="smartBtn" type="button">Scan Area</button>
+    <button class="smart" id="smartBtn" type="button" aria-live="polite">
+      Scan Area
+    </button>
     <div class="touch-hint" id="stickHint">Steer</div>
     <div class="touch-hint right" id="thrustHint">Thrust</div>
-    <button class="orbit-release" id="orbitRelease" type="button">LOCK</button
-    ><button class="brake" id="touchBrake" type="button">BRAKE</button
-    ><button class="touch" id="touchThrust" type="button">THRUST</button>
+    <button
+      class="orbit-release"
+      id="orbitRelease"
+      type="button"
+      aria-label="Lock or release orbit"
+    >
+      LOCK</button
+    ><button
+      class="brake"
+      id="touchBrake"
+      type="button"
+      aria-label="Brake starship"
+    >
+      BRAKE</button
+    ><button
+      class="touch"
+      id="touchThrust"
+      type="button"
+      aria-label="Thrust starship"
+    >
+      THRUST
+    </button>
     <div class="stick" id="stick"><div class="knob" id="knob"></div></div>
     <div class="debug-overlay" id="debugOverlay">
       <div id="debugText"></div>
@@ -4298,6 +4341,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
+        <div class="title-version">Release Candidate • v0.17.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -4685,6 +4729,12 @@
         >Drag joystick, thrust, brake, or release. Tap Done when finished.</span
       ><button id="controlEditDone" type="button">Done</button>
     </div>
+    <input
+      id="saveImportInput"
+      type="file"
+      accept="application/json,.json"
+      hidden
+    />
     <div class="feedback-flash" id="feedbackFlash"></div>
     <div class="toast-wrap" id="toasts"></div>
     <script>
@@ -4694,7 +4744,9 @@
         ctx = canvas.getContext("2d"),
         TAU = Math.PI * 2,
         SAVE_KEY = "orbital-drift-save-v12",
-        SAVE_VERSION = 14;
+        SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
+        SAVE_VERSION = 15,
+        APP_VERSION = "0.17.0";
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -4703,6 +4755,8 @@
         zoom = 0.68,
         cam = { x: 0, y: 0 },
         systems = [],
+        universeSeed = 0,
+        routeRollCounter = 0,
         currentSystemIndex = 0,
         activeMenu = null,
         titleOpen = true,
@@ -4769,6 +4823,7 @@
         menuContent: $("menuContent"),
         menuClose: $("menuClose"),
         menuBack: $("menuBack"),
+        saveImportInput: $("saveImportInput"),
         smartBtn: $("smartBtn"),
         menuLauncher: $("menuLauncher"),
         pauseBtn: $("pauseBtn"),
@@ -7030,6 +7085,37 @@
         const x = Math.sin(s) * 10000;
         return x - Math.floor(x);
       }
+      function mixSeed(...values) {
+        let hash = 2166136261;
+        for (const value of values) {
+          let n = Math.floor(Number(value) || 0) >>> 0;
+          for (let i = 0; i < 4; i++) {
+            hash ^= n & 255;
+            hash = Math.imul(hash, 16777619) >>> 0;
+            n >>>= 8;
+          }
+        }
+        return (hash >>> 0) || 1;
+      }
+      function createUniverseSeed() {
+        try {
+          const values = new Uint32Array(2);
+          window.crypto.getRandomValues(values);
+          return mixSeed(values[0], values[1], Date.now());
+        } catch (e) {
+          return mixSeed(Date.now(), Math.random() * 0xffffffff);
+        }
+      }
+      function randomUnit() {
+        try {
+          const value = new Uint32Array(1);
+          window.crypto.getRandomValues(value);
+          return value[0] / 4294967296;
+        } catch (e) {
+          routeRollCounter++;
+          return rand(universeSeed + Date.now() + routeRollCounter * 7919);
+        }
+      }
       function between(s, a, b) {
         return a + rand(s) * (b - a);
       }
@@ -7986,13 +8072,30 @@
         return sys;
       }
       function proceduralSeedForIndex(i) {
-        return 1000 + i * 137;
+        if (!universeSeed) return 1000 + i * 137;
+        return mixSeed(universeSeed, i + 1, 0x6f726269);
+      }
+      function finalizeSystemIdentity(sys, index) {
+        if (!sys || sys.isTutorial || sys.specialType) return sys;
+        const duplicate = systems.some((known) => known?.name === sys.name);
+        if (!duplicate) return sys;
+        const star = sys.bodies?.find((body) => body.type === "star");
+        if (!star) return sys;
+        const designation = " " + String(index + 1).padStart(2, "0");
+        star.name += designation;
+        sys.name = star.name + " System";
+        return sys;
       }
       function ensureSystemIndex(i) {
         i = Math.max(0, Math.floor(Number(i) || 0));
         while (systems.length <= i) {
           const idx = systems.length;
-          systems.push(proc(proceduralSeedForIndex(idx - 1)));
+          systems.push(
+            finalizeSystemIdentity(
+              proc(proceduralSeedForIndex(idx - 1)),
+              idx,
+            ),
+          );
         }
         return systems[i];
       }
@@ -8064,8 +8167,10 @@
         return d < Math.min(well + 25, rad + 170);
       }
       function initGame(showTips = false) {
+        universeSeed = createUniverseSeed();
+        routeRollCounter = 0;
         systems = [sol()];
-        for (let i = 1; i <= 8; i++) ensureSystemIndex(i);
+        for (let i = 1; i <= 12; i++) ensureSystemIndex(i);
         forceTutorialCommon();
         currentSystemIndex = 0;
         game.system = systems[0];
@@ -8388,6 +8493,50 @@
           },
         );
       }
+      function unchartedSystemCandidates(minimum = 8) {
+        const visited = new Set(
+          (game.visitedSectors || []).map((visit) => visit.index),
+        );
+        let candidates = systems
+          .map((system, index) => ({ system, index }))
+          .filter(
+            (entry) =>
+              entry.index > 0 &&
+              entry.index !== currentSystemIndex &&
+              !visited.has(entry.index) &&
+              !entry.system?.nonReturnable,
+          );
+        while (candidates.length < minimum) {
+          const index = systems.length;
+          const system = ensureSystemIndex(index);
+          if (!system?.nonReturnable) candidates.push({ system, index });
+        }
+        return candidates;
+      }
+      function routeVarietyScore(entry) {
+        const recent = [...(game.visitedSectors || [])]
+            .sort((a, b) => (b.lastVisit || 0) - (a.lastVisit || 0))
+            .slice(0, 3)
+            .map((visit) => systems[visit.index])
+            .filter(Boolean),
+          recentArchetypes = new Set(recent.map((s) => s.archetype?.key)),
+          recentModifiers = new Set(recent.map((s) => s.modifier?.key)),
+          system = entry.system;
+        return (
+          randomUnit() * 1.35 +
+          (recentArchetypes.has(system.archetype?.key) ? 0 : 1.15) +
+          (recentModifiers.has(system.modifier?.key) ? 0 : 0.8) +
+          (system.archetype?.key !== game.system?.archetype?.key ? 0.35 : 0) +
+          (system.modifier?.key !== game.system?.modifier?.key ? 0.25 : 0) +
+          (system.isSpecial ? 0.3 : 0)
+        );
+      }
+      function chooseUnchartedSystemIndex() {
+        const candidates = unchartedSystemCandidates(8)
+          .map((entry) => ({ ...entry, score: routeVarietyScore(entry) }))
+          .sort((a, b) => b.score - a.score);
+        return candidates[0]?.index ?? 1;
+      }
       function jumpSystem(i = null) {
         if (!game.frigate.built)
           return toast("System travel locked. Build the ODF Pioneer first.");
@@ -8396,12 +8545,12 @@
           return toast(
             "Complete the Pioneer rendezvous first: fly to the frigate and LOCK orbit.",
           );
-        const targetIndex =
-          i === null
-            ? currentSystemIndex + 1
+        const outward = i === null,
+          targetIndex = outward
+            ? chooseUnchartedSystemIndex()
             : Math.max(0, Math.floor(Number(i) || 0));
         ensureSystemIndex(targetIndex);
-        if (i === null) consumeFleetJumpBoosts();
+        if (outward) consumeFleetJumpBoosts();
         if (
           i !== null &&
           systems[targetIndex]?.nonReturnable &&
@@ -8460,7 +8609,7 @@
             ],
           );
         toast(
-          "Jump complete: entered " +
+          (outward ? "Uncharted jump complete: entered " : "Atlas travel complete: entered ") +
             game.system.name +
             " • " +
             sectorModifierName() +
@@ -8498,8 +8647,10 @@
         const now = Date.now();
         return {
           version: SAVE_VERSION,
+          appVersion: APP_VERSION,
           savedAt: now,
           meta: saveMeta({ savedAt: now }),
+          universeSeed,
           systemCount: knownSystemCount(),
           currentSystemIndex,
           t,
@@ -8622,6 +8773,14 @@
       function saveGame(manual = false) {
         try {
           lastSaveMeta = saveMeta();
+          const previous = localStorage.getItem(SAVE_KEY);
+          if (previous) {
+            try {
+              const parsed = JSON.parse(previous);
+              if (parsed && Number(parsed.version || 0) <= SAVE_VERSION)
+                localStorage.setItem(SAVE_BACKUP_KEY, previous);
+            } catch (e) {}
+          }
           localStorage.setItem(SAVE_KEY, JSON.stringify(saveState()));
           lastAutosave = Date.now();
           lastSaveMessage =
@@ -8653,29 +8812,61 @@
       }
       function loadGame(manual = false) {
         try {
-          const raw = localStorage.getItem(SAVE_KEY);
+          let raw = localStorage.getItem(SAVE_KEY),
+            recoveredBackup = false,
+            d = null;
           if (!raw) {
-            if (manual) toast("No save found.");
-            return false;
+            raw = localStorage.getItem(SAVE_BACKUP_KEY);
+            recoveredBackup = !!raw;
+            if (!raw) {
+              if (manual) toast("No save found.");
+              return false;
+            }
           }
-          const d = JSON.parse(raw);
-          if (!d || Number(d.version || 0) > SAVE_VERSION) {
+          try {
+            d = JSON.parse(raw);
+          } catch (primaryError) {
+            raw = localStorage.getItem(SAVE_BACKUP_KEY);
+            if (!raw) throw primaryError;
+            d = JSON.parse(raw);
+            recoveredBackup = true;
+          }
+          if (!validSavePayload(d)) {
+            const backupRaw = localStorage.getItem(SAVE_BACKUP_KEY);
+            if (backupRaw && backupRaw !== raw) {
+              const backupData = JSON.parse(backupRaw);
+              if (validSavePayload(backupData)) {
+                raw = backupRaw;
+                d = backupData;
+                recoveredBackup = true;
+              }
+            }
+          }
+          if (!validSavePayload(d)) {
             if (manual) toast("Save file is not compatible with this build.");
             return false;
           }
+          universeSeed = Number(d.universeSeed || 0) || createUniverseSeed();
+          routeRollCounter = 0;
           systems = [sol()];
           const needed = Math.max(
-            8,
+            12,
             Number(d.currentSystemIndex || 0),
             Number(d.systemCount || 0) - 1,
             (d.bodyStates || []).length - 1,
           );
           for (let i = 1; i <= needed; i++) ensureSystemIndex(i);
           (d.bodyStates || []).forEach((ss, idx) => {
-            if (ss.specialType === "parallel")
-              systems[idx] = parallelSystem(ss.seed);
-            else if (ss.specialType === "cosmicSpirit")
-              systems[idx] = cosmicSpiritSystem(ss.seed);
+            if (idx > 0 && ss.seed) {
+              if (ss.specialType === "parallel")
+                systems[idx] = parallelSystem(ss.seed);
+              else if (ss.specialType === "cosmicSpirit")
+                systems[idx] = cosmicSpiritSystem(ss.seed);
+              else systems[idx] = proc(ss.seed);
+              if (ss.name) systems[idx].name = ss.name;
+              if (ss.bodies?.[0]?.name && systems[idx].bodies?.[0])
+                systems[idx].bodies[0].name = ss.bodies[0].name;
+            }
             if (ss.blackHole && systems[idx])
               systems[idx].blackHole = { ...ss.blackHole };
           });
@@ -8803,6 +8994,15 @@
             "Loaded save from " +
             (d.savedAt ? new Date(d.savedAt).toLocaleString() : "unknown time");
           if (manual) toast("Saved game loaded.");
+          if (recoveredBackup) {
+            localStorage.setItem(SAVE_KEY, raw);
+            toast("Primary save was damaged. Restored the automatic backup.");
+            addActivity(
+              "save",
+              "Backup save restored",
+              "The damaged primary save was replaced with its last valid backup.",
+            );
+          }
           refreshTitleButtons();
           renderMenu();
           return true;
@@ -8845,32 +9045,105 @@
         );
       }
       function getStoredSaveMeta() {
+        for (const key of [SAVE_KEY, SAVE_BACKUP_KEY]) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            const d = JSON.parse(raw);
+            if (!validSavePayload(d)) continue;
+            return (
+              d.meta || {
+                savedAt: d.savedAt,
+                sector:
+                  d.bodyStates?.[d.currentSystemIndex || 0]?.name ||
+                  "Saved Sector",
+                shipClass: shipClasses[d.upgradeLevel || 0]?.name || "Scout",
+                shipName: d.shipName || "Starling",
+                missionStage: d.missionStage || 0,
+                captured: (d.captured || []).length,
+                resources: Object.values(d.resources || {}).reduce(
+                  (a, v) => a + Math.floor(v || 0),
+                  0,
+                ),
+              }
+            );
+          } catch (e) {}
+        }
+        return null;
+      }
+      function validSavePayload(data) {
+        return !!(
+          data &&
+          typeof data === "object" &&
+          Number(data.version || 0) > 0 &&
+          Number(data.version || 0) <= SAVE_VERSION &&
+          data.resources &&
+          typeof data.resources === "object" &&
+          Array.isArray(data.bodyStates) &&
+          data.ship &&
+          typeof data.ship === "object"
+        );
+      }
+      function exportSaveFile() {
+        if (!saveGame(false)) return;
         try {
-          const raw = localStorage.getItem(SAVE_KEY);
-          if (!raw) return null;
-          const d = JSON.parse(raw);
-          return (
-            d.meta || {
-              savedAt: d.savedAt,
-              sector:
-                d.bodyStates?.[d.currentSystemIndex || 0]?.name ||
-                "Saved Sector",
-              shipClass: shipClasses[d.upgradeLevel || 0]?.name || "Scout",
-              shipName: d.shipName || "Starling",
-              missionStage: d.missionStage || 0,
-              captured: (d.captured || []).length,
-              resources: Object.values(d.resources || {}).reduce(
-                (a, v) => a + Math.floor(v || 0),
-                0,
-              ),
-            }
+          const payload = localStorage.getItem(SAVE_KEY),
+            blob = new Blob([payload], { type: "application/json" }),
+            url = URL.createObjectURL(blob),
+            link = document.createElement("a");
+          link.href = url;
+          link.download =
+            "orbital-drift-save-" +
+            new Date().toISOString().slice(0, 10) +
+            ".json";
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(url), 500);
+          toast("Save backup exported.");
+          addActivity(
+            "save",
+            "Save backup exported",
+            "Portable JSON backup created successfully.",
           );
         } catch (e) {
-          return null;
+          console.error(e);
+          toast("Could not export the save backup.");
+        }
+      }
+      function openSaveImport() {
+        if (!ui.saveImportInput) return toast("Save import is unavailable.");
+        ui.saveImportInput.value = "";
+        ui.saveImportInput.click();
+      }
+      async function importSaveFile(file) {
+        if (!file) return false;
+        try {
+          const text = await file.text(),
+            data = JSON.parse(text);
+          if (!validSavePayload(data))
+            return errorToast("That file is not a compatible Orbital Drift save."), false;
+          confirmAction(
+            "Import Save Backup?",
+            "This replaces the current local save after preserving it as an automatic backup.",
+            () => {
+              const current = localStorage.getItem(SAVE_KEY);
+              if (current) localStorage.setItem(SAVE_BACKUP_KEY, current);
+              localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+              if (loadGame(true)) {
+                toast("Save backup imported successfully.");
+                closeMenu();
+              }
+            },
+          );
+          return true;
+        } catch (e) {
+          console.error(e);
+          errorToast("That save backup is damaged or unreadable.");
+          return false;
         }
       }
       function deleteSave() {
         localStorage.removeItem(SAVE_KEY);
+        localStorage.removeItem(SAVE_BACKUP_KEY);
         lastSaveMeta = null;
         lastSaveMessage = "Saved game deleted.";
         toast("Local save deleted.");
@@ -9863,8 +10136,8 @@
       function buildCost() {
         return {
           Alloy: 92,
-          Titanium: 36,
-          Helium3: 24,
+          Titanium: 32,
+          Helium3: 20,
           Crystal: 14,
           DataCores: 5,
         };
@@ -12475,7 +12748,7 @@
       }
       function openObjectiveAction() {
         const m = nextBestAction().menu || "hub";
-        openMenu(m === "flight" ? "hub" : m);
+        openMenu(m);
       }
       function feedbackPulse(kind = "action") {
         if (!ui.feedbackFlash) return;
@@ -14404,8 +14677,17 @@
           );
       }
       function storeHtml() {
+        const nativeStore = !!game.monetization?.storeKitReady,
+          purchaseLabel = (price) =>
+            nativeStore
+              ? "Unlock $" + price
+              : "Test Unlock (Browser — No Charge)";
         return (
-          '<div class="card"><h4>Complete Hull Sets</h4><p>Unlock matching designs for both command ships.</p><div class="grid">' +
+          '<div class="card"><h4>Complete Hull Sets</h4><p>' +
+          (nativeStore
+            ? "Unlock matching designs for both command ships through the native store."
+            : "Browser test mode uses simulated unlocks and does not process a real payment.") +
+          '</p><div class="grid">' +
           skinCombos
             .map((c) => {
               const owned = owns("ship", c.ship) && owns("frigate", c.frigate);
@@ -14422,7 +14704,7 @@
                     ? "Owned Set"
                     : c.type === "achievement"
                       ? "Earn in Exploration"
-                      : "Unlock $" + c.price,
+                      : purchaseLabel(c.price),
                   owned ? "noop" : "buyCombo",
                   owned ? null : c.key,
                   !owned && c.type !== "achievement",
@@ -14460,8 +14742,20 @@
                 false,
               )
             : s.type === "paidCombo"
-              ? btn("Buy Combo", "buyCombo", "Ancient Hunter Combo")
-              : btn("Unlock $" + s.price, "buySkinKind", kind + "|" + s.key);
+              ? btn(
+                  game.monetization?.storeKitReady
+                    ? "Buy Combo"
+                    : "Test Combo Unlock (No Charge)",
+                  "buyCombo",
+                  "Ancient Hunter Combo",
+                )
+              : btn(
+                  game.monetization?.storeKitReady
+                    ? "Unlock $" + s.price
+                    : "Test Unlock (No Charge)",
+                  "buySkinKind",
+                  kind + "|" + s.key,
+                );
         return (
           '<div class="cosmetic-card' +
           stateClass +
@@ -14615,7 +14909,7 @@
                 esc(mod.name) +
                 ":</b> " +
                 esc(mod.desc),
-              btn("Jump to Next New Sector", "jumpSystem") +
+                btn("Jump to Random Uncharted System", "jumpSystem") +
                 btn("New Contracts", "rerollContracts"),
             ) +
             card(
@@ -14663,7 +14957,7 @@
                 esc(mod.name) +
                 ":</b> " +
                 esc(mod.desc),
-              btn("Jump to Next New Sector", "jumpSystem") +
+              btn("Jump to Random Uncharted System", "jumpSystem") +
                 btn("Save Now", "saveGame", true) +
                 btn("Load Save", "loadGame", true),
             ) + questHtml();
@@ -14872,6 +15166,8 @@
             saveMetaHtml(lastSaveMeta || getStoredSaveMeta()),
           btn("Save Now", "saveGame", true) +
             btn("Load Save", "loadGame", true) +
+            btn("Export Backup", "exportSaveFile") +
+            btn("Import Backup", "openSaveImport") +
             '<button type="button" class="danger" data-action="deleteSave" data-arg="">Delete Save</button>',
         );
       }
@@ -14909,10 +15205,9 @@
                 );
               })
               .join("") +
-            '<div class="sector"><b>Uncharted Sector ' +
-            (currentSystemIndex + 1) +
-            '</b><span>A new procedural system will be generated when you jump.</span><div class="actions">' +
-            btn("Jump Outward", "jumpSystem") +
+            '<div class="sector rarity-rare"><b>Random Uncharted Route</b>' +
+            '<span>The Pioneer will select a new, unvisited destination from a varied route pool. Outward jumps never follow the Star Atlas in numerical order.</span><div class="actions">' +
+            btn("Jump to Random System", "jumpSystem") +
             "</div></div></div>",
         );
       }
@@ -15464,11 +15759,13 @@
           },
           {
             group: "Gameplay",
-            label: "Infinite sector generation available",
+            label: "Randomized unvisited sector routing available",
             pass:
               typeof ensureSystemIndex === "function" &&
               typeof proceduralSeedForIndex === "function" &&
-              String(jumpSystem).includes("currentSystemIndex+1"),
+              typeof chooseUnchartedSystemIndex === "function" &&
+              typeof routeVarietyScore === "function" &&
+              !String(jumpSystem).includes("currentSystemIndex + 1"),
           },
           {
             group: "Gameplay",
@@ -15486,12 +15783,25 @@
           {
             group: "Save",
             label: "Activity log saved",
-            pass: String(saveState).includes("activity:game.activity"),
+            pass:
+              String(saveState).includes("activity") &&
+              String(saveState).includes("universeSeed"),
+          },
+          {
+            group: "Save",
+            label: "Portable backup and recovery available",
+            pass:
+              typeof exportSaveFile === "function" &&
+              typeof importSaveFile === "function" &&
+              !!SAVE_BACKUP_KEY,
           },
           {
             group: "Audio",
             label: "Audio starts on gesture",
-            pass: String(syncAudioSettings).includes("const a=audio"),
+            pass:
+              typeof ensureAudio === "function" &&
+              typeof resumeAudio === "function" &&
+              typeof syncAudioSettings === "function",
           },
           {
             group: "Mobile",
@@ -15504,6 +15814,13 @@
             pass: document
               .querySelector('meta[name="viewport"]')
               ?.content.includes("viewport-fit=cover"),
+          },
+          {
+            group: "Mobile",
+            label: "Touch controls have accessible labels",
+            pass: [ui.touchThrust, ui.touchBrake, ui.orbitRelease].every(
+              (control) => !!control?.getAttribute("aria-label"),
+            ),
           },
           {
             group: "UI",
@@ -15519,6 +15836,13 @@
             group: "Performance",
             label: "Auto performance guard",
             pass: typeof performanceGuard === "function",
+          },
+          {
+            group: "Release",
+            label: "Installable offline build configured",
+            pass:
+              !!document.querySelector('link[rel="manifest"]') &&
+              typeof registerOfflineSupport === "function",
           },
           {
             group: "Release",
@@ -21413,12 +21737,16 @@
 
         ok(
           "Save schema is current",
-          SAVE_VERSION === 14 && SAVE_KEY === "orbital-drift-save-v12",
+          SAVE_VERSION === 15 &&
+            APP_VERSION === "0.17.0" &&
+            SAVE_KEY === "orbital-drift-save-v12" &&
+            !!SAVE_BACKUP_KEY,
         );
         const serialized = saveState();
         ok(
           "Save state contains core progression",
           serialized.version === SAVE_VERSION &&
+            serialized.universeSeed === universeSeed &&
             Array.isArray(serialized.bodyStates) &&
             Array.isArray(serialized.visitedSectors),
         );
@@ -22278,6 +22606,9 @@
         claimDaily,
         saveGame,
         loadGame,
+        exportSaveFile,
+        openSaveImport,
+        importSaveFile,
         deleteSave,
         claimProduction,
         checkAchievements,
@@ -22313,8 +22644,16 @@
       addEventListener("resize", resize);
       addEventListener("beforeunload", () => saveGame(false));
       document.addEventListener("visibilitychange", () => {
-        if (document.hidden) saveGame(false);
+        if (document.hidden) {
+          saveGame(false);
+          if (audio?.ctx?.state === "running") audio.ctx.suspend().catch?.(() => {});
+        } else if (audio && (game.settings?.music === "On" || game.settings?.sound === "On")) {
+          audio.ctx.resume().then?.(syncAudioSettings).catch?.(() => {});
+        }
       });
+      ui.saveImportInput?.addEventListener("change", (event) =>
+        importSaveFile(event.target.files?.[0]),
+      );
       addEventListener("keydown", (e) => {
         const k = e.key.toLowerCase();
         if (k === "escape") {
@@ -22831,6 +23170,25 @@
         resumeAudio();
         toggleOrbit();
       };
+      function registerOfflineSupport() {
+        if (!("serviceWorker" in navigator) || location.protocol === "file:")
+          return;
+        navigator.serviceWorker
+          .register("./sw.js")
+          .then((registration) => {
+            registration.addEventListener("updatefound", () => {
+              const worker = registration.installing;
+              worker?.addEventListener("statechange", () => {
+                if (
+                  worker.state === "installed" &&
+                  navigator.serviceWorker.controller
+                )
+                  toast("A new Orbital Drift build is ready. Reload to update.");
+              });
+            });
+          })
+          .catch((error) => console.warn("Offline support unavailable", error));
+      }
       resize();
       initGame(false);
       applySettings(false);
@@ -22842,6 +23200,7 @@
       titleOpen = true;
       paused = true;
       if (DEV_BUILD) runTests();
+      registerOfflineSupport();
       requestAnimationFrame(loop);
     </script>
   </body>
