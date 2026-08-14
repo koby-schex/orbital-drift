@@ -321,9 +321,10 @@
         display: none;
         position: fixed;
         right: 14px;
-        top: 76px;
+        top: calc(72px + var(--safeTop));
         width: min(560px, calc(100vw - 28px));
-        max-height: calc(100vh - 104px);
+        max-height: calc(100dvh - 88px - var(--safeTop) - var(--safeBottom));
+        box-sizing: border-box;
         overflow: auto;
         border-radius: 24px;
         padding: 14px;
@@ -2318,7 +2319,7 @@
       }
       .cosmetic-preview-live {
         position: relative;
-        height: 128px;
+        height: 156px;
         margin: 9px 0;
         overflow: hidden;
         border: 1px solid rgba(125, 211, 252, 0.18);
@@ -2358,7 +2359,7 @@
           grid-template-columns: 1fr;
         }
         .cosmetic-preview-live {
-          height: 142px;
+          height: 168px;
         }
       }
       .vault-hero {
@@ -3107,6 +3108,12 @@
       body.menu-open .touch-hint,
       body.menu-open .toast-wrap {
         display: none !important;
+      }
+      body.menu-open .dock {
+        display: none !important;
+      }
+      .menu .content {
+        padding-bottom: calc(18px + var(--safeBottom));
       }
       body.menu-open .menu {
         display: block;
@@ -4798,7 +4805,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Open Expeditions • v0.21.0</div>
+        <div class="title-version">Flight &amp; Fleet Refit • v0.22.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5096,7 +5103,8 @@
         </div>
         <div class="grid" id="discoveryStats"></div>
         <div class="actions">
-          <button id="closeDiscovery" type="button">Continue</button>
+          <button id="discoveryCapture" type="button" hidden>Capture World</button
+          ><button id="closeDiscovery" type="button">Tap Anywhere to Return</button>
         </div>
       </div>
     </div>
@@ -5202,8 +5210,9 @@
         TAU = Math.PI * 2,
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
-        SAVE_VERSION = 19,
-        APP_VERSION = "0.21.0";
+        SAVE_VERSION = 20,
+        APP_VERSION = "0.22.0",
+        STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -5237,6 +5246,7 @@
         stars = [],
         nebulas = [],
         asteroids = [],
+        shootingStars = [],
         constellationLines = [],
         distantGalaxies = [],
         upgradeFX = [],
@@ -5251,7 +5261,9 @@
         audioSyncing = false,
         activeVisualTheme = null,
         activeVisualPhenomenon = null,
-        nextVisualPhenomenonAt = Infinity;
+        nextVisualPhenomenonAt = Infinity,
+        pioneerRescue = null,
+        activeDiscoveryBody = null;
       const ui = {
         controlEditBanner: $("controlEditBanner"),
         controlEditDone: $("controlEditDone"),
@@ -5300,6 +5312,7 @@
         discoveryWorld: $("discoveryWorld"),
         discoveryClassification: $("discoveryClassification"),
         discoveryStats: $("discoveryStats"),
+        discoveryCapture: $("discoveryCapture"),
         closeDiscovery: $("closeDiscovery"),
         choiceOverlay: $("choiceOverlay"),
         choiceText: $("choiceText"),
@@ -5864,6 +5877,7 @@
           type: "free",
           price: 0,
           dynamic: true,
+          motif: "command",
           desc: "Adaptive command markings that automatically blend the active Starling and Pioneer hull palettes across every escort craft.",
         },
         {
@@ -5875,6 +5889,7 @@
           rarity: "Unusual",
           type: "free",
           price: 0,
+          motif: "frontier",
           desc: "Standard blue-white escort markings used by the ODF Pioneer support fleet.",
         },
         {
@@ -5886,6 +5901,7 @@
           rarity: "Rare",
           type: "paid",
           price: 1,
+          motif: "solar",
           desc: "Bright solar-orange fleet paint with heat-shield striping and golden engine trails.",
         },
         {
@@ -5897,6 +5913,7 @@
           rarity: "Mythic",
           type: "achievement",
           price: 0,
+          motif: "spirit",
           desc: "Unlocked by reaching a Cosmic Spirit system. Escorts glow like pale celestial lanterns.",
         },
         {
@@ -5908,6 +5925,7 @@
           rarity: "Mythic",
           type: "achievement",
           price: 0,
+          motif: "parallel",
           desc: "Unlocked by entering a Parallel system. Fleet ships appear warped by alien geometry.",
         },
       ];
@@ -6057,7 +6075,9 @@
         },
       };
       const rarityOdds = { Mythic: 0.01, Exotic: 0.05 };
-      const specialSystemOdds = { cosmicSpirit: 0.02, blackHole: 0.005 };
+      // Legendary systems are intentionally far rarer than planet rarity rolls.
+      // Parallel space is only reachable through the already-rare black-hole event.
+      const specialSystemOdds = { cosmicSpirit: 0.0035, blackHole: 0.005 };
       const systemArchetypes = [
         {
           key: "innerForge",
@@ -8462,18 +8482,28 @@
         return arr[Math.floor(rand(seed) * arr.length)];
       }
       function uniquePlanetName(seed, i, used) {
+        const roots = [
+            "Astra", "Caelum", "Eidra", "Ilyon", "Kestrel", "Liora",
+            "Neris", "Orison", "Peregrine", "Riven", "Sable", "Talaris",
+            "Vesper", "Yarrow", "Zephyr", "Nymara", "Orell", "Thessa",
+          ],
+          suffixes = [
+            "Reach", "Vale", "Crown", "Haven", "Drift", "Morrow",
+            "Echo", "Wake", "Frontier", "Basin", "Cradle", "Rest",
+          ];
         let base =
-            nameA[Math.floor(rand(seed + i * 37 + 4) * nameA.length)] +
-            "-" +
-            Math.floor(between(seed + i * 41 + 5, 100, 999)),
+            roots[Math.floor(rand(seed + i * 37 + 4) * roots.length)] +
+            " " +
+            suffixes[Math.floor(rand(seed + i * 41 + 5) * suffixes.length)],
           tries = 0;
         while (used.has(base) && tries < 12) {
           tries++;
           base =
-            nameA[Math.floor(rand(seed + i * 73 + tries * 11) * nameA.length)] +
-            "-" +
-            Math.floor(between(seed + i * 89 + tries * 17, 100, 999));
+            roots[Math.floor(rand(seed + i * 73 + tries * 11) * roots.length)] +
+            " " +
+            suffixes[Math.floor(rand(seed + i * 89 + tries * 17) * suffixes.length)];
         }
+        if (used.has(base)) base += " " + String.fromCharCode(65 + (i % 26));
         used.add(base);
         return base;
       }
@@ -8687,6 +8717,24 @@
             "Choirwake",
             "Pearl Oracle",
           ],
+          systemNames = [
+            "The Luminous Communion",
+            "Eirwake Sanctuary",
+            "The Pearl Expanse",
+            "Sanctum of Quiet Suns",
+            "The Verdant Choir",
+            "Mercy Lantern Reach",
+          ],
+          biomes = [
+            "Aurora Pilgrimage",
+            "Luminous Memory Garden",
+            "Pearl-Veil Biosphere",
+            "Choirwood Sanctuary",
+            "Halo-Tide Archipelago",
+            "Dreamglass Archive",
+            "Lantern Cloud Forest",
+            "Eidolon Bloom",
+          ],
           resources = [
             "BioGel",
             "DataCores",
@@ -8707,10 +8755,7 @@
         let orbit = between(seed + 6, 430, 580);
         for (let i = 0; i < count; i++) {
           orbit += between(seed + i * 31, 300, 520);
-          const nm =
-            pickFrom(names, seed + i * 37) +
-            " " +
-            Math.floor(between(seed + i * 41, 1, 99));
+          const nm = names[(Math.floor(rand(seed + 37) * names.length) + i * 3) % names.length];
           used.add(nm);
           const rarity =
             i === 2 ? "Mythic" : rand(seed + i * 43) > 0.55 ? "Exotic" : "Rare";
@@ -8731,13 +8776,7 @@
               upgradeable: rand(seed + i * 52) > 0.28,
               pattern: pickFrom(patterns, seed + i * 53),
               rarity,
-              biome:
-                "Cosmic Spirit " +
-                pickFrom(
-                  ["Garden", "Archive", "Choir", "Veil", "Sanctum", "Lantern"],
-                  seed + i * 54,
-                ) +
-                " World",
+              biome: biomes[(Math.floor(rand(seed + 54) * biomes.length) + i * 5) % biomes.length],
               hazard: pickFrom(
                 [
                   "Soft aurora pressure",
@@ -8753,8 +8792,7 @@
           );
         }
         return {
-          name:
-            "Cosmic Spirit System " + Math.floor(between(seed + 99, 10, 99)),
+          name: pickFrom(systemNames, seed + 99),
           seed,
           bodies: b,
           isTutorial: false,
@@ -8817,10 +8855,7 @@
           orbit += between(seed + i * 61, 260, 600);
           b.push(
             makeBody({
-              name:
-                pickFrom(names, seed + i * 62) +
-                " " +
-                Math.floor(between(seed + i * 63, 100, 999)),
+              name: names[(Math.floor(rand(seed + 62) * names.length) + i * 5) % names.length],
               radius: between(seed + i * 64, 12, 32),
               mass: between(seed + i * 65, 4200, 39000),
               orbitRadius: orbit,
@@ -8837,20 +8872,17 @@
               upgradeable: rand(seed + i * 72) > 0.36,
               pattern: pickFrom(patterns, seed + i * 73),
               rarity: "Mythic",
-              biome:
-                "Parallel " +
-                pickFrom(
-                  [
-                    "Paradox",
-                    "Fracture",
-                    "Anti-Life",
-                    "Mirror-Singularity",
-                    "Static Dream",
-                    "Null Garden",
-                  ],
-                  seed + i * 74,
-                ) +
-                " World",
+              biome: pickFrom(
+                [
+                  "Paradox Sea",
+                  "Fractured Continuum",
+                  "Anti-Life Biosphere",
+                  "Mirror Singularity",
+                  "Static Dreamscape",
+                  "Null Garden",
+                ],
+                seed + i * 74,
+              ),
               hazard: pickFrom(
                 [
                   "Contradictory mass readings",
@@ -8867,7 +8899,16 @@
           );
         }
         return {
-          name: "Parallel System " + Math.floor(between(seed + 101, 100, 999)),
+          name: pickFrom(
+            [
+              "The Contrary Horizon",
+              "Elsewhere Fold",
+              "The Broken Reflection",
+              "Parallax Beyond",
+              "The Unwritten System",
+            ],
+            seed + 101,
+          ),
           seed,
           bodies: b,
           isTutorial: false,
@@ -8995,9 +9036,16 @@
         return mixSeed(universeSeed, i + 1, 0x6f726269);
       }
       function finalizeSystemIdentity(sys, index) {
-        if (!sys || sys.isTutorial || sys.specialType) return sys;
+        if (!sys || sys.isTutorial) return sys;
         const duplicate = systems.some((known) => known?.name === sys.name);
         if (!duplicate) return sys;
+        if (sys.specialType) {
+          const epithets = [
+            "Halcyon", "Auralis", "Eidolon", "Vesper", "Seraph", "Peregrine",
+          ];
+          sys.name += " of " + pickFrom(epithets, Number(sys.seed || index) + index * 17);
+          return sys;
+        }
         const star = sys.bodies?.find((body) => body.type === "star");
         if (!star) return sys;
         const designation = " " + String(index + 1).padStart(2, "0");
@@ -11578,16 +11626,19 @@
         return true;
       }
       function applyDiscoveryReward(b) {
-        recordCodex(b, "discovered");
         markIceWorldEncountered(b);
-        if (!b || b.type === "star" || b.discoveryRewardClaimed)
+        if (!b || b.type === "star") return null;
+        if (b.discoveryRewardClaimed) {
+          recordCodex(b, "survey reviewed");
           return b?.lastDiscoveryReward || null;
+        }
         const reward = discoveryReward(b),
           filtered = Object.fromEntries(
             Object.entries(reward).filter(([, v]) => v > 0),
           );
         b.lastDiscoveryReward = filtered;
         b.discoveryRewardClaimed = true;
+        recordCodex(b, "surveyed");
         Object.entries(filtered).forEach(
           ([k, v]) => (game.resources[k] = (game.resources[k] || 0) + v),
         );
@@ -11615,22 +11666,24 @@
         if (!b || b.type === "star") return;
         const key = game.system.name + "|" + b.name,
           old = game.codex?.[key] || {},
-          now = Date.now();
+          now = Date.now(),
+          surveyed = bodySurveyed(b);
         game.codex[key] = {
           ...old,
           key,
           name: b.name,
           system: game.system.name,
-          rarity: b.rarity || "Common",
-          resource: b.resource,
-          biome: displayBiome(b),
-          className: planetClass(b),
+          surveyed,
+          rarity: surveyed ? b.rarity || "Common" : "Unknown",
+          resource: surveyed ? b.resource : null,
+          biome: surveyed ? displayBiome(b) : "Survey pending",
+          className: surveyed ? planetClass(b) : "Unclassified world",
           archetypeKey:
             game.system.specialType || game.system.archetype?.key || "unknown",
           archetypeName:
             game.system.archetype?.name || game.system.name || "Unknown Frontier",
           modifierName: game.system.modifier?.name || "Calm Drift",
-          hazard: b.hazard,
+          hazard: surveyed ? b.hazard : "Unknown",
           captured: game.captured.has(b.name),
           level: b.level || 0,
           factory: !!b.factory,
@@ -11815,9 +11868,40 @@
           s.vy += (dy / d) * f * dt;
         }
       }
+      function updateDrift(dt, cls) {
+        const s = game.ship;
+        if (!s || s.orbitLocked || pioneerRescue) {
+          if (s) s.driftCharge = Math.max(0, (s.driftCharge || 0) - 0.035 * dt);
+          return;
+        }
+        const speed = Math.hypot(s.vx, s.vy),
+          steering = touch.active || keys.has("a") || keys.has("d"),
+          braking = keys.has("s") || keys.has("brake"),
+          velocityAngle = speed > 0.05 ? Math.atan2(s.vy, s.vx) : s.angle,
+          slip = Math.abs(angleDiff(s.angle, velocityAngle)),
+          active = steering && speed > 0.85 && slip > 0.16;
+        s.driftSlip = slip;
+        if (active) {
+          const skill = clamp((speed - 0.7) / 3.2, 0.15, 1) * clamp(slip / 1.7, 0.12, 1),
+            handlingLevel = game.shipSystems?.handling || 0,
+            carve = (0.012 + handlingLevel * 0.0018) * (braking ? 1.8 : 1) * dt,
+            curvedAngle = velocityAngle + angleDiff(s.angle, velocityAngle) * carve;
+          // Preserve momentum while the nose carves across the travel vector.
+          s.vx = Math.cos(curvedAngle) * speed;
+          s.vy = Math.sin(curvedAngle) * speed;
+          s.driftCharge = clamp((s.driftCharge || 0) + skill * 0.028 * dt, 0, 1);
+          if (braking) {
+            s.vx /= Math.max(0.92, 1 - cls.brake * dt * 0.32);
+            s.vy /= Math.max(0.92, 1 - cls.brake * dt * 0.32);
+          }
+        } else {
+          s.driftCharge = Math.max(0, (s.driftCharge || 0) - 0.012 * dt);
+        }
+      }
       function updateShip(dt) {
         const s = game.ship,
           cls = shipStats();
+        if (pioneerRescue) updatePioneerRescue(dt);
         if (touch.active) {
           const a = Math.atan2(touch.y, touch.x);
           s.angle += angleDiff(a, s.angle) * 0.13 * dt;
@@ -11852,6 +11936,7 @@
           s.vy *= brake;
           s.fuel = Math.max(0, s.fuel - 0.035 * dt);
         }
+        updateDrift(dt, cls);
         if (!updateOrbit(dt)) {
           gravity(dt);
           s.x += s.vx * dt;
@@ -11868,8 +11953,11 @@
           sp,
         );
         game.captainLog.distance += sp * dt;
-        if (s.fuel <= 0.5 && !s.orbitLocked) recoverShip();
-        s.trail.push({ x: s.x, y: s.y, a: 1 });
+        if (s.fuel <= 0.5 && !s.orbitLocked && !pioneerRescue) {
+          if (game.frigate?.built) startPioneerRescue();
+          else recoverShip();
+        }
+        s.trail.push({ x: s.x, y: s.y, a: 1, drift: (s.driftCharge || 0) > 0.18 });
         if (s.trail.length > 360) s.trail.shift();
         s.trail.forEach((p) => (p.a *= 0.992));
         const n = nearestBody();
@@ -11878,8 +11966,6 @@
           n.body.discovered = true;
           game.discovered.add(n.body.name);
           if (was && n.body.type !== "star") {
-            completeContract("survey");
-            recordPlanet(n.body, "surveys", 1);
             game.captainLog.discoveries++;
             if (["Rare", "Exotic", "Mythic"].includes(n.body.rarity)) {
               game.captainLog.rareDiscoveries++;
@@ -11887,12 +11973,53 @@
             }
             if (["Exotic", "Mythic"].includes(n.body.rarity))
               game.captainLog.exoticDiscoveries++;
-            const reward = applyDiscoveryReward(n.body);
-            showDiscovery(n.body, reward);
+            recordCodex(n.body, "detected");
+            toast(
+              "World detected: " +
+                n.body.name +
+                ". Scan nearby for full survey data.",
+            );
+            addActivity(
+              "discovery",
+              n.body.name + " detected",
+              "Unsurveyed planetary signal awaiting a close scan.",
+            );
           }
-          if (n.body.name === "Venus" && game.missionStage === 3)
-            game.missionStage = 4;
         }
+      }
+
+      function scanPlanet(target = null) {
+        const n = nearestBody(),
+          b = typeof target === "string" ? body(target) : n.body;
+        if (!b || b.type === "star") return toast("No planetary world is in scanner range.");
+        const range = dist(game.ship, b) - visualRadius(b);
+        if (range > 230) return toast("Move within 230u of " + b.name + " to complete a survey scan.");
+        const wasDetected = b.discovered || game.discovered.has(b.name);
+        b.discovered = true;
+        game.discovered.add(b.name);
+        if (!wasDetected) {
+          game.captainLog.discoveries++;
+          if (["Rare", "Exotic", "Mythic"].includes(b.rarity)) {
+            game.captainLog.rareDiscoveries++;
+            trackDaily("discoverRare", 1);
+          }
+          if (["Exotic", "Mythic"].includes(b.rarity))
+            game.captainLog.exoticDiscoveries++;
+        }
+        const firstSurvey = !b.discoveryRewardClaimed,
+          reward = applyDiscoveryReward(b);
+        if (firstSurvey) {
+          completeContract("survey");
+          recordPlanet(b, "surveys", 1);
+          if (b.name === "Venus" && game.missionStage === 3) game.missionStage = 4;
+          addActivity(
+            "discovery",
+            b.name + " fully surveyed",
+            (fmt(reward) || "Survey complete") +
+              (b.capturable ? " • Suitable for capture" : " • Survey-only world"),
+          );
+        }
+        showDiscovery(b, reward);
       }
       function capture() {
         const s = game.ship;
@@ -12057,7 +12184,12 @@
       function refuel() {
         if (orbitingFrigate()) {
           game.ship.fuel = game.ship.maxFuel;
+          game.ship.boost = game.ship.maxBoost;
+          feedbackPulse("upgrade");
+          addActivity("resource", "Starling refueled", "Pioneer reactor reserves restored fuel and boost capacity.");
           toast("Refueled from the ODF Pioneer reactor reserve.");
+          saveGame(false);
+          if (ui.menu?.classList.contains("open")) renderMenu();
           return;
         }
         const n = nearestBody();
@@ -12069,6 +12201,7 @@
           game.ship.fuel = game.ship.maxFuel;
           recordPlanet(n.body, "refuels", 1);
           toast("Refueled at " + n.body.name + ".");
+          saveGame(false);
         } else
           toast("Orbit-lock the ODF Pioneer or move near a captured planet.");
       }
@@ -14197,6 +14330,90 @@
         });
         toast("Distress recovery complete near " + home.name + ".");
       }
+      function startPioneerRescue() {
+        if (pioneerRescue || !game.frigate?.built || !game.ship) return false;
+        const home = frigateHomePosition();
+        if (!home) return false;
+        keys.clear();
+        touch.active = false;
+        pioneerRescue = {
+          phase: "outbound",
+          time: 0,
+          duration: 105,
+          x: home.x,
+          y: home.y,
+          vx: home.vx,
+          vy: home.vy,
+          startX: home.x,
+          startY: home.y,
+          lastX: home.x,
+          lastY: home.y,
+        };
+        game.captainLog.rescueCount++;
+        toast((game.frigate.name || "ODF Pioneer") + " received the fuel distress call and is breaking orbit.");
+        addActivity("travel", "Pioneer rescue launched", "The frigate left stellar orbit to recover the stranded Starling.");
+        return true;
+      }
+      function updatePioneerRescue(dt) {
+        const rescue = pioneerRescue,
+          s = game.ship;
+        if (!rescue || !s) return;
+        rescue.time += dt;
+        if (rescue.phase === "outbound") {
+          const q0 = clamp(rescue.time / rescue.duration, 0, 1),
+            q = q0 * q0 * (3 - 2 * q0),
+            tx = s.x,
+            ty = s.y;
+          rescue.x = rescue.startX + (tx - rescue.startX) * q;
+          rescue.y = rescue.startY + (ty - rescue.startY) * q;
+          s.vx *= Math.pow(0.993, dt);
+          s.vy *= Math.pow(0.993, dt);
+          if (q0 >= 1) {
+            rescue.phase = "service";
+            rescue.time = 0;
+            rescue.duration = 82;
+            const a = Math.atan2(s.y - rescue.y, s.x - rescue.x) || Math.PI;
+            Object.assign(s, {
+              orbitLocked: true,
+              lockBody: "__FRIGATE__",
+              lockAngle: a,
+              lockRadius: 118,
+              lockDirection: 1,
+              lockCharge: 0,
+            });
+            toast("Pioneer on station. Emergency reactor transfer connected.");
+          }
+        } else if (rescue.phase === "service") {
+          s.fuel = Math.min(s.maxFuel, s.fuel + (s.maxFuel / rescue.duration) * dt);
+          s.boost = Math.min(s.maxBoost, s.boost + (s.maxBoost / rescue.duration) * dt);
+          if (rescue.time >= rescue.duration) {
+            rescue.phase = "returning";
+            rescue.time = 0;
+            rescue.duration = 125;
+            rescue.startX = rescue.x;
+            rescue.startY = rescue.y;
+            s.fuel = s.maxFuel;
+            toast("Refuel complete. The Starling is secured while Pioneer returns to orbit.");
+          }
+        } else if (rescue.phase === "returning") {
+          const home = frigateHomePosition(),
+            q0 = clamp(rescue.time / rescue.duration, 0, 1),
+            q = q0 * q0 * (3 - 2 * q0);
+          rescue.x = rescue.startX + (home.x - rescue.startX) * q;
+          rescue.y = rescue.startY + (home.y - rescue.startY) * q;
+          if (q0 >= 1) {
+            pioneerRescue = null;
+            placeShipAtFrigate();
+            saveGame(false);
+            toast("Pioneer has resumed stellar orbit. Starling remains safely docked in formation.");
+            return;
+          }
+        }
+        rescue.vx = (rescue.x - rescue.lastX) / Math.max(dt, 0.001);
+        rescue.vy = (rescue.y - rescue.lastY) / Math.max(dt, 0.001);
+        rescue.lastX = rescue.x;
+        rescue.lastY = rescue.y;
+      }
       function solarCrash(star) {
         const home = recoveryHome();
         game.captainLog.rescueCount++;
@@ -15575,10 +15792,7 @@
             (b) => b.type !== "star",
           ),
           surveyKnown = surveyBodies.filter(
-            (b) =>
-              b.discovered ||
-              game.discovered.has(b.name) ||
-              game.captured.has(b.name),
+            (b) => bodySurveyed(b),
           ).length,
           surveyProgress = surveyBodies.length
             ? Math.round((surveyKnown / surveyBodies.length) * 100)
@@ -15896,12 +16110,15 @@
       function renderPlanets() {
         const s = body(selectedPlanetName),
           summary = s
-            ? esc(s.name) +
-              " selected. " +
-              esc(displayBiome(s)) +
-              ". " +
-              esc(s.lore)
+            ? bodySurveyed(s)
+              ? esc(s.name) +
+                " selected. " +
+                esc(displayBiome(s)) +
+                ". " +
+                esc(s.lore)
+              : esc(s.name) + " detected. Complete a close scan to reveal its survey record."
             : "Select a planet.";
+        const scanRange = s && game.ship ? dist(game.ship, s) - visualRadius(s) : Infinity;
         ui.menuContent.innerHTML =
           '<div class="list">' +
           planetListHtml() +
@@ -15910,6 +16127,12 @@
             "Selected Planet",
             summary,
             btn("Set as Target", "setTarget", selectedPlanetName) +
+              btn(
+                bodySurveyed(s) ? "Survey Complete" : "Scan Selected World",
+                "scanPlanet",
+                selectedPlanetName,
+                !!s && s.type !== "star" && !bodySurveyed(s) && scanRange <= 230,
+              ) +
               btn("Clear Target", "clearTarget") +
               btnWhy(
                 "Upgrade Selected Planet",
@@ -15930,10 +16153,20 @@
             }),
         );
       }
+      function bodySurveyed(b) {
+        return !!(
+          b &&
+          (b.type === "star" ||
+            b.discoveryRewardClaimed ||
+            b.factory ||
+            game.captured.has(b.name))
+        );
+      }
       function planetListHtml() {
         return game.system.bodies
           .map((b) => {
             const known = b.discovered || game.discovered.has(b.name),
+              surveyed = bodySurveyed(b),
               tag =
                 b.type === "star"
                   ? "CORE"
@@ -15942,10 +16175,14 @@
                     : game.captured.has(b.name)
                       ? "OWNED"
                       : !b.capturable
-                        ? "SURVEY"
-                        : known
+                        ? surveyed
+                          ? "SURVEY"
+                          : "SIGNAL"
+                        : surveyed
                           ? b.rarity
-                          : "???";
+                          : known
+                            ? "SIGNAL"
+                            : "???";
             return (
               '<div class="planet ' +
               (b.name === selectedPlanetName ? "active" : "") +
@@ -15961,11 +16198,13 @@
               (known
                 ? b.type === "star"
                   ? "Star"
-                  : esc(displayBiome(b)) +
-                    " • " +
-                    esc(b.rarity) +
-                    " • Lv. " +
-                    b.level
+                  : surveyed
+                    ? esc(displayBiome(b)) +
+                      " • " +
+                      esc(b.rarity) +
+                      " • Lv. " +
+                      b.level
+                    : "Detected • Survey scan pending"
                 : "Unsurveyed") +
               '</span></div><div class="tag ' +
               (known && b.type !== "star" ? rarityClass(b) : "") +
@@ -15987,6 +16226,10 @@
             '<div class="card"><h4>' +
             esc(b.name) +
             "</h4><p>Stars cannot be captured, upgraded, or developed.</p></div>"
+          );
+        if (!bodySurveyed(b))
+          return (
+            '<div class="card"><h4>Unsurveyed Signal</h4><p>Only the world name and orbital position are confirmed. Fly within 230u and use <b>Scan</b> to reveal its class, biome, resources, hazards, and capture status.</p></div>'
           );
         const owned = game.captured.has(b.name) || b.factory,
           rar = rarityInfo(b),
@@ -17187,6 +17430,12 @@
               "Quick Actions",
               "Jump into the most common frigate actions without scrolling through the whole base.",
               '<div class="actions">' +
+                btn(
+                  game.ship.fuel < game.ship.maxFuel * 0.94 ? "Refuel Starling" : "Fuel Tanks Full",
+                  "refuel",
+                  null,
+                  game.ship.fuel < game.ship.maxFuel * 0.94,
+                ) +
                 btn("Jump Outward", "jumpSystem") +
                 btn(
                   "Random Charted Sector",
@@ -17386,7 +17635,7 @@
                     (kind === "ship" ? activeShipSkin() : activeFrigateSkin()),
               rect = canvas.getBoundingClientRect(),
               width = Math.max(220, Math.round(rect.width || 320)),
-              height = Math.max(110, Math.round(rect.height || 128)),
+              height = Math.max(132, Math.round(rect.height || 156)),
               dpr = Math.min(2, window.devicePixelRatio || 1),
               c = canvas.getContext("2d");
             canvas.width = Math.round(width * dpr);
@@ -17423,26 +17672,26 @@
               c.rotate(-0.08);
               drawShipVisual(
                 c,
-                Math.min(width / 145, height / 72),
+                Math.min(width / 195, height / 94),
                 skin,
                 false,
               );
             } else if (kind === "frigate") {
               drawFrigateVisual(
                 c,
-                Math.min(width / 430, height / 190),
+                Math.min(width / 470, height / 235),
                 skin,
               );
             } else {
               const previewShips = ["scout", "miner", "probe"];
               previewShips.forEach((type, index) => {
                 c.save();
-                c.translate((index - 1) * width * 0.17, (index % 2) * 20 - 8);
+                c.translate((index - 1) * width * 0.2, (index % 2) * 25 - 11);
                 c.rotate(index === 1 ? 0 : index ? -0.05 : 0.05);
-                drawFleetEngineTrail(c, 1.08, skin, 0.34 + index * 0.08);
+                drawFleetEngineTrail(c, 1.34, skin, 0.34 + index * 0.08);
                 drawFleetShipVisual(
                   c,
-                  1.08,
+                  1.34,
                   { type, level: 2 },
                   skin,
                   0.34 + index * 0.08,
@@ -18329,11 +18578,11 @@
                     " • " +
                     esc(e.archetypeName || e.className || "Planet") +
                     "</span><span>" +
-                    esc(e.biome) +
-                    " • " +
-                    esc(label(e.resource)) +
+                    (e.surveyed
+                      ? esc(e.biome) + " • " + esc(label(e.resource))
+                      : "Close survey required for classification") +
                     "</span><span>Status: " +
-                    (e.captured ? "Captured" : "Discovered") +
+                    (e.captured ? "Captured" : e.surveyed ? "Surveyed" : "Detected") +
                     " • Level " +
                     (e.level || 0) +
                     " • Factory: " +
@@ -19136,7 +19385,9 @@
           ui.fuelHud.classList.toggle("low", fuelPct < 25);
         }
         ui.boostText.textContent =
-          Math.round((s.boost / s.maxBoost) * 100) + "%";
+          (s.driftCharge || 0) > 0.08
+            ? "DRIFT " + Math.round((s.driftCharge || 0) * 100) + "%"
+            : Math.round((s.boost / s.maxBoost) * 100) + "%";
         ui.boostBar.style.width =
           clamp((s.boost / s.maxBoost) * 100, 0, 100) + "%";
         ui.nearest.textContent = n.body
@@ -19268,8 +19519,16 @@
           h = nearestEcho(),
           ev = nearestSectorEvent(),
           bh = nearestBlackHole();
+        if (pioneerRescue)
+          return { label: "Pioneer Rescue Active", run: noop, show: true };
         if (game.ship.fuel <= 0.5)
-          return { label: "Recover Ship", run: recoverShip, show: true };
+          return {
+            label: game.frigate?.built ? "Call Pioneer" : "Recover Ship",
+            run: game.frigate?.built ? startPioneerRescue : recoverShip,
+            show: true,
+          };
+        if (orbitingFrigate() && game.ship.fuel < game.ship.maxFuel * 0.94)
+          return { label: "Refuel at Pioneer", run: refuel, show: true };
         if (orbitingFrigate())
           return {
             label: "Jump Outward",
@@ -19281,6 +19540,17 @@
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
+        if (
+          n.body &&
+          n.body.type !== "star" &&
+          n.d < 230 &&
+          !n.body.discoveryRewardClaimed
+        )
+          return {
+            label: "Scan " + n.body.name,
+            run: () => scanPlanet(n.body.name),
+            show: true,
+          };
         if (game.ship.orbitLocked && game.ship.lockBody) {
           const b = body(game.ship.lockBody);
           if (b && b.capturable && !game.captured.has(b.name))
@@ -19366,13 +19636,14 @@
       }
       function showDiscovery(b, reward = null) {
         if (!b || b.type === "star") return;
+        activeDiscoveryBody = b;
         paused = true;
         modalFreeze = true;
         keys.clear();
         const rar = rarityInfo(b),
           actual = reward || b.lastDiscoveryReward || discoveryReward(b);
         ui.discoveryTitle.textContent =
-          "New " + b.rarity + " World Discovered: " + b.name;
+          "Survey Complete: " + b.name;
         ui.discoveryText.textContent = (b.lore || b.biome) + " " + rar.desc;
         const visualSeed = Math.abs(Math.round((b.featureSeed || 1) * 997)),
           rarityColor = rar.color || "#7dd3fc";
@@ -19422,7 +19693,33 @@
           '</div><div class="chip">Survey Reward: ' +
           (fmt(actual) || "None") +
           "</div>";
+        if (ui.discoveryCapture) {
+          const available = b.capturable && !game.captured.has(b.name);
+          ui.discoveryCapture.hidden = !available;
+          ui.discoveryCapture.textContent =
+            game.ship.orbitLocked && game.ship.lockBody === b.name
+              ? "Capture " + b.name
+              : "Target " + b.name + " for Capture";
+        }
         ui.discoveryOverlay.classList.add("show");
+      }
+      function closeDiscoveryPanel() {
+        ui.discoveryOverlay.classList.remove("show");
+        activeDiscoveryBody = null;
+        modalFreeze = false;
+        if (canResumePlay()) paused = false;
+      }
+      function captureDiscoveryWorld() {
+        const b = activeDiscoveryBody;
+        if (!b) return closeDiscoveryPanel();
+        if (game.ship.orbitLocked && game.ship.lockBody === b.name) {
+          closeDiscoveryPanel();
+          capture();
+          return;
+        }
+        manualTargetName = b.name;
+        closeDiscoveryPanel();
+        toast("Capture target set: " + b.name + ". Lock orbit when you arrive.");
       }
       function discoveryBg(b) {
         const r = rarityInfo(b);
@@ -19789,11 +20086,12 @@
         asteroids = [];
         constellationLines = [];
         distantGalaxies = [];
+        shootingStars = [];
         const theme = sectorVisualTheme(),
           quality = game.settings?.graphics || "High",
           starDiv =
-            quality === "Low" ? 6200 : quality === "Medium" ? 4800 : 4050,
-          nebulaBase = quality === "Low" ? 3 : quality === "Medium" ? 5 : 6,
+            quality === "Low" ? 5400 : quality === "Medium" ? 3900 : 3100,
+          nebulaBase = quality === "Low" ? 4 : quality === "Medium" ? 7 : 9,
           asteroidDiv =
             quality === "Low" ? 130000 : quality === "Medium" ? 100000 : 80000;
         activeVisualTheme = theme;
@@ -19842,7 +20140,7 @@
             drift: between(i + 81, 0.01, 0.034),
             d: between(i + 91, 0.1, 0.6),
             pulse: between(i + 111, 0.55, 1.2),
-            ring: rand(i + 211) > 0.45,
+            ring: false,
           });
         }
         for (let i = 0, c = Math.floor((W * H) / asteroidDiv); i < c; i++) {
@@ -19859,7 +20157,7 @@
           });
         }
         if (quality !== "Low") {
-          const groups = quality === "High" ? 4 : 2;
+          const groups = game.system?.isSpecial ? (quality === "High" ? 2 : 1) : 0;
           for (let g = 0; g < groups; g++) {
             const points = [],
               count = 3 + Math.floor(between(g + currentSystemIndex * 11, 0, 3)),
@@ -19875,6 +20173,15 @@
               color: g % 2 ? theme.accent2 : theme.accent,
               alpha: between(g * 31 + 7, 0.055, 0.11),
               drift: between(g * 43 + 4, 0.04, 0.13),
+            });
+          const streakCount = quality === "High" ? 4 : 2;
+          for (let i = 0; i < streakCount; i++)
+            shootingStars.push({
+              phase: between(currentSystemIndex * 131 + i * 29, 0, 1),
+              y: between(currentSystemIndex * 149 + i * 43, H * 0.08, H * 0.72),
+              speed: between(currentSystemIndex * 173 + i * 61, 0.00022, 0.00046),
+              length: between(currentSystemIndex * 191 + i * 71, 72, 155),
+              color: i % 2 ? theme.accent2 : theme.accent,
             });
           }
           const galaxyCount = quality === "High" ? 3 : 2;
@@ -19910,6 +20217,19 @@
         bg.addColorStop(1, theme.deep);
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, W, H);
+        // A broad dust lane gives every sector a horizon and a sense of scale.
+        ctx.save();
+        ctx.translate(W * 0.5, H * 0.48);
+        ctx.rotate(-0.22 + (currentSystemIndex % 5) * 0.07);
+        const dust = ctx.createLinearGradient(0, -H * 0.24, 0, H * 0.24);
+        dust.addColorStop(0, "rgba(0,0,0,0)");
+        dust.addColorStop(0.34, rgba(theme.accent2, 0.018));
+        dust.addColorStop(0.48, "rgba(2,6,23,.14)");
+        dust.addColorStop(0.58, rgba(theme.accent, 0.026));
+        dust.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = dust;
+        ctx.fillRect(-W, -H * 0.25, W * 2, H * 0.5);
+        ctx.restore();
         ctx.save();
         ctx.globalCompositeOperation = "screen";
         for (const galaxy of distantGalaxies) {
@@ -19971,12 +20291,19 @@
           ctx.beginPath();
           ctx.ellipse(0, 0, n.rx, n.ry, 0, 0, TAU);
           ctx.fill();
-          if (n.ring) {
-            ctx.strokeStyle = n.color + alpha * 0.12 + ")";
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, n.rx * 0.52, n.ry * 0.28, 0, 0, TAU);
-            ctx.stroke();
+          if (quality === "High") {
+            for (let lobe = 0; lobe < 4; lobe++) {
+              const a = n.rot + lobe * 1.73,
+                lx = Math.cos(a) * n.rx * 0.3,
+                ly = Math.sin(a) * n.ry * 0.34,
+                lr = Math.max(n.rx, n.ry) * (0.28 + lobe * 0.035),
+                cloud = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
+              cloud.addColorStop(0, n.color + alpha * 0.34 + ")");
+              cloud.addColorStop(0.55, n.color + alpha * 0.1 + ")");
+              cloud.addColorStop(1, "rgba(0,0,0,0)");
+              ctx.fillStyle = cloud;
+              ctx.fillRect(lx - lr, ly - lr, lr * 2, lr * 2);
+            }
           }
           ctx.restore();
         }
@@ -20025,6 +20352,27 @@
           }
         }
         ctx.globalAlpha = 1;
+        if (motion !== "Reduced") {
+          ctx.save();
+          ctx.globalCompositeOperation = "screen";
+          ctx.lineCap = "round";
+          for (const meteor of shootingStars) {
+            const q = (meteor.phase + t * meteor.speed) % 1,
+              x = -meteor.length + q * (W + meteor.length * 2),
+              y = meteor.y - q * H * 0.22,
+              streak = ctx.createLinearGradient(x - meteor.length, y + meteor.length * 0.38, x, y);
+            streak.addColorStop(0, "rgba(0,0,0,0)");
+            streak.addColorStop(0.76, rgba(meteor.color, 0.12));
+            streak.addColorStop(1, "rgba(255,255,255,.64)");
+            ctx.strokeStyle = streak;
+            ctx.lineWidth = 1.15;
+            ctx.beginPath();
+            ctx.moveTo(x - meteor.length, y + meteor.length * 0.38);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
         for (const a of asteroids) {
           a.x += a.vx;
           a.y += a.vy;
@@ -20037,7 +20385,11 @@
           ctx.translate(a.x, a.y);
           ctx.rotate(a.spin);
           ctx.globalAlpha = 0.14 + a.d * 0.35;
-          ctx.fillStyle = "rgba(148,163,184,.52)";
+          const rock = ctx.createRadialGradient(-a.r * 0.35, -a.r * 0.42, 0, 0, 0, a.r * 1.4);
+          rock.addColorStop(0, "rgba(226,232,240,.62)");
+          rock.addColorStop(0.36, "rgba(100,116,139,.48)");
+          rock.addColorStop(1, "rgba(15,23,42,.5)");
+          ctx.fillStyle = rock;
           ctx.beginPath();
           for (let i = 0; i < a.pts; i++) {
             const ang = (i / a.pts) * TAU,
@@ -20998,7 +21350,7 @@
           }
         }
       }
-      function frigatePosition() {
+      function frigateHomePosition() {
         if (!game.frigate.built || !game.system) return null;
         const star =
           game.system.bodies.find((b) => b.type === "star") ||
@@ -21030,6 +21382,20 @@
           capturable: false,
           upgradeable: false,
           color: "#7dd3fc",
+        };
+      }
+      function frigatePosition() {
+        const home = frigateHomePosition();
+        if (!home || !pioneerRescue) return home;
+        return {
+          ...home,
+          x: pioneerRescue.x,
+          y: pioneerRescue.y,
+          vx: pioneerRescue.vx || 0,
+          vy: pioneerRescue.vy || 0,
+          heading: Math.atan2(pioneerRescue.vy || 0, pioneerRescue.vx || 0),
+          angle: Math.atan2(pioneerRescue.vy || 0, pioneerRescue.vx || 0),
+          rescuePhase: pioneerRescue.phase,
         };
       }
       function placeShipAtFrigate() {
@@ -21169,7 +21535,7 @@
       function drawFleetEngineTrail(c, scale, skin, thrust = 0.25) {
         const glow = skin.glow || skin.accent || "#7dd3fc",
           length = (20 + 32 * thrust) * scale,
-          trail = c.createLinearGradient(-16 * scale - length, 0, -12 * scale, 0);
+          trail = c.createLinearGradient(-26 * scale - length, 0, -22 * scale, 0);
         trail.addColorStop(0, "rgba(0,0,0,0)");
         trail.addColorStop(0.58, rgba(glow, 0.16 + thrust * 0.12));
         trail.addColorStop(1, rgba("#ffffff", 0.4 + thrust * 0.18));
@@ -21179,8 +21545,8 @@
         c.lineCap = "round";
         c.lineWidth = Math.max(1, 3.2 * scale);
         c.beginPath();
-        c.moveTo(-16 * scale - length, 0);
-        c.lineTo(-13 * scale, 0);
+        c.moveTo(-26 * scale - length, 0);
+        c.lineTo(-23 * scale, 0);
         c.stroke();
         c.restore();
       }
@@ -21190,95 +21556,157 @@
           secondary = skin.secondary || "#0f172a",
           accent = skin.accent || def.color || "#e0f2fe",
           glow = skin.glow || accent,
+          motif = skin.motif || "frontier",
           hull = c.createLinearGradient(-24 * scale, -14 * scale, 25 * scale, 13 * scale);
         hull.addColorStop(0, dark(secondary, 0.18));
-        hull.addColorStop(0.48, primary);
-        hull.addColorStop(0.76, light(primary, 0.22));
+        hull.addColorStop(0.34, dark(primary, 0.18));
+        hull.addColorStop(0.62, primary);
+        hull.addColorStop(0.82, light(primary, 0.32));
         hull.addColorStop(1, dark(primary, 0.34));
+        const path = (points, fill = hull, stroke = rgba(light(accent, 0.35), 0.72)) => {
+          c.beginPath();
+          points.forEach(([x, y], i) =>
+            i ? c.lineTo(x * scale, y * scale) : c.moveTo(x * scale, y * scale),
+          );
+          c.closePath();
+          c.fillStyle = fill;
+          c.fill();
+          if (stroke) {
+            c.strokeStyle = stroke;
+            c.stroke();
+          }
+        };
         c.save();
         c.lineJoin = "round";
-        c.fillStyle = hull;
-        c.strokeStyle = rgba(light(accent, 0.35), 0.72);
         c.lineWidth = Math.max(0.8, 1.05 * scale);
-        c.shadowColor = glow;
-        c.shadowBlur = 8 * scale;
+        c.shadowColor = "rgba(0,0,0,.8)";
+        c.shadowBlur = 10 * scale;
+        c.fillStyle = "rgba(0,0,0,.42)";
+        c.beginPath();
+        c.ellipse(-2 * scale, 8 * scale, 28 * scale, 7 * scale, 0, 0, TAU);
+        c.fill();
+        c.shadowBlur = 0;
         if (def.shape === "barge") {
-          rr(c, -22 * scale, -9 * scale, 45 * scale, 18 * scale, 4 * scale);
+          c.fillStyle = hull;
+          c.strokeStyle = rgba(light(accent, 0.35), 0.72);
+          rr(c, -26 * scale, -10 * scale, 52 * scale, 20 * scale, 4 * scale);
           c.fill();
           c.stroke();
-          for (const y of [-13, 13]) {
-            rr(c, -13 * scale, (y - 4) * scale, 25 * scale, 8 * scale, 2 * scale);
+          for (const y of [-16, 16]) {
+            rr(c, -18 * scale, (y - 5) * scale, 34 * scale, 10 * scale, 3 * scale);
             c.fill();
             c.stroke();
           }
+          path([[18, -8], [34, 0], [18, 8], [23, 0]], hull);
         } else if (def.shape === "diamond") {
-          c.beginPath();
-          c.moveTo(27 * scale, 0);
-          c.lineTo(0, -19 * scale);
-          c.lineTo(-24 * scale, 0);
-          c.lineTo(0, 19 * scale);
-          c.closePath();
-          c.fill();
-          c.stroke();
+          path([[30, 0], [1, -21], [-27, 0], [1, 21]]);
           c.strokeStyle = rgba(accent, 0.48);
           c.beginPath();
-          c.ellipse(0, 0, 33 * scale, 9 * scale, t * 0.012, 0, TAU);
+          c.ellipse(0, 0, 35 * scale, 10 * scale, t * 0.012, 0, TAU);
           c.stroke();
         } else if (def.shape === "wing") {
-          c.beginPath();
-          c.moveTo(31 * scale, 0);
-          c.lineTo(-17 * scale, -20 * scale);
-          c.lineTo(-8 * scale, -4 * scale);
-          c.lineTo(-20 * scale, 0);
-          c.lineTo(-8 * scale, 4 * scale);
-          c.lineTo(-17 * scale, 20 * scale);
-          c.closePath();
-          c.fill();
-          c.stroke();
+          path([[34, 0], [-10, -24], [-5, -7], [-25, -3], [-25, 3], [-5, 7], [-10, 24]]);
+          path([[7, -6], [25, 0], [7, 6], [-14, 0]], rgba(dark(secondary, 0.12), 0.78));
         } else if (def.shape === "pod") {
+          c.fillStyle = hull;
+          c.strokeStyle = rgba(light(accent, 0.35), 0.72);
           c.beginPath();
-          c.ellipse(0, 0, 25 * scale, 12 * scale, 0, 0, TAU);
+          c.ellipse(0, 0, 29 * scale, 12 * scale, 0, 0, TAU);
           c.fill();
           c.stroke();
-          for (const y of [-15, 15]) {
+          for (const y of [-17, 17]) {
             c.beginPath();
-            c.ellipse(-3 * scale, y * scale, 13 * scale, 5 * scale, 0, 0, TAU);
+            c.ellipse(-5 * scale, y * scale, 16 * scale, 5.5 * scale, 0, 0, TAU);
             c.fill();
             c.stroke();
           }
+          path([[20, -7], [35, 0], [20, 7], [25, 0]], hull);
         } else {
-          c.beginPath();
-          c.moveTo(31 * scale, 0);
-          c.lineTo(-17 * scale, -11 * scale);
-          c.lineTo(-9 * scale, 0);
-          c.lineTo(-17 * scale, 11 * scale);
-          c.closePath();
-          c.fill();
-          c.stroke();
+          path([[35, 0], [-9, -13], [-27, -20], [-18, -4], [-23, 0], [-18, 4], [-27, 20], [-9, 13]]);
         }
-        c.shadowBlur = 0;
-        c.fillStyle = rgba(light(accent, 0.55), 0.68);
+
+        // Fleet designs alter physical architecture, not only paint.
+        if (motif === "solar") {
+          for (const sy of [-1, 1])
+            path(
+              [[-6, sy * 10], [18, sy * 31], [30, sy * 28], [11, sy * 8]],
+              rgba("#f97316", 0.72),
+              rgba("#fde68a", 0.7),
+            );
+          c.strokeStyle = rgba("#fde68a", 0.62);
+          for (const sy of [-1, 1]) {
+            c.beginPath();
+            c.moveTo(0, sy * 14 * scale);
+            c.lineTo(22 * scale, sy * 28 * scale);
+            c.stroke();
+          }
+        } else if (motif === "spirit") {
+          c.fillStyle = rgba("#f8fafc", 0.34);
+          c.strokeStyle = rgba(glow, 0.72);
+          for (const sy of [-1, 1]) {
+            c.beginPath();
+            c.moveTo(-14 * scale, sy * 7 * scale);
+            c.quadraticCurveTo(6 * scale, sy * 34 * scale, 36 * scale, sy * 14 * scale);
+            c.quadraticCurveTo(12 * scale, sy * 18 * scale, -14 * scale, sy * 7 * scale);
+            c.fill();
+            c.stroke();
+          }
+        } else if (motif === "parallel") {
+          c.globalCompositeOperation = "screen";
+          c.strokeStyle = rgba("#ff2bd6", 0.72);
+          c.lineWidth = 1.3 * scale;
+          c.beginPath();
+          c.moveTo(-24 * scale, -12 * scale);
+          c.lineTo(7 * scale, 2 * scale);
+          c.lineTo(31 * scale, -9 * scale);
+          c.stroke();
+          c.strokeStyle = rgba("#00f5ff", 0.68);
+          c.beginPath();
+          c.moveTo(-24 * scale, 12 * scale);
+          c.lineTo(7 * scale, -2 * scale);
+          c.lineTo(31 * scale, 9 * scale);
+          c.stroke();
+          c.beginPath();
+          c.ellipse(2 * scale, 0, 38 * scale, 14 * scale, t * 0.015, 0, TAU);
+          c.stroke();
+          c.globalCompositeOperation = "source-over";
+        } else {
+          for (const sy of [-1, 1])
+            path([[-18, sy * 8], [-5, sy * 16], [17, sy * 10], [9, sy * 6]], rgba(accent, 0.17), null);
+        }
+
+        const canopy = c.createLinearGradient(2 * scale, -5 * scale, 16 * scale, 5 * scale);
+        canopy.addColorStop(0, "rgba(255,255,255,.78)");
+        canopy.addColorStop(0.28, rgba(light(accent, 0.55), 0.88));
+        canopy.addColorStop(1, rgba(dark(accent, 0.28), 0.64));
+        c.fillStyle = canopy;
+        c.shadowColor = glow;
+        c.shadowBlur = 7 * scale;
         c.beginPath();
-        c.ellipse(7 * scale, 0, 8 * scale, 4.2 * scale, 0, 0, TAU);
+        c.ellipse(10 * scale, 0, 9 * scale, 4.6 * scale, 0, 0, TAU);
         c.fill();
-        c.strokeStyle = rgba("#ffffff", 0.22);
+        c.shadowBlur = 0;
+        c.strokeStyle = rgba("#ffffff", 0.32);
+        c.lineWidth = Math.max(0.55, 0.7 * scale);
         c.beginPath();
-        c.moveTo(-12 * scale, 0);
-        c.lineTo(21 * scale, 0);
+        c.moveTo(-17 * scale, -3 * scale);
+        c.lineTo(24 * scale, -2 * scale);
+        c.moveTo(-17 * scale, 4 * scale);
+        c.lineTo(19 * scale, 3 * scale);
         c.stroke();
         c.globalCompositeOperation = "screen";
         c.fillStyle = rgba(glow, 0.7 + Math.min(0.2, thrust * 0.12));
         c.shadowColor = glow;
         c.shadowBlur = 7 * scale;
-        for (const y of [-4, 4]) {
+        for (const y of [-5, 5]) {
           c.beginPath();
-          c.arc(-18 * scale, y * scale, 2.1 * scale, 0, TAU);
+          c.ellipse(-25 * scale, y * scale, 3.8 * scale, 2.1 * scale, 0, 0, TAU);
           c.fill();
         }
         c.shadowBlur = 0;
         c.fillStyle = rgba(def.color || accent, 0.78);
         c.beginPath();
-        c.arc(17 * scale, 0, 1.8 * scale, 0, TAU);
+        c.arc(23 * scale, 0, 1.8 * scale, 0, TAU);
         c.fill();
         c.restore();
       }
@@ -21453,6 +21881,53 @@
         c.ellipse(4 * r, 0, 158 * r, 56 * r, 0, 0, TAU);
         c.stroke();
         c.globalCompositeOperation = "source-over";
+        if (motif === "spirit") {
+          for (const sy of [-1, 1]) {
+            c.fillStyle = rgba("#f8fafc", 0.18);
+            c.strokeStyle = rgba(glow, 0.44);
+            c.lineWidth = 1.3 * r;
+            c.beginPath();
+            c.moveTo(-112 * r, sy * 26 * r);
+            c.bezierCurveTo(-18 * r, sy * 112 * r, 116 * r, sy * 96 * r, 184 * r, sy * 18 * r);
+            c.bezierCurveTo(82 * r, sy * 61 * r, -18 * r, sy * 52 * r, -112 * r, sy * 26 * r);
+            c.fill();
+            c.stroke();
+          }
+        } else if (motif === "freeze") {
+          for (const sy of [-1, 1])
+            P(
+              [[-116, sy * 32], [-72, sy * 92], [-5, sy * 70], [68, sy * 90], [138, sy * 28], [42, sy * 45]],
+              rgba("#67e8f9", 0.22),
+              rgba("#e0f2fe", 0.48),
+              0.9,
+            );
+        } else if (motif === "abyss") {
+          for (const sy of [-1, 1])
+            P(
+              [[-152, sy * 19], [-38, sy * 69], [136, sy * 30], [196, 0], [88, sy * 13]],
+              rgba("#020617", 0.9),
+              rgba("#38bdf8", 0.28),
+              0.65,
+            );
+        } else if (motif === "warp") {
+          c.strokeStyle = rgba(glow, 0.45);
+          c.lineWidth = 7 * r;
+          c.beginPath();
+          c.ellipse(-12 * r, 0, 126 * r, 82 * r, 0, 0, TAU);
+          c.stroke();
+        } else if (motif === "ancient") {
+          for (const sy of [-1, 1])
+            P(
+              [[-145, sy * 24], [-118, sy * 87], [-61, sy * 66], [-8, sy * 101], [61, sy * 58], [151, sy * 25]],
+              rgba("#78350f", 0.72),
+              rgba("#f59e0b", 0.38),
+              1,
+            );
+        } else if (motif === "archaeologist") {
+          for (const sy of [-1, 1])
+            for (let i = 0; i < 4; i++)
+              R(-98 + i * 52, sy * 66 - 9, 34, 18, 6, rgba(i % 2 ? "#67e8f9" : "#fbbf24", 0.28), rgba("#fde68a", 0.36), 0.8);
+        }
         const engine = G(-164, 0, -103, 0, [
           [0, "#020617"],
           [0.36, deep],
@@ -22217,6 +22692,23 @@
           ctx.strokeStyle = rgba(skin.glow || skin.accent, 0.28);
           ctx.lineWidth = 2;
           ctx.stroke();
+          const driftTrail = s.trail.filter((q) => q.drift);
+          if (driftTrail.length > 2) {
+            ctx.save();
+            ctx.globalCompositeOperation = "screen";
+            ctx.beginPath();
+            driftTrail.forEach((q, i) => {
+              const tp = screen(q.x, q.y);
+              if (i) ctx.lineTo(tp.x, tp.y);
+              else ctx.moveTo(tp.x, tp.y);
+            });
+            ctx.strokeStyle = rgba(skin.accent || "#7dd3fc", 0.5);
+            ctx.shadowColor = skin.glow || skin.accent;
+            ctx.shadowBlur = 10;
+            ctx.lineWidth = 3.2;
+            ctx.stroke();
+            ctx.restore();
+          }
         }
         ctx.translate(p.x, p.y);
         ctx.rotate(s.angle);
@@ -22321,6 +22813,40 @@
         c.ellipse(0, 14 * sc, 48 * sc, 8 * sc, 0, 0, TAU);
         c.fill();
         c.shadowBlur = 0;
+        if (motif === "parallel") {
+          for (const sy of [-1, 1])
+            P(
+              [[-38, sy * 8], [-18, sy * 30], [29, sy * 22], [67, sy * 7], [19, sy * 12]],
+              rgba(sy > 0 ? "#00f5ff" : "#ff2bd6", 0.28),
+              rgba(sy > 0 ? "#00f5ff" : "#ff2bd6", 0.62),
+              0.8,
+            );
+        } else if (motif === "warp") {
+          c.strokeStyle = rgba(glow, 0.5);
+          c.lineWidth = 4 * sc;
+          c.beginPath();
+          c.arc(-3 * sc, 0, 34 * sc, -1.1, 1.1);
+          c.stroke();
+          c.beginPath();
+          c.arc(-3 * sc, 0, 34 * sc, Math.PI - 1.1, Math.PI + 1.1);
+          c.stroke();
+        } else if (motif === "mythic") {
+          for (const sy of [-1, 1])
+            P(
+              [[-12, sy * 7], [9, sy * 38], [31, sy * 25], [62, sy * 8], [13, sy * 14]],
+              rgba("#fbcfe8", 0.3),
+              rgba("#ffffff", 0.42),
+              0.65,
+            );
+        } else if (motif === "ancient") {
+          for (const sy of [-1, 1])
+            P(
+              [[-30, sy * 8], [-55, sy * 30], [-14, sy * 22], [16, sy * 13], [5, sy * 7]],
+              rgba("#78350f", 0.74),
+              rgba("#f59e0b", 0.4),
+              0.7,
+            );
+        }
         const wingG = G(-43, 0, 28, 0, [
           [0, deep],
           [0.45, primary],
@@ -25203,8 +25729,8 @@
 
         ok(
           "Save schema is current",
-          SAVE_VERSION === 19 &&
-            APP_VERSION === "0.21.0" &&
+          SAVE_VERSION === 20 &&
+            APP_VERSION === "0.22.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -26490,11 +27016,12 @@
       ui.skipOnboard.onclick = () => dismissOnboarding(false);
       ui.confirmCancel.onclick = closeConfirm;
       ui.confirmOk.onclick = acceptConfirm;
-      ui.closeDiscovery.onclick = () => {
-        ui.discoveryOverlay.classList.remove("show");
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
-      };
+      ui.closeDiscovery.onclick = closeDiscoveryPanel;
+      if (ui.discoveryCapture) ui.discoveryCapture.onclick = captureDiscoveryWorld;
+      ui.discoveryOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) return;
+        closeDiscoveryPanel();
+      });
       ui.upgradeContinue.onclick = () => {
         ui.upgradeOverlay.classList.remove("show");
         delete ui.upgradeOverlay.dataset.token;

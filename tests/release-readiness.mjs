@@ -162,13 +162,14 @@ vm.runInContext(
     get game(){return game}, get systems(){return systems},
     get currentSystemIndex(){return currentSystemIndex},
     get universeSeed(){return universeSeed},
-    initGame, body, nearestBody, finishCapture, upgradeShip, upgradePlanet, updateShip,
-    buildFrigate, frigatePosition, toggleOrbit, jumpSystem,
+    initGame, body, nearestBody, finishCapture, upgradeShip, upgradePlanet, updateShip, scanPlanet,
+    buildFrigate, frigatePosition, frigateHomePosition, toggleOrbit, jumpSystem,
+    startPioneerRescue, updatePioneerRescue, updateDrift, shipStats, refuel,
     chooseUnchartedSystemIndex, unchartedSystemCandidates,
     ensureSystemIndex, menuNavigationHtml, normalizeMenuName,
     fleetFormationSlot, fleetEscortMotion, fleetSkinForKey,
     startFleetMission, updateFleetMissions, completeFleetMission,
-    systemVisualProfile, systemRarityClass, proc, parallelSystem,
+    systemVisualProfile, systemRarityClass, proc, parallelSystem, cosmicSpiritSystem,
     saveState, saveGame, loadGame, validSavePayload,
     setShipSkin, setFrigateSkin, owns, smartAction, releaseChecks,
     generateContracts, makeDailyOps, settingsHtml, storeHtml,
@@ -210,6 +211,8 @@ vm.runInContext(
       game.ship.orbitLocked=true; game.ship.lockBody="__FRIGATE__";
       return testSystem;
     },
+    get keys(){return keys}, get specialSystemOdds(){return specialSystemOdds},
+    get pioneerRescue(){return pioneerRescue},
     get SAVE_KEY(){return SAVE_KEY}, get SAVE_BACKUP_KEY(){return SAVE_BACKUP_KEY},
     get SAVE_VERSION(){return SAVE_VERSION}, get APP_VERSION(){return APP_VERSION}
   };`,
@@ -222,8 +225,8 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.21.0", "Expected release candidate version");
-assert.equal(api.SAVE_VERSION, 19, "Expected current save schema");
+assert.equal(api.APP_VERSION, "0.22.0", "Expected release candidate version");
+assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
 assert.equal(api.game.system.name, "Sol System", "Every pilot must start in Sol");
@@ -373,7 +376,7 @@ assert.match(api.journeyPulseHtml(), /Major Threats/, "The open-journey record s
 const featureCopy = [api.expeditionsHtml(), api.crewHtml(), api.livingSystemEventHtml(), api.journeyPulseHtml()].join(" ");
 assert.doesNotMatch(
   featureCopy,
-  /procedural|seed|similarity threshold|telemetry|retention system|developer|main campaign/i,
+  /procedural generation|random seed|similarity threshold|telemetry|retention system|developer|main campaign/i,
   "New player-facing systems must avoid implementation language",
 );
 assert.equal(api.saveState().crew.members.length, 4, "Crew progression must be included in saves");
@@ -533,12 +536,52 @@ for (const subsystem of ["thrust", "fuel", "brake", "accel", "handling", "cargo"
   api.game.ship.vy = venus.vy || 0;
   checkpoint(`${subsystem}: nearest before survey ${api.nearestBody().body?.name}/${api.nearestBody().d}`);
   api.updateShip(0.001);
+  assert.equal(venus.discoveryRewardClaimed, false, `${subsystem}: flyby must not auto-complete survey`);
+  assert.equal(api.game.missionStage, 3, `${subsystem}: flyby should preserve training until scan`);
+  api.scanPlanet("Venus");
+  api.dismissPanels();
   checkpoint(`${subsystem}: survey complete`);
   assert.equal(api.game.missionStage, 4, `${subsystem}: Venus survey should advance training`);
   api.buildFrigate();
   checkpoint(`${subsystem}: frigate complete`);
   assert.equal(api.game.frigate.built, true, `${subsystem}: economy must fund Pioneer construction`);
 }
+
+assert.ok(
+  api.specialSystemOdds.cosmicSpirit <= 0.005 && api.specialSystemOdds.blackHole <= 0.005,
+  "Cosmic Spirit and Parallel gateways must remain extremely rare",
+);
+const spiritNaming = api.cosmicSpiritSystem(848484);
+assert.ok(
+  spiritNaming.bodies.filter((b) => b.type !== "star").every((b) => !/^Cosmic Spirit\b/i.test(b.name) && !/^Cosmic Spirit\b/i.test(b.biome)),
+  "Cosmic Spirit worlds need distinct names and biome language",
+);
+assert.equal(
+  new Set(spiritNaming.bodies.map((b) => b.name)).size,
+  spiritNaming.bodies.length,
+  "Special-system world names must be unique",
+);
+
+api.initGame(false);
+api.game.frigate.built = true;
+api.game.ship.orbitLocked = false;
+api.game.ship.lockBody = null;
+api.game.ship.fuel = 0;
+assert.equal(api.startPioneerRescue(), true, "A built Pioneer should answer a fuel distress call");
+for (let i = 0; i < 330 && api.pioneerRescue; i++) api.updatePioneerRescue(1);
+assert.equal(api.pioneerRescue, null, "Pioneer rescue should complete its return to stellar orbit");
+assert.equal(api.game.ship.lockBody, "__FRIGATE__", "Recovered Starling should orbit the Pioneer");
+assert.equal(api.game.ship.fuel, api.game.ship.maxFuel, "Pioneer rescue should fully refuel the Starling");
+
+api.game.ship.orbitLocked = false;
+api.game.ship.vx = 2.4;
+api.game.ship.vy = 0;
+api.game.ship.angle = Math.PI / 2;
+api.game.ship.driftCharge = 0;
+api.keys.add("d");
+api.updateDrift(1, api.shipStats());
+api.keys.clear();
+assert.ok(api.game.ship.driftCharge > 0, "High-speed steering should engage orbital drift");
 
 api.initGame(false);
 checkpoint("rendezvous path initialized");

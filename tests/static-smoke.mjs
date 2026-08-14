@@ -25,6 +25,10 @@ assert.ok(
 
 for (const required of [
   "function updateShip(",
+  "function updateDrift(",
+  "function scanPlanet(",
+  "function startPioneerRescue(",
+  "function updatePioneerRescue(",
   "function toggleOrbit(",
   "function capture(",
   "function jumpSystem(",
@@ -73,8 +77,8 @@ for (const required of [
   "function importSaveFile(",
   "function registerOfflineSupport(",
   "function runTests(",
-  "SAVE_VERSION = 19",
-  'APP_VERSION = "0.21.0"',
+  "SAVE_VERSION = 20",
+  'APP_VERSION = "0.22.0"',
   "SAVE_BACKUP_KEY",
   'key: "silent_choir_3"',
   "height: 100dvh",
