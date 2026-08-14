@@ -37,6 +37,9 @@ for (const required of [
   "function sectorVisualTheme(",
   "function drawVelocityField(",
   "function drawUnchartedBody(",
+  "function tutorialObjective(",
+  "function renderCosmetics(",
+  "function renderSkinPreviews(",
   "function runTests(",
   "SAVE_VERSION = 14",
   'key: "silent_choir_3"',
@@ -44,6 +47,8 @@ for (const required of [
   "prefers-reduced-motion",
   "discovery-stage",
   "command-vista",
+  "menu-nav",
+  'label: "Jump Outward"',
 ]) {
   assert.ok(
     html.includes(required),
