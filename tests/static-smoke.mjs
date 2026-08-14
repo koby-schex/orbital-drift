@@ -34,11 +34,16 @@ for (const required of [
   "function openExplorationEncounter(",
   "function resolveExplorationEncounter(",
   "function reputationHtml(",
+  "function sectorVisualTheme(",
+  "function drawVelocityField(",
+  "function drawUnchartedBody(",
   "function runTests(",
   "SAVE_VERSION = 14",
   'key: "silent_choir_3"',
   "height: 100dvh",
   "prefers-reduced-motion",
+  "discovery-stage",
+  "command-vista",
 ]) {
   assert.ok(
     html.includes(required),
