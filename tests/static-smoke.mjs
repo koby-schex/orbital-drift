@@ -40,8 +40,14 @@ for (const required of [
   "function tutorialObjective(",
   "function renderCosmetics(",
   "function renderSkinPreviews(",
+  "function chooseUnchartedSystemIndex(",
+  "function exportSaveFile(",
+  "function importSaveFile(",
+  "function registerOfflineSupport(",
   "function runTests(",
-  "SAVE_VERSION = 14",
+  "SAVE_VERSION = 15",
+  'APP_VERSION = "0.17.0"',
+  "SAVE_BACKUP_KEY",
   'key: "silent_choir_3"',
   "height: 100dvh",
   "prefers-reduced-motion",
@@ -49,6 +55,7 @@ for (const required of [
   "command-vista",
   "menu-nav",
   'label: "Jump Outward"',
+  "Jump to Random Uncharted System",
 ]) {
   assert.ok(
     html.includes(required),

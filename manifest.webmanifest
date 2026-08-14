@@ -1,0 +1,27 @@
+{
+  "name": "Orbital Drift",
+  "short_name": "Orbital Drift",
+  "description": "A gravity-driven deep-space exploration game.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#030511",
+  "theme_color": "#030511",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "./assets/orbital-drift-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/orbital-drift-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
