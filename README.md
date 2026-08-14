@@ -32,3 +32,5 @@ The static smoke suite checks JavaScript parsing, unique element IDs, explicit b
 - Frontier Coalition, Wayfarer Guild, and Echo Collective reputation with permanent faction technologies
 - Three-part Silent Choir storyline, consequential outcomes, and a Captain's Log decision archive
 - Guided onboarding, objective tracking, save/load, settings, touch-control calibration, audio, and performance scaling
+- Seven-step Sol training flight with one active objective at a time, including Pioneer rendezvous and one-tap outward travel
+- Persistent command navigation plus a standalone Cosmetic Hangar with exact in-game hull previews and direct equip controls
