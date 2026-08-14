@@ -4805,7 +4805,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Flight &amp; Fleet Refit • v0.22.0</div>
+        <div class="title-version">Flight &amp; Fleet Refit • v0.22.1</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5211,7 +5211,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.22.0",
+        APP_VERSION = "0.22.1",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -19782,8 +19782,44 @@
           !ui.upgradeOverlay.classList.contains("show")
         );
       }
+      function gameplayModalOpen() {
+        return [
+          ui.onboardingOverlay,
+          ui.tutorialOverlay,
+          ui.discoveryOverlay,
+          ui.choiceOverlay,
+          ui.confirmOverlay,
+          ui.encounterOverlay,
+          ui.missionOverlay,
+          ui.upgradeOverlay,
+        ].some((overlay) => overlay?.classList.contains("show"));
+      }
+      function settleOverlayPause() {
+        modalFreeze = gameplayModalOpen();
+        if (
+          modalFreeze ||
+          titleOpen ||
+          titleMenuMode ||
+          ui.pauseOverlay.classList.contains("show")
+        ) {
+          paused = true;
+        } else if (canResumePlay()) {
+          paused = false;
+        }
+      }
+      function closeUpgradePanel() {
+        ui.upgradeOverlay.classList.remove("show");
+        delete ui.upgradeOverlay.dataset.token;
+        settleOverlayPause();
+      }
+      function closeMissionPanel() {
+        ui.missionOverlay.classList.remove("show");
+        settleOverlayPause();
+      }
       function showUpgradePanel(title, summary, rows = []) {
         if (!ui.upgradeOverlay) return;
+        paused = true;
+        modalFreeze = true;
         ui.upgradeTitle.textContent = title;
         ui.upgradeSummary.textContent = summary;
         ui.upgradeStats.innerHTML = rows
@@ -19797,8 +19833,7 @@
         ui.upgradeOverlay.dataset.token = String(token);
         setTimeout(() => {
           if (ui.upgradeOverlay?.dataset.token === String(token)) {
-            ui.upgradeOverlay.classList.remove("show");
-            delete ui.upgradeOverlay.dataset.token;
+            closeUpgradePanel();
           }
         }, 2400);
       }
@@ -25730,7 +25765,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.22.0" &&
+            APP_VERSION === "0.22.1" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -27022,16 +27057,8 @@
         if (event.target.closest("button")) return;
         closeDiscoveryPanel();
       });
-      ui.upgradeContinue.onclick = () => {
-        ui.upgradeOverlay.classList.remove("show");
-        delete ui.upgradeOverlay.dataset.token;
-        if (canResumePlay()) paused = false;
-      };
-      ui.missionContinue.onclick = () => {
-        ui.missionOverlay.classList.remove("show");
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
-      };
+      ui.upgradeContinue.onclick = closeUpgradePanel;
+      ui.missionContinue.onclick = closeMissionPanel;
       ui.encounterChoices.addEventListener("click", (e) => {
         const button = e.target.closest("button[data-encounter-choice]");
         if (!button || button.disabled) return;
