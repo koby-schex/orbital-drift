@@ -3489,6 +3489,558 @@
           min-height: 68px;
         }
       }
+      /* === Celestial visual remaster === */
+      :root {
+        --sectorAccent: #7dd3fc;
+        --sectorAccent2: #a78bfa;
+        --sectorDeep: #050816;
+        --sectorGlow: rgba(125, 211, 252, 0.18);
+      }
+      body:before,
+      body:after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 7;
+        pointer-events: none;
+      }
+      body:before {
+        background:
+          radial-gradient(circle at 50% 42%, transparent 34%, rgba(0, 2, 10, 0.2) 73%, rgba(0, 1, 7, 0.62) 100%),
+          linear-gradient(115deg, color-mix(in srgb, var(--sectorAccent) 4%, transparent), transparent 38% 66%, color-mix(in srgb, var(--sectorAccent2) 3%, transparent));
+        mix-blend-mode: screen;
+        opacity: 0.66;
+      }
+      body:after {
+        opacity: 0.12;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+        mix-blend-mode: soft-light;
+      }
+      #game {
+        filter: saturate(1.06) contrast(1.025);
+      }
+      .hud,
+      .fuel-hud,
+      .mini-map,
+      .objective-pill,
+      .menu,
+      .dialog {
+        border-color: color-mix(in srgb, var(--sectorAccent) 20%, rgba(190, 220, 255, 0.1));
+      }
+      .hud:before,
+      .fuel-hud:before,
+      .menu:after,
+      .dialog:after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        height: 1px;
+        left: 16px;
+        right: 16px;
+        top: 0;
+        background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sectorAccent) 58%, white 10%), transparent);
+        opacity: 0.76;
+      }
+      .hud,
+      .fuel-hud {
+        position: fixed;
+        overflow: hidden;
+      }
+      .dialog {
+        position: relative;
+      }
+      .logo,
+      .title-logo {
+        background: linear-gradient(105deg, #ffffff 5%, #d9f4ff 38%, var(--sectorAccent) 68%, #ddd6fe 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 34px color-mix(in srgb, var(--sectorAccent) 22%, transparent);
+      }
+      .logo {
+        letter-spacing: -0.045em;
+      }
+      .stat {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.024));
+      }
+      .stat:after {
+        content: "";
+        position: absolute;
+        width: 42px;
+        height: 42px;
+        right: -20px;
+        bottom: -26px;
+        border-radius: 50%;
+        background: var(--sectorGlow);
+        filter: blur(13px);
+      }
+      .barbox {
+        background: rgba(1, 4, 15, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.055);
+      }
+      .bar {
+        background: linear-gradient(90deg, var(--sectorAccent), var(--sectorAccent2), #fef3c7);
+        box-shadow: 0 0 14px var(--sectorGlow);
+      }
+      .pause-btn,
+      .menu-launcher {
+        overflow: hidden;
+      }
+      .pause-btn:before,
+      .menu-launcher:before,
+      .smart:before,
+      .touch:before,
+      .brake:before,
+      .orbit-release:before {
+        content: "";
+        position: absolute;
+        inset: 2px;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        pointer-events: none;
+      }
+      .smart,
+      .touch,
+      .brake,
+      .orbit-release {
+        position: fixed;
+        isolation: isolate;
+        box-shadow:
+          0 18px 48px rgba(0, 0, 0, 0.48),
+          0 0 28px color-mix(in srgb, var(--sectorAccent) 12%, transparent),
+          inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      }
+      .stick {
+        box-shadow:
+          0 22px 58px rgba(0, 0, 0, 0.52),
+          0 0 0 1px color-mix(in srgb, var(--sectorAccent) 17%, transparent),
+          inset 0 0 34px rgba(2, 6, 23, 0.8);
+      }
+      .stick:before,
+      .stick:after {
+        content: "";
+        position: absolute;
+        inset: 18%;
+        border-radius: 50%;
+        border: 1px solid color-mix(in srgb, var(--sectorAccent) 22%, transparent);
+        pointer-events: none;
+      }
+      .stick:after {
+        inset: 42%;
+        background: var(--sectorAccent);
+        border: 0;
+        opacity: 0.18;
+        box-shadow: 0 0 22px var(--sectorAccent);
+      }
+      .mini-map:before,
+      .mini-map:after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        pointer-events: none;
+      }
+      .mini-map:before {
+        left: 5px;
+        bottom: 5px;
+        border-left: 2px solid color-mix(in srgb, var(--sectorAccent) 66%, transparent);
+        border-bottom: 2px solid color-mix(in srgb, var(--sectorAccent) 66%, transparent);
+        border-radius: 0 0 0 7px;
+      }
+      .mini-map:after {
+        right: 5px;
+        top: 5px;
+        border-right: 2px solid color-mix(in srgb, var(--sectorAccent) 66%, transparent);
+        border-top: 2px solid color-mix(in srgb, var(--sectorAccent) 66%, transparent);
+        border-radius: 0 7px 0 0;
+      }
+      .objective-pill {
+        background:
+          radial-gradient(circle at 14% 20%, var(--sectorGlow), transparent 38%),
+          linear-gradient(180deg, rgba(7, 12, 28, 0.94), rgba(3, 7, 18, 0.82));
+      }
+      .objective-pill .chev {
+        color: var(--sectorAccent);
+        text-shadow: 0 0 14px var(--sectorAccent);
+      }
+      .menu {
+        background:
+          radial-gradient(circle at 88% 0%, var(--sectorGlow), transparent 31%),
+          var(--premiumPanel);
+      }
+      .menu-head:before {
+        content: "ODF COMMAND INTERFACE";
+        position: absolute;
+        left: 50%;
+        bottom: 2px;
+        transform: translateX(-50%);
+        color: color-mix(in srgb, var(--sectorAccent) 76%, #dbeafe);
+        font-size: 7px;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        opacity: 0.55;
+      }
+      .command-vista {
+        position: relative;
+        min-height: 128px;
+        overflow: hidden;
+        padding: 18px;
+        border: 1px solid color-mix(in srgb, var(--sectorAccent) 31%, transparent);
+        border-radius: 20px;
+        background:
+          radial-gradient(circle at 78% 48%, color-mix(in srgb, var(--sectorAccent2) 42%, transparent) 0 3%, transparent 4%),
+          radial-gradient(circle at 78% 48%, color-mix(in srgb, var(--sectorAccent) 22%, transparent), transparent 28%),
+          linear-gradient(135deg, rgba(2, 6, 23, 0.96), color-mix(in srgb, var(--sectorDeep) 86%, #111d3d));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 18px 45px rgba(0, 0, 0, 0.28);
+      }
+      .command-vista:before {
+        content: "";
+        position: absolute;
+        width: 150px;
+        height: 42px;
+        right: -2px;
+        top: 42px;
+        border: 1px solid color-mix(in srgb, var(--sectorAccent) 32%, transparent);
+        border-radius: 50%;
+        transform: rotate(-13deg);
+        box-shadow: 0 0 24px var(--sectorGlow);
+      }
+      .command-vista:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(circle at 12% 24%, rgba(255,255,255,.7) 0 1px, transparent 1.5px),
+          radial-gradient(circle at 58% 16%, rgba(255,255,255,.5) 0 1px, transparent 1.5px),
+          radial-gradient(circle at 92% 78%, rgba(255,255,255,.36) 0 1px, transparent 1.5px);
+        opacity: 0.7;
+        pointer-events: none;
+      }
+      .command-vista > * {
+        position: relative;
+        z-index: 1;
+      }
+      .command-kicker {
+        display: block;
+        color: var(--sectorAccent);
+        font-size: 9px;
+        font-weight: 950;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .command-vista h4 {
+        max-width: 68%;
+        font-size: 19px !important;
+      }
+      .command-vista p {
+        max-width: 70%;
+        margin-top: 5px !important;
+      }
+      .command-meter {
+        width: min(210px, 66%);
+        height: 5px;
+        margin-top: 12px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: rgba(255,255,255,.08);
+      }
+      .command-meter span {
+        display: block;
+        width: var(--commandProgress, 0%);
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--sectorAccent), var(--sectorAccent2));
+        box-shadow: 0 0 14px var(--sectorAccent);
+      }
+      .hub-btn {
+        min-height: 118px;
+        padding: 14px !important;
+      }
+      .hub-btn .hub-symbol {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 9px;
+        border-radius: 12px;
+        color: #eefaff;
+        font-size: 18px;
+        background: radial-gradient(circle at 32% 24%, rgba(255,255,255,.18), color-mix(in srgb, var(--sectorAccent) 15%, rgba(2,6,23,.8)));
+        border: 1px solid color-mix(in srgb, var(--sectorAccent) 30%, transparent);
+        box-shadow: 0 8px 22px rgba(0,0,0,.24), 0 0 20px var(--sectorGlow);
+      }
+      .hub-btn:hover .hub-symbol {
+        transform: translateY(-2px);
+        border-color: color-mix(in srgb, var(--sectorAccent) 68%, white 8%);
+      }
+      .hub-btn .hub-symbol {
+        transition: transform .16s ease, border-color .16s ease;
+      }
+      .planet[class*="rarity-"],
+      .shop[class*="rarity-"],
+      .quest[class*="rarity-"] {
+        border-left-width: 2px;
+      }
+      .planet.rarity-unusual { border-left-color: #86efac; }
+      .planet.rarity-rare { border-left-color: #7dd3fc; }
+      .planet.rarity-exotic { border-left-color: #fde68a; }
+      .planet.rarity-mythic { border-left-color: #fbcfe8; }
+      .overlay {
+        background:
+          radial-gradient(circle at 50% 24%, var(--sectorGlow), transparent 40%),
+          rgba(1, 4, 14, 0.83);
+      }
+      .overlay.show .dialog {
+        animation: celestialDialogIn 0.34s cubic-bezier(.2,.85,.28,1) both;
+      }
+      .title-screen {
+        background:
+          radial-gradient(circle at 76% 16%, color-mix(in srgb, var(--sectorAccent) 12%, transparent), transparent 34%),
+          linear-gradient(160deg, rgba(7,12,27,.97), rgba(1,4,14,.95));
+      }
+      .title-eyebrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        margin-bottom: 7px;
+        color: var(--sectorAccent);
+        font-size: 9px;
+        font-weight: 950;
+        letter-spacing: .24em;
+        text-transform: uppercase;
+      }
+      .title-eyebrow:before,
+      .title-eyebrow:after {
+        content: "";
+        width: 36px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--sectorAccent));
+      }
+      .title-eyebrow:after { transform: scaleX(-1); }
+      .title-feature {
+        position: relative;
+        padding-left: 16px;
+      }
+      .title-feature:before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        border-radius: 999px;
+        background: linear-gradient(var(--sectorAccent), transparent);
+      }
+      #discoveryOverlay .dialog {
+        width: min(610px, calc(100vw - 24px));
+        border-color: color-mix(in srgb, var(--discoveryColor, var(--sectorAccent)) 46%, transparent);
+        background:
+          radial-gradient(circle at 86% 4%, color-mix(in srgb, var(--discoveryColor, var(--sectorAccent)) 17%, transparent), transparent 32%),
+          linear-gradient(180deg, rgba(9,15,33,.985), rgba(2,6,23,.97));
+      }
+      #discoveryOverlay h2 {
+        color: color-mix(in srgb, var(--discoveryColor, #7dd3fc) 72%, white);
+        text-shadow: 0 0 24px color-mix(in srgb, var(--discoveryColor, #7dd3fc) 22%, transparent);
+      }
+      .discovery-stage {
+        --worldColor: #38bdf8;
+        --worldLight: #bae6fd;
+        --worldDark: #082f49;
+        --rarityColor: #7dd3fc;
+        position: relative;
+        height: clamp(220px, 34vh, 320px);
+        overflow: hidden;
+        isolation: isolate;
+        border: 1px solid color-mix(in srgb, var(--rarityColor) 32%, transparent);
+        border-radius: 22px;
+        background:
+          radial-gradient(circle at 22% 22%, rgba(255,255,255,.7) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 77% 16%, rgba(255,255,255,.46) 0 1px, transparent 1.7px),
+          radial-gradient(circle at 87% 70%, rgba(255,255,255,.34) 0 1px, transparent 1.6px),
+          radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--rarityColor) 16%, transparent), transparent 42%),
+          linear-gradient(145deg, #020617, #0b1430 55%, #02040e);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -48px 80px rgba(0,0,0,.38);
+      }
+      .discovery-stage:before {
+        content: "";
+        position: absolute;
+        inset: -60%;
+        z-index: -1;
+        background: conic-gradient(from 40deg, transparent, color-mix(in srgb, var(--rarityColor) 13%, transparent), transparent 30%, color-mix(in srgb, var(--sectorAccent2) 10%, transparent), transparent 64%);
+        animation: discoveryNebula 22s linear infinite;
+      }
+      .discovery-stage:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        pointer-events: none;
+        background: linear-gradient(180deg, transparent 60%, rgba(2,6,23,.72)), repeating-linear-gradient(180deg, rgba(255,255,255,.018) 0 1px, transparent 1px 5px);
+      }
+      .discovery-orbit {
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        width: min(390px, 86%);
+        height: 88px;
+        transform: translate(-50%,-50%) rotate(-12deg);
+        border: 1px solid color-mix(in srgb, var(--rarityColor) 42%, transparent);
+        border-radius: 50%;
+        box-shadow: 0 0 34px color-mix(in srgb, var(--rarityColor) 10%, transparent);
+      }
+      .discovery-orbit:before,
+      .discovery-orbit:after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        inset: -18px 32px;
+        border: 1px dashed color-mix(in srgb, var(--rarityColor) 22%, transparent);
+      }
+      .discovery-orbit:after {
+        inset: 17px -22px;
+        border-style: solid;
+        opacity: .42;
+      }
+      .discovery-world {
+        position: absolute;
+        left: 50%;
+        top: 48%;
+        width: 132px;
+        aspect-ratio: 1;
+        transform: translate(-50%,-50%);
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 34% 27%, rgba(255,255,255,.52), transparent 16%),
+          radial-gradient(ellipse at 28% 62%, color-mix(in srgb, var(--worldLight) 56%, transparent) 0 12%, transparent 13%),
+          radial-gradient(ellipse at 67% 38%, color-mix(in srgb, var(--worldDark) 58%, transparent) 0 18%, transparent 19%),
+          repeating-linear-gradient(var(--worldTilt, 16deg), transparent 0 12px, rgba(255,255,255,.07) 13px 16px),
+          radial-gradient(circle at 34% 28%, var(--worldLight), var(--worldColor) 42%, var(--worldDark) 78%);
+        border: 1px solid color-mix(in srgb, var(--worldLight) 74%, transparent);
+        box-shadow:
+          inset -28px -23px 38px rgba(0,0,0,.52),
+          inset 12px 9px 18px rgba(255,255,255,.08),
+          0 0 3px rgba(255,255,255,.65),
+          0 0 30px color-mix(in srgb, var(--rarityColor) 44%, transparent),
+          0 0 78px color-mix(in srgb, var(--worldColor) 25%, transparent);
+        animation: discoveryWorldFloat 5.8s ease-in-out infinite;
+      }
+      .discovery-world:before {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border: 2px solid color-mix(in srgb, var(--worldLight) 34%, transparent);
+        border-left-color: transparent;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        filter: blur(.2px);
+      }
+      .discovery-world:after {
+        content: "";
+        position: absolute;
+        inset: -22px;
+        border: 1px solid color-mix(in srgb, var(--rarityColor) 26%, transparent);
+        border-radius: 50%;
+        opacity: 0;
+      }
+      .discovery-stage.rarity-exotic .discovery-world:after,
+      .discovery-stage.rarity-mythic .discovery-world:after {
+        opacity: 1;
+        animation: discoveryAura 3.6s ease-in-out infinite;
+      }
+      .discovery-stage.rarity-mythic .discovery-world {
+        box-shadow: inset -28px -23px 38px rgba(0,0,0,.5), 0 0 36px color-mix(in srgb, var(--rarityColor) 58%, transparent), 0 0 110px color-mix(in srgb, var(--rarityColor) 32%, transparent);
+      }
+      .discovery-satellite {
+        position: absolute;
+        left: calc(50% + 118px);
+        top: calc(48% - 32px);
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--rarityColor);
+        box-shadow: 0 0 14px var(--rarityColor);
+        animation: discoverySatellite 6s ease-in-out infinite;
+      }
+      .discovery-classification {
+        position: absolute;
+        left: 14px;
+        bottom: 13px;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 9px;
+        border-radius: 999px;
+        background: rgba(2,6,23,.76);
+        border: 1px solid color-mix(in srgb, var(--rarityColor) 30%, transparent);
+        color: #eaf7ff;
+        font-size: 9px;
+        font-weight: 950;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        backdrop-filter: blur(12px);
+        max-width: calc(100% - 28px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .discovery-classification:before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--rarityColor);
+        box-shadow: 0 0 10px var(--rarityColor);
+      }
+      #discoveryStats .chip {
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
+      }
+      .toast {
+        border-left: 2px solid var(--sectorAccent);
+        background:
+          radial-gradient(circle at 100% 0%, var(--sectorGlow), transparent 48%),
+          linear-gradient(145deg, rgba(8,13,30,.96), rgba(2,6,23,.92));
+      }
+      @keyframes celestialDialogIn {
+        from { opacity: 0; transform: translateY(18px) scale(.975); filter: blur(5px); }
+        to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      }
+      @keyframes discoveryNebula { to { transform: rotate(360deg); } }
+      @keyframes discoveryWorldFloat {
+        0%,100% { transform: translate(-50%,-50%) rotate(-2deg) scale(1); }
+        50% { transform: translate(-50%,calc(-50% - 5px)) rotate(2deg) scale(1.018); }
+      }
+      @keyframes discoveryAura {
+        0%,100% { transform: scale(.94) rotate(0); opacity: .28; }
+        50% { transform: scale(1.08) rotate(180deg); opacity: .72; }
+      }
+      @keyframes discoverySatellite {
+        0%,100% { transform: translate(0,0) scale(.85); opacity: .55; }
+        50% { transform: translate(-236px,64px) scale(1.2); opacity: 1; }
+      }
+      @media (max-width: 520px) {
+        body:after { opacity: .08; }
+        .command-vista { min-height: 118px; }
+        .command-vista h4, .command-vista p { max-width: 72%; }
+        .hub-btn { min-height: 108px; }
+        .discovery-stage { height: min(270px, 31vh); }
+        .discovery-world { width: 112px; }
+        .discovery-satellite { left: calc(50% + 96px); }
+        #discoveryStats .chip { min-height: 46px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .discovery-stage:before,
+        .discovery-world,
+        .discovery-world:after,
+        .discovery-satellite { animation: none !important; }
+      }
     </style>
   </head>
   <body>
@@ -3590,6 +4142,7 @@
     </div>
     <div class="overlay show" id="titleOverlay">
       <div class="dialog title-screen">
+        <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
@@ -3880,7 +4433,12 @@
       <div class="dialog">
         <h2 id="discoveryTitle">New World Discovered</h2>
         <p id="discoveryText"></p>
-        <div class="art" id="discoveryArt"></div>
+        <div class="art discovery-stage" id="discoveryArt">
+          <div class="discovery-orbit"></div>
+          <div class="discovery-world" id="discoveryWorld"></div>
+          <div class="discovery-satellite"></div>
+          <div class="discovery-classification" id="discoveryClassification">Uncatalogued world</div>
+        </div>
         <div class="grid" id="discoveryStats"></div>
         <div class="actions">
           <button id="closeDiscovery" type="button">Continue</button>
@@ -4014,6 +4572,8 @@
         stars = [],
         nebulas = [],
         asteroids = [],
+        constellationLines = [],
+        distantGalaxies = [],
         upgradeFX = [],
         captureFX = [],
         audioNoticeShown = false,
@@ -4023,7 +4583,8 @@
         unclaimedProduction,
         echoRecorder = null,
         audio = null,
-        audioSyncing = false;
+        audioSyncing = false,
+        activeVisualTheme = null;
       const ui = {
         controlEditBanner: $("controlEditBanner"),
         controlEditDone: $("controlEditDone"),
@@ -4067,6 +4628,8 @@
         discoveryTitle: $("discoveryTitle"),
         discoveryText: $("discoveryText"),
         discoveryArt: $("discoveryArt"),
+        discoveryWorld: $("discoveryWorld"),
+        discoveryClassification: $("discoveryClassification"),
         discoveryStats: $("discoveryStats"),
         closeDiscovery: $("closeDiscovery"),
         choiceOverlay: $("choiceOverlay"),
@@ -12397,6 +12960,18 @@
       function renderHub() {
         const rs = readyState(),
           nba = nextBestAction(),
+          surveyBodies = (game.system?.bodies || []).filter(
+            (b) => b.type !== "star",
+          ),
+          surveyKnown = surveyBodies.filter(
+            (b) =>
+              b.discovered ||
+              game.discovered.has(b.name) ||
+              game.captured.has(b.name),
+          ).length,
+          surveyProgress = surveyBodies.length
+            ? Math.round((surveyKnown / surveyBodies.length) * 100)
+            : 0,
           core = [
             [
               "resources",
@@ -12468,7 +13043,7 @@
                     (s[4] > 99 ? "99+" : s[4]) +
                     "</em>"
                   : "") +
-                '<span style="font-size:20px;display:block">' +
+                '<span class="hub-symbol">' +
                 s[1] +
                 "</span><b>" +
                 esc(s[2]) +
@@ -12480,6 +13055,15 @@
           "</div></div>";
         ui.menuContent.innerHTML =
           guidedTutorialCard() +
+          '<div class="command-vista"><span class="command-kicker">Current Expedition</span><h4>' +
+          esc(game.system?.name || "Uncharted System") +
+          '</h4><p>' +
+          surveyKnown +
+          " of " +
+          surveyBodies.length +
+          ' worlds catalogued in this system.</p><div class="command-meter" style="--commandProgress:' +
+          surveyProgress +
+          '%"><span></span></div></div>' +
           card(
             "Recommended Next Action",
             esc(nba.title) +
@@ -15174,7 +15758,28 @@
         ui.discoveryTitle.textContent =
           "New " + b.rarity + " World Discovered: " + b.name;
         ui.discoveryText.textContent = (b.lore || b.biome) + " " + rar.desc;
-        ui.discoveryArt.style.background = discoveryBg(b);
+        const visualSeed = Math.abs(Math.round((b.featureSeed || 1) * 997)),
+          rarityColor = rar.color || "#7dd3fc";
+        ui.discoveryOverlay.style.setProperty("--discoveryColor", rarityColor);
+        ui.discoveryArt.className =
+          "art discovery-stage " + rarityClass(b) + (b.atmosphere ? " has-atmosphere" : "");
+        ui.discoveryArt.style.setProperty("--worldColor", b.color || "#38bdf8");
+        ui.discoveryArt.style.setProperty(
+          "--worldLight",
+          light(b.color || "#38bdf8", 0.58),
+        );
+        ui.discoveryArt.style.setProperty(
+          "--worldDark",
+          dark(b.color || "#38bdf8", 0.62),
+        );
+        ui.discoveryArt.style.setProperty("--rarityColor", rarityColor);
+        ui.discoveryArt.style.setProperty(
+          "--worldTilt",
+          Math.round(between(visualSeed, -28, 28)) + "deg",
+        );
+        if (ui.discoveryClassification)
+          ui.discoveryClassification.textContent =
+            b.rarity + " • " + planetClass(b) + " • " + displayBiome(b);
         ui.discoveryStats.innerHTML =
           '<div class="chip ' +
           rarityClass(b) +
@@ -15338,16 +15943,111 @@
         ui.titleCanvas.style.width = rw + "px";
         ui.titleCanvas.style.height = rh + "px";
       }
+      const sectorVisualThemes = [
+        {
+          name: "Azure Frontier",
+          deep: "#01040d",
+          mid: "#061127",
+          core: "#0b1b3d",
+          accent: "#7dd3fc",
+          accent2: "#a78bfa",
+          nebulas: ["#2563eb", "#7c3aed", "#0ea5e9", "#4f46e5"],
+        },
+        {
+          name: "Ember Reach",
+          deep: "#080307",
+          mid: "#1b0a18",
+          core: "#321325",
+          accent: "#fb7185",
+          accent2: "#fbbf24",
+          nebulas: ["#be123c", "#ea580c", "#7c2d12", "#a21caf"],
+        },
+        {
+          name: "Verdant Expanse",
+          deep: "#010806",
+          mid: "#06201c",
+          core: "#0b302e",
+          accent: "#5eead4",
+          accent2: "#86efac",
+          nebulas: ["#0f766e", "#047857", "#0369a1", "#4d7c0f"],
+        },
+        {
+          name: "Violet Meridian",
+          deep: "#05020c",
+          mid: "#150a2d",
+          core: "#251044",
+          accent: "#c4b5fd",
+          accent2: "#f0abfc",
+          nebulas: ["#7c3aed", "#a21caf", "#4338ca", "#be185d"],
+        },
+        {
+          name: "Golden Quiet",
+          deep: "#080603",
+          mid: "#1c1408",
+          core: "#32220b",
+          accent: "#fde68a",
+          accent2: "#fdba74",
+          nebulas: ["#b45309", "#c2410c", "#854d0e", "#9333ea"],
+        },
+        {
+          name: "Glacial Verge",
+          deep: "#01070c",
+          mid: "#061a29",
+          core: "#0b2b42",
+          accent: "#bae6fd",
+          accent2: "#67e8f9",
+          nebulas: ["#0369a1", "#0e7490", "#1d4ed8", "#0891b2"],
+        },
+      ];
+      function sectorVisualTheme() {
+        if (game.system?.specialType === "parallel")
+          return {
+            ...sectorVisualThemes[3],
+            name: "Parallel Breach",
+            deep: "#07020d",
+            mid: "#1c062a",
+            core: "#2e0d47",
+            accent: "#00f5ff",
+            accent2: "#ff2bd6",
+            nebulas: ["#ff2bd6", "#00f5ff", "#a855f7", "#4f46e5"],
+          };
+        if (game.system?.specialType === "cosmicSpirit")
+          return {
+            ...sectorVisualThemes[4],
+            name: "Cosmic Spirit",
+            deep: "#060507",
+            mid: "#171020",
+            core: "#30223b",
+            accent: "#fef3c7",
+            accent2: "#f0abfc",
+            nebulas: ["#f59e0b", "#c026d3", "#7c3aed", "#0ea5e9"],
+          };
+        return sectorVisualThemes[
+          Math.abs(Number(currentSystemIndex || 0)) % sectorVisualThemes.length
+        ];
+      }
+      function applySectorVisualTheme(theme = sectorVisualTheme()) {
+        const root = document.documentElement;
+        root.style.setProperty("--sectorAccent", theme.accent);
+        root.style.setProperty("--sectorAccent2", theme.accent2);
+        root.style.setProperty("--sectorDeep", theme.deep);
+        root.style.setProperty("--sectorGlow", rgba(theme.accent, 0.18));
+        document.body.dataset.visualTheme = theme.name;
+      }
       function buildBackdrop() {
         stars = [];
         nebulas = [];
         asteroids = [];
-        const quality = game.settings?.graphics || "High",
+        constellationLines = [];
+        distantGalaxies = [];
+        const theme = sectorVisualTheme(),
+          quality = game.settings?.graphics || "High",
           starDiv =
             quality === "Low" ? 6200 : quality === "Medium" ? 4800 : 4050,
           nebulaBase = quality === "Low" ? 3 : quality === "Medium" ? 5 : 6,
           asteroidDiv =
             quality === "Low" ? 130000 : quality === "Medium" ? 100000 : 80000;
+        activeVisualTheme = theme;
         for (let i = 0, c = Math.floor((W * H) / starDiv); i < c; i++) {
           stars.push({
             x: Math.random() * W,
@@ -15366,13 +16066,11 @@
                   : "#fff",
           });
         }
-        const colors = [
-          "rgba(37,99,235,",
-          "rgba(124,58,237,",
-          "rgba(14,165,233,",
-          "rgba(79,70,229,",
-          "rgba(236,72,153,",
-        ];
+        applySectorVisualTheme(theme);
+        const colors = theme.nebulas.map((h) => {
+          const c = hex(h);
+          return `rgba(${c.r},${c.g},${c.b},`;
+        });
         for (
           let i = 0;
           i <
@@ -15411,13 +16109,45 @@
             d: between(i + 300, 0.1, 0.32),
           });
         }
+        if (quality !== "Low") {
+          const groups = quality === "High" ? 4 : 2;
+          for (let g = 0; g < groups; g++) {
+            const points = [],
+              count = 3 + Math.floor(between(g + currentSystemIndex * 11, 0, 3)),
+              anchorX = between(g * 71 + currentSystemIndex, W * 0.08, W * 0.92),
+              anchorY = between(g * 97 + currentSystemIndex, H * 0.12, H * 0.78);
+            for (let i = 0; i < count; i++)
+              points.push({
+                x: anchorX + between(g * 113 + i * 17, -W * 0.14, W * 0.14),
+                y: anchorY + between(g * 127 + i * 23, -H * 0.1, H * 0.1),
+              });
+            constellationLines.push({
+              points,
+              color: g % 2 ? theme.accent2 : theme.accent,
+              alpha: between(g * 31 + 7, 0.055, 0.11),
+              drift: between(g * 43 + 4, 0.04, 0.13),
+            });
+          }
+          const galaxyCount = quality === "High" ? 3 : 2;
+          for (let i = 0; i < galaxyCount; i++)
+            distantGalaxies.push({
+              x: between(i * 83 + currentSystemIndex * 5, W * 0.08, W * 0.92),
+              y: between(i * 107 + currentSystemIndex * 7, H * 0.1, H * 0.84),
+              rx: between(i * 41 + 9, 54, 118),
+              ry: between(i * 53 + 11, 8, 19),
+              rot: between(i * 67 + 13, -0.8, 0.8),
+              color: i % 2 ? theme.accent2 : theme.accent,
+              alpha: between(i * 79 + 17, 0.045, 0.085),
+            });
+        }
       }
       function screen(x, y) {
         return { x: (x - cam.x) * zoom + W / 2, y: (y - cam.y) * zoom + H / 2 };
       }
       function drawBackdrop() {
         const quality = game.settings?.graphics || "High",
-          motion = game.settings?.motion || "On";
+          motion = game.settings?.motion || "On",
+          theme = activeVisualTheme || sectorVisualTheme();
         const bg = ctx.createRadialGradient(
           W * 0.5,
           H * 0.52,
@@ -15426,13 +16156,33 @@
           H * 0.52,
           Math.max(W, H) * 0.78,
         );
-        bg.addColorStop(0, "#091126");
-        bg.addColorStop(0.5, "#050816");
-        bg.addColorStop(1, "#01030b");
+        bg.addColorStop(0, theme.core);
+        bg.addColorStop(0.48, theme.mid);
+        bg.addColorStop(1, theme.deep);
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, W, H);
         ctx.save();
         ctx.globalCompositeOperation = "screen";
+        for (const galaxy of distantGalaxies) {
+          ctx.save();
+          ctx.translate(galaxy.x, galaxy.y);
+          ctx.rotate(galaxy.rot);
+          const gg = ctx.createRadialGradient(0, 0, 0, 0, 0, galaxy.rx);
+          gg.addColorStop(0, rgba("#ffffff", galaxy.alpha * 1.45));
+          gg.addColorStop(0.18, rgba(galaxy.color, galaxy.alpha));
+          gg.addColorStop(0.55, rgba(galaxy.color, galaxy.alpha * 0.28));
+          gg.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = gg;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, galaxy.rx, galaxy.ry, 0, 0, TAU);
+          ctx.fill();
+          ctx.strokeStyle = rgba(galaxy.color, galaxy.alpha * 1.2);
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, galaxy.rx * 0.7, galaxy.ry * 0.45, 0.18, 0, TAU);
+          ctx.stroke();
+          ctx.restore();
+        }
         for (const n of nebulas) {
           const sx = game.ship ? -game.ship.x * 0.018 * n.d : 0,
             sy = game.ship ? -game.ship.y * 0.018 * n.d : 0,
@@ -15481,6 +16231,26 @@
           }
           ctx.restore();
         }
+        for (const constellation of constellationLines) {
+          const sx = game.ship ? -game.ship.x * 0.008 * constellation.drift : 0,
+            sy = game.ship ? -game.ship.y * 0.008 * constellation.drift : 0;
+          ctx.strokeStyle = rgba(constellation.color, constellation.alpha);
+          ctx.lineWidth = 0.75;
+          ctx.beginPath();
+          constellation.points.forEach((point, i) => {
+            const x = point.x + sx,
+              y = point.y + sy;
+            if (i) ctx.lineTo(x, y);
+            else ctx.moveTo(x, y);
+          });
+          ctx.stroke();
+          for (const point of constellation.points) {
+            ctx.fillStyle = rgba(constellation.color, constellation.alpha * 3.2);
+            ctx.beginPath();
+            ctx.arc(point.x + sx, point.y + sy, 1.15, 0, TAU);
+            ctx.fill();
+          }
+        }
         ctx.globalCompositeOperation = "source-over";
         for (const s of stars) {
           const sx = game.ship ? -game.ship.x * 0.022 * s.d : 0,
@@ -15493,6 +16263,17 @@
           ctx.beginPath();
           ctx.arc(x, y, s.r, 0, TAU);
           ctx.fill();
+          if (quality === "High" && s.r > 1.05 && s.a > 0.58) {
+            ctx.globalAlpha = tw * 0.38;
+            ctx.strokeStyle = s.h;
+            ctx.lineWidth = 0.55;
+            ctx.beginPath();
+            ctx.moveTo(x - s.r * 4.5, y);
+            ctx.lineTo(x + s.r * 4.5, y);
+            ctx.moveTo(x, y - s.r * 4.5);
+            ctx.lineTo(x, y + s.r * 4.5);
+            ctx.stroke();
+          }
         }
         ctx.globalAlpha = 1;
         for (const a of asteroids) {
@@ -15523,6 +16304,37 @@
         }
         ctx.restore();
       }
+      function drawVelocityField() {
+        if (
+          game.settings?.graphics === "Low" ||
+          game.settings?.motion === "Reduced" ||
+          !game.ship
+        )
+          return;
+        const speed = Math.hypot(game.ship.vx || 0, game.ship.vy || 0),
+          intensity = clamp((speed - 0.65) / 2.8, 0, 1);
+        if (intensity <= 0.01) return;
+        const angle = Math.atan2(game.ship.vy || 0, game.ship.vx || 0),
+          dx = Math.cos(angle),
+          dy = Math.sin(angle),
+          count = Math.min(stars.length, Math.round(18 + intensity * 42));
+        ctx.save();
+        ctx.globalCompositeOperation = "screen";
+        ctx.lineCap = "round";
+        for (let i = 0; i < count; i++) {
+          const s = stars[(i * 7 + Math.floor(t * 0.08)) % stars.length],
+            x = (((s.x - game.ship.x * 0.022 * s.d) % W) + W) % W,
+            y = (((s.y - game.ship.y * 0.022 * s.d) % H) + H) % H,
+            len = (7 + s.d * 24) * intensity;
+          ctx.strokeStyle = rgba(s.h, (0.07 + s.a * 0.16) * intensity);
+          ctx.lineWidth = Math.max(0.45, s.r * 0.7);
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x - dx * len, y - dy * len);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
       function drawOrbit(b) {
         if (!b.parent) return;
         const p = screen(b.parent.x, b.parent.y),
@@ -15543,19 +16355,28 @@
       }
       function drawBody(b) {
         const p = screen(b.x, b.y),
-          r = Math.max(2, visualRadius(b) * zoom);
+          r = Math.max(2, visualRadius(b) * zoom),
+          known =
+            b.type === "star" ||
+            b.discovered ||
+            game.discovered.has(b.name) ||
+            game.captured.has(b.name) ||
+            b.name === "Earth" ||
+            b.name === "Mars";
         ctx.save();
-        drawRarityField(b, p, r);
         if (b.type === "star") {
           drawStarBody(b, p, r);
+        } else if (!known) {
+          drawUnchartedBody(b, p, r);
         } else {
+          drawRarityField(b, p, r);
           drawPlanetBase(b, p, r);
+          drawSurface(b, p, r);
+          drawPlanetLighting(b, p, r);
+          drawRarityDetails(b, p, r);
+          if (b.name === "Saturn" || b.pattern === "rings")
+            drawPlanetRings(p, r, b);
         }
-        drawSurface(b, p, r);
-        drawPlanetLighting(b, p, r);
-        drawRarityDetails(b, p, r);
-        if (b.name === "Saturn" || b.pattern === "rings")
-          drawPlanetRings(p, r, b);
         if (game.captured.has(b.name)) {
           ctx.save();
           ctx.globalCompositeOperation = "screen";
@@ -15572,17 +16393,60 @@
         if (b.factory) {
           drawFactory(p, r);
         }
-        const show =
-          b.type === "star" ||
-          b.discovered ||
-          game.discovered.has(b.name) ||
-          b.name === "Earth" ||
-          b.name === "Mars";
-        if (show && r > 3) {
+        if (known && r > 3) {
           ctx.font = "700 12px Inter, system-ui";
           ctx.textAlign = "center";
           ctx.fillStyle = "rgba(238,245,255,.92)";
           ctx.fillText(b.name, p.x, p.y - r - 10);
+        }
+        ctx.restore();
+      }
+      function drawUnchartedBody(b, p, r) {
+        ctx.save();
+        const pulse = 0.72 + Math.sin(t * 0.045 + (b.featureSeed || 1)) * 0.18,
+          halo = ctx.createRadialGradient(p.x, p.y, r * 0.72, p.x, p.y, r * 2.7);
+        halo.addColorStop(0, "rgba(30,41,59,.26)");
+        halo.addColorStop(0.46, "rgba(100,116,139,.07)");
+        halo.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r * 2.7, 0, TAU);
+        ctx.fill();
+        const shadow = ctx.createRadialGradient(
+          p.x - r * 0.28,
+          p.y - r * 0.3,
+          0,
+          p.x,
+          p.y,
+          r * 1.08,
+        );
+        shadow.addColorStop(0, "rgba(71,85,105,.58)");
+        shadow.addColorStop(0.28, "rgba(30,41,59,.78)");
+        shadow.addColorStop(0.72, "rgba(7,12,24,.96)");
+        shadow.addColorStop(1, "rgba(1,3,10,1)");
+        ctx.fillStyle = shadow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r, 0, TAU);
+        ctx.fill();
+        ctx.save();
+        ctx.globalCompositeOperation = "screen";
+        ctx.strokeStyle = `rgba(148,163,184,${0.18 * pulse})`;
+        ctx.lineWidth = Math.max(1, r * 0.025);
+        ctx.setLineDash([Math.max(2, r * 0.12), Math.max(3, r * 0.18)]);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, r + 7, t * 0.018, t * 0.018 + TAU * 0.78);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = `rgba(125,211,252,${0.12 * pulse})`;
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y, r * 1.42, r * 0.34, -0.18, 0, TAU);
+        ctx.stroke();
+        ctx.restore();
+        if (r > 7) {
+          ctx.font = "900 8px Inter, system-ui";
+          ctx.textAlign = "center";
+          ctx.fillStyle = `rgba(191,219,254,${0.42 + pulse * 0.18})`;
+          ctx.fillText("UNIDENTIFIED", p.x, p.y + r + 22);
         }
         ctx.restore();
       }
@@ -18849,6 +19713,7 @@
         ctx.imageSmoothingQuality =
           game.settings?.graphics === "High" ? "high" : "medium";
         drawBackdrop();
+        drawVelocityField();
         drawCosmicSpiritBackdrop();
         drawParallelBackdrop();
         drawCinematicLight();
@@ -19194,6 +20059,7 @@
       }
       function drawScreenFX() {
         if (game.settings?.graphics === "Low") return;
+        const theme = activeVisualTheme || sectorVisualTheme();
         ctx.save();
         const vignette = ctx.createRadialGradient(
           W / 2,
@@ -19216,8 +20082,8 @@
           H * 0.42,
           Math.max(W, H) * 0.46,
         );
-        bloom.addColorStop(0, "rgba(125,211,252,.025)");
-        bloom.addColorStop(0.5, "rgba(167,139,250,.018)");
+        bloom.addColorStop(0, rgba(theme.accent, 0.032));
+        bloom.addColorStop(0.5, rgba(theme.accent2, 0.021));
         bloom.addColorStop(1, "rgba(0,0,0,0)");
         ctx.globalCompositeOperation = "screen";
         ctx.fillStyle = bloom;
