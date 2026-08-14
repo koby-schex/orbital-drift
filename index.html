@@ -4805,7 +4805,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Flight &amp; Fleet Refit • v0.22.1</div>
+        <div class="title-version">Tutorial Safeguards • v0.22.2</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5211,7 +5211,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.22.1",
+        APP_VERSION = "0.22.2",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -10215,6 +10215,13 @@
           CAPTURE_BASE + Math.max(0, Number(game.frigate.capacityLevel) || 0)
         );
       }
+      function captureCapacityUsed() {
+        let used = 0;
+        game.captured.forEach((name) => {
+          if (name !== "Earth") used++;
+        });
+        return used;
+      }
       function fleetLimit() {
         if (!game.frigate.built) return 0;
         return clamp(
@@ -11273,6 +11280,36 @@
           DataCores: 5,
         };
       }
+      function pioneerConstructionReserveAvailable() {
+        return !!(
+          !game.frigate.built &&
+          game.system?.isTutorial &&
+          game.missionStage >= 4 &&
+          hasFactoryAccess()
+        );
+      }
+      function releasePioneerConstructionReserve(cost = buildCost()) {
+        if (!pioneerConstructionReserveAvailable()) return {};
+        const supplied = {};
+        Object.entries(cost).forEach(([resource, required]) => {
+          const missing = Math.max(
+            0,
+            Math.ceil(required - (game.resources[resource] || 0)),
+          );
+          if (!missing) return;
+          game.resources[resource] = (game.resources[resource] || 0) + missing;
+          supplied[resource] = missing;
+        });
+        if (Object.keys(supplied).length)
+          addActivity(
+            "resource",
+            "Pioneer reserve released",
+            "Earth Factory supplied the remaining construction materials: " +
+              fmt(supplied) +
+              ".",
+          );
+        return supplied;
+      }
       function shipSubsystemCost(key) {
         const def = shipSubsystemDefs[key];
         if (!def) return null;
@@ -12032,7 +12069,7 @@
           return errorToast(b.name + " is survey-only: " + b.hazard);
         if (game.captured.has(b.name))
           return errorToast(b.name + " is already captured.");
-        if (game.captured.size >= captureLimit()) return openChoice(b);
+        if (captureCapacityUsed() >= captureLimit()) return openChoice(b);
         finishCapture(b);
       }
       function finishCapture(b, replace = null) {
@@ -12151,7 +12188,7 @@
         ui.choiceText.textContent =
           "Your network supports " +
           captureLimit() +
-          " captured worlds. Replace one or raid " +
+          " frontier worlds in addition to protected Earth. Replace one or raid " +
           b.name +
           " once.";
         ui.choiceList.innerHTML = "";
@@ -12496,6 +12533,7 @@
         if (!game.system.isTutorial || !hasFactoryAccess())
           return toast("Build the first frigate from the Earth Factory menu.");
         const cost = buildCost();
+        const reserve = releasePioneerConstructionReserve(cost);
         if (!canAfford(cost))
           return toast("Frigate requires " + fmt(cost) + ".");
         spend(cost);
@@ -12515,6 +12553,10 @@
           [
             ["Unlocked", "Pioneer rendezvous"],
             ["Base", game.frigate.name],
+            [
+              "Earth Factory Reserve",
+              fmt(reserve) || "Construction materials were already complete",
+            ],
             ["Next", "Target Pioneer, approach, then LOCK"],
           ],
         );
@@ -14835,7 +14877,11 @@
           else if (game.missionStage === 3)
             sub = target ? "Venus distance: " + Math.round(Math.max(0, dist(game.ship, target) - visualRadius(target))) + "u" : "Follow the Venus target";
           else if (game.missionStage === 4)
-            sub = canAfford(buildCost()) ? "Pioneer construction ready" : "Gather the build resources";
+            sub = pioneerConstructionReserveAvailable()
+              ? "Pioneer construction ready — Earth reserve secured"
+              : canAfford(buildCost())
+                ? "Pioneer construction ready"
+                : "Return to Earth Factory";
           else if (game.missionStage === 5)
             sub = target ? "Pioneer distance: " + Math.round(Math.max(0, dist(game.ship, target) - (target.radius || 42))) + "u" : "Set the Pioneer target";
           else if (game.missionStage === 6)
@@ -15433,6 +15479,7 @@
             return "Complete the Sol tutorial objectives first.";
           if (!game.system.isTutorial || !hasFactoryAccess())
             return "Return to Earth Factory to build your first frigate.";
+          if (pioneerConstructionReserveAvailable()) return "";
           return firstMissingReason(buildCost()) || "";
         }
         if (kind === "frigateUpgrade") {
@@ -16422,9 +16469,10 @@
               "Planet Development",
               "Develop captured worlds, improve passive production, and create factory planets for major upgrades.",
               '<div class="chip">Capture Network: ' +
-                game.captured.size +
+                captureCapacityUsed() +
                 " / " +
                 captureLimit() +
+                " frontier worlds • Earth protected" +
                 '</div><div class="chip">Planet: ' +
                 esc(sel?.name || "None") +
                 '</div><div class="chip">Production: ' +
@@ -17268,16 +17316,19 @@
         }
         if (!game.frigate.built) {
           const cost = buildCost(),
+            reserveReady = pioneerConstructionReserveAvailable(),
             ready =
               game.system.isTutorial &&
               game.missionStage >= 4 &&
               hasFactoryAccess() &&
-              canAfford(cost);
+              (canAfford(cost) || reserveReady);
           ui.menuContent.innerHTML = card(
             "Frigate Project: ODF Pioneer",
             "Build the mobile headquarters that will anchor every future expedition at Earth Factory. " +
               costHtml(cost) +
-              missingHints(cost),
+              (reserveReady
+                ? '<div class="upgrade-impact"><b>Earth Factory construction reserve</b><span>Your tutorial progress is protected. Earth will supply any missing Pioneer materials when you build.</span></div>'
+                : missingHints(cost)),
             btnWhy(
               "Build ODF Pioneer",
               "buildFrigate",
@@ -19393,7 +19444,8 @@
         ui.nearest.textContent = n.body
           ? n.body.name + " " + Math.max(0, Math.round(n.d)) + " km"
           : "None";
-        ui.captured.textContent = game.captured.size + " / " + captureLimit();
+        ui.captured.textContent =
+          captureCapacityUsed() + " / " + captureLimit() + " + Earth";
         const controlsVisible = !!(
           !titleOpen &&
           !modalFreeze &&
@@ -25765,7 +25817,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.22.1" &&
+            APP_VERSION === "0.22.2" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );

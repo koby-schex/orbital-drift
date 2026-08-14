@@ -162,7 +162,8 @@ vm.runInContext(
     get game(){return game}, get systems(){return systems},
     get currentSystemIndex(){return currentSystemIndex},
     get universeSeed(){return universeSeed},
-    initGame, body, nearestBody, finishCapture, upgradeShip, upgradePlanet, updateShip, scanPlanet,
+    initGame, body, nearestBody, capture, finishCapture, captureLimit, captureCapacityUsed,
+    upgradeShip, upgradePlanet, updateShip, scanPlanet,
     buildFrigate, frigatePosition, frigateHomePosition, toggleOrbit, jumpSystem,
     startPioneerRescue, updatePioneerRescue, updateDrift, shipStats, refuel,
     chooseUnchartedSystemIndex, unchartedSystemCandidates,
@@ -229,12 +230,28 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.22.1", "Expected release candidate version");
+assert.equal(api.APP_VERSION, "0.22.2", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
 assert.equal(api.game.system.name, "Sol System", "Every pilot must start in Sol");
 assert.equal(api.game.system.isTutorial, true, "Sol must remain the tutorial route");
+assert.equal(api.captureLimit(), 3, "A new flight must begin with three frontier capture slots");
+assert.equal(api.captureCapacityUsed(), 0, "Protected Earth must not consume a frontier capture slot");
+for (const worldName of ["Mars", "Venus", "Uranus"]) {
+  api.game.ship.orbitLocked = true;
+  api.game.ship.lockBody = worldName;
+  api.capture();
+  api.dismissPanels();
+}
+assert.equal(api.captureCapacityUsed(), 3, "All three starting frontier slots must be usable");
+assert.equal(api.game.captured.size, 4, "Earth plus three frontier worlds must remain captured");
+api.game.ship.orbitLocked = true;
+api.game.ship.lockBody = "Neptune";
+api.capture();
+assert.equal(api.game.captured.has("Neptune"), false, "A fourth frontier capture must open replacement flow");
+assert.equal(api.captureCapacityUsed(), 3, "A blocked fourth capture must preserve the existing network");
+api.dismissPanels();
 assert.equal(
   new Set(api.systems.map((system) => system.name)).size,
   api.systems.length,
@@ -569,9 +586,20 @@ for (const subsystem of ["thrust", "fuel", "brake", "accel", "handling", "cargo"
   api.dismissPanels();
   checkpoint(`${subsystem}: survey complete`);
   assert.equal(api.game.missionStage, 4, `${subsystem}: Venus survey should advance training`);
+  Object.keys(api.game.resources).forEach((resource) => {
+    api.game.resources[resource] = 0;
+  });
   api.buildFrigate();
   checkpoint(`${subsystem}: frigate complete`);
-  assert.equal(api.game.frigate.built, true, `${subsystem}: economy must fund Pioneer construction`);
+  assert.equal(api.game.frigate.built, true, `${subsystem}: Earth reserve must guarantee Pioneer construction`);
+  assert.ok(
+    Object.values(api.game.resources).every((amount) => amount >= 0),
+    `${subsystem}: reserve-backed construction must never create negative resources`,
+  );
+  assert.ok(
+    api.game.activity.some((entry) => entry.title === "Pioneer reserve released"),
+    `${subsystem}: the construction reserve must be visible in the activity log`,
+  );
 }
 
 assert.ok(
