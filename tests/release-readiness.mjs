@@ -179,6 +179,16 @@ vm.runInContext(
     vaultCatalog, vaultState, vaultCapacity, vaultContainment,
     vaultSecuredEntries, registerVaultDiscovery, secureVaultEntry,
     unlockVaultSkin, vaultHtml, frigateSkins, frigateBenefit,
+    crewTemplates, crewUniforms, crewState, crewMember, crewUpgradeCost,
+    crewXpNeeded, recruitCrew, renameCrew, cycleCrewUniform, setCrewDuty,
+    grantCrewXp, upgradeCrew, crewHtml,
+    expeditionThemes, expeditionState, expeditionSimilarity,
+    makeExpeditionOffer, generateExpeditionOffers, acceptExpedition,
+    assignCrewToExpedition, trackExpeditionProgress, expeditionsHtml,
+    livingEventTemplates, worldEventState, currentLivingSystemEvent,
+    ensureLivingSystemEvent, resolveLivingSystemEvent, livingSystemEventHtml,
+    majorThreatTemplates, spawnMajorThreat, prepareMajorThreat,
+    resolveMajorThreat, majorThreatHtml, journeyPulseHtml,
     resolveExplorationEncounter,
     dismissPanels(){
       [ui.missionOverlay,ui.upgradeOverlay,ui.discoveryOverlay,ui.choiceOverlay,ui.confirmOverlay]
@@ -212,8 +222,8 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.20.0", "Expected release candidate version");
-assert.equal(api.SAVE_VERSION, 18, "Expected current save schema");
+assert.equal(api.APP_VERSION, "0.21.0", "Expected release candidate version");
+assert.equal(api.SAVE_VERSION, 19, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
 assert.equal(api.game.system.name, "Sol System", "Every pilot must start in Sol");
@@ -277,6 +287,106 @@ assert.doesNotMatch(
   /Reset Save \+ Run/,
   "Destructive actions need player-facing language",
 );
+
+api.prepareVaultTest(515151);
+api.game.resources = Object.fromEntries(
+  Object.keys(api.game.resources).map((key) => [key, 9999]),
+);
+const offers = api.generateExpeditionOffers(true);
+assert.equal(offers.length, 3, "The Pioneer should present three distinct expedition leads");
+assert.equal(
+  new Set(offers.map((offer) => offer.family)).size,
+  offers.length,
+  "An expedition board must not repeat a subject family",
+);
+for (let left = 0; left < offers.length; left++) {
+  for (let right = left + 1; right < offers.length; right++) {
+    assert.ok(
+      api.expeditionSimilarity(offers[left], offers[right]) < 0.72,
+      "Expedition leads on the same board must not use similar objective routes",
+    );
+  }
+}
+for (const theme of api.expeditionThemes) {
+  const vaultName = api.vaultCatalog.find((entry) => entry.key === theme.vaultKey)?.name;
+  assert.ok(vaultName, `${theme.name} needs a real Vault discovery reward`);
+  assert.match(
+    theme.rewardText,
+    new RegExp(vaultName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
+    `${theme.name} must describe its matching Vault reward`,
+  );
+  assert.equal(
+    api.majorThreatTemplates.filter((entry) => entry.key === theme.threat).length,
+    1,
+    `${theme.name} needs one matching final threat`,
+  );
+}
+const accepted = offers[0];
+assert.equal(api.acceptExpedition(accepted.id), true, "A Pioneer-orbit expedition should be accepted");
+assert.equal(api.expeditionState().active.family, accepted.family);
+api.expeditionState().active = null;
+api.expeditionState().offers = [];
+const nextOffers = api.generateExpeditionOffers(true);
+assert.ok(
+  nextOffers.every((offer) => offer.family !== accepted.family),
+  "Accepted expedition families must remain retired even when progress is abandoned",
+);
+
+const starterCrew = api.crewState().members;
+assert.equal(starterCrew.length, 3, "The Pioneer should launch with three core specialists");
+assert.equal(new Set(starterCrew.map((member) => member.role)).size, 3);
+const marshalTemplate = api.crewTemplates.find((entry) => entry.id === "tactical");
+assert.equal(api.recruitCrew(marshalTemplate.id), true, "Recruitable specialists should join at Pioneer orbit");
+const marshal = api.crewMember(marshalTemplate.id);
+const firstUniform = marshal.uniform;
+api.cycleCrewUniform(marshal.id);
+assert.notEqual(marshal.uniform, firstUniform, "Crew uniforms should be customizable");
+getElement(`crewName-${marshal.id}`).value = "Sera Horizon";
+api.renameCrew(marshal.id);
+assert.equal(marshal.name, "Sera Horizon", "Crew names should be customizable");
+api.setCrewDuty(`${marshal.id}|fleet`);
+assert.equal(marshal.duty, "fleet", "Crew duties should be assignable");
+api.grantCrewXp(api.crewXpNeeded(marshal) + 5, marshal.id);
+assert.equal(api.upgradeCrew(marshal.id), true, "Experienced crew should advance through training");
+assert.equal(marshal.level, 2, "Crew training should raise specialist level");
+assert.match(api.crewHtml(), /Sera Horizon/, "Crew customization must appear on the Pioneer deck");
+assert.match(api.expeditionsHtml(), /Independent adventures/, "Expeditions must be presented as open adventures");
+
+const livingEvent = api.ensureLivingSystemEvent(api.game.system, true);
+assert.equal(livingEvent.status, "active", "A forced living-system event should become active");
+api.resolveLivingSystemEvent(0);
+assert.equal(livingEvent.status, "resolved", "Living-system choices should persist their resolution");
+assert.ok(livingEvent.reward && Object.keys(livingEvent.reward).length, "Living-system decisions need themed rewards");
+
+const threat = api.spawnMajorThreat("thermal-burrower", "ambient");
+const hullBeforeRetreat = api.game.ship.hull;
+assert.equal(api.resolveMajorThreat("engineering"), false, "An unprepared major threat should force a safe retreat");
+assert.ok(api.game.ship.hull < hullBeforeRetreat, "A retreat should carry a recoverable hull setback");
+api.game.fleet.ships = [{ id: "threat-screen", type: "scout", status: "idle" }];
+api.prepareMajorThreat("crew");
+api.prepareMajorThreat("fleet");
+api.prepareMajorThreat("systems");
+assert.equal(api.resolveMajorThreat("engineering"), true, "Preparation and the right crew role should resolve a major threat");
+assert.equal(threat.status, "resolved", "Resolved threats must enter the journey record");
+assert.match(api.journeyPulseHtml(), /Major Threats/, "The open-journey record should include major threats");
+
+const featureCopy = [api.expeditionsHtml(), api.crewHtml(), api.livingSystemEventHtml(), api.journeyPulseHtml()].join(" ");
+assert.doesNotMatch(
+  featureCopy,
+  /procedural|seed|similarity threshold|telemetry|retention system|developer|main campaign/i,
+  "New player-facing systems must avoid implementation language",
+);
+assert.equal(api.saveState().crew.members.length, 4, "Crew progression must be included in saves");
+assert.ok(api.saveState().expeditions.retiredFamilies.includes(accepted.family), "Expedition history must be included in saves");
+assert.ok(Object.keys(api.saveState().worldEvents.records).length, "Living-system records must be included in saves");
+assert.equal(api.saveGame(false), true, "Open-journey progress should save");
+api.game.crew.members = [];
+api.game.expeditions.retiredFamilies = [];
+api.game.worldEvents.records = {};
+assert.equal(api.loadGame(false), true, "Open-journey progress should load");
+assert.equal(api.crewState().members.length, 4, "Customized crew must survive save/load");
+assert.ok(api.expeditionState().retiredFamilies.includes(accepted.family), "Retired expedition leads must survive save/load");
+assert.ok(Object.keys(api.worldEventState().records).length, "Living-system decisions must survive save/load");
 
 assert.equal(api.discoveryMysteries.length, 8, "Every system family needs a mystery profile");
 assert.equal(

@@ -2531,6 +2531,204 @@
       @media (prefers-reduced-motion: reduce) {
         .vault-specimen-core { animation: none !important; }
       }
+      .expedition-board,
+      .crew-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .expedition-card,
+      .crew-card,
+      .living-event-card,
+      .threat-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(125, 211, 252, 0.18);
+        border-radius: 18px;
+        padding: 12px;
+        background:
+          radial-gradient(circle at 92% 8%, rgba(125, 211, 252, 0.1), transparent 34%),
+          linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(3, 7, 18, 0.9));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.075), 0 14px 34px rgba(0, 0, 0, 0.2);
+      }
+      .expedition-card.active {
+        border-color: rgba(251, 191, 36, 0.48);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 30px rgba(251, 191, 36, 0.08);
+      }
+      .expedition-card > b,
+      .crew-card > b,
+      .living-event-card > b,
+      .threat-card > b {
+        display: block;
+        color: #f8fbff;
+        font-size: 13px;
+      }
+      .expedition-card > span,
+      .crew-card > span,
+      .living-event-card > span,
+      .threat-card > span {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.45;
+      }
+      .expedition-kicker,
+      .crew-role,
+      .event-kicker,
+      .threat-kicker {
+        color: #67e8f9 !important;
+        font-size: 8px !important;
+        font-weight: 950;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .expedition-route {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 5px;
+        margin-top: 10px;
+      }
+      .expedition-stage {
+        min-height: 45px;
+        padding: 6px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.035);
+        color: #94a3b8;
+        font-size: 8px;
+        line-height: 1.3;
+      }
+      .expedition-stage.current {
+        color: #fef3c7;
+        border-color: rgba(251, 191, 36, 0.38);
+        background: rgba(251, 191, 36, 0.09);
+      }
+      .expedition-stage.done {
+        color: #bbf7d0;
+        border-color: rgba(134, 239, 172, 0.28);
+        background: rgba(134, 239, 172, 0.065);
+      }
+      .crew-card {
+        display: grid;
+        grid-template-columns: 70px minmax(0, 1fr);
+        gap: 11px;
+      }
+      .crew-avatar {
+        --crewColor: #67e8f9;
+        --crewUniform: #1e3a5f;
+        position: relative;
+        width: 70px;
+        height: 92px;
+        overflow: hidden;
+        border-radius: 18px 18px 23px 23px;
+        background:
+          radial-gradient(circle at 50% 31%, color-mix(in srgb, var(--crewColor) 76%, white) 0 16%, transparent 17%),
+          radial-gradient(circle at 50% 35%, #111827 0 25%, transparent 26%),
+          linear-gradient(155deg, var(--crewUniform), #020617 72%);
+        border: 1px solid color-mix(in srgb, var(--crewColor) 45%, transparent);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 22px color-mix(in srgb, var(--crewColor) 16%, transparent);
+      }
+      .crew-avatar:before {
+        content: "";
+        position: absolute;
+        left: 15px;
+        right: 15px;
+        bottom: -5px;
+        height: 48px;
+        border-radius: 30px 30px 8px 8px;
+        background: linear-gradient(145deg, color-mix(in srgb, var(--crewUniform) 72%, white), var(--crewUniform));
+        border: 1px solid rgba(255, 255, 255, 0.18);
+      }
+      .crew-avatar:after {
+        content: attr(data-initials);
+        position: absolute;
+        inset: auto 0 8px;
+        z-index: 2;
+        text-align: center;
+        color: var(--crewColor);
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: 1px;
+      }
+      .crew-copy { min-width: 0; }
+      .crew-copy > b { color: #f8fbff; }
+      .crew-xp {
+        height: 6px;
+        margin-top: 7px;
+        overflow: hidden;
+        border-radius: 99px;
+        background: rgba(2, 6, 23, 0.8);
+      }
+      .crew-xp div {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #22d3ee, #a78bfa);
+      }
+      .crew-duty-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+        margin-top: 8px;
+      }
+      .crew-duty-grid button { min-height: 34px; padding: 5px; font-size: 8px; }
+      .living-event-card {
+        border-color: color-mix(in srgb, var(--eventColor, #67e8f9) 38%, transparent);
+        background:
+          radial-gradient(circle at 86% 15%, color-mix(in srgb, var(--eventColor, #67e8f9) 18%, transparent), transparent 34%),
+          linear-gradient(145deg, rgba(15, 23, 42, 0.94), rgba(3, 7, 18, 0.91));
+      }
+      .living-event-visual,
+      .threat-visual {
+        position: relative;
+        height: 104px;
+        margin: 8px 0;
+        overflow: hidden;
+        border-radius: 14px;
+        background:
+          radial-gradient(circle at 58% 45%, color-mix(in srgb, var(--eventColor, #67e8f9) 36%, transparent), transparent 24%),
+          linear-gradient(155deg, #020617, #111827);
+        border: 1px solid color-mix(in srgb, var(--eventColor, #67e8f9) 26%, transparent);
+      }
+      .living-event-visual:before,
+      .living-event-visual:after,
+      .threat-visual:before,
+      .threat-visual:after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        border: 1px solid color-mix(in srgb, var(--eventColor, #67e8f9) 58%, transparent);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) rotate(-12deg);
+      }
+      .living-event-visual:before { width: 168px; height: 42px; }
+      .living-event-visual:after { width: 84px; height: 84px; }
+      .threat-card { border-color: rgba(248, 113, 113, 0.38); }
+      .threat-visual { --eventColor: #f87171; height: 132px; }
+      .threat-visual:before { width: 146px; height: 58px; border-width: 3px; }
+      .threat-visual:after { width: 42px; height: 42px; box-shadow: 0 0 40px var(--eventColor); }
+      .threat-meter {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .threat-meter .chip b { color: #fecaca; }
+      .journey-pulse {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+      }
+      .journey-pulse .chip { text-align: center; }
+      @media (max-width: 760px) {
+        .expedition-board,
+        .crew-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 440px) {
+        .expedition-route { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .journey-pulse { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
       .title-feature {
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
@@ -4600,7 +4798,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Pioneer Relic Vault • v0.20.0</div>
+        <div class="title-version">Open Expeditions • v0.21.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -4623,10 +4821,10 @@
               >
             </div>
             <div class="title-feature">
-              <b>Build Your Fleet</b
+              <b>Build Your Pioneer</b
               ><span
-                >Bring the ODF Pioneer online, expand your frontier network, and
-                outfit your vessel with rare hull designs.</span
+                >Bring the ODF Pioneer online, shape its crew, command a living
+                fleet, and choose independent adventures.</span
               >
             </div>
             <div class="title-actions primary-first" id="titleActions">
@@ -5004,8 +5202,8 @@
         TAU = Math.PI * 2,
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
-        SAVE_VERSION = 18,
-        APP_VERSION = "0.20.0";
+        SAVE_VERSION = 19,
+        APP_VERSION = "0.21.0";
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -6368,6 +6566,53 @@
           { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism sharing Starling's genetic telemetry without sharing its history. It reacts before the crew touches the controls." },
           { key: "causality-lace", name: "Causality Lace", kind: "phenomenon", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#c084fc", "#fef08a"], visual: "swarm", entry: "Threads of probability braided into a stable specimen. Every strand records a different outcome for the same discovery." },
         ];
+      const crewUniforms = ["#164e63", "#312e81", "#713f12", "#14532d", "#4c1d95"],
+        crewTemplates = [
+          { id: "navigator", name: "Mira Vale", role: "Navigator", specialty: "Routecraft", color: "#67e8f9", starter: true, bio: "A gravity-lane cartographer who can feel a bad route before the instruments agree.", perks: ["Long-range route clarity", "Safer expedition jumps", "Rare-system awareness"] },
+          { id: "xenologist", name: "Dr. Imani Voss", role: "Xenologist", specialty: "Living Systems", color: "#86efac", starter: true, bio: "A patient field scientist who treats every unfamiliar organism as a neighbor before a specimen.", perks: ["Stronger survey rewards", "Safer creature handling", "Additional Vault insight"] },
+          { id: "engineer", name: "Tomas Rook", role: "Chief Engineer", specialty: "Pioneer Systems", color: "#fbbf24", starter: true, bio: "The engineer who kept the Pioneer alive when it was still more scaffolding than frigate.", perks: ["Lower threat preparation cost", "Improved fuel recovery", "Stronger repair outcomes"] },
+          { id: "tactical", name: "Sera Kade", role: "Flight Marshal", specialty: "Threat Response", color: "#f87171", starter: false, cost: { Alloy: 75, Titanium: 40, DataCores: 15 }, bio: "A convoy defender who turns frightened crews into coordinated wings.", perks: ["Major-threat readiness", "Fleet defense bonus", "Reduced confrontation damage"] },
+          { id: "quartermaster", name: "Oren Finch", role: "Quartermaster", specialty: "Expedition Logistics", color: "#fdba74", starter: false, cost: { Alloy: 60, Helium3: 35, Crystal: 18 }, bio: "A frontier broker famous for making one supply crate feel like three.", perks: ["Themed reward bonus", "Production efficiency", "More expedition supplies"] },
+          { id: "envoy", name: "Nyra Sol", role: "Expedition Envoy", specialty: "First Contact", color: "#c4b5fd", starter: false, cost: { BioGel: 28, Crystal: 35, DataCores: 24 }, bio: "A calm negotiator who listens for what a signal avoids saying.", perks: ["Better event choices", "Faction standing bonus", "Alternative threat solutions"] },
+        ],
+        expeditionThemes = [
+          { key: "starwhale-migration", family: "migration", name: "Migration of the Starwhales", hook: "A living convoy is crossing unstable territory, and something enormous is steering it away from home.", color: "#67e8f9", leadRole: "Xenologist", stages: [["jump",2,"Follow the migration wake"],["survey",1,"Survey a feeding world"],["event",1,"Protect the moving herd"],["threat",1,"Face the wounded matriarch"]], threat: "starwhale", reward: { BioGel: 42, Helium3: 38, DataCores: 14 }, vaultKey: "storm-ray", rewardText: "living-tissue cultures, migration fuel, and a protected Storm Ray specimen" },
+          { key: "vanished-surveyors", family: "rescue", name: "The Vanished Surveyors", hook: "Three survey crews disappeared after reporting the same impossible beacon from different systems.", color: "#fde68a", leadRole: "Navigator", stages: [["signal",1,"Decode the abandoned beacon"],["fleet",1,"Search with a fleet escort"],["jump",2,"Trace the final route"],["threat",1,"Break the hunter's ambush"]], threat: "void-leviathan", reward: { DataCores: 46, Alloy: 34, Titanium: 18 }, vaultKey: "cartographer-sarcophagus", rewardText: "recovered charts, rescue salvage, and the Cartographer Sarcophagus" },
+          { key: "glassmaker-ruins", family: "archaeology", name: "The Glassmaker Ruins", hook: "Planetary shards form a map only when observed from several unrelated suns.", color: "#c4b5fd", leadRole: "Xenologist", stages: [["survey",2,"Recover matching glass shards"],["signal",1,"Align the hidden coordinates"],["vault",1,"Secure a relic sample"],["threat",1,"Wake the ruin guardian"]], threat: "archive-custodian", reward: { Crystal: 55, DataCores: 34, Titanium: 16 }, vaultKey: "mnemonic-shard", rewardText: "prismatic research data and an intact Mnemonic Shard" },
+          { key: "containment-breach", family: "containment", name: "Containment Breach", hook: "A derelict laboratory is empty, its specimen manifest is not, and the escape trail is fresh.", color: "#86efac", leadRole: "Xenologist", stages: [["vault",1,"Identify the escaped specimen"],["survey",1,"Find its new habitat"],["event",1,"Evacuate the threatened colony"],["threat",1,"Contain the adaptive creature"]], threat: "genesis-beast", reward: { BioGel: 58, Alloy: 24, DataCores: 20 }, vaultKey: "genesis-pod", rewardText: "xenobiology cultures and the stabilized Genesis Pod" },
+          { key: "other-pioneer", family: "parallel", name: "The Other Pioneer", hook: "A frigate using your call sign is answering questions several minutes before you transmit them.", color: "#f472b6", leadRole: "Navigator", stages: [["jump",2,"Triangulate the duplicate wake"],["echo",1,"Record the counter-route"],["signal",1,"Separate the two transmissions"],["threat",1,"Close the mirrored breach"]], threat: "counter-pioneer", reward: { DarkMatter: 3, DataCores: 48, Crystal: 26 }, vaultKey: "inverted-astrolabe", rewardText: "parallel navigation data, Dark Matter, and the Inverted Astrolabe" },
+          { key: "sunken-foundry", family: "industrial", name: "The Sunken Foundry", hook: "An automated forge beneath a lava world has resumed production for a civilization that never arrived.", color: "#fb923c", leadRole: "Chief Engineer", stages: [["survey",1,"Locate the buried exhaust ports"],["capture",1,"Establish a safe industrial foothold"],["fleet",1,"Haul the dormant machinery"],["threat",1,"Shut down the forge mind"]], threat: "forge-mind", reward: { Alloy: 70, Titanium: 48, Plasma: 28 }, vaultKey: "foundry-heart", rewardText: "heavy alloys, reactor plasma, and the Foundry Heart" },
+          { key: "choir-in-the-storm", family: "storm", name: "Choir in the Great Storm", hook: "A chain of gas giants is singing the same warning through storms that should drown one another out.", color: "#818cf8", leadRole: "Expedition Envoy", stages: [["event",1,"Ride the first storm front"],["signal",1,"Translate the repeating chord"],["fleet",1,"Anchor a listening array"],["threat",1,"Silence the storm sovereign"]], threat: "storm-sovereign", reward: { Helium3: 66, Plasma: 42, Crystal: 18 }, vaultKey: "thunder-pearl", rewardText: "storm-harvested fuel, plasma, and a living Thunder Pearl" },
+          { key: "sleeper-garden", family: "biosphere", name: "The Sleeper Garden", hook: "Dead worlds along one route are blooming for exactly nine minutes when the Pioneer arrives.", color: "#4ade80", leadRole: "Xenologist", stages: [["survey",2,"Record the temporary gardens"],["vault",1,"Secure a dormant seed"],["event",1,"Stabilize the shared bloom"],["threat",1,"Calm the planetary rootmind"]], threat: "rootmind", reward: { BioGel: 72, Crystal: 30, DataCores: 18 }, vaultKey: "spore-cathedral", rewardText: "rare Bio-Gel, living research, and the Spore Cathedral" },
+          { key: "silent-armada", family: "derelict", name: "The Silent Armada", hook: "Hundreds of intact ships drift in formation around an empty command channel.", color: "#94a3b8", leadRole: "Flight Marshal", stages: [["jump",1,"Reach the drifting formation"],["fleet",2,"Map the silent escort lanes"],["event",1,"Restore the command channel"],["threat",1,"Outfly the awakened flagship"]], threat: "ghost-flagship", reward: { Titanium: 62, Alloy: 48, Plasma: 20 }, vaultKey: "witness-coin", rewardText: "capital salvage, formation technology, and the fleet's Witness Coin" },
+          { key: "gravity-cartographers", family: "gravity", name: "The Gravity Cartographers", hook: "A route drawn entirely in gravity wells promises to reach a place that has no coordinates.", color: "#a78bfa", leadRole: "Navigator", stages: [["echo",2,"Record two precision routes"],["jump",2,"Follow the gravity notation"],["signal",1,"Decode the final vector"],["threat",1,"Untie the living gravity knot"]], threat: "gravity-maw", reward: { DarkMatter: 2, DataCores: 52, Crystal: 34 }, vaultKey: "gravity-knot", rewardText: "impossible route data and a contained Gravity Knot" },
+          { key: "ember-ice", family: "climate", name: "Ember Beneath the Ice", hook: "A frozen planet is emitting forge heat from a chamber older than its star.", color: "#bae6fd", leadRole: "Chief Engineer", stages: [["survey",1,"Map the moving ice fault"],["capture",1,"Build a stable surface relay"],["event",1,"Vent the buried heat"],["threat",1,"Defeat the thermal burrower"]], threat: "thermal-burrower", reward: { Plasma: 48, Titanium: 38, Crystal: 32 }, vaultKey: "cinder-mite", rewardText: "thermal materials, plasma, and a Cinder Mite Colony" },
+          { key: "pilgrim-mirrors", family: "diplomacy", name: "The Pilgrim Mirrors", hook: "Luminous travelers are leaving gifts at worlds where your earlier choices helped strangers.", color: "#d9f99d", leadRole: "Expedition Envoy", stages: [["encounter",1,"Answer a pilgrim contact"],["vault",1,"Preserve a luminous gift"],["jump",2,"Follow the shadowless path"],["threat",1,"Shield the pilgrims from the Memory Tide"]], threat: "memory-tempest", reward: { Crystal: 48, BioGel: 36, DataCores: 32 }, vaultKey: "memory-tide", rewardText: "pilgrim knowledge, restorative cultures, and the Memory Tide" },
+        ],
+        livingEventTemplates = [
+          { key: "comet-migration", name: "Comet Migration", desc: "A bright family of comets is crossing the inhabited orbital lanes.", color: "#bae6fd", visual: "cometTrail", choices: [{ label: "Chart a safe passage", result: "The Pioneer publishes a clean route through the procession.", reward: { DataCores: 9, Helium3: 12 } }, { label: "Harvest the outer tails", result: "Fleet collectors skim rare ice without disturbing the migration.", reward: { Crystal: 12, BioGel: 7 } }] },
+          { key: "aurora-spawning", name: "Aurora Spawning", desc: "Magnetic lifeforms are gathering inside a planet-wide aurora.", color: "#4ade80", visual: "auroraTide", choices: [{ label: "Observe quietly", result: "The spawning pattern becomes a new xenology reference.", reward: { DataCores: 12, BioGel: 10 } }, { label: "Stabilize the field", result: "The Pioneer prevents a magnetic collapse and recovers charged crystals.", reward: { Crystal: 14, Plasma: 8 } }] },
+          { key: "relay-market", name: "Wayfarer Relay Market", desc: "A temporary market has assembled around an old communications relay.", color: "#fde68a", visual: "crystalMotes", choices: [{ label: "Trade expedition charts", result: "Fresh route intelligence reaches the bridge.", reward: { Helium3: 16, DataCores: 8 } }, { label: "Restock the fleet", result: "The quarterdeck secures useful hull stock and repair metal.", reward: { Alloy: 22, Titanium: 10 } }] },
+          { key: "moon-shedding", name: "Moon Shedding", desc: "A small moon is releasing its crystalline crust into a glittering orbital ring.", color: "#c4b5fd", visual: "crystalMotes", choices: [{ label: "Collect stable fragments", result: "The crew gathers only pieces that have cleared the gravity lane.", reward: { Crystal: 22, Titanium: 8 } }, { label: "Protect nearby traffic", result: "Convoys cross safely and repay the Pioneer in supplies.", reward: { Alloy: 18, Helium3: 14 } }] },
+          { key: "solar-bloom", name: "Solar Bloom", desc: "A temporary flower of plasma is unfolding above the system's star.", color: "#fb923c", visual: "ionLightning", choices: [{ label: "Sample the outer petals", result: "Shielded probes capture unusually stable plasma.", reward: { Plasma: 24, DataCores: 7 } }, { label: "Warn the colonies", result: "Every settlement shutters before the wave arrives.", reward: { Titanium: 16, Alloy: 18 } }] },
+          { key: "drift-nursery", name: "Drift Nursery", desc: "Newborn vacuum organisms are using the Pioneer as a navigation landmark.", color: "#86efac", visual: "auroraTide", choices: [{ label: "Escort the nursery", result: "The creatures reach a quiet magnetosphere unharmed.", reward: { BioGel: 20, DataCores: 9 } }, { label: "Map their instincts", result: "Their route reveals a rich Helium-3 current.", reward: { Helium3: 24, Crystal: 6 } }] },
+          { key: "echo-rain", name: "Echo Rain", desc: "Fragments of old flight paths are falling through the system like luminous rain.", color: "#a78bfa", visual: "prismaticTide", choices: [{ label: "Record the lost routes", result: "The archive recovers maneuvers flown by unknown pilots.", reward: { DataCores: 18, Crystal: 10 } }, { label: "Guide ships through", result: "The Pioneer turns the strange rain into a safe gravity corridor.", reward: { Helium3: 18, Alloy: 14 } }] },
+          { key: "colony-festival", name: "Frontier Light Festival", desc: "A captured world's settlements are celebrating the Pioneer overhead.", color: "#f9a8d4", visual: "spiritChoir", choices: [{ label: "Join the celebration", result: "Crew morale rises and the colony sends its best provisions.", reward: { BioGel: 16, Alloy: 16 } }, { label: "Stage a fleet flyby", result: "The escort formation becomes the evening's brightest constellation.", reward: { Titanium: 14, DataCores: 10 } }] },
+        ],
+        majorThreatTemplates = [
+          { key: "starwhale", name: "Wounded Starwhale Matriarch", rating: 3, color: "#67e8f9", desc: "Pain has turned a migrating giant against every vessel near its calves.", strategies: [{ key: "science", label: "Calm its resonance", role: "Xenologist" }, { key: "flight", label: "Open a safe corridor", role: "Navigator" }] },
+          { key: "void-leviathan", name: "Voidwake Leviathan", rating: 4, color: "#38bdf8", desc: "The creature that hunted the surveyors is folding itself through their abandoned wake.", strategies: [{ key: "flight", label: "Break its pursuit pattern", role: "Navigator" }, { key: "tactical", label: "Drive it from the beacon", role: "Flight Marshal" }] },
+          { key: "archive-custodian", name: "Glassmaker Custodian", rating: 4, color: "#c4b5fd", desc: "The ruin's guardian interprets every modern signal as an excavation alarm.", strategies: [{ key: "science", label: "Translate the archive protocol", role: "Xenologist" }, { key: "engineering", label: "Disable its defense lattice", role: "Chief Engineer" }] },
+          { key: "genesis-beast", name: "Adaptive Genesis Beast", rating: 4, color: "#4ade80", desc: "The escaped organism is rewriting itself faster than the containment field can respond.", strategies: [{ key: "science", label: "Build a humane containment", role: "Xenologist" }, { key: "tactical", label: "Herd it into quarantine", role: "Flight Marshal" }] },
+          { key: "counter-pioneer", name: "Counterfactual Pioneer", rating: 6, color: "#f472b6", desc: "The duplicate frigate is trying to occupy the same history as yours.", strategies: [{ key: "flight", label: "Fly the route it cannot predict", role: "Navigator" }, { key: "diplomacy", label: "Negotiate a shared memory", role: "Expedition Envoy" }] },
+          { key: "forge-mind", name: "Autonomous Forge Mind", rating: 4, color: "#fb923c", desc: "The buried factory has classified the Pioneer as unprocessed material.", strategies: [{ key: "engineering", label: "Rewrite the production order", role: "Chief Engineer" }, { key: "tactical", label: "Overload the foundry shields", role: "Flight Marshal" }] },
+          { key: "storm-sovereign", name: "Storm Sovereign", rating: 4, color: "#818cf8", desc: "A city-sized atmospheric organism is conducting the warning chorus.", strategies: [{ key: "diplomacy", label: "Answer the warning chord", role: "Expedition Envoy" }, { key: "science", label: "Ground the pressure song", role: "Xenologist" }] },
+          { key: "rootmind", name: "Planetary Rootmind", rating: 5, color: "#86efac", desc: "The synchronized gardens have recognized starships as an invasive species.", strategies: [{ key: "science", label: "Offer a safe symbiosis", role: "Xenologist" }, { key: "engineering", label: "Isolate the orbital root", role: "Chief Engineer" }] },
+          { key: "ghost-flagship", name: "Awakened Ghost Flagship", rating: 5, color: "#94a3b8", desc: "The armada's command ship is testing the Pioneer for an admiral who died centuries ago.", strategies: [{ key: "tactical", label: "Answer with fleet doctrine", role: "Flight Marshal" }, { key: "diplomacy", label: "Accept the command trial", role: "Expedition Envoy" }] },
+          { key: "gravity-maw", name: "Living Gravity Maw", rating: 6, color: "#a78bfa", desc: "The final route is a predator drawn in the language of gravity wells.", strategies: [{ key: "flight", label: "Complete the impossible route", role: "Navigator" }, { key: "engineering", label: "Invert the route anchors", role: "Chief Engineer" }] },
+          { key: "thermal-burrower", name: "Thermal Burrower", rating: 3, color: "#f59e0b", desc: "A colossal heat-fed organism is climbing toward the surface relay.", strategies: [{ key: "engineering", label: "Redirect the geothermal vents", role: "Chief Engineer" }, { key: "tactical", label: "Draw it away from the colony", role: "Flight Marshal" }] },
+          { key: "memory-tempest", name: "Predatory Memory Tide", rating: 5, color: "#d9f99d", desc: "A sentient wave is stripping the pilgrims' memories to build a voice of its own.", strategies: [{ key: "diplomacy", label: "Give the tide a new story", role: "Expedition Envoy" }, { key: "science", label: "Contain its memory current", role: "Xenologist" }] },
+        ];
       const encounterFactions = {
         coalition: {
           name: "Frontier Coalition",
@@ -7247,6 +7492,105 @@
         totalScans: 0,
       });
       const defaultVault = () => ({ entries: [], discoveryKeys: [] });
+      function newCrewMember(template, index = 0) {
+        return {
+          id: template.id,
+          name: template.name,
+          role: template.role,
+          specialty: template.specialty,
+          color: template.color,
+          uniform: crewUniforms[index % crewUniforms.length],
+          level: 1,
+          xp: 0,
+          duty: template.id === "xenologist" ? "vault" : template.id === "engineer" ? "systems" : "bridge",
+          expeditions: 0,
+        };
+      }
+      const defaultCrew = () => ({
+        members: crewTemplates
+          .filter((template) => template.starter)
+          .map((template, index) => newCrewMember(template, index)),
+      });
+      function hydrateCrew(raw = {}) {
+        const known = new Map(crewTemplates.map((template) => [template.id, template])),
+          members = Array.isArray(raw.members)
+            ? raw.members
+                .filter((member) => member && known.has(member.id))
+                .map((member, index) => ({
+                  ...newCrewMember(known.get(member.id), index),
+                  ...member,
+                  name: cleanName(member.name || known.get(member.id).name),
+                  level: clamp(Number(member.level || 1), 1, 6),
+                  xp: Math.max(0, Number(member.xp || 0)),
+                  duty: ["bridge", "vault", "fleet", "systems"].includes(member.duty)
+                    ? member.duty
+                    : "bridge",
+                }))
+            : [];
+        crewTemplates
+          .filter((template) => template.starter)
+          .forEach((template, index) => {
+            if (!members.some((member) => member.id === template.id))
+              members.push(newCrewMember(template, index));
+          });
+        return { members };
+      }
+      function crewState() {
+        if (!game.crew) game.crew = defaultCrew();
+        if (!Array.isArray(game.crew.members)) game.crew = hydrateCrew(game.crew);
+        return game.crew;
+      }
+      const defaultExpeditions = () => ({
+        offers: [],
+        active: null,
+        history: [],
+        retiredFamilies: [],
+        offerSeed: 1,
+        completed: 0,
+      });
+      function hydrateExpeditions(raw = {}) {
+        return {
+          offers: Array.isArray(raw.offers) ? raw.offers.slice(0, 3) : [],
+          active: raw.active && typeof raw.active === "object" ? { ...raw.active } : null,
+          history: Array.isArray(raw.history) ? raw.history.slice(0, 80) : [],
+          retiredFamilies: [...new Set(raw.retiredFamilies || [])],
+          offerSeed: Math.max(1, Number(raw.offerSeed || 1)),
+          completed: Math.max(0, Number(raw.completed || 0)),
+        };
+      }
+      function expeditionState() {
+        if (!game.expeditions) game.expeditions = defaultExpeditions();
+        if (!Array.isArray(game.expeditions.history))
+          game.expeditions = hydrateExpeditions(game.expeditions);
+        return game.expeditions;
+      }
+      const defaultWorldEvents = () => ({ records: {}, history: [] });
+      function hydrateWorldEvents(raw = {}) {
+        return {
+          records: raw.records && typeof raw.records === "object" ? { ...raw.records } : {},
+          history: Array.isArray(raw.history) ? raw.history.slice(0, 80) : [],
+        };
+      }
+      function worldEventState() {
+        if (!game.worldEvents) game.worldEvents = defaultWorldEvents();
+        if (!game.worldEvents.records) game.worldEvents = hydrateWorldEvents(game.worldEvents);
+        return game.worldEvents;
+      }
+      const defaultRetention = () => ({
+        startedAt: Date.now(),
+        firstJumpAt: null,
+        firstVaultAt: null,
+        firstFleetAt: null,
+        firstExpeditionAt: null,
+        firstExpeditionCompleteAt: null,
+        meaningfulMoments: 0,
+        systemsSinceMoment: 0,
+        lastMomentAt: Date.now(),
+        sessionStarts: 1,
+      });
+      function hydrateRetention(raw = {}) {
+        return { ...defaultRetention(), ...(raw || {}), sessionStarts: Math.max(1, Number(raw.sessionStarts || 0) + 1) };
+      }
       function hydrateVault(raw = {}) {
         const knownCatalog = new Set(vaultCatalog.map((item) => item.key));
         return {
@@ -7433,6 +7777,9 @@
           parallelVisits: 0,
           mysteriesScanned: 0,
           collectionsCompleted: 0,
+          fleetMissionsCompleted: 0,
+          livingEventsResolved: 0,
+          threatsResolved: 0,
         };
       }
       unclaimedProduction = blankResources();
@@ -7461,6 +7808,10 @@
         encounters: defaultEncounterState(),
         discovery: defaultDiscoveryState(),
         vault: defaultVault(),
+        crew: defaultCrew(),
+        expeditions: defaultExpeditions(),
+        worldEvents: defaultWorldEvents(),
+        retention: defaultRetention(),
         encounteredIceWorld: false,
         ownedShipSkins: new Set(["High Tech"]),
         ownedFrigateSkins: new Set(["Frigate Standard"]),
@@ -7471,6 +7822,7 @@
         shipName: "Starling",
         negotiationAnomaly: null,
         sectorEvent: null,
+        majorThreat: null,
         weather: null,
         settings: defaultSettings(),
       };
@@ -7585,7 +7937,7 @@
         [
           "silentChoir",
           "The Silent Choir",
-          "Complete the three-part Silent Choir storyline.",
+          "Complete all three optional Silent Choir contacts.",
           () => !!game.encounters?.storyComplete,
           "Reward: Choir Key technology + 3 Dark Matter",
           { DarkMatter: 3, Crystal: 18 },
@@ -8778,6 +9130,10 @@
         game.encounters = defaultEncounterState();
         game.discovery = defaultDiscoveryState();
         game.vault = defaultVault();
+        game.crew = defaultCrew();
+        game.expeditions = defaultExpeditions();
+        game.worldEvents = defaultWorldEvents();
+        game.retention = defaultRetention();
         game.collapsedBlackHoles = new Set();
         game.encounteredIceWorld = false;
         game.ownedShipSkins = new Set(["High Tech"]);
@@ -8791,6 +9147,7 @@
         game.settings = { ...defaultSettings(), ...game.settings };
         game.negotiationAnomaly = createAnomaly(0);
         game.sectorEvent = null;
+        game.majorThreat = null;
         game.weather = { name: "Calm Drift", remaining: 75 };
         unclaimedProduction = blankResources();
         manualTargetName = null;
@@ -9152,7 +9509,10 @@
           vy: (b.vy || 0) + Math.cos(rad) * 1.05,
           fuel: Math.min(
             game.ship.fuel +
-              cls.maxFuel * (0.4 + (game.fleet?.boosts?.fuelRecovery || 0)),
+              cls.maxFuel *
+                (0.4 +
+                  (game.fleet?.boosts?.fuelRecovery || 0) +
+                  Math.min(0.12, crewRolePower("Navigator") * 0.012)),
             cls.maxFuel,
           ),
           trail: [],
@@ -9170,6 +9530,11 @@
         if (game.system.specialType === "cosmicSpirit")
           unlockCosmicSpiritRewards();
         game.sectorJumps++;
+        if (!game.retention.firstJumpAt) game.retention.firstJumpAt = Date.now();
+        game.retention.systemsSinceMoment =
+          Number(game.retention.systemsSinceMoment || 0) + 1;
+        trackExpeditionProgress("jump", 1);
+        ensureLivingSystemEvent(game.system);
         if (leavingTutorial) game.missionStage = tutorialObjectives.length;
         trackDaily("sector", 1);
         generateContracts(game.system.seed);
@@ -9265,12 +9630,17 @@
           encounters: serializeEncounterState(),
           discovery: serializeDiscoveryState(),
           vault: serializeVault(),
+          crew: { members: crewState().members.map((member) => ({ ...member })) },
+          expeditions: structuredClone(expeditionState()),
+          worldEvents: structuredClone(worldEventState()),
+          retention: { ...game.retention },
           specialRewards: game.specialRewards || {
             cosmicSpirit: [],
             parallel: [],
           },
           collapsedBlackHoles: [...(game.collapsedBlackHoles || new Set())],
           sectorEvent: game.sectorEvent,
+          majorThreat: game.majorThreat ? structuredClone(game.majorThreat) : null,
           unlockedAchievements: [...game.unlockedAchievements],
           unclaimedProduction: { ...unclaimedProduction },
           tutorialDismissed,
@@ -9302,6 +9672,7 @@
               branches: b.branches || defaultBranches(),
               discoveryRewardClaimed: !!b.discoveryRewardClaimed,
               lastDiscoveryReward: b.lastDiscoveryReward || null,
+              stronghold: b.stronghold || null,
             })),
           })),
         };
@@ -9342,6 +9713,7 @@
               discoveryRewardClaimed: !!sb.discoveryRewardClaimed,
               lastDiscoveryReward:
                 sb.lastDiscoveryReward || b.lastDiscoveryReward || null,
+              stronghold: sb.stronghold || b.stronghold || null,
             });
           }
         }
@@ -9517,6 +9889,10 @@
           game.encounters = hydrateEncounterState(d.encounters || {});
           game.discovery = hydrateDiscoveryState(d.discovery || {});
           game.vault = hydrateVault(d.vault || {});
+          game.crew = hydrateCrew(d.crew || {});
+          game.expeditions = hydrateExpeditions(d.expeditions || {});
+          game.worldEvents = hydrateWorldEvents(d.worldEvents || {});
+          game.retention = hydrateRetention(d.retention || {});
           unlockVaultSkin(false);
           game.specialRewards = {
             cosmicSpirit: [...((d.specialRewards || {}).cosmicSpirit || [])],
@@ -9570,6 +9946,9 @@
           game.negotiationAnomaly = createAnomaly(currentSystemIndex);
           game.sectorEvent =
             d.sectorEvent || createSectorEvent(currentSystemIndex);
+          game.majorThreat = d.majorThreat && typeof d.majorThreat === "object"
+            ? structuredClone(d.majorThreat)
+            : null;
           ensureSectorEventEncounter(game.sectorEvent);
           resetSystemVisualPhenomena();
           buildBackdrop();
@@ -10193,6 +10572,11 @@
         game.fleet.completed.unshift({ ...m, claimedAt: Date.now() });
         game.fleet.completed = game.fleet.completed.slice(0, 12);
         game.fleet.stats.completed++;
+        if (!game.retention.firstFleetAt) game.retention.firstFleetAt = Date.now();
+        game.captainLog.fleetMissionsCompleted =
+          (game.captainLog.fleetMissionsCompleted || 0) + 1;
+        trackExpeditionProgress("fleet", 1);
+        markMeaningfulMoment("fleet-return");
         trackDaily(
           m.type === "resource"
             ? "production"
@@ -11148,7 +11532,11 @@
       }
       function discoveryReward(b) {
         const reward = blankResources(),
-          bonus = rarityBonus(b);
+          bonus =
+            rarityBonus(b) *
+            (1 +
+              crewRolePower("Xenologist") * 0.025 +
+              crewDutyPower("vault") * 0.01);
         if (!b || b.type === "star") return reward;
         reward.DataCores = Math.max(
           1,
@@ -11216,6 +11604,8 @@
         } else
           toast("Survey reward: " + b.name + " yielded " + fmt(filtered) + ".");
         registerVaultDiscovery("planet", b.name);
+        trackExpeditionProgress("survey", 1);
+        markMeaningfulMoment("survey");
         checkAchievements();
         refreshSkins(false);
         saveGame(false);
@@ -11546,6 +11936,8 @@
         game.ship.fuel = Math.min(game.ship.maxFuel, game.ship.fuel + 28);
         game.captainLog.captures++;
         trackDaily("capture", 1);
+        trackExpeditionProgress("capture", 1);
+        markMeaningfulMoment("capture");
         recordPlanet(b, "extracted", amount);
         recordCodex(b, "captured");
         playSound("capture");
@@ -11982,6 +12374,7 @@
           commandLevel: 0,
         });
         ensureFleet();
+        generateExpeditionOffers(true);
         game.missionStage = 5;
         showMissionPanel(
           "ODF Pioneer Constructed!",
@@ -12272,10 +12665,18 @@
         };
       }
       function vaultCapacity(level = game.frigate?.vaultLevel || 0) {
-        return 4 + clamp(Number(level || 0), 0, 6) * 4;
+        return (
+          4 +
+          clamp(Number(level || 0), 0, 6) * 4 +
+          Math.floor(crewDutyPower("vault") / 2)
+        );
       }
       function vaultContainment(level = game.frigate?.vaultLevel || 0) {
-        return clamp(1 + Number(level || 0), 1, 6);
+        return clamp(
+          1 + Number(level || 0) + Math.floor(crewDutyPower("vault") / 4),
+          1,
+          6,
+        );
       }
       function vaultSecuredEntries() {
         return vaultState().entries.filter((entry) => entry.status === "secured");
@@ -12393,6 +12794,9 @@
             securedAt: canSecure ? Date.now() : null,
           };
         vault.entries.push(entry);
+        if (!game.retention.firstVaultAt) game.retention.firstVaultAt = Date.now();
+        trackExpeditionProgress("vault", 1);
+        markMeaningfulMoment("vault-find");
         const stateText = canSecure
           ? "secured in the Pioneer Vault"
           : "transferred to quarantine pending a Vault upgrade";
@@ -12423,6 +12827,457 @@
         toast(entry.name + " moved from quarantine into the Pioneer Vault.");
         checkDiscoveryCollections();
         unlockVaultSkin(true);
+        saveGame(false);
+        renderMenu();
+        return true;
+      }
+      function crewTemplate(id) {
+        return crewTemplates.find((template) => template.id === id) || null;
+      }
+      function crewMember(id) {
+        return crewState().members.find((member) => member.id === id) || null;
+      }
+      function crewRolePower(role) {
+        return crewState().members
+          .filter((member) => member.role === role)
+          .reduce((sum, member) => sum + Number(member.level || 1), 0);
+      }
+      function crewDutyPower(duty) {
+        return crewState().members
+          .filter((member) => member.duty === duty)
+          .reduce((sum, member) => sum + Number(member.level || 1), 0);
+      }
+      function crewUpgradeCost(id) {
+        const member = crewMember(id),
+          level = Number(member?.level || 1);
+        return {
+          DataCores: 8 + level * 7,
+          Crystal: 6 + level * 6,
+          Alloy: 12 + level * 9,
+        };
+      }
+      function crewXpNeeded(member) {
+        return Number(member?.level || 1) * 24;
+      }
+      function grantCrewXp(amount = 1, leadId = null) {
+        crewState().members.forEach((member) => {
+          member.xp = Number(member.xp || 0) + Math.max(1, Math.round(amount * (member.id === leadId ? 1.5 : 0.65)));
+        });
+      }
+      function recruitCrew(id) {
+        if (!requireFrigateOrbit()) return false;
+        if (crewMember(id)) return toast("That specialist already serves aboard the Pioneer.");
+        const template = crewTemplate(id);
+        if (!template) return toast("Specialist record not found.");
+        const cost = template.cost || { DataCores: 20, Alloy: 50 };
+        if (!canAfford(cost)) return toast("Recruitment requires " + fmt(cost) + ".");
+        spend(cost);
+        crewState().members.push(newCrewMember(template, crewState().members.length));
+        addActivity("system", template.name + " joined the Pioneer", template.role + " • " + template.specialty);
+        toast(template.name + " joined the crew as " + template.role + ".");
+        markMeaningfulMoment("crew");
+        saveGame(false);
+        renderMenu();
+        return true;
+      }
+      function renameCrew(id) {
+        const member = crewMember(id),
+          input = $("crewName-" + id),
+          name = cleanName(input?.value || "");
+        if (!member || !okName(name)) return toast("Choose a valid crew name.");
+        member.name = name;
+        toast(member.role + " renamed to " + name + ".");
+        saveGame(false);
+        renderMenu();
+      }
+      function cycleCrewUniform(id) {
+        const member = crewMember(id);
+        if (!member) return;
+        const index = Math.max(0, crewUniforms.indexOf(member.uniform));
+        member.uniform = crewUniforms[(index + 1) % crewUniforms.length];
+        toast(member.name + " selected a new Pioneer uniform.");
+        saveGame(false);
+        renderMenu();
+      }
+      function setCrewDuty(payload) {
+        const [id, duty] = String(payload || "").split("|");
+        if (!["bridge", "vault", "fleet", "systems"].includes(duty)) return;
+        const member = crewMember(id);
+        if (!member) return;
+        member.duty = duty;
+        toast(member.name + " assigned to " + ({ bridge: "the bridge", vault: "the Vault", fleet: "fleet operations", systems: "Pioneer systems" })[duty] + ".");
+        saveGame(false);
+        renderMenu();
+      }
+      function upgradeCrew(id) {
+        if (!requireFrigateOrbit()) return false;
+        const member = crewMember(id);
+        if (!member) return false;
+        if (member.level >= 6) return toast(member.name + " has reached mastery.");
+        const needed = crewXpNeeded(member),
+          cost = crewUpgradeCost(id);
+        if (member.xp < needed)
+          return toast(member.name + " needs " + (needed - member.xp) + " more field experience.");
+        if (!canAfford(cost)) return toast("Specialist training requires " + fmt(cost) + ".");
+        spend(cost);
+        member.xp -= needed;
+        member.level++;
+        addActivity("upgrade", member.name + " advanced", member.role + " • Level " + member.level);
+        toast(member.name + " advanced to Level " + member.level + ".");
+        saveGame(false);
+        renderMenu();
+        return true;
+      }
+      function expeditionTemplate(key) {
+        return expeditionThemes.find((theme) => theme.key === key) || null;
+      }
+      function currentExpeditionStage(active = expeditionState().active) {
+        return active?.stages?.[Number(active.stageIndex || 0)] || null;
+      }
+      function expeditionSimilarity(a, b) {
+        if (!a || !b) return 0;
+        if (a.family === b.family || a.themeKey === b.themeKey) return 1;
+        const left = new Set((a.stages || []).map((stage) => stage.type || stage[0])),
+          right = new Set((b.stages || []).map((stage) => stage.type || stage[0])),
+          overlap = [...left].filter((type) => right.has(type)).length;
+        return overlap / Math.max(1, new Set([...left, ...right]).size);
+      }
+      function makeExpeditionOffer(theme, seed) {
+        const stages = theme.stages.map(([type, goal, label]) => ({ type, goal, label, progress: 0 }));
+        return {
+          id: "arc-" + theme.key + "-" + seed.toString(36),
+          signature: theme.key,
+          themeKey: theme.key,
+          family: theme.family,
+          name: theme.name,
+          hook: theme.hook,
+          color: theme.color,
+          leadRole: theme.leadRole,
+          stages,
+          threatKey: theme.threat,
+          reward: { ...theme.reward },
+          vaultKey: theme.vaultKey,
+          rewardText: theme.rewardText,
+        };
+      }
+      function generateExpeditionOffers(force = false) {
+        const state = expeditionState();
+        if (state.offers.length && !force) return state.offers;
+        const retired = new Set(state.retiredFamilies),
+          history = state.history,
+          candidates = expeditionThemes.filter((theme) => {
+            if (retired.has(theme.family)) return false;
+            const sample = makeExpeditionOffer(theme, state.offerSeed);
+            return !history.some((record) => expeditionSimilarity(sample, record) >= 0.72);
+          }),
+          ranked = candidates
+            .map((theme, index) => ({
+              theme,
+              score: rand(mixSeed(universeSeed, state.offerSeed, index, vaultStringSeed(theme.key))),
+            }))
+            .sort((a, b) => b.score - a.score);
+        const selected = [];
+        for (const entry of ranked) {
+          const offer = makeExpeditionOffer(
+            entry.theme,
+            mixSeed(state.offerSeed, selected.length + 1, universeSeed),
+          );
+          if (
+            selected.every(
+              (existing) => expeditionSimilarity(offer, existing) < 0.72,
+            )
+          )
+            selected.push(offer);
+          if (selected.length >= 3) break;
+        }
+        state.offers = selected;
+        state.offerSeed++;
+        return state.offers;
+      }
+      function acceptExpedition(id) {
+        if (!requireFrigateOrbit()) return false;
+        const state = expeditionState();
+        if (state.active) return toast("Finish or archive the current expedition first.");
+        const offer = state.offers.find((entry) => entry.id === id);
+        if (!offer) return toast("That expedition lead is no longer available.");
+        state.active = {
+          ...structuredClone(offer),
+          status: "active",
+          stageIndex: 0,
+          leadCrewId: null,
+          acceptedAt: Date.now(),
+          systemsVisited: [],
+        };
+        state.retiredFamilies.push(offer.family);
+        state.offers = [];
+        if (!game.retention.firstExpeditionAt) game.retention.firstExpeditionAt = Date.now();
+        addActivity("travel", "Expedition accepted: " + offer.name, currentExpeditionStage()?.label || offer.hook);
+        toast("Expedition accepted: " + offer.name + ". Choose a crew lead.");
+        markMeaningfulMoment("expedition");
+        saveGame(false);
+        renderMenu();
+        return true;
+      }
+      function assignCrewToExpedition(id) {
+        const active = expeditionState().active,
+          member = crewMember(id);
+        if (!active || !member) return;
+        active.leadCrewId = id;
+        toast(member.name + " assigned as expedition lead.");
+        saveGame(false);
+        renderMenu();
+      }
+      function archiveExpedition() {
+        const state = expeditionState(), active = state.active;
+        if (!active) return;
+        confirmAction(
+          "Archive This Expedition?",
+          "Its current progress will close permanently, and this lead will not be offered again.",
+          () => {
+            state.history.unshift({ ...active, status: "archived", endedAt: Date.now() });
+            state.active = null;
+            generateExpeditionOffers(true);
+            addActivity("travel", active.name + " archived", "The Pioneer turned to other horizons.");
+            saveGame(false);
+            renderMenu();
+          },
+        );
+      }
+      function markMeaningfulMoment(kind = "discovery") {
+        if (!game.retention) game.retention = defaultRetention();
+        game.retention.meaningfulMoments = Number(game.retention.meaningfulMoments || 0) + 1;
+        game.retention.systemsSinceMoment = 0;
+        game.retention.lastMomentAt = Date.now();
+        game.retention.lastMomentKind = kind;
+      }
+      function trackExpeditionProgress(type, amount = 1) {
+        const state = expeditionState(),
+          active = state.active,
+          stage = currentExpeditionStage(active);
+        if (!active || !stage || stage.type !== type) return false;
+        if (type === "jump" && active.systemsVisited.includes(game.system?.name)) {
+          toast(active.name + ": this system is already charted for the current route.");
+          return false;
+        }
+        stage.progress = Math.min(stage.goal, Number(stage.progress || 0) + Math.max(1, Number(amount || 1)));
+        if (type === "jump" && !active.systemsVisited.includes(game.system?.name))
+          active.systemsVisited.push(game.system?.name);
+        if (stage.progress < stage.goal) {
+          toast(active.name + ": " + stage.label + " • " + stage.progress + "/" + stage.goal + ".");
+          return true;
+        }
+        grantCrewXp(8, active.leadCrewId);
+        markMeaningfulMoment("expedition-stage");
+        if (active.stageIndex >= active.stages.length - 1) {
+          completeExpeditionArc();
+          return true;
+        }
+        active.stageIndex++;
+        const next = currentExpeditionStage(active);
+        addActivity("travel", active.name + " advanced", next.label);
+        toast("Expedition advanced: " + next.label + ".");
+        if (next.type === "threat") spawnMajorThreat(active.threatKey, "expedition");
+        saveGame(false);
+        return true;
+      }
+      function expeditionRewardMultiplier(active) {
+        const lead = crewMember(active?.leadCrewId),
+          logistics = crewDutyPower("fleet");
+        return (
+          1 +
+          Number(lead?.level || 0) * 0.035 +
+          logistics * 0.012 +
+          crewRolePower("Quartermaster") * 0.025
+        );
+      }
+      function completeExpeditionArc() {
+        const state = expeditionState(), active = state.active;
+        if (!active) return false;
+        const reward = scaleReward(active.reward, expeditionRewardMultiplier(active)),
+          vaultTemplate = vaultCatalog.find((entry) => entry.key === active.vaultKey);
+        grantReward(reward, active.name + " expedition reward");
+        const vaultFind = vaultTemplate
+          ? registerVaultDiscovery(vaultTemplate.source, active.name + " finale", true, vaultTemplate.key)
+          : null;
+        grantCrewXp(34, active.leadCrewId);
+        const lead = crewMember(active.leadCrewId);
+        if (lead) lead.expeditions = Number(lead.expeditions || 0) + 1;
+        state.completed++;
+        state.history.unshift({ ...structuredClone(active), status: "completed", endedAt: Date.now(), finalReward: reward });
+        state.active = null;
+        game.majorThreat = null;
+        if (!game.retention.firstExpeditionCompleteAt)
+          game.retention.firstExpeditionCompleteAt = Date.now();
+        markMeaningfulMoment("expedition-complete");
+        generateExpeditionOffers(true);
+        addActivity("discovery", active.name + " completed", active.rewardText);
+        showMissionPanel("Expedition Complete: " + active.name, "The Pioneer closes this adventure and opens new leads whenever you are ready.", [
+          ["Themed Reward", fmt(reward)],
+          ["Vault Record", vaultFind?.name || "Archive updated"],
+          ["Crew", lead ? lead.name + " led the expedition" : "Pioneer crew"],
+          ["Journey", "Independent adventure — choose another lead whenever you like"],
+        ]);
+        saveGame(false);
+        renderMenu();
+        return true;
+      }
+      function systemEventKey(system = game.system) {
+        return String(system?.seed || system?.name || "unknown");
+      }
+      function currentLivingSystemEvent(system = game.system) {
+        return worldEventState().records[systemEventKey(system)] || null;
+      }
+      function ensureLivingSystemEvent(system = game.system, force = false) {
+        if (!system || system.isTutorial) return null;
+        const state = worldEventState(), key = systemEventKey(system);
+        if (state.records[key]) return state.records[key];
+        const seed = mixSeed(Number(system.seed || 1), universeSeed, 9109),
+          shouldCreate = force || game.sectorJumps <= 1 || rand(seed + 17) < 0.76 || Number(game.retention?.systemsSinceMoment || 0) >= 2;
+        if (!shouldCreate) {
+          state.records[key] = { status: "quiet", system: system.name, createdAt: Date.now() };
+          return state.records[key];
+        }
+        const recent = new Set(state.history.slice(0, 4).map((entry) => entry.templateKey)),
+          pool = livingEventTemplates.filter((template) => !recent.has(template.key)),
+          template = (pool.length ? pool : livingEventTemplates)[Math.floor(rand(seed + 29) * (pool.length ? pool.length : livingEventTemplates.length))],
+          record = {
+            id: "world-event-" + key,
+            templateKey: template.key,
+            name: template.name,
+            desc: template.desc,
+            color: template.color,
+            visual: template.visual,
+            choices: structuredClone(template.choices),
+            system: system.name,
+            status: "active",
+            createdAt: Date.now(),
+          };
+        state.records[key] = record;
+        return record;
+      }
+      function resolveLivingSystemEvent(index = 0) {
+        const event = currentLivingSystemEvent();
+        if (!event || event.status !== "active") return toast("No living-system event is awaiting a decision.");
+        const choice = event.choices[clamp(Number(index || 0), 0, event.choices.length - 1)];
+        if (!choice) return;
+        const envoyBonus = 1 + crewRolePower("Expedition Envoy") * 0.025,
+          reward = scaleReward(choice.reward, envoyBonus);
+        grantReward(reward, event.name);
+        event.status = "resolved";
+        event.choice = choice.label;
+        event.result = choice.result;
+        event.reward = reward;
+        event.resolvedAt = Date.now();
+        worldEventState().history.unshift({ ...structuredClone(event) });
+        game.captainLog.livingEventsResolved =
+          (game.captainLog.livingEventsResolved || 0) + 1;
+        trackExpeditionProgress("event", 1);
+        markMeaningfulMoment("living-event");
+        addActivity("discovery", event.name + " resolved", choice.result + " • " + fmt(reward));
+        showMissionPanel(event.name, choice.result, [["Decision", choice.label], ["Reward", fmt(reward)], ["System", event.system]]);
+        if (!expeditionState().active && !game.majorThreat && rand(mixSeed(game.system.seed, event.resolvedAt)) < 0.12)
+          spawnAmbientThreat();
+        saveGame(false);
+        renderMenu();
+      }
+      function threatTemplate(key) {
+        return majorThreatTemplates.find((template) => template.key === key) || null;
+      }
+      function spawnMajorThreat(key, source = "ambient") {
+        const template = threatTemplate(key);
+        if (!template || game.majorThreat?.status === "active") return game.majorThreat || null;
+        game.majorThreat = {
+          id: "threat-" + key + "-" + Date.now(),
+          templateKey: key,
+          name: template.name,
+          rating: template.rating,
+          color: template.color,
+          desc: template.desc,
+          strategies: structuredClone(template.strategies),
+          source,
+          status: "active",
+          readiness: 0,
+          preparations: [],
+          setbacks: 0,
+          system: game.system?.name,
+          x: Math.cos(between(mixSeed(game.system?.seed || 1, vaultStringSeed(key)), 0, TAU)) *
+            between(mixSeed(game.system?.seed || 1, 3119), 650, 1050),
+          y: Math.sin(between(mixSeed(game.system?.seed || 1, vaultStringSeed(key)), 0, TAU)) *
+            between(mixSeed(game.system?.seed || 1, 3119), 650, 1050),
+          appearedAt: Date.now(),
+        };
+        markMeaningfulMoment("major-threat");
+        addActivity("warning", template.name + " detected", template.desc);
+        toast("Major threat detected: " + template.name + ".");
+        return game.majorThreat;
+      }
+      function spawnAmbientThreat() {
+        const used = new Set(worldEventState().history.filter((entry) => entry.kind === "threat").map((entry) => entry.templateKey)),
+          pool = majorThreatTemplates.filter((template) => !used.has(template.key) && template.rating <= 5),
+          choices = pool.length ? pool : majorThreatTemplates.filter((template) => template.rating <= 5),
+          template = choices[Math.floor(rand(mixSeed(game.system?.seed || 1, universeSeed, 4481)) * choices.length)];
+        return template ? spawnMajorThreat(template.key, "ambient") : null;
+      }
+      function prepareMajorThreat(kind = "crew") {
+        const threat = game.majorThreat;
+        if (!threat || threat.status !== "active") return toast("No major threat is active.");
+        if (threat.preparations.includes(kind)) return toast("That preparation is already complete.");
+        const options = {
+          crew: { cost: { DataCores: 8 }, value: 2 + Math.floor(crewState().members.length / 2), label: "Crew briefing" },
+          fleet: { cost: { Alloy: 15, Helium3: 8 }, value: 2 + Math.min(3, game.fleet?.ships?.length || 0), label: "Fleet screen", needsFleet: true },
+          systems: { cost: { Titanium: 12, Plasma: 6 }, value: 3 + crewDutyPower("systems") * 0.35, label: "Pioneer fortification" },
+        }, option = options[kind];
+        if (!option) return;
+        if (option.needsFleet && !(game.fleet?.ships?.length > 0)) return toast("Build a fleet escort first.");
+        const cost = scaleReward(
+          option.cost,
+          Math.max(0.72, 1 - crewRolePower("Chief Engineer") * 0.025),
+        );
+        if (!canAfford(cost)) return toast(option.label + " requires " + fmt(cost) + ".");
+        spend(cost);
+        threat.preparations.push(kind);
+        threat.readiness += option.value;
+        toast(option.label + " complete. Threat readiness increased.");
+        saveGame(false);
+        renderMenu();
+      }
+      function resolveMajorThreat(strategyKey) {
+        const threat = game.majorThreat,
+          template = threatTemplate(threat?.templateKey),
+          strategy = template?.strategies.find((entry) => entry.key === strategyKey);
+        if (!threat || threat.status !== "active" || !strategy) return toast("Threat response is unavailable.");
+        const rolePower = crewRolePower(strategy.role),
+          lead = crewMember(expeditionState().active?.leadCrewId),
+          leadBonus = lead?.role === strategy.role ? Number(lead.level || 1) * 0.8 : 0,
+          fleetBonus = Math.min(3, game.fleet?.ships?.length || 0) * 0.55,
+          score = Number(threat.readiness || 0) + rolePower + leadBonus + fleetBonus,
+          required = threat.rating * 2.15;
+        if (score < required) {
+          threat.setbacks++;
+          threat.readiness += 1.5;
+          game.ship.hull = Math.max(12, Number(game.ship.hull || HULL_MAX) - Math.max(4, threat.rating * 2));
+          addActivity("warning", threat.name + " forced a retreat", "Readiness " + score.toFixed(1) + " / " + required.toFixed(1));
+          toast("The response was underprepared. The Pioneer withdrew safely; readiness improved for another attempt.");
+          saveGame(false);
+          renderMenu();
+          return false;
+        }
+        threat.status = "resolved";
+        threat.strategy = strategy.label;
+        threat.resolvedAt = Date.now();
+        worldEventState().history.unshift({ kind: "threat", ...structuredClone(threat) });
+        game.captainLog.threatsResolved =
+          (game.captainLog.threatsResolved || 0) + 1;
+        grantCrewXp(18, expeditionState().active?.leadCrewId);
+        if (threat.source === "ambient") {
+          const reward = scaleReward({ DataCores: 12 + threat.rating * 4, Plasma: 8 + threat.rating * 3, Titanium: 10 + threat.rating * 3 }, 1 + crewDutyPower("fleet") * 0.02);
+          grantReward(reward, threat.name + " response");
+          showMissionPanel("Threat Resolved: " + threat.name, "The Pioneer prevailed through preparation and the crew's chosen response.", [["Strategy", strategy.label], ["Reward", fmt(reward)], ["Setbacks", String(threat.setbacks || 0)]]);
+          game.majorThreat = null;
+        }
+        markMeaningfulMoment("threat-resolved");
+        addActivity("discovery", threat.name + " resolved", strategy.label);
+        trackExpeditionProgress("threat", 1);
         saveGame(false);
         renderMenu();
         return true;
@@ -12537,6 +13392,8 @@
           scannedAt: Date.now(),
         };
         state.totalScans++;
+        trackExpeditionProgress("signal", 1);
+        markMeaningfulMoment("signal");
         event.mysteryKey = profile.key;
         event.mysteryScanned = true;
         event.mysteryClue = profile.clue;
@@ -12950,6 +13807,8 @@
           (game.captainLog.eventsCompleted || 0) + 1;
         game.captainLog.encountersResolved =
           (game.captainLog.encountersResolved || 0) + 1;
+        trackExpeditionProgress("encounter", 1);
+        markMeaningfulMoment("encounter");
         trackDaily("event", 1);
         const perks = checkFactionPerks(),
           collections = checkDiscoveryCollections(),
@@ -13159,6 +14018,8 @@
           .sort((a, b) => b.quality - a.quality)
           .slice(0, ECHO_MAX * 3);
         game.echoStats.created++;
+        trackExpeditionProgress("echo", 1);
+        markMeaningfulMoment("echo");
         game.captainLog.bestEchoQuality = Math.max(
           game.captainLog.bestEchoQuality || 0,
           e.quality,
@@ -13764,6 +14625,35 @@
             sub = orbitingFrigate() ? "Jump drive synchronized" : "Return to Pioneer orbit";
           return { title: objective.action, sub, menu: objective.menu };
         }
+        if (game.majorThreat?.status === "active")
+          return {
+            title: "Prepare for " + game.majorThreat.name,
+            sub:
+              "Readiness " +
+              Number(game.majorThreat.readiness || 0).toFixed(1) +
+              " • Pioneer Command",
+            menu: "system",
+          };
+        const livingEvent = currentLivingSystemEvent();
+        if (livingEvent?.status === "active")
+          return {
+            title: livingEvent.name,
+            sub: "A temporary system event awaits your decision",
+            menu: "system",
+          };
+        const activeArc = expeditionState().active,
+          arcStage = currentExpeditionStage(activeArc);
+        if (activeArc && arcStage)
+          return {
+            title: arcStage.label,
+            sub:
+              activeArc.name +
+              " • " +
+              Number(arcStage.progress || 0) +
+              "/" +
+              arcStage.goal,
+            menu: "frigate",
+          };
         if (h && h.d < 70 && !h.echo.harvested)
           return {
             title: "Harvest Echo",
@@ -13836,6 +14726,8 @@
           echoes: h && h.d < 70 && !h.echo.harvested ? 1 : 0,
           planets: cap ? 1 : 0,
           system:
+            game.majorThreat?.status === "active" ||
+            currentLivingSystemEvent()?.status === "active" ||
             (ev &&
               ((!ev.event.mysteryScanned && ev.d < mysteryScanRadius()) ||
                 (ev.event.mysteryScanned && ev.d < 115))) ||
@@ -15687,6 +16579,360 @@
           "</div></div>"
         );
       }
+      function crewAvatarHtml(member) {
+        const initials = String(member.name || "Crew")
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((part) => part[0] || "")
+          .join("")
+          .toUpperCase();
+        return (
+          '<div class="crew-avatar" style="--crewColor:' +
+          esc(member.color || "#67e8f9") +
+          ";--uniform:" +
+          esc(member.uniform || crewUniforms[0]) +
+          '" role="img" aria-label="Portrait of ' +
+          esc(member.name) +
+          '"><span>' +
+          esc(initials) +
+          "</span></div>"
+        );
+      }
+      function crewCardHtml(member) {
+        const template = crewTemplate(member.id),
+          needed = crewXpNeeded(member),
+          cost = crewUpgradeCost(member.id),
+          canTrain = member.level < 6 && member.xp >= needed && canAfford(cost),
+          duties = [
+            ["bridge", "Bridge"],
+            ["vault", "Vault"],
+            ["fleet", "Fleet"],
+            ["systems", "Systems"],
+          ];
+        return (
+          '<div class="crew-card" style="--crewColor:' +
+          esc(member.color || "#67e8f9") +
+          '">' +
+          crewAvatarHtml(member) +
+          '<div class="crew-copy"><b>' +
+          esc(member.name) +
+          '</b><span class="crew-role">' +
+          esc(member.role + " • " + member.specialty) +
+          "</span><p>" +
+          esc(template?.bio || "Pioneer specialist.") +
+          '</p><div class="vault-tags"><span class="tag">Level ' +
+          member.level +
+          '</span><span class="tag">' +
+          esc(member.expeditions || 0) +
+          ' expeditions</span><span class="tag">Duty: ' +
+          esc(duties.find(([key]) => key === member.duty)?.[1] || "Bridge") +
+          "</span></div>" +
+          '<div class="crew-xp"><div style="width:' +
+          clamp((member.xp / Math.max(1, needed)) * 100, 0, 100) +
+          '%"></div></div><span>' +
+          (member.level >= 6 ? "Master specialist" : member.xp + " / " + needed + " field experience") +
+          '</span><div class="crew-perks">' +
+          (template?.perks || [])
+            .map(
+              (perk, index) =>
+                '<span class="' +
+                (member.level >= index * 2 + 2 ? "unlocked" : "") +
+                '">' +
+                esc(perk) +
+                (member.level >= index * 2 + 2 ? " • active" : " • unlocks Lv. " + (index * 2 + 2)) +
+                "</span>",
+            )
+            .join("") +
+          '</div><div class="crew-duties">' +
+          duties
+            .map(([key, labelText]) =>
+              btn(
+                member.duty === key ? labelText + " Assigned" : "Assign " + labelText,
+                "setCrewDuty",
+                member.id + "|" + key,
+                member.duty !== key,
+              ),
+            )
+            .join("") +
+          '</div><div class="actions"><input id="crewName-' +
+          esc(member.id) +
+          '" maxlength="20" value="' +
+          esc(member.name) +
+          '"><button type="button" data-action="renameCrew" data-arg="' +
+          esc(member.id) +
+          '">Rename</button>' +
+          btn("Change Uniform", "cycleCrewUniform", member.id) +
+          btnWhy(
+            member.level >= 6 ? "Mastered" : "Train to Level " + (member.level + 1),
+            "upgradeCrew",
+            member.id,
+            canTrain,
+            member.level >= 6
+              ? "This specialist has reached mastery."
+              : member.xp < needed
+                ? "Complete field work to earn " + (needed - member.xp) + " more experience."
+                : !canAfford(cost)
+                  ? "Training requires " + fmt(cost) + "."
+                  : "",
+          ) +
+          "</div></div></div>"
+        );
+      }
+      function crewHtml() {
+        const crew = crewState().members,
+          candidates = crewTemplates.filter((template) => !crewMember(template.id));
+        return (
+          card(
+            "Pioneer Crew",
+            "Your specialists live and grow aboard the Pioneer. Field work earns experience; duties shape the bonuses they provide between expeditions.",
+            '<div class="grid"><div class="chip"><b>Crew Aboard</b><br>' +
+              crew.length +
+              ' / ' +
+              crewTemplates.length +
+              '</div><div class="chip"><b>Bridge Strength</b><br>' +
+              crewDutyPower("bridge") +
+              '</div><div class="chip"><b>Fleet Logistics</b><br>' +
+              crewDutyPower("fleet") +
+              '</div><div class="chip"><b>Systems Expertise</b><br>' +
+              crewDutyPower("systems") +
+              "</div></div>",
+          ) +
+          '<div class="crew-grid">' +
+          crew.map(crewCardHtml).join("") +
+          "</div>" +
+          card(
+            "Recruitment Channel",
+            candidates.length
+              ? "New specialists become permanent, customizable members of the Pioneer crew."
+              : "Every available specialist now has a berth aboard the Pioneer.",
+            candidates.length
+              ? '<div class="crew-grid">' +
+                  candidates
+                    .map(
+                      (template) =>
+                        '<div class="crew-card" style="--crewColor:' +
+                        esc(template.color) +
+                        '"><div class="crew-copy"><b>' +
+                        esc(template.name) +
+                        '</b><span class="crew-role">' +
+                        esc(template.role + " • " + template.specialty) +
+                        "</span><p>" +
+                        esc(template.bio) +
+                        "</p><span>Recruitment: " +
+                        esc(fmt(template.cost)) +
+                        '</span><div class="actions">' +
+                        btnWhy(
+                          "Recruit " + template.name,
+                          "recruitCrew",
+                          template.id,
+                          canAfford(template.cost),
+                          canAfford(template.cost) ? "" : "Requires " + fmt(template.cost) + ".",
+                        ) +
+                        "</div></div></div>",
+                    )
+                    .join("") +
+                  "</div>"
+              : "",
+          )
+        );
+      }
+      function expeditionStagesHtml(expedition) {
+        return (
+          '<div class="expedition-route">' +
+          expedition.stages
+            .map((stage, index) => {
+              const done = index < Number(expedition.stageIndex || 0),
+                current = index === Number(expedition.stageIndex || 0) && expedition.status === "active";
+              return (
+                '<div class="expedition-stage ' +
+                (done ? "done" : current ? "current" : "") +
+                '"><b>' +
+                (done ? "✓ " : index + 1 + ". ") +
+                esc(stage.label) +
+                "</b><span>" +
+                (done ? "Complete" : current ? (stage.progress || 0) + " / " + stage.goal : "Awaiting earlier stage") +
+                "</span></div>"
+              );
+            })
+            .join("") +
+          "</div>"
+        );
+      }
+      function activeExpeditionHtml(active) {
+        if (!active) return "";
+        const stage = currentExpeditionStage(active),
+          lead = crewMember(active.leadCrewId);
+        return card(
+          "Active Expedition: " + active.name,
+          active.hook,
+          '<div class="expedition-card active" style="--arcColor:' +
+            esc(active.color) +
+            '"><div class="grid"><div class="chip"><b>Current Objective</b><br>' +
+            esc(stage?.label || "Return to the Pioneer") +
+            '</div><div class="chip"><b>Crew Lead</b><br>' +
+            esc(lead ? lead.name + " • Lv. " + lead.level : "Choose a specialist") +
+            '</div><div class="chip"><b>Final Reward</b><br>' +
+            esc(active.rewardText) +
+            "</div></div>" +
+            expeditionStagesHtml(active) +
+            '<div class="actions">' +
+            crewState().members
+              .map((member) =>
+                btn(
+                  active.leadCrewId === member.id ? member.name + " Leading" : "Lead: " + member.name,
+                  "assignCrewToExpedition",
+                  member.id,
+                  active.leadCrewId !== member.id,
+                ),
+              )
+              .join("") +
+            btn("Archive Expedition", "archiveExpedition") +
+            "</div></div>",
+        );
+      }
+      function expeditionsHtml() {
+        const state = expeditionState();
+        if (!state.active && !state.offers.length) generateExpeditionOffers();
+        const offers = state.offers;
+        return (
+          card(
+            "Open Expedition Board",
+            "Choose self-contained adventures whenever you want a new horizon. Completed and archived leads never return, keeping future expeditions distinct.",
+            '<div class="grid"><div class="chip"><b>Completed Adventures</b><br>' +
+              state.completed +
+              '</div><div class="chip"><b>Available Leads</b><br>' +
+              offers.length +
+              '</div><div class="chip"><b>Structure</b><br>Independent adventures</div></div>',
+          ) +
+          activeExpeditionHtml(state.active) +
+          (!state.active
+            ? card(
+                "Available Leads",
+                offers.length
+                  ? "Every lead uses a different subject, route pattern, final threat, and matching reward set."
+                  : "Every known lead has been explored. Your completed adventures remain in the archive while the Pioneer waits for future discoveries.",
+                offers.length
+                  ? '<div class="expedition-board">' +
+                      offers
+                        .map(
+                          (offer) =>
+                            '<div class="expedition-card" style="--arcColor:' +
+                            esc(offer.color) +
+                            '"><b>' +
+                            esc(offer.name) +
+                            "</b><p>" +
+                            esc(offer.hook) +
+                            '</p><span>Recommended lead: ' +
+                            esc(offer.leadRole) +
+                            '</span><span>Outcome: ' +
+                            esc(offer.rewardText) +
+                            "</span>" +
+                            expeditionStagesHtml({ ...offer, status: "offer", stageIndex: -1 }) +
+                            '<div class="actions">' +
+                            btn("Accept Expedition", "acceptExpedition", offer.id) +
+                            "</div></div>",
+                        )
+                        .join("") +
+                      "</div>"
+                  : "",
+              )
+            : "") +
+          (state.history.length
+            ? card(
+                "Expedition Archive",
+                "Past adventures stay recorded without becoming a required path.",
+                '<div class="list">' +
+                  state.history
+                    .slice(0, 10)
+                    .map(
+                      (entry) =>
+                        '<div class="log ' +
+                        (entry.status === "completed" ? "done" : "") +
+                        '"><b>' +
+                        esc(entry.name) +
+                        "</b><span>" +
+                        esc(entry.status === "completed" ? "Adventure completed • " + fmt(entry.finalReward) : "Archived by the Pioneer") +
+                        "</span></div>",
+                    )
+                    .join("") +
+                  "</div>",
+              )
+            : "")
+        );
+      }
+      function livingSystemEventHtml() {
+        const event = ensureLivingSystemEvent();
+        if (!event || event.status === "quiet")
+          return card("Living System", "This sector is in a rare quiet interval. The next jump may reveal a temporary phenomenon, migration, market, or celebration.");
+        return card(
+          event.status === "active" ? event.name : event.name + " • Resolved",
+          event.status === "active" ? event.desc : event.result,
+          '<div class="living-event-card" style="--eventColor:' +
+            esc(event.color) +
+            '"><div class="living-event-visual visual-' +
+            esc(event.visual) +
+            '"><i></i><i></i><i></i></div>' +
+            (event.status === "active"
+              ? '<div class="actions">' +
+                event.choices
+                  .map((choice, index) =>
+                    btn(choice.label + " • " + fmt(choice.reward), "resolveLivingSystemEvent", index),
+                  )
+                  .join("") +
+                "</div>"
+              : '<span>Decision: ' + esc(event.choice) + " • Reward: " + esc(fmt(event.reward)) + "</span>") +
+            "</div>",
+        );
+      }
+      function majorThreatHtml() {
+        const threat = game.majorThreat;
+        if (!threat || threat.status !== "active") return "";
+        const template = threatTemplate(threat.templateKey),
+          required = threat.rating * 2.15;
+        return card(
+          "Major Threat: " + threat.name,
+          threat.desc,
+          '<div class="threat-card" style="--threatColor:' +
+            esc(threat.color) +
+            '"><div class="threat-visual"><i></i><i></i><i></i></div><div class="threat-meter"><div style="width:' +
+            clamp((threat.readiness / required) * 100, 0, 100) +
+            '%"></div></div><span>Readiness ' +
+            Number(threat.readiness || 0).toFixed(1) +
+            " / " +
+            required.toFixed(1) +
+            ' • Safe retreats: ' +
+            Number(threat.setbacks || 0) +
+            '</span><div class="actions">' +
+            btn("Brief Crew", "prepareMajorThreat", "crew", !threat.preparations.includes("crew")) +
+            btn("Deploy Fleet Screen", "prepareMajorThreat", "fleet", !threat.preparations.includes("fleet")) +
+            btn("Fortify Pioneer", "prepareMajorThreat", "systems", !threat.preparations.includes("systems")) +
+            (template?.strategies || [])
+              .map((strategy) =>
+                btn(strategy.label + " • " + strategy.role, "resolveMajorThreat", strategy.key),
+              )
+              .join("") +
+            "</div></div>",
+        );
+      }
+      function journeyPulseHtml() {
+        const state = expeditionState(),
+          eventCount = worldEventState().history.filter((entry) => entry.kind !== "threat").length;
+        return card(
+          "Pioneer Journey",
+          "There is no single required path. Your record grows through the adventures, worlds, crew, and discoveries you choose.",
+          '<div class="journey-pulse"><div class="chip"><b>Expeditions</b><br>' +
+            state.completed +
+            '</div><div class="chip"><b>Crew</b><br>' +
+            crewState().members.length +
+            '</div><div class="chip"><b>Living Events</b><br>' +
+            eventCount +
+            '</div><div class="chip"><b>Major Threats</b><br>' +
+            (game.captainLog.threatsResolved || 0) +
+            '</div><div class="chip"><b>Meaningful Moments</b><br>' +
+            (game.retention.meaningfulMoments || 0) +
+            "</div></div>",
+        );
+      }
       function vaultHtml() {
         const vault = vaultState(),
           secured = vaultSecuredEntries(),
@@ -15814,8 +17060,21 @@
               (game.frigate[k + "Level"] || 0) < 6,
           ).length,
           readyFleet = fleetReadyCount();
+        if (!expeditionState().active && !expeditionState().offers.length)
+          generateExpeditionOffers();
+        const expeditionCount = expeditionState().active
+            ? 1
+            : expeditionState().offers.length,
+          crewTraining = crewState().members.filter(
+            (member) =>
+              member.level < 6 &&
+              member.xp >= crewXpNeeded(member) &&
+              canAfford(crewUpgradeCost(member.id)),
+          ).length;
         const tabs = tabBar("frigate", [
           { key: "overview", label: "Overview" },
+          { key: "expeditions", label: "Expeditions", count: expeditionCount || "" },
+          { key: "crew", label: "Crew", count: crewTraining || "" },
           { key: "fleet", label: "Fleet", count: readyFleet || "" },
           { key: "vault", label: "Vault", count: vaultPendingEntries().length || "" },
           { key: "upgrades", label: "Upgrades", count: readyUpgrades || "" },
@@ -15898,7 +17157,9 @@
               readyUpgrades +
               "</div>",
           ) + tabs;
-        if (tab === "fleet")
+        if (tab === "expeditions") html += expeditionsHtml();
+        else if (tab === "crew") html += crewHtml();
+        else if (tab === "fleet")
           html +=
             fleetOverviewHtml() +
             fleetShipyardHtml() +
@@ -15934,6 +17195,8 @@
                   chartedJumpCandidates().length > 0,
                 ) +
                 btn("Fleet Operations", "setMenuTab", "frigate|fleet") +
+                btn("Expedition Board", "setMenuTab", "frigate|expeditions") +
+                btn("Pioneer Crew", "setMenuTab", "frigate|crew") +
                 btn("Pioneer Vault", "setMenuTab", "frigate|vault") +
                 btn("Base Upgrades", "setMenuTab", "frigate|upgrades") +
                 btn("Cosmetic Store", "setMenuTab", "frigate|cosmetics") +
@@ -16247,6 +17510,8 @@
           html += dailyOpsHtml() + milestoneHtml() + contractsHtml();
         } else if (tab === "travel") {
           html +=
+            majorThreatHtml() +
+            livingSystemEventHtml() +
             card(
               "Current Sector",
               esc(game.system.name) +
@@ -16278,6 +17543,7 @@
             atlasHtml();
         } else if (tab === "records") {
           html +=
+            journeyPulseHtml() +
             reputationHtml() +
             encounterStoryHtml() +
             collectionHtml() +
@@ -16295,6 +17561,8 @@
           html += settingsHtml() + saveHtml();
         } else {
           html +=
+            majorThreatHtml() +
+            livingSystemEventHtml() +
             card(
               "Current Sector",
               esc(game.system.name) +
@@ -16776,11 +18044,11 @@
             "The Last Note Home resolved",
           ];
         return card(
-          "The Silent Choir",
+          "Optional Chronicle: The Silent Choir",
           state.storyComplete
-            ? "Story complete. The Choir Key is active, increasing all future encounter resource rewards by 10%. The lost expeditions have heard your final decision."
-            : "A three-part storyline emerges through exploration encounters. New chapters surface as you resolve other signals.",
-          '<div class="grid"><div class="chip"><b>Story Progress</b><br>' +
+            ? "Chronicle complete. The Choir Key is active, increasing all future encounter resource rewards by 10%. This remains one finished record inside your open journey."
+            : "Three optional contacts may surface through exploration. They are never required to travel, accept expeditions, or keep discovering.",
+          '<div class="grid"><div class="chip"><b>Chronicle Record</b><br>' +
             stage +
             ' / 3</div><div class="chip"><b>Current Record</b><br>' +
             esc(chapters[stage] || chapters[0]) +
@@ -16976,7 +18244,15 @@
             " • Daily Ops: " +
             (l.dailyCompleted || 0) +
             " • Planet upgrades: " +
-            (l.planetUpgrades || 0),
+            (l.planetUpgrades || 0) +
+            "<br>Expeditions: " +
+            (expeditionState().completed || 0) +
+            " • Fleet returns: " +
+            (l.fleetMissionsCompleted || 0) +
+            " • Living events: " +
+            (l.livingEventsResolved || 0) +
+            " • Major threats: " +
+            (l.threatsResolved || 0),
         );
       }
       function renderActivity() {
@@ -17148,6 +18424,22 @@
             "The ODF Pioneer is your mobile base. Build it at Earth Factory, then upgrade its reactor, hangar, scanner, capacity, Fleet Command, and Vault systems. Once built, it can lead the expedition into uncharted space.",
           ],
           [
+            "Expedition Arcs",
+            "The Pioneer offers optional, self-contained adventures rather than a single required path. Choose one lead at a time, complete its distinct field stages through normal play, and face a matching final threat. Completed or archived leads never return.",
+          ],
+          [
+            "Pioneer Crew",
+            "Crew specialists can be renamed, given different uniforms, assigned to bridge, Vault, fleet, or systems duty, and chosen to lead expeditions. Field work earns experience; training raises their level and strengthens role bonuses.",
+          ],
+          [
+            "Living Systems",
+            "Temporary migrations, markets, festivals, stellar phenomena, and other events make frontier systems change around you. Each event offers a clear choice and rewards that reflect what happened.",
+          ],
+          [
+            "Major Threats",
+            "Dangerous contacts reward preparation. Brief the crew, deploy a fleet screen, and fortify the Pioneer before choosing a role-based response. An underprepared attempt causes a safe retreat and can be tried again.",
+          ],
+          [
             "Exploration Encounters",
             "Every sector beyond Sol contains a contact with multiple responses. Approach its signal, then choose based on your ship systems, fleet, resources, faction standing, and earlier decisions. Outcomes are permanent and recorded in the Captain's Log.",
           ],
@@ -17165,7 +18457,7 @@
           ],
           [
             "Faction Reputation",
-            "Rescue and research decisions build standing with the Frontier Coalition, Wayfarer Guild, and Echo Collective. Trust 3 unlocks a permanent faction technology. The Silent Choir storyline unfolds across three encounters.",
+            "Rescue and research decisions build standing with the Frontier Coalition, Wayfarer Guild, and Echo Collective. Trust 3 unlocks a permanent faction technology. The optional Silent Choir chronicle can surface across three encounters.",
           ],
           [
             "Rarities",
@@ -17248,7 +18540,7 @@
           },
           {
             group: "Gameplay",
-            label: "Fixed Sol tutorial precedes procedural travel",
+            label: "Fixed Sol tutorial precedes uncharted travel",
             pass:
               sol().name === "Sol System" &&
               sol().isTutorial === true &&
@@ -17298,8 +18590,44 @@
               vaultCatalog.length >= 24 &&
               typeof registerVaultDiscovery === "function" &&
               typeof secureVaultEntry === "function" &&
-              vaultCapacity(6) === 28 &&
-              vaultContainment(5) === 6,
+              vaultCapacity(6) >= 28 &&
+              vaultContainment(5) >= 6,
+          },
+          {
+            group: "Gameplay",
+            label: "Distinct Expedition Arcs available",
+            pass:
+              expeditionThemes.length >= 12 &&
+              typeof generateExpeditionOffers === "function" &&
+              typeof expeditionSimilarity === "function" &&
+              new Set(expeditionThemes.map((theme) => theme.family)).size ===
+                expeditionThemes.length,
+          },
+          {
+            group: "Gameplay",
+            label: "Customizable Pioneer crew available",
+            pass:
+              crewTemplates.length >= 6 &&
+              typeof recruitCrew === "function" &&
+              typeof upgradeCrew === "function" &&
+              typeof setCrewDuty === "function",
+          },
+          {
+            group: "Gameplay",
+            label: "Living-system events available",
+            pass:
+              livingEventTemplates.length >= 8 &&
+              typeof ensureLivingSystemEvent === "function" &&
+              typeof resolveLivingSystemEvent === "function",
+          },
+          {
+            group: "Gameplay",
+            label: "Major threat responses available",
+            pass:
+              majorThreatTemplates.length >= expeditionThemes.length &&
+              typeof prepareMajorThreat === "function" &&
+              typeof resolveMajorThreat === "function" &&
+              typeof drawMajorThreat === "function",
           },
           {
             group: "Save",
@@ -17313,7 +18641,10 @@
               String(saveState).includes("activity") &&
               String(saveState).includes("universeSeed") &&
               String(saveState).includes("discovery") &&
-              String(saveState).includes("vault"),
+              String(saveState).includes("vault") &&
+              String(saveState).includes("crew") &&
+              String(saveState).includes("expeditions") &&
+              String(saveState).includes("worldEvents"),
           },
           {
             group: "Save",
@@ -17887,9 +19218,29 @@
             esc(objective.action) +
             "</b><br>" +
             esc(objective.text);
-        } else
-          ui.missionBox.innerHTML =
-            "<b>Expedition:</b> Chart worlds, decode unknown signals, choose your response, and complete Codex collections.";
+        } else {
+          const activeArc = expeditionState().active,
+            arcStage = currentExpeditionStage(activeArc),
+            livingEvent = currentLivingSystemEvent();
+          ui.missionBox.innerHTML = game.majorThreat?.status === "active"
+            ? "<b>Major Threat: " +
+              esc(game.majorThreat.name) +
+              "</b><br>Prepare the crew, fleet, and Pioneer before choosing a response."
+            : activeArc && arcStage
+              ? "<b>" +
+                esc(activeArc.name) +
+                ":</b> " +
+                esc(arcStage.label) +
+                " • " +
+                Number(arcStage.progress || 0) +
+                "/" +
+                arcStage.goal
+              : livingEvent?.status === "active"
+                ? "<b>Living System: " +
+                  esc(livingEvent.name) +
+                  "</b><br>Open System to choose how the Pioneer responds."
+                : "<b>Open Journey:</b> Chart worlds, follow independent leads, and return whenever you want another adventure.";
+        }
         const ready = Object.values(unclaimedProduction).reduce(
             (a, v) => a + Math.floor(v || 0),
             0,
@@ -18298,6 +19649,17 @@
             color: "#d9f99d",
             color2: "#fef9c3",
             intensity: 1.45,
+          };
+        const livingEvent =
+          sys === game.system ? currentLivingSystemEvent(sys) : null;
+        if (livingEvent?.status === "active")
+          return {
+            type: livingEvent.visual,
+            name: livingEvent.name,
+            desc: livingEvent.desc,
+            color: livingEvent.color,
+            color2: "#ffffff",
+            intensity: 1.28,
           };
         if (rarity === "Mythic")
           return {
@@ -22021,6 +23383,73 @@
         ctx.fillText("EXPLORATION ENCOUNTER", p.x, p.y - 17);
         ctx.restore();
       }
+      function drawMajorThreat() {
+        const threat = game.majorThreat;
+        if (!threat || threat.status !== "active") return;
+        const raw = screen(threat.x || 0, threat.y || 0),
+          offscreen = raw.x < 110 || raw.x > W - 110 || raw.y < 110 || raw.y > H - 110,
+          p = {
+            x: clamp(raw.x, 118, W - 118),
+            y: clamp(raw.y, 128, H - 138),
+          },
+          size = 34 + threat.rating * 5,
+          color = threat.color || "#f87171";
+        ctx.save();
+        ctx.globalCompositeOperation = "screen";
+        const glow = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, size * 2.8);
+        glow.addColorStop(0, rgba(color, 0.38));
+        glow.addColorStop(0.42, rgba(color, 0.13));
+        glow.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, size * 2.8, 0, TAU);
+        ctx.fill();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(t * 0.003);
+        ctx.strokeStyle = rgba(color, 0.72);
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 3; i++) {
+          ctx.setLineDash([7 + i * 3, 10]);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, size * (1.05 + i * 0.32), size * (0.48 + i * 0.13), i * 0.72 - t * 0.004, 0, TAU);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        ctx.fillStyle = rgba("#020617", 0.94);
+        ctx.strokeStyle = rgba(color, 0.92);
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let i = 0; i < 12; i++) {
+          const angle = (i / 12) * TAU,
+            radius = size * (i % 2 ? 0.64 : 1.04 + Math.sin(t * 0.05 + i) * 0.08),
+            x = Math.cos(angle) * radius,
+            y = Math.sin(angle) * radius * 0.72;
+          if (!i) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = rgba(color, 0.9);
+        ctx.beginPath();
+        ctx.arc(-size * 0.18, -size * 0.08, 4, 0, TAU);
+        ctx.arc(size * 0.18, -size * 0.08, 4, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.font = "900 10px Inter, system-ui";
+        ctx.fillStyle = rgba("#ffffff", 0.94);
+        ctx.fillText(threat.name, p.x, p.y - size - 25);
+        ctx.font = "800 8px Inter, system-ui";
+        ctx.fillStyle = rgba(color, 0.9);
+        ctx.fillText(
+          (offscreen ? "DISTANT CONTACT • " : "") + "THREAT " + threat.rating,
+          p.x,
+          p.y - size - 13,
+        );
+        ctx.restore();
+      }
       function drawAnomaly() {
         const a = game.negotiationAnomaly;
         if (!a) return;
@@ -22447,6 +23876,7 @@
         drawAnomaly();
         drawBlackHole();
         drawSectorEvent();
+        drawMajorThreat();
         for (const b of game.system.bodies) drawBody(b);
         drawFrigate();
         drawCaptureHint();
@@ -22492,8 +23922,10 @@
             game.sectorEvent && !game.sectorEvent.complete
               ? game.sectorEvent
               : null,
+          threat =
+            game.majorThreat?.status === "active" ? game.majorThreat : null,
           bodies = game.system.bodies || [],
-          all = [...bodies, frig, bh, ev, game.ship].filter(Boolean),
+          all = [...bodies, frig, bh, ev, threat, game.ship].filter(Boolean),
           maxWorld = Math.max(
             900,
             ...all.map(
@@ -22738,6 +24170,30 @@
             label("VOID", p.x, p.y - 11, "#fbcfe8");
           }
           c.restore();
+        }
+        if (threat) {
+          const p = mapPoint(threat),
+            color = threat.color || "#f87171";
+          c.save();
+          c.strokeStyle = rgba(color, 0.88);
+          c.fillStyle = rgba(color, 0.28);
+          c.lineWidth = 1.5;
+          c.translate(p.x, p.y);
+          if (p.clamped) c.rotate(p.a);
+          c.beginPath();
+          for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * TAU,
+              radius = i % 2 ? 3 : 6,
+              x = Math.cos(angle) * radius,
+              y = Math.sin(angle) * radius;
+            if (!i) c.moveTo(x, y);
+            else c.lineTo(x, y);
+          }
+          c.closePath();
+          c.fill();
+          c.stroke();
+          c.restore();
+          if (!p.clamped) label("THREAT", p.x, p.y - 11, color);
         }
         const sp = mapPoint(game.ship);
         c.save();
@@ -23747,8 +25203,8 @@
 
         ok(
           "Save schema is current",
-          SAVE_VERSION === 18 &&
-            APP_VERSION === "0.20.0" &&
+          SAVE_VERSION === 19 &&
+            APP_VERSION === "0.21.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -23789,6 +25245,15 @@
             Array.isArray(serialized.vault.discoveryKeys),
         );
         ok(
+          "Save state contains crew and open expeditions",
+          !!serialized.crew &&
+            Array.isArray(serialized.crew.members) &&
+            !!serialized.expeditions &&
+            Array.isArray(serialized.expeditions.history) &&
+            !!serialized.worldEvents &&
+            !!serialized.worldEvents.records,
+        );
+        ok(
           "Save metadata is available",
           typeof saveMeta === "function" && !!saveMeta().shipName,
         );
@@ -23806,7 +25271,7 @@
             ),
         );
         ok(
-          "Procedural sector helpers exist",
+          "Uncharted sector helpers exist",
           hasFunctions([
             "ensureSystemIndex",
             "proceduralSeedForIndex",
@@ -23815,7 +25280,7 @@
           ]),
         );
         ok(
-          "Procedural sectors are generated only when requested",
+          "Uncharted sectors are generated only when requested",
           systems[0]?.isTutorial === true &&
             typeof unchartedSystemCandidates === "function" &&
             !String(initGame).includes("i <= 12"),
@@ -23920,6 +25385,42 @@
             ]),
         );
         ok(
+          "Expedition Arc board is distinct and repeat-safe",
+          expeditionThemes.length >= 12 &&
+            new Set(expeditionThemes.map((theme) => theme.family)).size ===
+              expeditionThemes.length &&
+            hasFunctions([
+              "generateExpeditionOffers",
+              "expeditionSimilarity",
+              "acceptExpedition",
+              "trackExpeditionProgress",
+            ]),
+        );
+        ok(
+          "Pioneer crew is customizable and upgradeable",
+          crewTemplates.length >= 6 &&
+            hasFunctions([
+              "recruitCrew",
+              "renameCrew",
+              "cycleCrewUniform",
+              "setCrewDuty",
+              "upgradeCrew",
+            ]),
+        );
+        ok(
+          "Living events and major threats are integrated",
+          livingEventTemplates.length >= 8 &&
+            majorThreatTemplates.length >= expeditionThemes.length &&
+            hasFunctions([
+              "ensureLivingSystemEvent",
+              "resolveLivingSystemEvent",
+              "spawnMajorThreat",
+              "prepareMajorThreat",
+              "resolveMajorThreat",
+              "drawMajorThreat",
+            ]),
+        );
+        ok(
           "Echo route system exists",
           hasFunctions([
             "startEcho",
@@ -23950,7 +25451,7 @@
             ]),
         );
         ok(
-          "Silent Choir storyline has three chapters",
+          "Optional Silent Choir chronicle has three contacts",
           encounterTemplates.filter((entry) => entry.story).length === 3,
         );
         ok(
