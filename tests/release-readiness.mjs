@@ -191,6 +191,7 @@ vm.runInContext(
     majorThreatTemplates, spawnMajorThreat, prepareMajorThreat,
     resolveMajorThreat, majorThreatHtml, journeyPulseHtml,
     resolveExplorationEncounter,
+    closeUpgradePanel, closeMissionPanel, settleOverlayPause,
     dismissPanels(){
       [ui.missionOverlay,ui.upgradeOverlay,ui.discoveryOverlay,ui.choiceOverlay,ui.confirmOverlay]
         .forEach((panel)=>panel?.classList.remove("show"));
@@ -213,6 +214,9 @@ vm.runInContext(
     },
     get keys(){return keys}, get specialSystemOdds(){return specialSystemOdds},
     get pioneerRescue(){return pioneerRescue},
+    get paused(){return paused}, get modalFreeze(){return modalFreeze},
+    get upgradePanelOpen(){return ui.upgradeOverlay.classList.contains("show")},
+    get missionPanelOpen(){return ui.missionOverlay.classList.contains("show")},
     get SAVE_KEY(){return SAVE_KEY}, get SAVE_BACKUP_KEY(){return SAVE_BACKUP_KEY},
     get SAVE_VERSION(){return SAVE_VERSION}, get APP_VERSION(){return APP_VERSION}
   };`,
@@ -225,7 +229,7 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.22.0", "Expected release candidate version");
+assert.equal(api.APP_VERSION, "0.22.1", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
@@ -361,6 +365,7 @@ api.resolveLivingSystemEvent(0);
 assert.equal(livingEvent.status, "resolved", "Living-system choices should persist their resolution");
 assert.ok(livingEvent.reward && Object.keys(livingEvent.reward).length, "Living-system decisions need themed rewards");
 
+api.game.majorThreat = null;
 const threat = api.spawnMajorThreat("thermal-burrower", "ambient");
 const hullBeforeRetreat = api.game.ship.hull;
 assert.equal(api.resolveMajorThreat("engineering"), false, "An unprepared major threat should force a safe retreat");
@@ -510,6 +515,28 @@ assert.ok(
 );
 
 api.initGame(false);
+
+api.finishCapture(api.body("Mars"));
+api.dismissPanels();
+api.upgradeShip("thrust");
+assert.equal(api.upgradePanelOpen, true, "First subsystem upgrade should show its result panel");
+assert.equal(api.missionPanelOpen, true, "First subsystem upgrade should also show the next tutorial step");
+assert.equal(api.paused, true, "Stacked upgrade panels should pause gameplay");
+api.closeMissionPanel();
+assert.equal(api.paused, true, "Closing the tutorial panel first must keep the remaining upgrade panel paused");
+assert.equal(api.modalFreeze, true, "The remaining upgrade panel must retain modal freeze");
+api.closeUpgradePanel();
+assert.equal(api.paused, false, "Closing the final stacked panel must always resume gameplay");
+assert.equal(api.modalFreeze, false, "No stale modal freeze may remain after stacked panels close");
+
+api.initGame(false);
+api.finishCapture(api.body("Mars"));
+api.dismissPanels();
+api.upgradeShip("fuel");
+api.closeUpgradePanel();
+assert.equal(api.paused, true, "Closing the upgrade panel first must preserve the tutorial panel pause");
+api.closeMissionPanel();
+assert.equal(api.paused, false, "Closing stacked panels in reverse order must also resume gameplay");
 
 for (const subsystem of ["thrust", "fuel", "brake", "accel", "handling", "cargo"]) {
   checkpoint(`tutorial path: ${subsystem}`);
