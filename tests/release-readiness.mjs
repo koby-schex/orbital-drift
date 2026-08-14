@@ -176,6 +176,9 @@ vm.runInContext(
     discoveryMysteries, discoveryCollections, discoveryState,
     systemMysteryProfile, currentMysteryRecord, scanSectorMystery,
     discoveryCollectionProgress, checkDiscoveryCollections,
+    vaultCatalog, vaultState, vaultCapacity, vaultContainment,
+    vaultSecuredEntries, registerVaultDiscovery, secureVaultEntry,
+    unlockVaultSkin, vaultHtml, frigateSkins, frigateBenefit,
     resolveExplorationEncounter,
     dismissPanels(){
       [ui.missionOverlay,ui.upgradeOverlay,ui.discoveryOverlay,ui.choiceOverlay,ui.confirmOverlay]
@@ -189,6 +192,14 @@ vm.runInContext(
       game.ship.x=game.sectorEvent.x; game.ship.y=game.sectorEvent.y;
       return game.sectorEvent;
     },
+    prepareVaultTest(seed=626262){
+      const testSystem=proc(seed);
+      systems=[sol(),testSystem]; currentSystemIndex=1; game.system=testSystem;
+      updateBodies(game.system); resetShip(); game.vault=defaultVault();
+      Object.assign(game.frigate,{built:true,vaultLevel:0});
+      game.ship.orbitLocked=true; game.ship.lockBody="__FRIGATE__";
+      return testSystem;
+    },
     get SAVE_KEY(){return SAVE_KEY}, get SAVE_BACKUP_KEY(){return SAVE_BACKUP_KEY},
     get SAVE_VERSION(){return SAVE_VERSION}, get APP_VERSION(){return APP_VERSION}
   };`,
@@ -201,8 +212,8 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.19.0", "Expected release candidate version");
-assert.equal(api.SAVE_VERSION, 17, "Expected current save schema");
+assert.equal(api.APP_VERSION, "0.20.0", "Expected release candidate version");
+assert.equal(api.SAVE_VERSION, 18, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
 assert.equal(api.game.system.name, "Sol System", "Every pilot must start in Sol");
@@ -273,7 +284,7 @@ assert.equal(
   api.discoveryMysteries.length,
   "Mystery profiles must be unique by system family",
 );
-assert.ok(api.discoveryCollections.length >= 8, "Discovery Depth needs a substantial collection board");
+assert.ok(api.discoveryCollections.length >= 12, "Discovery Depth needs a substantial collection board");
 
 const discoveryEvent = api.prepareDiscoveryTest(112233);
 const mysteryProfile = api.systemMysteryProfile();
@@ -315,6 +326,74 @@ assert.ok(
 assert.ok(
   api.game.resources.Titanium > collectionRewardBefore,
   "Codex collections must grant their listed rewards",
+);
+
+api.prepareVaultTest();
+assert.ok(api.vaultCatalog.length >= 24, "Vault needs a substantial discovery catalog");
+assert.ok(
+  api.vaultCatalog.some((entry) => entry.kind === "artifact") &&
+    api.vaultCatalog.some((entry) => entry.kind === "lifeform") &&
+    api.vaultCatalog.some((entry) => entry.kind === "phenomenon"),
+  "Vault catalog must include artifacts, lifeforms, and phenomena",
+);
+assert.ok(
+  api.vaultCatalog.some((entry) => entry.source === "planet") &&
+    api.vaultCatalog.some((entry) => entry.source === "space"),
+  "Discoveries must come from planets and space",
+);
+assert.equal(api.vaultCapacity(0), 4, "Base Vault should begin with four secure slots");
+assert.equal(api.vaultCapacity(6), 28, "Fully upgraded Vault should hold 28 discoveries");
+assert.equal(api.vaultContainment(0), 1, "Base Vault should contain Benign discoveries");
+assert.equal(api.vaultContainment(5), 6, "High-level Vault should contain Reality-Bending discoveries");
+const dangerousFind = api.registerVaultDiscovery(
+  "planet",
+  "QA Ruins",
+  true,
+  "absence-glass",
+);
+assert.equal(dangerousFind.status, "pending", "Dangerous finds must enter quarantine");
+api.game.frigate.vaultLevel = 3;
+assert.equal(api.secureVaultEntry(dangerousFind.id), true, "Upgraded containment must secure quarantined finds");
+assert.equal(dangerousFind.status, "secured", "Secured find must persist its new state");
+assert.match(api.vaultHtml(), /Absence Glass/, "Vault UI must show visual discovery records");
+assert.match(api.vaultHtml(), /Threat 4 • Volatile/, "Vault UI must explain threat ratings");
+
+api.prepareVaultTest(737373);
+api.game.frigate.vaultLevel = 6;
+api.vaultCatalog.slice(0, 18).forEach((template, index) => {
+  const entry = api.registerVaultDiscovery(
+    template.source,
+    `QA Site ${index}`,
+    true,
+    template.key,
+  );
+  assert.equal(entry?.status, "secured", `Vault specimen ${index + 1} should be secured`);
+});
+assert.equal(api.vaultSecuredEntries().length, 18, "Rare hull goal must require 18 secured finds");
+assert.equal(api.unlockVaultSkin(false), false, "Threshold unlock should be idempotent");
+assert.ok(
+  api.game.ownedFrigateSkins.has("Astral Archaeologist"),
+  "Eighteen secured discoveries must unlock Astral Archaeologist",
+);
+assert.equal(
+  api.frigateSkins.find((skin) => skin.key === "Astral Archaeologist")?.rarity,
+  "Rare",
+  "Astral Archaeologist must be a Rare frigate skin",
+);
+assert.match(
+  api.frigateBenefit("vault", 2).stat,
+  /slots.*Hazardous.*Volatile/,
+  "Vault upgrades must describe both capacity and containment gains",
+);
+assert.equal(api.saveState().vault.entries.length, 18, "Vault entries must be included in saves");
+assert.equal(api.saveGame(false), true, "Vault progress save should succeed");
+api.game.vault.entries = [];
+api.game.ownedFrigateSkins.delete("Astral Archaeologist");
+assert.equal(api.loadGame(false), true, "Vault progress save should load");
+assert.equal(api.vaultSecuredEntries().length, 18, "Vault entries must survive save/load");
+assert.ok(
+  api.game.ownedFrigateSkins.has("Astral Archaeologist"),
+  "Vault reward must remain unlocked after load",
 );
 
 api.initGame(false);
@@ -501,5 +580,5 @@ assert.doesNotThrow(() => new Function(worker), "Service worker must parse");
 assert.match(worker, /caches\.match/, "Service worker needs an offline fallback");
 
 console.log(
-  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, save migration/recovery, cosmetics, responsive invariants, audio lifecycle, and PWA assets.`,
+  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, audio lifecycle, and PWA assets.`,
 );
