@@ -18,13 +18,16 @@ Then open `http://localhost:8080`.
 npm test
 ```
 
-The test command runs static validation plus a functional release-readiness harness against the real game script. It covers all six first-upgrade tutorial paths, the fixed Sol start, Pioneer construction and rendezvous, non-linear multi-jump routes, fleet departure/return choreography, save migration and backup recovery, cosmetic equipping, responsive UI invariants, audio lifecycle hooks, and offline-app assets. The game also contains a browser-level `runTests()` suite used during release QA.
+The test command runs static validation plus a functional release-readiness harness against the real game script. It covers all six first-upgrade tutorial paths, the fixed Sol start, Pioneer construction and rendezvous, repeat-safe Expedition Arcs, customizable crew progression, living-system events, major threats, non-linear multi-jump routes, fleet departure/return choreography, save migration and backup recovery, cosmetic equipping, responsive UI invariants, audio lifecycle hooks, and offline-app assets. The game also contains a browser-level `runTests()` suite used during release QA.
 
 ## Current systems
 
 - Gravity flight, orbit locking, braking, thrust, fuel, recovery, and slingshot release
 - Planet discovery, rarity tiers, capture capacity, upgrades, production, and codex records
 - ODF Pioneer command hub, upgrades, refueling, sector travel, cosmetics, and living fleet operations
+- Twelve self-contained Expedition Arc families with permanent history, similarity filtering, distinct objectives, final threats, and subject-matched rewards
+- Six customizable Pioneer specialists with names, uniforms, duty assignments, experience, upgrades, role bonuses, and expedition leadership
+- Living-system events with persistent choices and visual phenomena, plus preparation-driven major threats with safe retreat and retry
 - Visible fleet formations outside the Starling orbit lane, with launch, deployment, return, and reward-ready states
 - Adaptive Command Match fleet paint that inherits the equipped Starling and Pioneer palette, plus live escort previews
 - Per-save randomized uncharted routes with anti-repetition scoring, unique generated system names, Cosmic Spirit systems, black-hole breaches, Parallel systems, and rare events
@@ -33,8 +36,8 @@ The test command runs static validation plus a functional release-readiness harn
 - Cinematic discovery reveals that visually distinguish planetary color, class, atmosphere, anomaly, and rarity
 - Ten choice-driven Exploration Encounters with ship, fleet, resource, and reputation requirements
 - Frontier Coalition, Wayfarer Guild, and Echo Collective reputation with permanent faction technologies
-- Three-part Silent Choir storyline, consequential outcomes, and a Captain's Log decision archive
+- Optional three-contact Silent Choir chronicle, consequential outcomes, and a Captain's Log decision archive
 - Guided onboarding, objective tracking, automatic save recovery, portable save export/import, settings, touch-control calibration, audio, and performance scaling
-- Seven-step fixed Earth/Sol tutorial with one active objective at a time; procedural systems are generated only after the first outward journey
+- Seven-step fixed Earth/Sol tutorial with one active objective at a time; uncharted systems are generated only after the first outward journey
 - Cleaner Pioneer Command navigation without duplicate flight controls, plus a standalone Cosmetic Hangar with exact in-game hull previews and direct equip controls
 - Installable browser build with a manifest, home-screen icons, and offline shell support

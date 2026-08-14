@@ -7,6 +7,10 @@
 - [x] All six possible first subsystem upgrades can complete the Sol training economy.
 - [x] Mars capture, first upgrade, Mars outpost upgrade, Venus survey, Pioneer build, and Pioneer rendezvous advance in order.
 - [x] Pioneer orbit exposes the one-tap outward jump action.
+- [x] Expedition offers never repeat a retired family, reject similar history, and preserve theme-matched objectives, threats, Vault finds, and resources.
+- [x] Crew recruitment, renaming, uniform selection, duty assignment, field experience, training, and save/load persistence work from Pioneer orbit.
+- [x] Living-system events persist by system, avoid recent event types, present clear decisions, and trigger matching visual phenomena.
+- [x] Major threats support preparation, role-based responses, safe underprepared retreats, retry, resolution, and expedition completion.
 - [x] Every new game begins with only the fixed Earth/Sol tutorial; random systems are generated after departure.
 - [x] Flight controls are absent from the menu and legacy Flight links redirect to a relevant section.
 - [x] New games receive different universe seeds and generated system sets.
@@ -32,6 +36,9 @@ npm test
 - [ ] Complete the tutorial once on a narrow phone viewport and once on desktop.
 - [ ] Build every fleet hull and confirm its formation slot, role silhouette, and equipped paint remain readable at gameplay zoom.
 - [ ] Launch and complete an expedition while watching the Pioneer; verify the full fly-out, absence, fly-in, and formation sequence.
+- [ ] Complete one full Expedition Arc, confirm every stage advances through normal play, and verify the final reward matches its subject.
+- [ ] Customize, train, save, and reload at least two crew specialists; confirm duties and expedition lead assignment persist.
+- [ ] Resolve a living-system event and a major threat on both phone and desktop viewports.
 - [ ] Visit standard, Exotic, Mythic, Cosmic Spirit, and Parallel systems and confirm each visual identity is immediately distinguishable.
 - [ ] Confirm the smart action never overlaps the Nav Map at the device's smallest supported height.
 - [ ] Test touch thrust, brake, orbit lock/release, pause, and menu navigation on iOS Safari and Android Chrome.
