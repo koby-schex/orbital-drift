@@ -162,16 +162,18 @@ vm.runInContext(
     get game(){return game}, get systems(){return systems},
     get currentSystemIndex(){return currentSystemIndex},
     get universeSeed(){return universeSeed},
-    initGame, body, nearestBody, finishCapture, upgradeShip, upgradePlanet, updateShip, scanPlanet,
+    initGame, body, nearestBody, capture, finishCapture, captureLimit, captureCapacityUsed,
+    upgradeShip, upgradePlanet, updateShip, scanPlanet,
     buildFrigate, frigatePosition, frigateHomePosition, toggleOrbit, jumpSystem,
     startPioneerRescue, updatePioneerRescue, updateDrift, shipStats, refuel,
     chooseUnchartedSystemIndex, unchartedSystemCandidates,
-    ensureSystemIndex, menuNavigationHtml, normalizeMenuName,
+    ensureSystemIndex, menuNavigationHtml, normalizeMenuName, openSection, closeMenu, openPause, closePause, renderFrigate,
     fleetFormationSlot, fleetEscortMotion, fleetSkinForKey,
     startFleetMission, updateFleetMissions, completeFleetMission,
     systemVisualProfile, systemRarityClass, proc, parallelSystem, cosmicSpiritSystem,
     saveState, saveGame, loadGame, validSavePayload,
-    setShipSkin, setFrigateSkin, owns, smartAction, releaseChecks,
+    setShipSkin, setFrigateSkin, setTrailSkin, owns, ownsTrailSkin, activeTrailSkin,
+    trailSkins, refreshSkins, smartAction, releaseChecks,
     generateContracts, makeDailyOps, settingsHtml, storeHtml,
     monetizationStatusText,
     discoveryMysteries, discoveryCollections, discoveryState,
@@ -192,6 +194,7 @@ vm.runInContext(
     resolveMajorThreat, majorThreatHtml, journeyPulseHtml,
     resolveExplorationEncounter,
     closeUpgradePanel, closeMissionPanel, settleOverlayPause,
+    showDiscovery, closeDiscoveryPanel, updateCinematicTimeScale,
     dismissPanels(){
       [ui.missionOverlay,ui.upgradeOverlay,ui.discoveryOverlay,ui.choiceOverlay,ui.confirmOverlay]
         .forEach((panel)=>panel?.classList.remove("show"));
@@ -217,6 +220,10 @@ vm.runInContext(
     get paused(){return paused}, get modalFreeze(){return modalFreeze},
     get upgradePanelOpen(){return ui.upgradeOverlay.classList.contains("show")},
     get missionPanelOpen(){return ui.missionOverlay.classList.contains("show")},
+    get menuOpen(){return ui.menu.classList.contains("open")},
+    get pauseOpen(){return ui.pauseOverlay.classList.contains("show")},
+    get cinematicTimeScale(){return cinematicTimeScale},
+    get cinematicPausePending(){return cinematicPausePending},
     get SAVE_KEY(){return SAVE_KEY}, get SAVE_BACKUP_KEY(){return SAVE_BACKUP_KEY},
     get SAVE_VERSION(){return SAVE_VERSION}, get APP_VERSION(){return APP_VERSION}
   };`,
@@ -229,12 +236,28 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.22.1", "Expected release candidate version");
+assert.equal(api.APP_VERSION, "0.23.0", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
 assert.equal(api.game.system.name, "Sol System", "Every pilot must start in Sol");
 assert.equal(api.game.system.isTutorial, true, "Sol must remain the tutorial route");
+assert.equal(api.captureLimit(), 3, "A new flight must begin with three frontier capture slots");
+assert.equal(api.captureCapacityUsed(), 0, "Protected Earth must not consume a frontier capture slot");
+for (const worldName of ["Mars", "Venus", "Uranus"]) {
+  api.game.ship.orbitLocked = true;
+  api.game.ship.lockBody = worldName;
+  api.capture();
+  api.dismissPanels();
+}
+assert.equal(api.captureCapacityUsed(), 3, "All three starting frontier slots must be usable");
+assert.equal(api.game.captured.size, 4, "Earth plus three frontier worlds must remain captured");
+api.game.ship.orbitLocked = true;
+api.game.ship.lockBody = "Neptune";
+api.capture();
+assert.equal(api.game.captured.has("Neptune"), false, "A fourth frontier capture must open replacement flow");
+assert.equal(api.captureCapacityUsed(), 3, "A blocked fourth capture must preserve the existing network");
+api.dismissPanels();
 assert.equal(
   new Set(api.systems.map((system) => system.name)).size,
   api.systems.length,
@@ -256,6 +279,34 @@ assert.ok(
   "Flight controls must not be duplicated in menu navigation",
 );
 assert.notEqual(api.normalizeMenuName("flight"), "flight", "Legacy Flight links must redirect");
+
+api.dismissPanels();
+api.openSection("hub");
+assert.equal(api.menuOpen, true, "Opening a command menu must reveal the menu sheet");
+assert.equal(api.paused, true, "Opening any command menu must pause flight");
+api.closeMenu();
+assert.equal(api.menuOpen, false, "Closing the command menu must hide the sheet");
+assert.equal(api.paused, false, "Closing a menu opened during flight must resume play");
+
+api.openSection("frigate");
+api.openPause();
+assert.equal(api.menuOpen, false, "Opening Pause must cleanly close the command sheet");
+assert.equal(api.pauseOpen, true, "Pause must replace the command sheet");
+assert.equal(api.paused, true, "Opening Pause from another menu must keep flight stopped");
+api.closePause();
+assert.equal(api.pauseOpen, false, "Closing Pause must return to flight");
+assert.equal(api.paused, false, "Flight must resume only after the final menu closes");
+
+api.showDiscovery(api.body("Venus"), { Crystal: 1 });
+assert.equal(api.cinematicPausePending, true, "Survey panels must begin with eased time dilation");
+assert.equal(api.paused, false, "Survey arrival should slow flight before fully pausing it");
+for (let frame = 0; frame < 28; frame++) api.updateCinematicTimeScale(1);
+assert.equal(api.paused, true, "Survey time dilation must settle into a complete pause");
+assert.equal(api.cinematicTimeScale, 0, "Survey panels must fully stop simulation time");
+api.closeDiscoveryPanel();
+assert.equal(api.paused, false, "Closing the survey panel must resume flight");
+for (let frame = 0; frame < 28; frame++) api.updateCinematicTimeScale(1);
+assert.equal(api.cinematicTimeScale, 1, "Flight must smoothly return to full speed after dismissal");
 
 for (let seed = 1; seed <= 24; seed++) {
   api.generateContracts(seed);
@@ -569,9 +620,20 @@ for (const subsystem of ["thrust", "fuel", "brake", "accel", "handling", "cargo"
   api.dismissPanels();
   checkpoint(`${subsystem}: survey complete`);
   assert.equal(api.game.missionStage, 4, `${subsystem}: Venus survey should advance training`);
+  Object.keys(api.game.resources).forEach((resource) => {
+    api.game.resources[resource] = 0;
+  });
   api.buildFrigate();
   checkpoint(`${subsystem}: frigate complete`);
-  assert.equal(api.game.frigate.built, true, `${subsystem}: economy must fund Pioneer construction`);
+  assert.equal(api.game.frigate.built, true, `${subsystem}: Earth reserve must guarantee Pioneer construction`);
+  assert.ok(
+    Object.values(api.game.resources).every((amount) => amount >= 0),
+    `${subsystem}: reserve-backed construction must never create negative resources`,
+  );
+  assert.ok(
+    api.game.activity.some((entry) => entry.title === "Pioneer reserve released"),
+    `${subsystem}: the construction reserve must be visible in the activity log`,
+  );
 }
 
 assert.ok(
@@ -595,7 +657,7 @@ api.game.ship.orbitLocked = false;
 api.game.ship.lockBody = null;
 api.game.ship.fuel = 0;
 assert.equal(api.startPioneerRescue(), true, "A built Pioneer should answer a fuel distress call");
-for (let i = 0; i < 330 && api.pioneerRescue; i++) api.updatePioneerRescue(1);
+for (let i = 0; i < 450 && api.pioneerRescue; i++) api.updatePioneerRescue(1);
 assert.equal(api.pioneerRescue, null, "Pioneer rescue should complete its return to stellar orbit");
 assert.equal(api.game.ship.lockBody, "__FRIGATE__", "Recovered Starling should orbit the Pioneer");
 assert.equal(api.game.ship.fuel, api.game.ship.maxFuel, "Pioneer rescue should fully refuel the Starling");
@@ -696,11 +758,21 @@ assert.equal(api.game.frigate.shipSkin, "Solar Flare", "Owned ship skin should e
 api.game.ownedFrigateSkins.add("Abyss");
 api.setFrigateSkin("Abyss");
 assert.equal(api.game.frigate.skin, "Abyss", "Owned frigate skin should equip");
+assert.ok(api.trailSkins.length >= 6, "The cosmetic hangar must offer a full trail collection");
+assert.equal(api.activeTrailSkin().key, "Ion Wake", "New pilots need a clean starter trail");
+api.game.echoStats.created = 25;
+api.refreshSkins(false);
+assert.equal(api.ownsTrailSkin("Echo Lattice"), true, "Echo mastery must unlock its trail reward");
+api.setTrailSkin("Echo Lattice");
+assert.equal(api.activeTrailSkin().key, "Echo Lattice", "Earned trail designs must equip");
+assert.match(api.storeHtml(), /Starship Trail Designs/, "The hangar must expose trail customization");
+assert.match(api.storeHtml(), /Relic Ember/, "Premium trail designs must appear in the hangar");
 checkpoint("cosmetics equipped");
 
 assert.equal(api.saveGame(false), true, "Primary save should succeed");
 const saved = localStorage.getItem(api.SAVE_KEY);
 assert.ok(api.validSavePayload(JSON.parse(saved)), "Current save should pass validation");
+assert.ok(Array.isArray(JSON.parse(saved).ownedTrailSkins), "Trail ownership must persist in saves");
 api.game.resources.Alloy = 999999;
 assert.equal(api.loadGame(false), true, "Current save should load");
 assert.notEqual(api.game.resources.Alloy, 999999, "Load should restore saved state");

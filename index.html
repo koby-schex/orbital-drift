@@ -2281,7 +2281,7 @@
       }
       .cosmetic-loadout {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 9px;
         margin-bottom: 12px;
       }
@@ -2354,7 +2354,7 @@
       .cosmetic-card .tag {
         margin: 8px 5px 0 0;
       }
-      @media (max-width: 620px) {
+      @media (max-width: 820px) {
         .cosmetic-loadout {
           grid-template-columns: 1fr;
         }
@@ -4678,6 +4678,223 @@
         .discovery-world:after,
         .discovery-satellite { animation: none !important; }
       }
+
+      /* v0.23 command deck, modal motion, and hangar presentation */
+      .menu-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 17;
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 82% 30%, var(--sectorGlow), transparent 42%),
+          rgba(1, 4, 14, 0.64);
+        backdrop-filter: blur(5px);
+        transition: opacity 0.24s ease, visibility 0s linear 0.24s;
+      }
+      body.menu-open .menu-scrim {
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+        transition-delay: 0s;
+      }
+      .menu {
+        display: block;
+        visibility: hidden;
+        opacity: 0;
+        transform: translateX(28px) scale(0.985);
+        transform-origin: 100% 20%;
+        transition:
+          opacity 0.24s ease,
+          transform 0.3s cubic-bezier(.2,.82,.24,1),
+          visibility 0s linear 0.3s;
+      }
+      .menu.open {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        transition-delay: 0s;
+        animation: none !important;
+      }
+      .menu-content-enter {
+        animation: commandContentIn 0.25s cubic-bezier(.2,.82,.24,1) both;
+      }
+      .menu-nav:empty { display: none; }
+      .menu-back,
+      #menuClose {
+        min-width: 72px;
+        min-height: 42px;
+      }
+      #menuClose {
+        border-color: rgba(248,250,252,.22);
+        background: rgba(248,250,252,.07);
+      }
+      .frigate-deck-tabs {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        overflow: visible;
+        margin: 0 0 12px;
+        padding: 0;
+        background: transparent;
+      }
+      .frigate-deck-tabs button {
+        width: 100%;
+        min-width: 0;
+        padding: 9px 7px;
+        border-radius: 13px;
+        white-space: normal;
+      }
+      .pioneer-hero {
+        position: relative;
+        overflow: hidden;
+        border-color: color-mix(in srgb, var(--sectorAccent) 34%, transparent);
+        background:
+          radial-gradient(circle at 86% 16%, var(--sectorGlow), transparent 36%),
+          linear-gradient(145deg, rgba(16,25,48,.96), rgba(3,7,18,.92));
+      }
+      .pioneer-hero-grid {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 10px;
+        align-items: stretch;
+      }
+      .pioneer-hero .cosmetic-preview-live { height: 132px; margin: 0; }
+      .fleet-hangar-stage {
+        position: relative;
+        height: 190px;
+        margin: 10px 0;
+        overflow: hidden;
+        border: 1px solid rgba(125,211,252,.2);
+        border-radius: 18px;
+        background:
+          radial-gradient(circle at 56% 48%, rgba(125,211,252,.12), transparent 35%),
+          linear-gradient(160deg, rgba(8,15,32,.98), rgba(1,4,14,.95));
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 16px 38px rgba(0,0,0,.28);
+      }
+      .fleet-hangar-stage canvas { width: 100%; height: 100%; display: block; }
+      .fleet-ship-card {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+        align-items: start;
+      }
+      .fleet-ship-card .fleet-ship-mark {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        color: #f8fbff;
+        font-size: 19px;
+        background: radial-gradient(circle at 32% 24%, rgba(255,255,255,.18), rgba(14,165,233,.12));
+        border: 1px solid rgba(125,211,252,.22);
+        box-shadow: 0 0 22px rgba(125,211,252,.09);
+      }
+      .cosmetic-card.premium {
+        border-color: rgba(251,191,36,.42);
+        background:
+          radial-gradient(circle at 90% 6%, rgba(251,191,36,.12), transparent 34%),
+          linear-gradient(145deg, rgba(28,23,38,.94), rgba(6,10,23,.88));
+        box-shadow: 0 0 34px rgba(251,146,60,.09), inset 0 1px 0 rgba(255,255,255,.1);
+      }
+      .cosmetic-card.premium > b:after {
+        content: "Premium";
+        float: right;
+        padding: 3px 6px;
+        border-radius: 999px;
+        color: #fef3c7;
+        font-size: 8px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        background: rgba(245,158,11,.15);
+        border: 1px solid rgba(251,191,36,.28);
+      }
+      .cosmetic-preview-live { height: 176px; }
+      .overlay {
+        display: flex;
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.3s ease,
+          visibility 0s linear 0.34s,
+          backdrop-filter 0.34s ease;
+      }
+      .overlay .dialog {
+        opacity: 0;
+        transform: translateY(20px) scale(.975);
+        filter: blur(4px);
+        transition:
+          opacity 0.3s ease,
+          transform 0.38s cubic-bezier(.2,.82,.24,1),
+          filter 0.32s ease;
+      }
+      .overlay.show {
+        display: flex;
+        visibility: visible;
+        opacity: 1;
+        pointer-events: auto;
+        transition-delay: 0s;
+      }
+      .overlay.show .dialog {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+        animation: none;
+      }
+      .overlay.closing {
+        display: flex;
+        visibility: visible;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .overlay.closing .dialog {
+        opacity: 0;
+        transform: translateY(12px) scale(.985);
+        filter: blur(3px);
+      }
+      #discoveryOverlay {
+        transition-duration: .46s;
+        background:
+          radial-gradient(circle at 50% 28%, color-mix(in srgb, var(--discoveryColor) 20%, transparent), transparent 42%),
+          rgba(1,4,14,.86);
+      }
+      #discoveryOverlay .dialog { transition-duration: .48s; }
+      .tap-dismiss-note {
+        display: block;
+        margin-top: 9px;
+        color: rgba(219,234,254,.68);
+        font-size: 9px;
+        font-weight: 850;
+        letter-spacing: .1em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+      @keyframes commandContentIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @media (max-width: 900px) {
+        .menu { transform: translateY(26px) scale(.99); transform-origin: 50% 100%; }
+        .menu.open { transform: translateY(0) scale(1); }
+        .frigate-deck-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      @media (max-width: 560px) {
+        .pioneer-hero-grid { grid-template-columns: 1fr; }
+        .pioneer-hero .cosmetic-preview-live { height: 145px; }
+        .fleet-ship-card { grid-template-columns: 1fr; }
+        .fleet-ship-card .fleet-ship-mark { width: 38px; height: 38px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .menu,
+        .menu-scrim,
+        .overlay,
+        .overlay .dialog { transition-duration: .01ms !important; }
+        .menu-content-enter { animation: none !important; }
+      }
     </style>
   </head>
   <body>
@@ -4735,6 +4952,7 @@
         <span>〰</span><small>Echoes</small>
       </button>
     </div>
+    <div class="menu-scrim" id="menuScrim" aria-hidden="true"></div>
     <div class="menu" id="menu">
       <div class="menu-head">
         <button class="menu-back" id="menuBack" type="button">Back</button>
@@ -4805,7 +5023,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Flight &amp; Fleet Refit • v0.22.1</div>
+        <div class="title-version">Command Deck Overhaul • v0.23.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5113,6 +5331,7 @@
         <h2>Capture Capacity Reached</h2>
         <p id="choiceText"></p>
         <div class="list" id="choiceList"></div>
+        <span class="tap-dismiss-note">Tap open space to return</span>
       </div>
     </div>
     <div class="overlay" id="confirmOverlay">
@@ -5123,6 +5342,7 @@
           <button id="confirmCancel" type="button">Cancel</button
           ><button class="danger" id="confirmOk" type="button">Continue</button>
         </div>
+        <span class="tap-dismiss-note">Tap open space to cancel</span>
       </div>
     </div>
     <div class="overlay upgrade-pop" id="upgradeOverlay">
@@ -5133,6 +5353,7 @@
         <div class="actions">
           <button id="upgradeContinue" type="button">Continue</button>
         </div>
+        <span class="tap-dismiss-note">Tap anywhere outside a control to return</span>
       </div>
     </div>
     <div class="overlay mission-reward" id="missionOverlay">
@@ -5143,6 +5364,7 @@
         <div class="actions">
           <button id="missionContinue" type="button">Continue</button>
         </div>
+        <span class="tap-dismiss-note">Tap anywhere outside a control to return</span>
       </div>
     </div>
     <div
@@ -5185,6 +5407,7 @@
           >
             Return to Flight
           </button>
+          <span class="tap-dismiss-note">Tap open space to leave this signal</span>
         </div>
       </div>
     </div>
@@ -5211,7 +5434,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.22.1",
+        APP_VERSION = "0.23.0",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -5263,7 +5486,11 @@
         activeVisualPhenomenon = null,
         nextVisualPhenomenonAt = Infinity,
         pioneerRescue = null,
-        activeDiscoveryBody = null;
+        activeDiscoveryBody = null,
+        menuWasPaused = true,
+        cinematicTimeScale = 1,
+        cinematicTargetScale = 1,
+        cinematicPausePending = false;
       const ui = {
         controlEditBanner: $("controlEditBanner"),
         controlEditDone: $("controlEditDone"),
@@ -5288,6 +5515,7 @@
         captured: $("captured"),
         missionBox: $("missionBox"),
         missionTracker: $("missionTracker"),
+        menuScrim: $("menuScrim"),
         menu: $("menu"),
         menuTitle: $("menuTitle"),
         menuNav: $("menuNav"),
@@ -5526,7 +5754,7 @@
           accent: "#fde68a",
           glow: "#fb923c",
           rarity: "Rare",
-          visualTier: 2,
+          visualTier: 3,
           motif: "flare",
           type: "paid",
           price: 1,
@@ -5632,7 +5860,7 @@
           accent: "#38bdf8",
           glow: "#0ea5e9",
           rarity: "Rare",
-          visualTier: 2,
+          visualTier: 3,
           motif: "abyss",
           type: "paid",
           price: 1,
@@ -5729,6 +5957,20 @@
           price: "$0.99",
           type: "nonconsumable",
           desc: "Unlocks the Solar Convoy fleet escort style.",
+        },
+        trailSolarRibbon: {
+          id: "orbitaldrift.trail.solarribbon",
+          label: "Solar Ribbon Trail",
+          price: "$0.99",
+          type: "nonconsumable",
+          desc: "Unlocks the premium Solar Ribbon starship wake.",
+        },
+        trailRelicEmber: {
+          id: "orbitaldrift.trail.relicember",
+          label: "Relic Ember Trail",
+          price: "$1.99",
+          type: "nonconsumable",
+          desc: "Unlocks the Exotic Relic Ember starship wake.",
         },
         ancientHunterCombo: {
           id: "orbitaldrift.combo.ancienthunter",
@@ -5874,6 +6116,7 @@
           accent: "#7dd3fc",
           glow: "#7dd3fc",
           rarity: "Starter",
+          visualTier: 1,
           type: "free",
           price: 0,
           dynamic: true,
@@ -5887,6 +6130,7 @@
           accent: "#e0f2fe",
           glow: "#7dd3fc",
           rarity: "Unusual",
+          visualTier: 1,
           type: "free",
           price: 0,
           motif: "frontier",
@@ -5899,6 +6143,7 @@
           accent: "#fde68a",
           glow: "#fb923c",
           rarity: "Rare",
+          visualTier: 3,
           type: "paid",
           price: 1,
           motif: "solar",
@@ -5911,6 +6156,7 @@
           accent: "#fef9c3",
           glow: "#bbf7d0",
           rarity: "Mythic",
+          visualTier: 4,
           type: "achievement",
           price: 0,
           motif: "spirit",
@@ -5923,10 +6169,94 @@
           accent: "#ff2bd6",
           glow: "#a855f7",
           rarity: "Mythic",
+          visualTier: 4,
           type: "achievement",
           price: 0,
           motif: "parallel",
           desc: "Unlocked by entering a Parallel system. Fleet ships appear warped by alien geometry.",
+        },
+      ];
+
+      const trailSkins = [
+        {
+          key: "Ion Wake",
+          primary: "#7dd3fc",
+          secondary: "#1d4ed8",
+          accent: "#e0f2fe",
+          glow: "#38bdf8",
+          rarity: "Starter",
+          visualTier: 1,
+          motif: "ion",
+          type: "free",
+          price: 0,
+          desc: "A clean blue-white engine wake fitted to every Starling.",
+        },
+        {
+          key: "Solar Ribbon",
+          primary: "#f97316",
+          secondary: "#7c2d12",
+          accent: "#fde68a",
+          glow: "#fb923c",
+          rarity: "Rare",
+          visualTier: 3,
+          motif: "solar",
+          type: "paid",
+          price: 1,
+          productId: "orbitaldrift.trail.solarribbon",
+          desc: "Premium braided plasma ribbons with golden flare sparks and a heat-haze core.",
+        },
+        {
+          key: "Echo Lattice",
+          primary: "#a78bfa",
+          secondary: "#312e81",
+          accent: "#67e8f9",
+          glow: "#c4b5fd",
+          rarity: "Rare",
+          visualTier: 2,
+          motif: "echo",
+          type: "achievement",
+          price: 0,
+          desc: "Earned after creating 25 Orbital Echoes. Interlaced route lines replay the pilot's drift rhythm.",
+        },
+        {
+          key: "Relic Ember",
+          primary: "#b45309",
+          secondary: "#1c0b03",
+          accent: "#fef3c7",
+          glow: "#f59e0b",
+          rarity: "Exotic",
+          visualTier: 4,
+          motif: "relic",
+          type: "paid",
+          price: 2,
+          productId: "orbitaldrift.trail.relicember",
+          desc: "Premium ancient-fire exhaust with rotating rune fragments, molten embers, and a luminous relic core.",
+        },
+        {
+          key: "Spirit Aurora",
+          primary: "#d9f99d",
+          secondary: "#f8fafc",
+          accent: "#fef9c3",
+          glow: "#bbf7d0",
+          rarity: "Mythic",
+          visualTier: 4,
+          motif: "spirit",
+          type: "achievement",
+          price: 0,
+          desc: "Unlocked in a Cosmic Spirit system. A soft aurora follows the Starling like a living current.",
+        },
+        {
+          key: "Parallel Fracture",
+          primary: "#00f5ff",
+          secondary: "#140021",
+          accent: "#ff2bd6",
+          glow: "#a855f7",
+          rarity: "Mythic",
+          visualTier: 4,
+          motif: "parallel",
+          type: "achievement",
+          price: 0,
+          desc: "Unlocked in a Parallel system. Cyan and magenta wakes split around broken slices of local space.",
         },
       ];
 
@@ -7433,6 +7763,7 @@
         skin: "Frigate Standard",
         shipSkin: "High Tech",
         fleetSkin: "Command Match",
+        trailSkin: "Ion Wake",
       });
       function frigateSystemDefs() {
         return {
@@ -7835,6 +8166,7 @@
         encounteredIceWorld: false,
         ownedShipSkins: new Set(["High Tech"]),
         ownedFrigateSkins: new Set(["Frigate Standard"]),
+        ownedTrailSkins: new Set(["Ion Wake"]),
         purchasedSkins: new Set(),
         frigate: defaultFrigate(),
         fleet: defaultFleet(),
@@ -7881,6 +8213,14 @@
           () => game.echoStats.created >= 1,
           "Reward: 8 Data Cores",
           { DataCores: 8 },
+        ],
+        [
+          "echoWeaver",
+          "Echo Weaver",
+          "Create 25 Orbital Echoes and unlock the Echo Lattice trail.",
+          () => game.echoStats.created >= 25,
+          "Reward: Echo Lattice trail",
+          {},
         ],
         [
           "rareDrift",
@@ -9187,6 +9527,7 @@
         game.ownedShipSkins = new Set(["High Tech"]);
         game.ownedFrigateSkins = new Set(["Frigate Standard"]);
         game.ownedFleetSkins = new Set(["Command Match", "Frontier Fleet"]);
+        game.ownedTrailSkins = new Set(["Ion Wake"]);
         game.purchasedSkins = new Set();
         game.monetization = defaultMonetization();
         game.frigate = defaultFrigate();
@@ -9201,6 +9542,9 @@
         manualTargetName = null;
         selectedPlanetName = "Earth";
         t = 0;
+        cinematicTimeScale = 1;
+        cinematicTargetScale = 1;
+        cinematicPausePending = false;
         updateBodies(game.system);
         const earth = body("Earth");
         Object.assign(earth, {
@@ -9659,6 +10003,7 @@
           fleet: serializeFleet(),
           ownedShipSkins: [...game.ownedShipSkins],
           ownedFrigateSkins: [...game.ownedFrigateSkins],
+          ownedTrailSkins: [...game.ownedTrailSkins],
           ownedFleetSkins: [
             ...(game.ownedFleetSkins ||
               new Set(["Command Match", "Frontier Fleet"])),
@@ -9908,6 +10253,7 @@
           game.ownedFrigateSkins = new Set(
             d.ownedFrigateSkins || ["Frigate Standard"],
           );
+          game.ownedTrailSkins = new Set(d.ownedTrailSkins || ["Ion Wake"]);
           game.ownedFleetSkins = new Set(
             d.ownedFleetSkins || ["Command Match", "Frontier Fleet"],
           );
@@ -9969,6 +10315,9 @@
             : null;
           zoom = d.zoom || 0.68;
           t = d.t || 0;
+          cinematicTimeScale = 1;
+          cinematicTargetScale = 1;
+          cinematicPausePending = false;
           updateBodies(game.system);
           const cls = shipStats();
           game.ship = d.ship
@@ -10214,6 +10563,13 @@
         return (
           CAPTURE_BASE + Math.max(0, Number(game.frigate.capacityLevel) || 0)
         );
+      }
+      function captureCapacityUsed() {
+        let used = 0;
+        game.captured.forEach((name) => {
+          if (name !== "Earth") used++;
+        });
+        return used;
       }
       function fleetLimit() {
         if (!game.frigate.built) return 0;
@@ -10873,22 +11229,22 @@
           (ready
             ? '<span class="tag rarity-unusual">' + ready + " Ready</span>"
             : "") +
-          '</h4><p>Your escorts physically assemble around the Pioneer, depart when deployed, and return to formation before rewards become claimable.</p>' +
+          '</h4><p>Escorts cruise in dedicated formation lanes, fly out on assignment, and visibly return before their rewards become available.</p>' +
           fleetStatusStripHtml() +
-          '<div class="fleet-visual-note"><b>Live fleet:</b> Docked ships hold dedicated formation lanes outside the Starling orbit corridor. The active fleet design is visible on every escort.</div><div class="fleet-flow"><div class="chip"><b>1. Build</b><br>Create a specialist escort.</div><div class="chip"><b>2. Deploy</b><br>Watch it leave the Pioneer.</div><div class="chip"><b>3. Recover</b><br>Claim after it flies home.</div></div><div class="fleet-anchor-actions"><button type="button" data-action="scrollFleetSection" data-arg="fleetShipyard">Shipyard</button><button type="button" data-action="scrollFleetSection" data-arg="fleetMissions">Missions</button><button type="button" data-action="scrollFleetSection" data-arg="fleetSkins">Fleet Skins</button><button type="button" data-action="scrollFleetSection" data-arg="fleetBoosts">Boosts</button></div><div class="grid" style="margin-top:8px"><div class="chip">Fleet Slots: ' +
+          '<div class="fleet-hangar-stage"><canvas data-skin-kind="fleet" data-skin-key="' +
+          esc(game.fleet.skin) +
+          '" role="img" aria-label="Current fleet formation preview"></canvas><span class="cosmetic-preview-label">Current cruising formation</span></div><div class="fleet-anchor-actions"><button type="button" data-action="scrollFleetSection" data-arg="fleetShipyard">Open Shipyard</button><button type="button" data-action="scrollFleetSection" data-arg="fleetMissions">Open Mission Board</button></div><div class="grid" style="margin-top:8px"><div class="chip"><b>Fleet Slots</b><br>' +
           game.fleet.ships.length +
           " / " +
           fleetLimit() +
-          '</div><div class="chip">Active Missions: ' +
+          '</div><div class="chip"><b>Active Missions</b><br>' +
           game.fleet.missions.length +
           " / " +
           activeMissionLimit() +
-          '</div><div class="chip">Ready to Claim: ' +
+          '</div><div class="chip"><b>Ready to Claim</b><br>' +
           ready +
-          '</div><div class="chip">Completed Missions: ' +
+          '</div><div class="chip"><b>Completed</b><br>' +
           (game.fleet.stats.completed || 0) +
-          '</div><div class="chip">Matched Runs: ' +
-          (game.fleet.stats.matched || 0) +
           '</div></div><h4 id="fleetBoosts" style="margin-top:10px">Active Fleet Boosts</h4><div class="grid">' +
           fleetBoostChips() +
           "</div></div>"
@@ -10906,9 +11262,9 @@
                     (s.level || 1) < 6 &&
                     canAfford(cost);
                 return (
-                  '<div class="branch"><b>' +
+                  '<div class="branch fleet-ship-card"><div class="fleet-ship-mark">' +
                   fleetShipIcon(s.type) +
-                  " " +
+                  '</div><div><b>' +
                   esc(s.name) +
                   " Lv. " +
                   (s.level || 1) +
@@ -10936,7 +11292,7 @@
                       ? "Fleet ship is deployed."
                       : firstMissingReason(cost) || "Requirements not met yet.",
                   ) +
-                  "</div></div>"
+                  "</div></div></div>"
                 );
               })
               .join("")
@@ -11103,6 +11459,7 @@
               return (
                 '<div class="cosmetic-card' +
                 (active ? " equipped" : own ? " owned" : " locked") +
+                (s.type === "paid" ? " premium" : "") +
                 '"><b>' +
                 esc(s.key) +
                 "</b>" +
@@ -11114,7 +11471,7 @@
                 "<span>" +
                 esc(s.desc) +
                 '</span><span class="tag ' +
-                (s.rarity === "Mythic" ? "rarity-mythic" : "rarity-unusual") +
+                cosmeticRarityClass(s.rarity) +
                 '">' +
                 esc(s.rarity) +
                 '</span><span class="tag">' +
@@ -11272,6 +11629,36 @@
           Crystal: 14,
           DataCores: 5,
         };
+      }
+      function pioneerConstructionReserveAvailable() {
+        return !!(
+          !game.frigate.built &&
+          game.system?.isTutorial &&
+          game.missionStage >= 4 &&
+          hasFactoryAccess()
+        );
+      }
+      function releasePioneerConstructionReserve(cost = buildCost()) {
+        if (!pioneerConstructionReserveAvailable()) return {};
+        const supplied = {};
+        Object.entries(cost).forEach(([resource, required]) => {
+          const missing = Math.max(
+            0,
+            Math.ceil(required - (game.resources[resource] || 0)),
+          );
+          if (!missing) return;
+          game.resources[resource] = (game.resources[resource] || 0) + missing;
+          supplied[resource] = missing;
+        });
+        if (Object.keys(supplied).length)
+          addActivity(
+            "resource",
+            "Pioneer reserve released",
+            "Earth Factory supplied the remaining construction materials: " +
+              fmt(supplied) +
+              ".",
+          );
+        return supplied;
       }
       function shipSubsystemCost(key) {
         const def = shipSubsystemDefs[key];
@@ -12032,7 +12419,7 @@
           return errorToast(b.name + " is survey-only: " + b.hazard);
         if (game.captured.has(b.name))
           return errorToast(b.name + " is already captured.");
-        if (game.captured.size >= captureLimit()) return openChoice(b);
+        if (captureCapacityUsed() >= captureLimit()) return openChoice(b);
         finishCapture(b);
       }
       function finishCapture(b, replace = null) {
@@ -12147,11 +12534,12 @@
       function openChoice(b) {
         paused = true;
         modalFreeze = true;
+        ui.choiceOverlay.classList.remove("closing");
         ui.choiceOverlay.classList.add("show");
         ui.choiceText.textContent =
           "Your network supports " +
           captureLimit() +
-          " captured worlds. Replace one or raid " +
+          " frontier worlds in addition to protected Earth. Replace one or raid " +
           b.name +
           " once.";
         ui.choiceList.innerHTML = "";
@@ -12176,7 +12564,7 @@
         ui.choiceList.appendChild(c);
       }
       function closeChoice() {
-        ui.choiceOverlay.classList.remove("show");
+        hideOverlayWithTransition(ui.choiceOverlay);
         ui.choiceList.innerHTML = "";
         modalFreeze = false;
         if (canResumePlay()) paused = false;
@@ -12496,6 +12884,7 @@
         if (!game.system.isTutorial || !hasFactoryAccess())
           return toast("Build the first frigate from the Earth Factory menu.");
         const cost = buildCost();
+        const reserve = releasePioneerConstructionReserve(cost);
         if (!canAfford(cost))
           return toast("Frigate requires " + fmt(cost) + ".");
         spend(cost);
@@ -12515,6 +12904,10 @@
           [
             ["Unlocked", "Pioneer rendezvous"],
             ["Base", game.frigate.name],
+            [
+              "Earth Factory Reserve",
+              fmt(reserve) || "Construction materials were already complete",
+            ],
             ["Next", "Target Pioneer, approach, then LOCK"],
           ],
         );
@@ -13843,6 +14236,7 @@
         ui.encounterResult.classList.remove("show");
         ui.encounterContinue.classList.remove("show");
         ui.encounterChoices.style.display = "grid";
+        ui.encounterOverlay.classList.remove("closing");
         ui.encounterOverlay.classList.add("show");
         playSound("event");
         requestAnimationFrame(() =>
@@ -14008,12 +14402,13 @@
         ui.encounterContinue.focus();
       }
       function closeExplorationEncounter() {
-        if (!game.sectorEvent?.complete)
-          return toast("Choose a response before leaving the encounter.");
-        ui.encounterOverlay.classList.remove("show");
+        const unresolved = !game.sectorEvent?.complete;
+        hideOverlayWithTransition(ui.encounterOverlay);
         document.body.classList.remove("encounter-open");
         modalFreeze = false;
         if (canResumePlay()) paused = false;
+        if (unresolved)
+          toast("Signal left open. Return whenever you are ready to respond.");
       }
       function createSectorEvent(i = currentSystemIndex) {
         if (i === 0) return null;
@@ -14339,7 +14734,7 @@
         pioneerRescue = {
           phase: "outbound",
           time: 0,
-          duration: 105,
+          duration: 132,
           x: home.x,
           y: home.y,
           vx: home.vx,
@@ -14389,7 +14784,7 @@
           if (rescue.time >= rescue.duration) {
             rescue.phase = "returning";
             rescue.time = 0;
-            rescue.duration = 125;
+            rescue.duration = 145;
             rescue.startX = rescue.x;
             rescue.startY = rescue.y;
             s.fuel = s.maxFuel;
@@ -14453,13 +14848,22 @@
           game.ownedFrigateSkins = new Set(["Frigate Standard"]);
         if (!game.ownedFleetSkins)
           game.ownedFleetSkins = new Set(["Command Match", "Frontier Fleet"]);
+        if (!game.ownedTrailSkins)
+          game.ownedTrailSkins = new Set(["Ion Wake"]);
         game.ownedShipSkins.add("High Tech");
         game.ownedFrigateSkins.add("Frigate Standard");
         game.ownedFleetSkins.add("Command Match");
+        game.ownedTrailSkins.add("Ion Wake");
         if (game.encounteredIceWorld) game.ownedFrigateSkins.add("Deep Freeze");
         if (vaultSecuredEntries().length >= VAULT_SKIN_GOAL)
           game.ownedFrigateSkins.add("Astral Archaeologist");
         game.ownedFleetSkins.add("Frontier Fleet");
+        if ((game.echoStats?.created || 0) >= 25)
+          game.ownedTrailSkins.add("Echo Lattice");
+        if ((game.captainLog?.cosmicSpiritVisits || 0) >= 1)
+          game.ownedTrailSkins.add("Spirit Aurora");
+        if ((game.captainLog?.parallelVisits || 0) >= 1)
+          game.ownedTrailSkins.add("Parallel Fracture");
         if (
           game.frigate &&
           !frigateSkins.some((s) => s.key === game.frigate.skin)
@@ -14467,6 +14871,11 @@
           game.frigate.skin = "Frigate Standard";
         if (game.frigate?.skin === "Deep Freeze" && !game.encounteredIceWorld)
           game.frigate.skin = "Frigate Standard";
+        if (
+          !trailSkins.some((skin) => skin.key === game.frigate?.trailSkin) ||
+          !game.ownedTrailSkins.has(game.frigate?.trailSkin)
+        )
+          game.frigate.trailSkin = "Ion Wake";
       }
       function isCosmicWarpUnlocked() {
         return (
@@ -14477,6 +14886,12 @@
       function refreshSkins(show = true) {
         ensureSkins();
         unlockVaultSkin(show);
+        if ((game.echoStats?.created || 0) >= 25) {
+          const locked = !game.ownedTrailSkins.has("Echo Lattice");
+          game.ownedTrailSkins.add("Echo Lattice");
+          if (locked && show)
+            toast("Echo Lattice trail unlocked: 25 Orbital Echoes recorded.");
+        }
         if (game.encounteredIceWorld) {
           const locked = !game.ownedFrigateSkins.has("Deep Freeze");
           game.ownedFrigateSkins.add("Deep Freeze");
@@ -14486,14 +14901,16 @@
         if ((game.captainLog.parallelVisits || 0) >= 1) {
           const locked =
             !game.ownedShipSkins.has("Parallel Chaos") ||
-            !(game.ownedFleetSkins || new Set()).has("Parallel Swarm");
+            !(game.ownedFleetSkins || new Set()).has("Parallel Swarm") ||
+            !game.ownedTrailSkins.has("Parallel Fracture");
           game.ownedShipSkins.add("Parallel Chaos");
           if (!game.ownedFleetSkins)
             game.ownedFleetSkins = new Set(["Command Match", "Frontier Fleet"]);
           game.ownedFleetSkins.add("Command Match");
           game.ownedFleetSkins.add("Parallel Swarm");
+          game.ownedTrailSkins.add("Parallel Fracture");
           if (locked && show)
-            toast("Parallel Chaos and Parallel Swarm skins unlocked.");
+            toast("Parallel hull, fleet, and trail designs unlocked.");
         }
         if (isCosmicWarpUnlocked()) {
           const locked =
@@ -14511,14 +14928,16 @@
         if ((game.captainLog.cosmicSpiritVisits || 0) >= 1) {
           const locked =
             !game.ownedFrigateSkins.has("Spirit Voyager") ||
-            !(game.ownedFleetSkins || new Set()).has("Spirit Wing");
+            !(game.ownedFleetSkins || new Set()).has("Spirit Wing") ||
+            !game.ownedTrailSkins.has("Spirit Aurora");
           game.ownedFrigateSkins.add("Spirit Voyager");
           if (!game.ownedFleetSkins)
             game.ownedFleetSkins = new Set(["Command Match", "Frontier Fleet"]);
           game.ownedFleetSkins.add("Command Match");
           game.ownedFleetSkins.add("Spirit Wing");
+          game.ownedTrailSkins.add("Spirit Aurora");
           if (locked && show)
-            toast("Spirit Voyager and Spirit Wing skins unlocked.");
+            toast("Spirit frigate, fleet, and trail designs unlocked.");
         }
       }
       function checkAchievements() {
@@ -14654,6 +15073,46 @@
           frigateSkins.find((s) => s.key === "Frigate Standard") ||
           frigateSkins[0]
         );
+      }
+      function ownsTrailSkin(key) {
+        ensureSkins();
+        return game.ownedTrailSkins.has(key);
+      }
+      function activeTrailSkin() {
+        ensureSkins();
+        return (
+          trailSkins.find((skin) => skin.key === game.frigate.trailSkin) ||
+          trailSkins[0]
+        );
+      }
+      function setTrailSkin(key) {
+        if (!ownsTrailSkin(key)) return toast(key + " is locked.");
+        game.frigate.trailSkin = key;
+        feedbackPulse("upgrade");
+        playSound("upgrade");
+        toast("Starling trail equipped: " + key + ".");
+        saveGame(false);
+        renderMenu();
+      }
+      function buyTrailSkin(key) {
+        ensureSkins();
+        const skin = trailSkins.find((item) => item.key === key);
+        if (!skin) return;
+        if (ownsTrailSkin(key)) return toast("Already owned.");
+        if (skin.type === "achievement")
+          return toast("This trail must be earned through exploration.");
+        requestPurchase(skin.productId, {
+          kind: "trail",
+          key,
+          label: key,
+          onVerified: () => {
+            game.ownedTrailSkins.add(key);
+            game.purchasedSkins.add("trail:" + key);
+            toast("Trail design unlocked: " + key + ".");
+            saveGame(false);
+            renderMenu();
+          },
+        });
       }
       function cleanName(raw) {
         return (
@@ -14835,7 +15294,11 @@
           else if (game.missionStage === 3)
             sub = target ? "Venus distance: " + Math.round(Math.max(0, dist(game.ship, target) - visualRadius(target))) + "u" : "Follow the Venus target";
           else if (game.missionStage === 4)
-            sub = canAfford(buildCost()) ? "Pioneer construction ready" : "Gather the build resources";
+            sub = pioneerConstructionReserveAvailable()
+              ? "Pioneer construction ready — Earth reserve secured"
+              : canAfford(buildCost())
+                ? "Pioneer construction ready"
+                : "Return to Earth Factory";
           else if (game.missionStage === 5)
             sub = target ? "Pioneer distance: " + Math.round(Math.max(0, dist(game.ship, target) - (target.radius || 42))) + "u" : "Set the Pioneer target";
           else if (game.missionStage === 6)
@@ -15433,6 +15896,7 @@
             return "Complete the Sol tutorial objectives first.";
           if (!game.system.isTutorial || !hasFactoryAccess())
             return "Return to Earth Factory to build your first frigate.";
+          if (pioneerConstructionReserveAvailable()) return "";
           return firstMissingReason(buildCost()) || "";
         }
         if (kind === "frigateUpgrade") {
@@ -15521,7 +15985,15 @@
         return allowed.has(name) ? name : "hub";
       }
       function openSection(name = "hub") {
+        const opening = !ui.menu.classList.contains("open");
+        if (opening) {
+          menuWasPaused = !!(paused || modalFreeze || titleOpen || titleMenuMode);
+          paused = true;
+          keys.clear();
+          touch.active = false;
+        }
         activeMenu = normalizeMenuName(name);
+        ui.menu.classList.remove("closing");
         ui.menu.classList.add("open");
         document
           .querySelectorAll(".dock button")
@@ -15544,12 +16016,12 @@
         openSection(name);
       }
       function closeMenu() {
+        const shouldResume = !menuWasPaused && !titleMenuMode && !titleOpen;
         activeMenu = null;
         layoutDrag = null;
+        ui.menu.classList.add("closing");
         ui.menu.classList.remove("open", "in-section");
         ui.menuTitle.textContent = "Menu";
-        ui.menuNav.innerHTML = "";
-        ui.menuContent.innerHTML = "";
         document.body.classList.remove("menu-open", "menu-section-open");
         document
           .querySelectorAll(".dock button")
@@ -15561,7 +16033,16 @@
           paused = true;
           modalFreeze = false;
           ui.titleOverlay.classList.add("show");
+        } else if (shouldResume && canResumePlay()) {
+          paused = false;
         }
+        menuWasPaused = true;
+        setTimeout(() => {
+          if (ui.menu.classList.contains("open")) return;
+          ui.menu.classList.remove("closing");
+          ui.menuNav.innerHTML = "";
+          ui.menuContent.innerHTML = "";
+        }, 320);
       }
       function backToMainMenu() {
         openSection("hub");
@@ -15577,14 +16058,14 @@
             upgrades: "Upgrade Center",
             frigate: "Pioneer Base",
             cosmetics: "Cosmetic Hangar",
-            system: "System",
+            system: "Operations",
             echoes: "Orbital Echoes",
             codex: "Planet Codex",
             activity: "Captain Log",
             guide: "Pilot Manual",
             help: "Help / Glossary",
           }[activeMenu] || "Command Menu";
-        ui.menuNav.innerHTML = menuNavigationHtml();
+        ui.menuNav.innerHTML = "";
         (
           ({
             hub: renderHub,
@@ -15601,10 +16082,13 @@
             help: renderHelp,
           })[activeMenu] || renderHub
         )();
-        addMobileMenuFooter();
         hydrateSettingsControls();
         wireMenuButtons();
-        requestAnimationFrame(renderSkinPreviews);
+        ui.menuContent.classList.remove("menu-content-enter");
+        requestAnimationFrame(() => {
+          ui.menuContent.classList.add("menu-content-enter");
+          renderSkinPreviews();
+        });
       }
       function menuNavigationHtml() {
         const sections = [
@@ -15802,35 +16286,35 @@
               "resources",
               "◆",
               "Resources",
-              "Gather colony output and review your cargo.",
+              "Gather colony output and inspect cargo.",
               rs.resources,
             ],
             [
               "planets",
               "●",
-              "Planets",
-              "Target, inspect, capture, and develop worlds.",
+              "Worlds",
+              "Target, scan, capture, and develop planets.",
               rs.planets,
             ],
             [
               "upgrades",
               "▲",
-              "Upgrades",
-              "Improve your ship and selected worlds.",
+              "Ship & World Upgrades",
+              "Improve the Starling and captured worlds.",
               rs.upgrades,
             ],
             [
               "frigate",
               "▰",
               game.frigate?.built ? "Pioneer Base" : "Pioneer Project",
-              "Your mobile headquarters for fleet, upgrades, customization, and outward travel.",
+              "Crew, fleet, adventures, systems, and travel.",
               rs.frigate,
             ],
             [
               "cosmetics",
               "◇",
-              "Cosmetic Hangar",
-              "Preview and equip every owned starship and frigate hull.",
+              "Appearance",
+              "Preview and equip hull, fleet, and trail designs.",
               0,
             ],
           ],
@@ -15839,14 +16323,14 @@
               "echoes",
               "〰",
               "Echoes",
-              "Harvest and review saved slingshot routes.",
+              "Review saved slingshot routes.",
               rs.echoes,
             ],
             [
               "codex",
               "☉",
               "Codex",
-              "Archive of discovered planets and rarities.",
+              "Browse surveyed worlds and discoveries.",
               0,
             ],
           ],
@@ -15854,25 +16338,25 @@
             [
               "system",
               "◎",
-              "System",
-              "Daily Ops, Pilot Rank, events, save, settings, and star atlas.",
+              "Operations",
+              "Assignments, atlas, records, save, and settings.",
               rs.system,
             ],
             [
               "activity",
               "≡",
               "Captain Log",
-              "Review discoveries, upgrades, encounters, and travel history.",
+              "Review the journey so far.",
               0,
             ],
             [
               "guide",
               "△",
               "Pilot Manual",
-              "Tutorial guidance and system explanations.",
+              "Guidance for every major system.",
               0,
             ],
-            ["help", "?", "Help", "Controls, glossary, and how to play.", 0],
+            ["help", "?", "Glossary", "Quick definitions and gameplay help.", 0],
           ];
         const groupHtml = (title, items) =>
           '<div class="card"><h4>' +
@@ -15901,7 +16385,6 @@
           "</div></div>";
         ui.menuContent.innerHTML =
           guidedTutorialCard() +
-          pioneerCommandHubHtml() +
           '<div class="command-vista"><span class="command-kicker">Current Expedition</span><h4>' +
           esc(game.system?.name || "Uncharted System") +
           '</h4><p>' +
@@ -15919,9 +16402,9 @@
               "</span>",
             btn("Open " + menuLabel(nba.menu), "openSection", nba.menu),
           ) +
-          groupHtml("Core Commands", core) +
-          groupHtml("Exploration Records", explore) +
-          groupHtml("System & Help", support);
+          groupHtml("Flight & Development", core.slice(0, 3)) +
+          groupHtml("Pioneer & Exploration", core.slice(3).concat(explore)) +
+          groupHtml("Records & Help", support);
       }
       function menuLabel(k) {
         return (
@@ -15931,7 +16414,7 @@
             upgrades: "Upgrades",
             frigate: game.frigate?.built ? "Pioneer Base" : "Pioneer Project",
             cosmetics: "Cosmetic Hangar",
-            system: "System",
+            system: "Operations & Records",
             echoes: "Echoes",
             codex: "Codex",
             activity: "Captain Log",
@@ -16422,9 +16905,10 @@
               "Planet Development",
               "Develop captured worlds, improve passive production, and create factory planets for major upgrades.",
               '<div class="chip">Capture Network: ' +
-                game.captured.size +
+                captureCapacityUsed() +
                 " / " +
                 captureLimit() +
+                " frontier worlds • Earth protected" +
                 '</div><div class="chip">Planet: ' +
                 esc(sel?.name || "None") +
                 '</div><div class="chip">Production: ' +
@@ -17213,7 +17697,7 @@
             upgradeReady,
             actionReason("frigateUpgrade", "vault"),
           ) +
-          btn("Open Collections", "openSection", "log") +
+          btn("Open Collections", "openSection", "codex") +
           "</div></div>" +
           card(
             "Rare Hull Project: Astral Archaeologist",
@@ -17256,28 +17740,21 @@
       }
       function renderFrigate() {
         refreshSkins(false);
-        if (game.frigate.built && !orbitingFrigate()) {
-          ui.menuContent.innerHTML = card(
-            "Pioneer Docking Required",
-            "Sensitive base systems require a physical link. Use the mini-map to find your headquarters, fly close, then tap LOCK. Fleet status remains visible from Pioneer Command.",
-            btn("Set Frigate Target", "setFrigateTarget") +
-              btn("Open Cosmetic Hangar", "openSection", "cosmetics") +
-              btn("Back to Menu", "openSection", "hub"),
-          );
-          return;
-        }
         if (!game.frigate.built) {
           const cost = buildCost(),
+            reserveReady = pioneerConstructionReserveAvailable(),
             ready =
               game.system.isTutorial &&
               game.missionStage >= 4 &&
               hasFactoryAccess() &&
-              canAfford(cost);
+              (canAfford(cost) || reserveReady);
           ui.menuContent.innerHTML = card(
             "Frigate Project: ODF Pioneer",
             "Build the mobile headquarters that will anchor every future expedition at Earth Factory. " +
               costHtml(cost) +
-              missingHints(cost),
+              (reserveReady
+                ? '<div class="upgrade-impact"><b>Earth Factory construction reserve</b><span>Your tutorial progress is protected. Earth will supply any missing Pioneer materials when you build.</span></div>'
+                : missingHints(cost)),
             btnWhy(
               "Build ODF Pioneer",
               "buildFrigate",
@@ -17315,40 +17792,40 @@
               canAfford(crewUpgradeCost(member.id)),
           ).length;
         const tabs = tabBar("frigate", [
-          { key: "overview", label: "Overview" },
-          { key: "expeditions", label: "Expeditions", count: expeditionCount || "" },
+          { key: "overview", label: "Command" },
+          { key: "expeditions", label: "Adventures", count: expeditionCount || "" },
           { key: "crew", label: "Crew", count: crewTraining || "" },
           { key: "fleet", label: "Fleet", count: readyFleet || "" },
           { key: "vault", label: "Vault", count: vaultPendingEntries().length || "" },
-          { key: "upgrades", label: "Upgrades", count: readyUpgrades || "" },
-          { key: "cosmetics", label: "Cosmetics" },
-        ]);
-        const overview = card(
-          game.frigate.name,
-          'Your persistent home among the stars: sector-travel platform, supply network, customization bay, and fleet command center.<div class="grid"><div class="chip">Base Level: ' +
-            game.frigate.level +
-            '</div><div class="chip">Capture Capacity: ' +
-            captureLimit() +
-            '</div><div class="chip">Reactor: Lv. ' +
-            (game.frigate.reactorLevel || 0) +
-            '</div><div class="chip">Scanner: Lv. ' +
-            (game.frigate.scannerLevel || 0) +
-            '</div><div class="chip">Vault: ' +
-            vaultSecuredEntries().length +
-            " / " +
-            vaultCapacity() +
-            '</div><div class="chip">Fleet Ships: ' +
-            (game.fleet?.ships?.length || 0) +
-            " / " +
-            fleetLimit() +
-            '</div><div class="chip">Fleet Missions: ' +
-            (game.fleet?.missions?.length || 0) +
-            " / " +
-            activeMissionLimit() +
-            '</div></div><div class="actions"><input id="frigateNameInput" maxlength="24" value="' +
-            esc(game.frigate.name) +
-            '"><button type="button" data-action="renameFrigate" data-arg="">Rename</button></div>',
-        );
+          { key: "upgrades", label: "Systems", count: readyUpgrades || "" },
+          { key: "cosmetics", label: "Appearance" },
+        ]).replace('class="section-tabs"', 'class="section-tabs frigate-deck-tabs"');
+        const overview =
+          '<div class="card pioneer-hero"><div class="section-focus-title"><div><span class="command-kicker">Mobile Headquarters</span><h4>' +
+          esc(game.frigate.name) +
+          '</h4></div><span class="tag rarity-unusual">' +
+          (orbitingFrigate() ? "Docked" : "Remote Link") +
+          '</span></div><p>Command the expedition, refuel the Starling, deploy escorts, and prepare the next jump from one base.</p><div class="pioneer-hero-grid"><div><div class="grid"><div class="chip"><b>Base</b><br>Lv. ' +
+          game.frigate.level +
+          '</div><div class="chip"><b>Frontier Slots</b><br>' +
+          captureLimit() +
+          '</div><div class="chip"><b>Vault</b><br>' +
+          vaultSecuredEntries().length +
+          " / " +
+          vaultCapacity() +
+          '</div><div class="chip"><b>Escort Wing</b><br>' +
+          (game.fleet?.ships?.length || 0) +
+          " / " +
+          fleetLimit() +
+          '</div></div><div class="actions"><input id="frigateNameInput" maxlength="24" aria-label="Frigate name" value="' +
+          esc(game.frigate.name) +
+          '"><button type="button" data-action="renameFrigate" data-arg="">Rename Base</button></div></div>' +
+          cosmeticPreviewHtml(
+            "frigate",
+            game.frigate.skin,
+            "Current Pioneer configuration",
+          ) +
+          '</div></div>';
         const upgradeRows = [
           "capacity",
           "reactor",
@@ -17390,13 +17867,18 @@
             );
           })
           .join("");
+        const accessLabel = orbitingFrigate()
+          ? "Docked aboard Pioneer"
+          : "Remote command link";
         let html =
           tabIntro(
-            "Pioneer Command Deck",
-            "Your main base of operations is divided into focused decks for command status, living fleet operations, base upgrades, and matching hull designs.",
-            '<div class="chip">Orbit Access: Locked</div><div class="chip">Ready Fleet Rewards: ' +
+            "Pioneer Base",
+            "Choose a deck below. Every expedition, escort, crew assignment, discovery, and base system stays organized here.",
+            '<div class="chip">Access: ' +
+              accessLabel +
+              '</div><div class="chip">Fleet Rewards: ' +
               readyFleet +
-              '</div><div class="chip">Ready Upgrades: ' +
+              '</div><div class="chip">System Upgrades: ' +
               readyUpgrades +
               "</div>",
           ) + tabs;
@@ -17418,17 +17900,13 @@
         else if (tab === "cosmetics")
           html +=
             storeHtml() +
-            card(
-              "Fleet Escort Designs",
-              "Unlock and equip cosmetic designs for your fleet escorts.",
-              fleetSkinsHtml(),
-            );
+            fleetSkinsHtml();
         else
           html +=
             overview +
             card(
-              "Quick Actions",
-              "Jump into the most common frigate actions without scrolling through the whole base.",
+              "Command Shortcuts",
+              "The controls used most often while preparing a flight.",
               '<div class="actions">' +
                 btn(
                   game.ship.fuel < game.ship.maxFuel * 0.94 ? "Refuel Starling" : "Fuel Tanks Full",
@@ -17437,18 +17915,11 @@
                   game.ship.fuel < game.ship.maxFuel * 0.94,
                 ) +
                 btn("Jump Outward", "jumpSystem") +
-                btn(
-                  "Random Charted Sector",
-                  "jumpRandomSystem",
-                  null,
-                  chartedJumpCandidates().length > 0,
-                ) +
                 btn("Fleet Operations", "setMenuTab", "frigate|fleet") +
-                btn("Expedition Board", "setMenuTab", "frigate|expeditions") +
-                btn("Pioneer Crew", "setMenuTab", "frigate|crew") +
-                btn("Pioneer Vault", "setMenuTab", "frigate|vault") +
-                btn("Base Upgrades", "setMenuTab", "frigate|upgrades") +
-                btn("Cosmetic Store", "setMenuTab", "frigate|cosmetics") +
+                btn("Adventure Board", "setMenuTab", "frigate|expeditions") +
+                (!orbitingFrigate()
+                  ? btn("Set Pioneer Target", "setFrigateTarget")
+                  : "") +
                 "</div>",
             );
         ui.menuContent.innerHTML = html;
@@ -17470,8 +17941,12 @@
         refreshSkins(false);
         const ship = activeShipSkin(),
           frigate = activeFrigateSkin(),
-          owned = game.ownedShipSkins.size + game.ownedFrigateSkins.size,
-          total = shipSkins.length + frigateSkins.length;
+          trail = activeTrailSkin(),
+          owned =
+            game.ownedShipSkins.size +
+            game.ownedFrigateSkins.size +
+            game.ownedTrailSkins.size,
+          total = shipSkins.length + frigateSkins.length + trailSkins.length;
         ui.menuContent.innerHTML =
           tabIntro(
             "Cosmetic Hangar",
@@ -17484,6 +17959,8 @@
               esc(ship.key) +
               '</div><div class="chip">Active Frigate: ' +
               esc(frigate.key) +
+              '</div><div class="chip">Active Trail: ' +
+              esc(trail.key) +
               "</div>",
           ) +
           '<div class="cosmetic-loadout"><div class="cosmetic-slot"><b>' +
@@ -17498,13 +17975,13 @@
           esc(frigate.key) +
           "</b>" +
           cosmeticPreviewHtml("frigate", frigate.key, "Equipped frigate") +
+          '</div><div class="cosmetic-slot"><b>Engine Trail • ' +
+          esc(trail.key) +
+          "</b>" +
+          cosmeticPreviewHtml("trail", trail.key, "Equipped starship trail") +
           "</div></div>" +
           storeHtml() +
-          card(
-            "Fleet Escort Designs",
-            "Fleet escort skins remain managed here alongside the two primary hulls.",
-            fleetSkinsHtml(),
-          );
+          fleetSkinsHtml();
       }
       function storeHtml() {
         const nativeStore = !!game.monetization?.storeKitReady,
@@ -17545,6 +18022,8 @@
             .join("") +
           '</div></div><div class="card"><h4>Starship Skins</h4><p>Designs for the Starling command ship.</p><div class="grid">' +
           shipSkins.map((s) => skinHtml(s, "ship")).join("") +
+          '</div></div><div class="card"><h4>Starship Trail Designs</h4><p>Equip a separate light trail behind the Starling. Trails are cosmetic and never alter handling.</p><div class="grid">' +
+          trailSkins.map(trailSkinHtml).join("") +
           '</div></div><div class="card"><h4>Frigate Skins</h4><p>Capital hulls for the ODF Pioneer.</p><div class="grid">' +
           frigateSkins.map((s) => skinHtml(s, "frigate")).join("") +
           "</div></div>"
@@ -17556,7 +18035,9 @@
             kind === "ship"
               ? game.frigate.shipSkin === s.key
               : game.frigate.skin === s.key,
-          stateClass = active ? " equipped" : own ? " owned" : " locked";
+          stateClass =
+            (active ? " equipped" : own ? " owned" : " locked") +
+            (["paid", "paidCombo"].includes(s.type) ? " premium" : "");
         let action = own
           ? btn(
               active ? "Equipped" : "Equip",
@@ -17602,7 +18083,9 @@
           cosmeticPreviewHtml(kind, s.key, active ? "Equipped" : own ? "Owned" : "Preview") +
           "<span>" +
           esc(s.desc) +
-          '</span><span class="tag rarity-unusual">' +
+          '</span><span class="tag ' +
+          cosmeticRarityClass(s.rarity) +
+          '">' +
           esc(s.rarity || "Unusual") +
           '</span><span class="tag">' +
           (own
@@ -17619,6 +18102,59 @@
           "</div></div>"
         );
       }
+      function cosmeticRarityClass(rarity = "Unusual") {
+        return "rarity-" + String(rarity).toLowerCase().replace(/[^a-z]/g, "");
+      }
+      function trailSkinHtml(s) {
+        const own = ownsTrailSkin(s.key),
+          active = game.frigate.trailSkin === s.key,
+          premium = s.type === "paid" ? " premium" : "",
+          progress =
+            s.key === "Echo Lattice"
+              ? Math.min(25, game.echoStats?.created || 0) + " / 25 Echoes"
+              : s.key === "Spirit Aurora"
+                ? "Reach a Cosmic Spirit system"
+                : s.key === "Parallel Fracture"
+                  ? "Enter a Parallel system"
+                  : "Exploration achievement";
+        const action = own
+          ? btn(active ? "Equipped" : "Equip Trail", "setTrailSkin", s.key, !active)
+          : s.type === "achievement"
+            ? btn(progress, "noop", null, false)
+            : btn(
+                game.monetization?.storeKitReady
+                  ? "Unlock $" + s.price
+                  : "Claim Web Edition Design",
+                "buyTrailSkin",
+                s.key,
+              );
+        return (
+          '<div class="cosmetic-card' +
+          (active ? " equipped" : own ? " owned" : " locked") +
+          premium +
+          '"><b>' +
+          esc(s.key) +
+          "</b>" +
+          cosmeticPreviewHtml("trail", s.key, active ? "Equipped" : own ? "Owned" : "Preview") +
+          "<span>" +
+          esc(s.desc) +
+          '</span><span class="tag ' +
+          cosmeticRarityClass(s.rarity) +
+          '">' +
+          esc(s.rarity) +
+          '</span><span class="tag">' +
+          (own
+            ? "Owned"
+            : s.type === "achievement"
+              ? "Achievement"
+              : game.monetization?.storeKitReady
+                ? "$" + s.price
+                : "Web Edition") +
+          '</span><div class="actions">' +
+          action +
+          "</div></div>"
+        );
+      }
       function renderSkinPreviews() {
         if (!ui.menu?.classList.contains("open")) return;
         ui.menuContent
@@ -17627,7 +18163,10 @@
             const kind = canvas.dataset.skinKind,
               key = canvas.dataset.skinKey,
               skin =
-                kind === "fleet"
+                kind === "trail"
+                  ? trailSkins.find((item) => item.key === key) ||
+                    activeTrailSkin()
+                  : kind === "fleet"
                   ? fleetSkinForKey(key)
                   : (kind === "ship" ? shipSkins : frigateSkins).find(
                         (item) => item.key === key,
@@ -17667,7 +18206,11 @@
               c.fillRect(x, y, size, size);
             }
             c.save();
-            c.translate(width * 0.52, height * 0.48);
+            if (kind === "trail") {
+              drawTrailPreview(c, width, height, skin);
+            } else {
+              c.translate(width * 0.52, height * 0.48);
+            }
             if (kind === "ship") {
               c.rotate(-0.08);
               drawShipVisual(
@@ -17682,19 +18225,34 @@
                 Math.min(width / 470, height / 235),
                 skin,
               );
-            } else {
-              const previewShips = ["scout", "miner", "probe"];
+            } else if (kind === "fleet") {
+              c.save();
+              c.globalAlpha = 0.42;
+              drawFrigateVisual(
+                c,
+                Math.min(width / 760, height / 370),
+                activeFrigateSkin(),
+              );
+              c.restore();
+              const previewShips = ["scout", "miner", "tender", "probe", "warden"];
               previewShips.forEach((type, index) => {
+                const lanes = [
+                  [-0.3, -0.31],
+                  [-0.28, 0.33],
+                  [-0.05, -0.4],
+                  [-0.02, 0.42],
+                  [0.22, 0.03],
+                ];
                 c.save();
-                c.translate((index - 1) * width * 0.2, (index % 2) * 25 - 11);
-                c.rotate(index === 1 ? 0 : index ? -0.05 : 0.05);
-                drawFleetEngineTrail(c, 1.34, skin, 0.34 + index * 0.08);
+                c.translate(lanes[index][0] * width, lanes[index][1] * height);
+                c.rotate(index % 2 ? -0.035 : 0.035);
+                drawFleetEngineTrail(c, 1.46, skin, 0.42 + index * 0.05);
                 drawFleetShipVisual(
                   c,
-                  1.34,
+                  1.46,
                   { type, level: 2 },
                   skin,
-                  0.34 + index * 0.08,
+                  0.42 + index * 0.05,
                 );
                 c.restore();
               });
@@ -17707,6 +18265,59 @@
             c.fillStyle = shade;
             c.fillRect(0, 0, width, height);
           });
+      }
+      function drawTrailPreview(c, width, height, skin) {
+        const colors = [skin.primary, skin.accent, skin.glow],
+          tier = skin.visualTier || 1,
+          strands = Math.min(5, 1 + tier),
+          startX = width * 0.08,
+          endX = width * 0.77,
+          centerY = height * 0.53;
+        c.save();
+        c.globalCompositeOperation = "screen";
+        for (let strand = 0; strand < strands; strand++) {
+          const offset = (strand - (strands - 1) / 2) * (4 + tier),
+            color = colors[strand % colors.length] || "#7dd3fc",
+            grad = c.createLinearGradient(startX, 0, endX, 0);
+          grad.addColorStop(0, "rgba(0,0,0,0)");
+          grad.addColorStop(0.28, rgba(color, 0.18 + tier * 0.04));
+          grad.addColorStop(1, rgba(color, 0.82));
+          c.beginPath();
+          c.moveTo(startX, centerY + offset);
+          c.bezierCurveTo(
+            width * 0.28,
+            centerY + offset + Math.sin(strand + 1) * 18,
+            width * 0.5,
+            centerY + offset - Math.cos(strand + 2) * 13,
+            endX,
+            centerY + offset * 0.35,
+          );
+          c.strokeStyle = grad;
+          c.lineWidth = Math.max(1.4, 1.2 + tier * 0.7 - strand * 0.08);
+          c.shadowColor = color;
+          c.shadowBlur = 6 + tier * 4;
+          if (skin.motif === "echo") c.setLineDash([8, 7]);
+          c.stroke();
+          c.setLineDash([]);
+        }
+        if (tier >= 3) {
+          for (let i = 0; i < 16; i++) {
+            const q = i / 16,
+              x = startX + (endX - startX) * q,
+              y = centerY + Math.sin(i * 1.7) * (8 + tier * 2);
+            c.fillStyle = rgba(colors[i % colors.length], 0.35 + q * 0.45);
+            c.beginPath();
+            c.arc(x, y, 1 + (i % 3) * 0.55, 0, TAU);
+            c.fill();
+          }
+        }
+        c.shadowBlur = 0;
+        c.restore();
+        c.save();
+        c.translate(width * 0.79, centerY);
+        c.rotate(-0.05);
+        drawShipVisual(c, Math.min(width / 240, height / 120), activeShipSkin(), true);
+        c.restore();
       }
       function setFrigateTarget() {
         const f = frigatePosition();
@@ -19393,7 +20004,8 @@
         ui.nearest.textContent = n.body
           ? n.body.name + " " + Math.max(0, Math.round(n.d)) + " km"
           : "None";
-        ui.captured.textContent = game.captured.size + " / " + captureLimit();
+        ui.captured.textContent =
+          captureCapacityUsed() + " / " + captureLimit() + " + Earth";
         const controlsVisible = !!(
           !titleOpen &&
           !modalFreeze &&
@@ -19588,6 +20200,7 @@
           ((i + 1) / onboardingSteps.length) * 100 + "%";
         ui.nextOnboard.textContent =
           i >= onboardingSteps.length - 1 ? "Start" : "Next";
+        ui.onboardingOverlay.classList.remove("closing");
         ui.onboardingOverlay.classList.add("show");
       }
       function nextOnboarding() {
@@ -19604,8 +20217,8 @@
       function dismissOnboarding() {
         onboardingDismissed = true;
         tutorialDismissed = true;
-        ui.onboardingOverlay.classList.remove("show");
-        ui.tutorialOverlay.classList.remove("show");
+        hideOverlayWithTransition(ui.onboardingOverlay);
+        hideOverlayWithTransition(ui.tutorialOverlay);
         modalFreeze = false;
         setHudCollapsed(true);
         if (canResumePlay()) paused = false;
@@ -19620,6 +20233,7 @@
         ui.tutorialText.textContent = tutorials[i][1];
         ui.nextTip.textContent =
           i >= tutorials.length - 1 ? "Start Flying" : "Next";
+        ui.tutorialOverlay.classList.remove("closing");
         ui.tutorialOverlay.classList.add("show");
       }
       function nextTip() {
@@ -19629,7 +20243,7 @@
       }
       function dismissTips() {
         tutorialDismissed = true;
-        ui.tutorialOverlay.classList.remove("show");
+        hideOverlayWithTransition(ui.tutorialOverlay);
         modalFreeze = false;
         if (canResumePlay()) paused = false;
         saveGame(false);
@@ -19637,9 +20251,8 @@
       function showDiscovery(b, reward = null) {
         if (!b || b.type === "star") return;
         activeDiscoveryBody = b;
-        paused = true;
-        modalFreeze = true;
         keys.clear();
+        touch.active = false;
         const rar = rarityInfo(b),
           actual = reward || b.lastDiscoveryReward || discoveryReward(b);
         ui.discoveryTitle.textContent =
@@ -19701,13 +20314,18 @@
               ? "Capture " + b.name
               : "Target " + b.name + " for Capture";
         }
-        ui.discoveryOverlay.classList.add("show");
+        beginCinematicPause(ui.discoveryOverlay);
       }
       function closeDiscoveryPanel() {
-        ui.discoveryOverlay.classList.remove("show");
+        hideOverlayWithTransition(ui.discoveryOverlay);
         activeDiscoveryBody = null;
+        cinematicPausePending = false;
+        cinematicTargetScale = 1;
         modalFreeze = false;
-        if (canResumePlay()) paused = false;
+        if (canResumePlay()) {
+          paused = false;
+          cinematicTimeScale = Math.max(0.08, cinematicTimeScale);
+        }
       }
       function captureDiscoveryWorld() {
         const b = activeDiscoveryBody;
@@ -19752,11 +20370,12 @@
         pendingConfirm = onOk;
         ui.confirmTitle.textContent = title;
         ui.confirmText.textContent = text;
+        ui.confirmOverlay.classList.remove("closing");
         ui.confirmOverlay.classList.add("show");
       }
       function closeConfirm() {
         pendingConfirm = null;
-        ui.confirmOverlay.classList.remove("show");
+        hideOverlayWithTransition(ui.confirmOverlay);
         modalFreeze = false;
         if (canResumePlay()) paused = false;
       }
@@ -19771,6 +20390,7 @@
         return (
           !titleOpen &&
           !titleMenuMode &&
+          !ui.menu.classList.contains("open") &&
           !ui.pauseOverlay.classList.contains("show") &&
           !ui.onboardingOverlay.classList.contains("show") &&
           !ui.tutorialOverlay.classList.contains("show") &&
@@ -19794,6 +20414,29 @@
           ui.upgradeOverlay,
         ].some((overlay) => overlay?.classList.contains("show"));
       }
+      function hideOverlayWithTransition(overlay) {
+        if (!overlay) return;
+        overlay.classList.add("closing");
+        overlay.classList.remove("show");
+        setTimeout(() => overlay.classList.remove("closing"), 520);
+      }
+      function beginCinematicPause(overlay) {
+        const canEase = !paused && !titleOpen && !modalFreeze;
+        overlay?.classList.remove("closing");
+        overlay?.classList.add("show");
+        if (!canEase) {
+          paused = true;
+          modalFreeze = true;
+          cinematicTimeScale = 0;
+          cinematicTargetScale = 0;
+          cinematicPausePending = false;
+          return;
+        }
+        cinematicTargetScale = 0;
+        cinematicPausePending = true;
+        modalFreeze = false;
+        paused = false;
+      }
       function settleOverlayPause() {
         modalFreeze = gameplayModalOpen();
         if (
@@ -19808,12 +20451,12 @@
         }
       }
       function closeUpgradePanel() {
-        ui.upgradeOverlay.classList.remove("show");
+        hideOverlayWithTransition(ui.upgradeOverlay);
         delete ui.upgradeOverlay.dataset.token;
         settleOverlayPause();
       }
       function closeMissionPanel() {
-        ui.missionOverlay.classList.remove("show");
+        hideOverlayWithTransition(ui.missionOverlay);
         settleOverlayPause();
       }
       function showUpgradePanel(title, summary, rows = []) {
@@ -19828,6 +20471,7 @@
               '<div class="chip"><b>' + esc(k) + "</b><br>" + esc(v) + "</div>",
           )
           .join("");
+        ui.upgradeOverlay.classList.remove("closing");
         ui.upgradeOverlay.classList.add("show");
         const token = Date.now();
         ui.upgradeOverlay.dataset.token = String(token);
@@ -19852,6 +20496,7 @@
               '<div class="chip"><b>' + esc(k) + "</b><br>" + esc(v) + "</div>",
           )
           .join("");
+        ui.missionOverlay.classList.remove("closing");
         ui.missionOverlay.classList.add("show");
       }
       function resize() {
@@ -21490,6 +22135,27 @@
         const skin = fleetSkin(),
           count = Math.min(6, game.fleet.ships.length),
           now = Date.now();
+        c.save();
+        c.globalCompositeOperation = "screen";
+        c.strokeStyle = rgba(skin.glow || skin.accent, 0.075);
+        c.lineWidth = Math.max(0.55, zoom * 0.7);
+        c.setLineDash([3 * zoom, 9 * zoom]);
+        for (let i = 0; i < count; i++) {
+          const ship = game.fleet.ships[i];
+          if (["mission", "launching"].includes(ship.status)) continue;
+          const slot = fleetFormationSlot(i);
+          c.beginPath();
+          c.moveTo(-94 * zoom, Math.sign(slot.y || 1) * 38 * zoom);
+          c.quadraticCurveTo(
+            slot.x * 0.48 * zoom,
+            slot.y * 0.72 * zoom,
+            slot.x * zoom,
+            slot.y * zoom,
+          );
+          c.stroke();
+        }
+        c.setLineDash([]);
+        c.restore();
         for (let i = 0; i < count; i++) {
           const ship = game.fleet.ships[i],
             slot = fleetFormationSlot(i),
@@ -21499,13 +22165,14 @@
               game.settings?.motion === "Reduced"
                 ? 0
                 : Math.sin(t * 0.024 + i * 1.7) * 5,
-            scale = (0.66 + 0.025 * (ship.level || 1)) * zoom;
+            scale = (0.78 + 0.03 * (ship.level || 1)) * zoom,
+            cruisingThrust = motion.thrust + (pioneerRescue ? 0.34 : 0);
           c.save();
           c.globalAlpha = motion.alpha;
           c.translate(motion.x * zoom, (motion.y + bob) * zoom);
           c.rotate(motion.angle);
-          drawFleetEngineTrail(c, scale, skin, motion.thrust);
-          drawFleetShipVisual(c, scale, ship, skin, motion.thrust);
+          drawFleetEngineTrail(c, scale, skin, cruisingThrust);
+          drawFleetShipVisual(c, scale, ship, skin, cruisingThrust);
           if (ship.status === "ready") {
             c.globalCompositeOperation = "screen";
             c.strokeStyle = rgba("#86efac", 0.34 + Math.sin(t * 0.05) * 0.08);
@@ -21522,13 +22189,13 @@
       function fleetFormationSlot(index) {
         return (
           [
-            { x: -78, y: -255 },
-            { x: -78, y: 255 },
-            { x: -270, y: -220 },
-            { x: -270, y: 220 },
-            { x: -390, y: -92 },
-            { x: -390, y: 92 },
-          ][index % 6] || { x: -390, y: 0 }
+            { x: -42, y: -230 },
+            { x: -42, y: 230 },
+            { x: -225, y: -158 },
+            { x: -225, y: 158 },
+            { x: -350, y: -76 },
+            { x: -350, y: 76 },
+          ][index % 6] || { x: -350, y: 0 }
         );
       }
       function fleetEscortMotion(ship, slot, now = Date.now()) {
@@ -21565,11 +22232,18 @@
             thrust: 1.35 - q * 0.85,
           };
         }
-        return { x: slot.x, y: slot.y, angle: 0, alpha: 1, thrust: 0.24 };
+        const cruise = game.settings?.motion === "Reduced" ? 0 : now * 0.0012;
+        return {
+          x: slot.x + Math.sin(cruise + slot.y * 0.01) * 9,
+          y: slot.y + Math.cos(cruise * 0.82 + slot.x * 0.01) * 7,
+          angle: Math.sin(cruise * 0.7 + slot.y) * 0.026,
+          alpha: 1,
+          thrust: 0.34,
+        };
       }
       function drawFleetEngineTrail(c, scale, skin, thrust = 0.25) {
         const glow = skin.glow || skin.accent || "#7dd3fc",
-          length = (20 + 32 * thrust) * scale,
+          length = (28 + 46 * thrust) * scale,
           trail = c.createLinearGradient(-26 * scale - length, 0, -22 * scale, 0);
         trail.addColorStop(0, "rgba(0,0,0,0)");
         trail.addColorStop(0.58, rgba(glow, 0.16 + thrust * 0.12));
@@ -22712,39 +23386,87 @@
         }
         c.restore();
       }
+      function drawStarshipTrail(c, ship, trailSkin, hullSkin) {
+        const points = ship.trail.slice(-260);
+        if (points.length < 3) return;
+        const tier = trailSkin.visualTier || 1,
+          motif = trailSkin.motif || "ion",
+          strands = Math.min(5, 1 + tier),
+          colors = [
+            trailSkin.primary || hullSkin.glow,
+            trailSkin.accent || hullSkin.accent,
+            trailSkin.glow || hullSkin.glow,
+          ];
+        c.save();
+        c.globalCompositeOperation = "screen";
+        for (let strand = 0; strand < strands; strand++) {
+          const color = colors[strand % colors.length],
+            offset = (strand - (strands - 1) / 2) * (1.8 + tier * 0.75);
+          c.beginPath();
+          points.forEach((point, index) => {
+            const p = screen(point.x, point.y),
+              wave =
+                motif === "parallel"
+                  ? (index % 7 < 3 ? -1 : 1) * offset
+                  : Math.sin(index * 0.16 + strand * 1.8) * offset,
+              x = p.x,
+              y = p.y + wave;
+            if (index) c.lineTo(x, y);
+            else c.moveTo(x, y);
+          });
+          c.strokeStyle = rgba(color, 0.18 + tier * 0.105);
+          c.lineWidth = Math.max(1.1, 1.25 + tier * 0.58 - strand * 0.08);
+          c.lineCap = "round";
+          c.lineJoin = "round";
+          c.shadowColor = color;
+          c.shadowBlur = 4 + tier * 3;
+          if (motif === "echo") c.setLineDash([7, 6]);
+          c.stroke();
+          c.setLineDash([]);
+        }
+        if (tier >= 3) {
+          const step = motif === "relic" ? 8 : 12;
+          for (let i = 4; i < points.length; i += step) {
+            const p = screen(points[i].x, points[i].y),
+              color = colors[i % colors.length],
+              size = 1.1 + ((i / step) % 3) * 0.45;
+            c.fillStyle = rgba(color, 0.34 + (points[i].a || 0) * 0.34);
+            c.save();
+            c.translate(p.x, p.y);
+            c.rotate(i * 0.31);
+            if (motif === "relic" || motif === "parallel")
+              c.fillRect(-size, -size, size * 2, size * 2);
+            else {
+              c.beginPath();
+              c.arc(0, 0, size, 0, TAU);
+              c.fill();
+            }
+            c.restore();
+          }
+        }
+        const driftPoints = points.filter((point) => point.drift);
+        if (driftPoints.length > 2) {
+          c.beginPath();
+          driftPoints.forEach((point, index) => {
+            const p = screen(point.x, point.y);
+            if (index) c.lineTo(p.x, p.y);
+            else c.moveTo(p.x, p.y);
+          });
+          c.strokeStyle = rgba(trailSkin.accent || hullSkin.accent, 0.68);
+          c.lineWidth = 2.4 + tier * 0.5;
+          c.shadowColor = trailSkin.glow || hullSkin.glow;
+          c.shadowBlur = 10 + tier * 2;
+          c.stroke();
+        }
+        c.restore();
+      }
       function drawShip() {
         const s = game.ship,
           p = screen(s.x, s.y),
-          skin = activeShipSkin();
+          skin = activeShipSkin(),
+          trailSkin = activeTrailSkin();
         ctx.save();
-        if (s.trail.length > 2) {
-          ctx.beginPath();
-          s.trail.forEach((q, i) => {
-            const tp = screen(q.x, q.y);
-            if (i) ctx.lineTo(tp.x, tp.y);
-            else ctx.moveTo(tp.x, tp.y);
-          });
-          ctx.strokeStyle = rgba(skin.glow || skin.accent, 0.28);
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          const driftTrail = s.trail.filter((q) => q.drift);
-          if (driftTrail.length > 2) {
-            ctx.save();
-            ctx.globalCompositeOperation = "screen";
-            ctx.beginPath();
-            driftTrail.forEach((q, i) => {
-              const tp = screen(q.x, q.y);
-              if (i) ctx.lineTo(tp.x, tp.y);
-              else ctx.moveTo(tp.x, tp.y);
-            });
-            ctx.strokeStyle = rgba(skin.accent || "#7dd3fc", 0.5);
-            ctx.shadowColor = skin.glow || skin.accent;
-            ctx.shadowBlur = 10;
-            ctx.lineWidth = 3.2;
-            ctx.stroke();
-            ctx.restore();
-          }
-        }
+        drawStarshipTrail(ctx, s, trailSkin, skin);
         ctx.translate(p.x, p.y);
         ctx.rotate(s.angle);
         const sc = Math.max(0.34, zoom * SHIP_VISUAL_SCALE);
@@ -25659,12 +26381,33 @@
         );
         ctx.restore();
       }
+      function updateCinematicTimeScale(frameUnits = 1) {
+        const dilationEase = 1 - Math.pow(0.72, Math.max(0.05, frameUnits));
+        cinematicTimeScale +=
+          (cinematicTargetScale - cinematicTimeScale) * dilationEase;
+        if (cinematicPausePending && cinematicTimeScale <= 0.035) {
+          cinematicTimeScale = 0;
+          cinematicPausePending = false;
+          paused = true;
+          modalFreeze = true;
+        } else if (
+          !cinematicPausePending &&
+          cinematicTargetScale === 1 &&
+          cinematicTimeScale >= 0.995
+        ) {
+          cinematicTimeScale = 1;
+        }
+        return cinematicTimeScale;
+      }
       function loop(now) {
         lastFrameMs = now - (loop.last || now);
         if (lastFrameMs > 80) lastFrameMs = 80;
         fps = fps * 0.92 + (lastFrameMs ? 1000 / lastFrameMs : 60) * 0.08;
         performanceGuard(lastFrameMs);
-        const dt = Math.min(2, (lastFrameMs / 16.67) * TIME_SCALE);
+        const frameUnits = Math.max(0.05, lastFrameMs / 16.67);
+        updateCinematicTimeScale(frameUnits);
+        const dt =
+          Math.min(2, frameUnits * TIME_SCALE) * cinematicTimeScale;
         loop.last = now;
         if (!paused && !titleOpen && !modalFreeze) {
           t += dt;
@@ -25765,7 +26508,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.22.1" &&
+            APP_VERSION === "0.23.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -25781,7 +26524,8 @@
           "Save state contains fleet and cosmetics",
           !!serialized.fleet &&
             Array.isArray(serialized.ownedShipSkins) &&
-            Array.isArray(serialized.ownedFrigateSkins),
+            Array.isArray(serialized.ownedFrigateSkins) &&
+            Array.isArray(serialized.ownedTrailSkins),
         );
         ok(
           "Save state contains ice-world unlock",
@@ -26395,6 +27139,10 @@
             game.ownedFrigateSkins?.add("Abyss");
           if (p.productId === "orbitaldrift.fleet.solarconvoy")
             game.ownedFleetSkins?.add("Solar Convoy");
+          if (p.productId === "orbitaldrift.trail.solarribbon")
+            game.ownedTrailSkins?.add("Solar Ribbon");
+          if (p.productId === "orbitaldrift.trail.relicember")
+            game.ownedTrailSkins?.add("Relic Ember");
           if (p.productId === "orbitaldrift.combo.ancienthunter") {
             game.ownedShipSkins?.add("Ancient Hunter");
             game.ownedFrigateSkins?.add("Ancient Hunter");
@@ -26695,6 +27443,8 @@
         buySkinKind,
         setShipSkin,
         setFrigateSkin,
+        buyTrailSkin,
+        setTrailSkin,
         upgradeFrigate,
         secureVaultEntry,
         upgradePlanet,
@@ -26773,8 +27523,7 @@
         if (k === "escape") {
           if (ui.encounterOverlay.classList.contains("show")) {
             e.preventDefault();
-            if (game.sectorEvent?.complete) closeExplorationEncounter();
-            else toast("Choose a response before leaving the encounter.");
+            closeExplorationEncounter();
             return;
           }
           paused ? closePause() : openPause();
@@ -26798,8 +27547,8 @@
         if (game.settings?.controlLayout === "Move Controls")
           exitControlEditMode();
         layoutDrag = null;
-        paused = true;
         closeMenu();
+        paused = true;
         cleanControlButtons();
         document.body.classList.add("pause-open");
         ui.pauseOverlay.classList.add("show");
@@ -27023,6 +27772,7 @@
           },
         );
       ui.pauseBtn.onclick = openPause;
+      if (ui.menuScrim) ui.menuScrim.onclick = closeMenu;
       ui.hudToggle.onclick = () =>
         setHudCollapsed(!ui.hud.classList.contains("collapsed"));
       ui.menuLauncher.onclick = () => openMenu("hub");
@@ -27059,6 +27809,30 @@
       });
       ui.upgradeContinue.onclick = closeUpgradePanel;
       ui.missionContinue.onclick = closeMissionPanel;
+      ui.upgradeOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button, input, select, a")) return;
+        closeUpgradePanel();
+      });
+      ui.missionOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button, input, select, a")) return;
+        closeMissionPanel();
+      });
+      ui.choiceOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) return;
+        closeChoice();
+      });
+      ui.confirmOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) return;
+        closeConfirm();
+      });
+      ui.onboardingOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) return;
+        nextOnboarding();
+      });
+      ui.tutorialOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button")) return;
+        nextTip();
+      });
       ui.encounterChoices.addEventListener("click", (e) => {
         const button = e.target.closest("button[data-encounter-choice]");
         if (!button || button.disabled) return;
@@ -27067,6 +27841,14 @@
         resolveExplorationEncounter(button.dataset.encounterChoice);
       });
       ui.encounterContinue.onclick = closeExplorationEncounter;
+      ui.encounterOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target.closest("button, input, select, a")) return;
+        closeExplorationEncounter();
+      });
+      ui.pauseOverlay.addEventListener("pointerdown", (event) => {
+        if (event.target !== ui.pauseOverlay) return;
+        closePause();
+      });
       ui.objectivePill.onclick = openObjectiveAction;
       ui.objectivePill.onkeydown = (e) => {
         if (e.key === "Enter" || e.key === " ") {
