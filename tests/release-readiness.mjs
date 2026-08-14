@@ -75,6 +75,7 @@ class FakeElement {
   prepend(child) { this.children.unshift(child); }
   removeChild(child) { this.children = this.children.filter((item) => item !== child); }
   remove() {}
+  focus() {}
   get firstChild() { return this.children[0] || null; }
   get lastChild() { return this.children.at(-1) || null; }
   click() { this.onclick?.({ target: this, preventDefault() {}, stopPropagation() {} }); }
@@ -170,10 +171,23 @@ vm.runInContext(
     systemVisualProfile, systemRarityClass, proc, parallelSystem,
     saveState, saveGame, loadGame, validSavePayload,
     setShipSkin, setFrigateSkin, owns, smartAction, releaseChecks,
+    generateContracts, makeDailyOps, settingsHtml, storeHtml,
+    monetizationStatusText,
+    discoveryMysteries, discoveryCollections, discoveryState,
+    systemMysteryProfile, currentMysteryRecord, scanSectorMystery,
+    discoveryCollectionProgress, checkDiscoveryCollections,
+    resolveExplorationEncounter,
     dismissPanels(){
       [ui.missionOverlay,ui.upgradeOverlay,ui.discoveryOverlay,ui.choiceOverlay,ui.confirmOverlay]
         .forEach((panel)=>panel?.classList.remove("show"));
       titleOpen=false; titleMenuMode=false; modalFreeze=false; paused=false;
+    },
+    prepareDiscoveryTest(seed=424242){
+      const testSystem=proc(seed);
+      systems=[sol(),testSystem]; currentSystemIndex=1; game.system=testSystem;
+      updateBodies(game.system); resetShip(); game.sectorEvent=createSectorEvent(1);
+      game.ship.x=game.sectorEvent.x; game.ship.y=game.sectorEvent.y;
+      return game.sectorEvent;
     },
     get SAVE_KEY(){return SAVE_KEY}, get SAVE_BACKUP_KEY(){return SAVE_BACKUP_KEY},
     get SAVE_VERSION(){return SAVE_VERSION}, get APP_VERSION(){return APP_VERSION}
@@ -187,8 +201,8 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.18.0", "Expected release candidate version");
-assert.equal(api.SAVE_VERSION, 16, "Expected current save schema");
+assert.equal(api.APP_VERSION, "0.19.0", "Expected release candidate version");
+assert.equal(api.SAVE_VERSION, 17, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
 assert.equal(api.game.system.name, "Sol System", "Every pilot must start in Sol");
@@ -214,6 +228,96 @@ assert.ok(
   "Flight controls must not be duplicated in menu navigation",
 );
 assert.notEqual(api.normalizeMenuName("flight"), "flight", "Legacy Flight links must redirect");
+
+for (let seed = 1; seed <= 24; seed++) {
+  api.generateContracts(seed);
+  assert.equal(
+    new Set(api.game.contracts.map((contract) => contract.type)).size,
+    api.game.contracts.length,
+    `Frontier contracts must not repeat for seed ${seed}`,
+  );
+}
+const dailyOps = api.makeDailyOps().ops;
+assert.equal(
+  new Set(dailyOps.map((operation) => operation.type)).size,
+  dailyOps.length,
+  "Daily Operations must offer distinct objectives",
+);
+
+api.game.monetization.storeKitReady = false;
+api.game.monetization.adMobReady = false;
+const playerFacingCopy = [
+  api.monetizationStatusText(),
+  api.settingsHtml(),
+  api.storeHtml(),
+].join(" ");
+assert.doesNotMatch(
+  playerFacingCopy,
+  /StoreKit|AdMob|placeholder|product\s?id|test unlock|browser test|procedural|seed|route pool/i,
+  "Player-facing menus must not expose implementation language",
+);
+assert.match(
+  playerFacingCopy,
+  /Web Edition has no advertisements or payments/,
+  "Web players need an accurate commerce status",
+);
+assert.doesNotMatch(
+  api.settingsHtml(),
+  /Reset Save \+ Run/,
+  "Destructive actions need player-facing language",
+);
+
+assert.equal(api.discoveryMysteries.length, 8, "Every system family needs a mystery profile");
+assert.equal(
+  new Set(api.discoveryMysteries.map((mystery) => mystery.archetype)).size,
+  api.discoveryMysteries.length,
+  "Mystery profiles must be unique by system family",
+);
+assert.ok(api.discoveryCollections.length >= 8, "Discovery Depth needs a substantial collection board");
+
+const discoveryEvent = api.prepareDiscoveryTest(112233);
+const mysteryProfile = api.systemMysteryProfile();
+for (const key of Object.keys(api.game.resources)) api.game.resources[key] = 999;
+api.game.shipSystems = { thrust: 6, fuel: 6, brake: 6, accel: 6, handling: 6, cargo: 6 };
+Object.assign(api.game.frigate, {
+  built: true,
+  scannerLevel: 4,
+  reactorLevel: 4,
+  hangarLevel: 4,
+  capacityLevel: 4,
+  commandLevel: 4,
+});
+api.game.fleet.ships = [{ id: "qa-scout", type: "scout", status: "idle" }];
+api.game.echoStats.harvested = 3;
+api.game.encounters.reputation = { coalition: 5, wayfarers: 5, echo: 5 };
+api.scanSectorMystery();
+const scannedMystery = api.currentMysteryRecord();
+assert.equal(discoveryEvent.mysteryScanned, true, "Nearby mysteries should become decoded");
+assert.equal(scannedMystery?.name, mysteryProfile.name, "Decoded mystery must match the system family");
+assert.ok(scannedMystery?.clue, "Decoded mysteries need a persistent clue");
+api.resolveExplorationEncounter(mysteryProfile.insightChoice);
+assert.equal(api.currentMysteryRecord()?.resolved, true, "Encounter choices must resolve the mystery record");
+assert.equal(api.currentMysteryRecord()?.usedInsight, true, "Decoded choices must apply their discovery advantage");
+
+api.initGame(false);
+api.game.codex = Object.fromEntries(
+  ["A", "B", "C"].map((name) => [
+    name,
+    { name, archetypeKey: "innerForge", rarity: "Common" },
+  ]),
+);
+const collectionRewardBefore = api.game.resources.Titanium;
+api.checkDiscoveryCollections();
+assert.ok(
+  api.discoveryState().claimedCollections.has("forgeSurvey"),
+  "Completing a themed Codex set must claim its collection",
+);
+assert.ok(
+  api.game.resources.Titanium > collectionRewardBefore,
+  "Codex collections must grant their listed rewards",
+);
+
+api.initGame(false);
 
 for (const subsystem of ["thrust", "fuel", "brake", "accel", "handling", "cargo"]) {
   checkpoint(`tutorial path: ${subsystem}`);
@@ -378,7 +482,7 @@ assert.match(html, /bottom:\s*calc\(var\(--miniMapSize\) \+ 30px/, "Desktop acti
 assert.match(html, /@media \(max-width: 900px\)[\s\S]*?\.smart\s*\{[\s\S]*?bottom:\s*calc\(370px/, "Mobile action must clear controls and Nav Map");
 assert.match(html, /--thrustSize:\s*76px/, "Primary touch control must remain large");
 assert.match(html, /prefers-reduced-motion:\s*reduce/, "Reduced motion support must remain present");
-assert.match(html, /Browser — No Charge|Browser test mode uses simulated unlocks/, "Browser purchases must be explicitly labeled as simulations");
+assert.match(html, /Web Edition designs are complimentary and never require payment/, "Web commerce copy must be accurate and player-facing");
 assert.match(html, /audio\.ctx\.suspend/, "Backgrounding should suspend audio");
 assert.match(html, /audio\.ctx\.resume/, "Returning should resume configured audio");
 
@@ -397,5 +501,5 @@ assert.doesNotThrow(() => new Function(worker), "Service worker must parse");
 assert.match(worker, /caches\.match/, "Service worker needs an offline fallback");
 
 console.log(
-  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, save migration/recovery, cosmetics, responsive invariants, audio lifecycle, and PWA assets.`,
+  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, save migration/recovery, cosmetics, responsive invariants, audio lifecycle, and PWA assets.`,
 );

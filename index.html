@@ -1433,6 +1433,30 @@
         box-shadow: 0 0 24px
           color-mix(in srgb, var(--encounterColor, #7dd3fc) 13%, transparent);
       }
+      .encounter-choice.insight {
+        border-color: color-mix(
+          in srgb,
+          var(--encounterColor, #7dd3fc) 64%,
+          #fde68a 18%
+        );
+        background:
+          radial-gradient(
+            circle at 88% 14%,
+            color-mix(
+              in srgb,
+              var(--encounterColor, #7dd3fc) 18%,
+              transparent
+            ),
+            transparent 34%
+          ),
+          rgba(8, 18, 37, 0.9);
+        box-shadow: inset 0 0 28px
+          color-mix(
+            in srgb,
+            var(--encounterColor, #7dd3fc) 8%,
+            transparent
+          );
+      }
       .encounter-choice strong,
       .encounter-choice small,
       .encounter-choice em {
@@ -1951,8 +1975,8 @@
         gap: 10px;
       }
       .title-showcase {
-        height: min(58vh, 520px);
-        min-height: 390px;
+        height: min(42vh, 400px);
+        min-height: 320px;
         border-radius: 28px;
         border: 1px solid rgba(255, 255, 255, 0.13);
         background:
@@ -2370,9 +2394,9 @@
           grid-template-columns: 1fr;
         }
         .title-showcase {
-          height: 54vh;
-          min-height: 360px;
-          max-height: 520px;
+          height: 42vh;
+          min-height: 300px;
+          max-height: 400px;
         }
         .title-screen {
           padding: 16px;
@@ -3692,8 +3716,8 @@
           line-height: 1.42;
         }
         .title-showcase {
-          height: 46vh;
-          min-height: 300px;
+          height: 38vh;
+          min-height: 260px;
         }
         .encounter-overlay {
           align-items: flex-end;
@@ -4406,7 +4430,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Living Systems • v0.18.0</div>
+        <div class="title-version">Discovery Depth • v0.19.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -4424,7 +4448,7 @@
             <div class="title-feature">
               <b>Gravity-Based Exploration</b
               ><span
-                >Ride orbital momentum, break from gravity wells, and uncover
+                >Ride orbital momentum, decode deep-space mysteries, and uncover
                 anomaly-class worlds.</span
               >
             </div>
@@ -4451,7 +4475,7 @@
           <div class="pause-title-wrap">
             <h2>Paused</h2>
             <p>
-              Flight is paused. Manage your run, adjust controls, or return to
+              Flight is paused. Save your journey, adjust settings, or return to
               space.
             </p>
           </div>
@@ -4810,8 +4834,8 @@
         TAU = Math.PI * 2,
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
-        SAVE_VERSION = 16,
-        APP_VERSION = "0.18.0";
+        SAVE_VERSION = 17,
+        APP_VERSION = "0.19.0";
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -5028,7 +5052,7 @@
         thrust: {
           name: "Thrust Array",
           short: "Thrust",
-          desc: "Improves engine force without making the starter ship feel weak.",
+          desc: "Increases engine force for faster departures and stronger burns.",
           stat: "Thrust power",
           base: "Standard burn",
           per: 0.045,
@@ -5057,7 +5081,7 @@
         },
         accel: {
           name: "Acceleration Core",
-          short: "Accel",
+          short: "Acceleration",
           desc: "Improves launch response and short-burst acceleration.",
           stat: "Acceleration response",
           base: "Standard response",
@@ -5950,6 +5974,146 @@
           need: "Approach carefully. Recovery damages hull slightly.",
         },
       ];
+      const discoveryMysteries = [
+        {
+          key: "forgeheart",
+          archetype: "innerForge",
+          name: "Forgeheart Lattice",
+          signal: "A rhythmic thermal pulse is moving between the inner worlds without losing energy.",
+          clue: "The pulse is a navigation lattice built to open only when a vessel matches the system's gravity rhythm.",
+          insightChoice: 0,
+          reward: { DataCores: 5, Plasma: 4 },
+        },
+        {
+          key: "stormchoir",
+          archetype: "gasFrontier",
+          name: "Choir in the Storm",
+          signal: "Several gas giants are repeating the same radio chord through different storms.",
+          clue: "The chord marks a survivable corridor and reveals which response will avoid the strongest pressure wake.",
+          insightChoice: 1,
+          reward: { DataCores: 5, Helium3: 6 },
+        },
+        {
+          key: "prismmemory",
+          archetype: "crystalReach",
+          name: "Prism Memory",
+          signal: "Reflected starlight is arriving before the source that produced it.",
+          clue: "The crystals preserve moments rather than light. One encounter response aligns with the memory already stored here.",
+          insightChoice: 0,
+          reward: { DataCores: 5, Crystal: 6 },
+        },
+        {
+          key: "sleepingbiosphere",
+          archetype: "bioCluster",
+          name: "The Sleeping Biosphere",
+          signal: "Organic compounds across multiple worlds are breathing in perfect synchronization.",
+          clue: "The system is protecting a dormant migration network. A careful response can wake it without causing harm.",
+          insightChoice: 1,
+          reward: { DataCores: 5, BioGel: 5 },
+        },
+        {
+          key: "palimpsest",
+          archetype: "ancientArchive",
+          name: "Palimpsest Beacon",
+          signal: "A buried transmission keeps rewriting its own origin coordinates.",
+          clue: "The newest coordinates are a warning; the oldest are an invitation. The archive identifies the safer interpretation.",
+          insightChoice: 0,
+          reward: { DataCores: 8, Crystal: 3 },
+        },
+        {
+          key: "missingshadow",
+          archetype: "voidRim",
+          name: "The Missing Shadow",
+          signal: "A region of empty space is blocking stars but registering no mass.",
+          clue: "The darkness is a folded transit wake. Its edges reveal the only response that will not destabilize the fold.",
+          insightChoice: 2,
+          reward: { DataCores: 6, DarkMatter: 1 },
+        },
+        {
+          key: "pilgrimlight",
+          archetype: "cosmicSpirit",
+          name: "Pilgrim Light",
+          signal: "A pale light is circling the system without casting a shadow.",
+          clue: "The light is following Starling's future path and brightens around a single compassionate response.",
+          insightChoice: 1,
+          reward: { DataCores: 8, Crystal: 8 },
+        },
+        {
+          key: "counterwake",
+          archetype: "parallel",
+          name: "Counterfactual Wake",
+          signal: "Sensors are receiving Starling's engine signature from several impossible positions at once.",
+          clue: "Only one signature belongs to this universe. Following it prevents the breach from copying your next decision.",
+          insightChoice: 2,
+          reward: { DataCores: 10, DarkMatter: 2 },
+        },
+      ];
+      const discoveryCollections = [
+        {
+          key: "forgeSurvey",
+          name: "Forge Chain Survey",
+          desc: "Catalogue three worlds shaped by stellar heat and heavy industry.",
+          archetype: "innerForge",
+          goal: 3,
+          reward: { Titanium: 18, Plasma: 10 },
+        },
+        {
+          key: "gasSurvey",
+          name: "Storm Route Atlas",
+          desc: "Catalogue three worlds from Gas Frontier systems.",
+          archetype: "gasFrontier",
+          goal: 3,
+          reward: { Helium3: 24, Crystal: 8 },
+        },
+        {
+          key: "crystalSurvey",
+          name: "Prismatic Archive",
+          desc: "Catalogue three worlds from Crystal Reach systems.",
+          archetype: "crystalReach",
+          goal: 3,
+          reward: { Crystal: 22, DataCores: 8 },
+        },
+        {
+          key: "bioSurvey",
+          name: "Living Worlds Record",
+          desc: "Catalogue three worlds from Bio Cluster systems.",
+          archetype: "bioCluster",
+          goal: 3,
+          reward: { BioGel: 16, Alloy: 20 },
+        },
+        {
+          key: "archiveSurvey",
+          name: "Relic Constellation",
+          desc: "Catalogue three worlds from Ancient Archive systems.",
+          archetype: "ancientArchive",
+          goal: 3,
+          reward: { DataCores: 20, Crystal: 10 },
+        },
+        {
+          key: "voidSurvey",
+          name: "Edge of Nothing",
+          desc: "Catalogue three worlds from Void Rim systems.",
+          archetype: "voidRim",
+          goal: 3,
+          reward: { DarkMatter: 2, Plasma: 16 },
+        },
+        {
+          key: "mysteryDossier",
+          name: "Mystery Dossier",
+          desc: "Decode mysteries in three different system families.",
+          mode: "mysteries",
+          goal: 3,
+          reward: { DataCores: 24, DarkMatter: 1 },
+        },
+        {
+          key: "decisionArchive",
+          name: "First Contact Archive",
+          desc: "Resolve three encounters and preserve the outcomes.",
+          mode: "decisions",
+          goal: 3,
+          reward: { Crystal: 16, Titanium: 16, DataCores: 12 },
+        },
+      ];
       const encounterFactions = {
         coalition: {
           name: "Frontier Coalition",
@@ -6585,15 +6749,15 @@
         ],
         [
           "Build Your Network",
-          "Captured planets produce resources. Collect production and upgrade planets from the menu.",
+          "Captured planets support your expedition over time. Gather their output and develop worlds from the Command Menu.",
         ],
         [
-          "Upgrade Clearly",
-          "The Upgrade Center shows subsystem levels, class progress, missing resources, and what each upgrade changes.",
+          "Strengthen the Starling",
+          "The Upgrade Center shows your ship systems, hull progress, required resources, and the benefit of every improvement.",
         ],
         [
           "Explore Beyond Sol",
-          "Build the ODF Pioneer, follow Echo routes, discover rare worlds, and jump to new sectors.",
+          "Build the ODF Pioneer, jump beyond Sol, scan unknown signals, and preserve your discoveries in the Codex.",
         ],
       ];
       const tutorialObjectives = [
@@ -6817,6 +6981,35 @@
         storyStage: 0,
         storyComplete: false,
       });
+      const defaultDiscoveryState = () => ({
+        mysteries: {},
+        claimedCollections: new Set(),
+        totalScans: 0,
+      });
+      function hydrateDiscoveryState(raw = {}) {
+        return {
+          mysteries:
+            raw.mysteries && typeof raw.mysteries === "object"
+              ? { ...raw.mysteries }
+              : {},
+          claimedCollections: new Set(raw.claimedCollections || []),
+          totalScans: Math.max(0, Number(raw.totalScans || 0)),
+        };
+      }
+      function discoveryState() {
+        if (!game.discovery) game.discovery = defaultDiscoveryState();
+        if (!(game.discovery.claimedCollections instanceof Set))
+          game.discovery = hydrateDiscoveryState(game.discovery);
+        return game.discovery;
+      }
+      function serializeDiscoveryState() {
+        const state = discoveryState();
+        return {
+          mysteries: { ...state.mysteries },
+          claimedCollections: [...state.claimedCollections],
+          totalScans: Number(state.totalScans || 0),
+        };
+      }
       function hydrateEncounterState(raw = {}) {
         const base = defaultEncounterState();
         return {
@@ -6947,6 +7140,8 @@
           cosmicSpiritVisits: 0,
           blackHolesEntered: 0,
           parallelVisits: 0,
+          mysteriesScanned: 0,
+          collectionsCompleted: 0,
         };
       }
       unclaimedProduction = blankResources();
@@ -6973,6 +7168,7 @@
         captainLog: defaultLog(),
         specialRewards: { cosmicSpirit: [], parallel: [] },
         encounters: defaultEncounterState(),
+        discovery: defaultDiscoveryState(),
         encounteredIceWorld: false,
         ownedShipSkins: new Set(["High Tech"]),
         ownedFrigateSkins: new Set(["Frigate Standard"]),
@@ -7057,7 +7253,7 @@
         [
           "sectorScout",
           "Sector Scout",
-          "Jump to your first uncharted procedural system.",
+          "Reach your first uncharted system.",
           () => game.sectorJumps >= 1,
           "Reward: 10 Data Cores",
           { DataCores: 10 },
@@ -7105,7 +7301,7 @@
         [
           "producer",
           "Resource Network",
-          "Collect 25 resources from production.",
+          "Gather 25 resources from your colony network.",
           () => game.captainLog.productionClaimed >= 25,
           "Reward: 20 Alloy",
           { Alloy: 20 },
@@ -7141,7 +7337,7 @@
           () => !game.system.isTutorial && game.discovered.size >= 4,
         ],
         [
-          "Capture 1 non-tutorial planet",
+          "Capture 1 frontier planet",
           () => !game.system.isTutorial && game.captured.size >= 1,
         ],
         ["Create 1 Orbital Echo", () => game.echoStats.created >= 1],
@@ -7587,7 +7783,7 @@
         return {
           key: "parallel",
           name: "Parallel System",
-          desc: "A non-returnable alternate-universe system reached only through a 0.5% black hole in a normal procedural sector. Once you leave, only another black hole can take you to another Parallel system.",
+          desc: "A one-way alternate universe reached through an unstable black hole. After departure, the breach collapses and the system vanishes from the Star Atlas.",
         };
       }
       function cosmicSpiritModifier() {
@@ -7607,7 +7803,7 @@
         return {
           key: "cosmicSpirit",
           name: "Cosmic Spirit System",
-          desc: "A legendary handcrafted system that appears instead of a normal generated sector only on a rare 2% jump. Its planets feel ethereal, luminous, and alive.",
+          desc: "A legendary luminous system whose ethereal worlds and living energy currents are unlike anything on the known frontier.",
         };
       }
       function sectorArchetype(seed = 1, isTutorial = false) {
@@ -7810,8 +8006,8 @@
           modifier: sectorModifiers[0],
           archetype: {
             key: "tutorial",
-            name: "Earth Tutorial System",
-            desc: "Every pilot begins in this handcrafted home system before the uncharted galaxy is generated.",
+            name: "Humanity's Home System",
+            desc: "Humanity's home system and the starting point of every pilot's first expedition.",
           },
         };
       }
@@ -8288,6 +8484,7 @@
         game.captainLog = defaultLog();
         game.specialRewards = { cosmicSpirit: [], parallel: [] };
         game.encounters = defaultEncounterState();
+        game.discovery = defaultDiscoveryState();
         game.collapsedBlackHoles = new Set();
         game.encounteredIceWorld = false;
         game.ownedShipSkins = new Set(["High Tech"]);
@@ -8448,7 +8645,7 @@
         if (firstEver)
           showMissionPanel(
             "Cosmic Spirit Found!",
-            "You entered a legendary 2% special system. Spirit Voyager has been unlocked. Equip it anytime from the Frigate Cosmetic Store.",
+            "You entered a legendary Cosmic Spirit system. Spirit Voyager has been unlocked and can be equipped from the Cosmetic Hangar.",
             [
               ["Unlocked", "Spirit Voyager"],
               ["Reward", "5 Dark Matter • 25 Crystal • 18 Data Cores"],
@@ -8773,6 +8970,7 @@
           milestonesClaimed: [...game.milestonesClaimed],
           captainLog: game.captainLog,
           encounters: serializeEncounterState(),
+          discovery: serializeDiscoveryState(),
           specialRewards: game.specialRewards || {
             cosmicSpirit: [],
             parallel: [],
@@ -9023,6 +9221,7 @@
           game.sectorJumps = Number(d.sectorJumps || 0);
           game.captainLog = { ...defaultLog(), ...(d.captainLog || {}) };
           game.encounters = hydrateEncounterState(d.encounters || {});
+          game.discovery = hydrateDiscoveryState(d.discovery || {});
           game.specialRewards = {
             cosmicSpirit: [...((d.specialRewards || {}).cosmicSpirit || [])],
             parallel: [...((d.specialRewards || {}).parallel || [])],
@@ -9119,6 +9318,13 @@
       function saveMetaHtml(meta = lastSaveMeta) {
         if (!meta)
           return '<div class="save-meta"><div class="chip">No save metadata yet</div></div>';
+        const journeyProgress =
+          meta.missionStage < tutorialObjectives.length
+            ? "Tutorial Step " +
+              (Number(meta.missionStage || 0) + 1) +
+              " of " +
+              tutorialObjectives.length
+            : "Frontier Journey";
         return (
           '<div class="save-meta"><div class="chip"><b>Saved</b><br>' +
           esc(new Date(meta.savedAt).toLocaleString()) +
@@ -9126,11 +9332,12 @@
           esc(meta.sector) +
           '</div><div class="chip"><b>Ship</b><br>' +
           esc(meta.shipName + " • " + meta.shipClass) +
-          '</div><div class="chip"><b>Progress</b><br>Mission ' +
-          esc(meta.missionStage) +
+          '</div><div class="chip"><b>Progress</b><br>' +
+          esc(journeyProgress) +
           " • " +
           esc(meta.captured) +
-          " captured</div></div>"
+          (Number(meta.captured) === 1 ? " world" : " worlds") +
+          " claimed</div></div>"
         );
       }
       function getStoredSaveMeta() {
@@ -10144,7 +10351,7 @@
       function fleetSkinsHtml() {
         ensureFleet();
         return (
-          '<div class="card" id="fleetSkins"><h4>Fleet Skins</h4><p>Fleet skins change the visual identity of escort ships around the capital ship. Achievement skins are earned and do not auto-equip.</p><div class="grid">' +
+          '<div class="card" id="fleetSkins"><h4>Fleet Designs</h4><p>Choose a unified visual identity for every escort stationed around the Pioneer. Earned designs can be equipped here at any time.</p><div class="grid">' +
           fleetSkins
             .map((s) => {
               const own = ownsFleetSkin(s.key),
@@ -10161,7 +10368,7 @@
                   : btn(
                       game.monetization?.storeKitReady
                         ? "Unlock $" + s.price
-                        : "Test Unlock (No Charge)",
+                        : "Claim Web Edition Design",
                       "buyFleetSkin",
                       s.key,
                     );
@@ -10711,6 +10918,11 @@
           resource: b.resource,
           biome: displayBiome(b),
           className: planetClass(b),
+          archetypeKey:
+            game.system.specialType || game.system.archetype?.key || "unknown",
+          archetypeName:
+            game.system.archetype?.name || game.system.name || "Unknown Frontier",
+          modifierName: game.system.modifier?.name || "Calm Drift",
           hazard: b.hazard,
           captured: game.captured.has(b.name),
           level: b.level || 0,
@@ -10723,6 +10935,7 @@
           ),
           events: [...(old.events || []).slice(-5), { event, time: now }],
         };
+        checkDiscoveryCollections();
       }
       function updateCodexForKnown() {
         for (const b of game.system?.bodies || [])
@@ -11535,11 +11748,21 @@
       }
       function generateContracts(seed) {
         game.contracts = [];
+        const usedTypes = new Set();
         for (let i = 0; i < 3; i++) {
-          const c =
-            contractTemplates[
-              Math.floor(rand(seed + i * 31) * contractTemplates.length)
-            ];
+          let pick = Math.floor(
+              rand(seed + i * 31) * contractTemplates.length,
+            ),
+            guard = 0;
+          while (
+            usedTypes.has(contractTemplates[pick].type) &&
+            guard < contractTemplates.length
+          ) {
+            pick = (pick + 1) % contractTemplates.length;
+            guard++;
+          }
+          const c = contractTemplates[pick];
+          usedTypes.add(c.type);
           game.contracts.push({
             id: seed + "-" + i,
             type: c.type,
@@ -11578,13 +11801,23 @@
       }
       function makeDailyOps() {
         const seed = dailySeed(),
-          picks = [];
+          picks = [],
+          usedTypes = new Set();
         for (let i = 0; i < 3; i++) {
-          const base =
-              dailyTemplates[
-                Math.floor(rand(seed + i * 77) * dailyTemplates.length)
-              ],
+          let pick = Math.floor(
+              rand(seed + i * 77) * dailyTemplates.length,
+            ),
+            guard = 0;
+          while (
+            usedTypes.has(dailyTemplates[pick].type) &&
+            guard < dailyTemplates.length
+          ) {
+            pick = (pick + 1) % dailyTemplates.length;
+            guard++;
+          }
+          const base = dailyTemplates[pick],
             bonus = 1 + i * 0.08;
+          usedTypes.add(base.type);
           picks.push({
             id: todayKey() + "-" + i,
             type: base.type,
@@ -11706,7 +11939,135 @@
           exoticPlus: (byR.Exotic || 0) + (byR.Mythic || 0),
           captured: entries.filter((e) => e.captured).length,
           factory: entries.filter((e) => e.factory).length,
+          mysteries: Object.values(discoveryState().mysteries).filter(
+            (entry) => entry.scanned,
+          ).length,
+          resolvedMysteries: Object.values(discoveryState().mysteries).filter(
+            (entry) => entry.resolved,
+          ).length,
+          collections: discoveryState().claimedCollections.size,
         };
+      }
+      function systemMysteryProfile(system = game.system) {
+        const family = system?.specialType || system?.archetype?.key;
+        return (
+          discoveryMysteries.find((entry) => entry.archetype === family) ||
+          discoveryMysteries.find((entry) => entry.archetype === "voidRim")
+        );
+      }
+      function mysteryRecordKey(system = game.system) {
+        return String(system?.name || "Unknown System");
+      }
+      function currentMysteryRecord(system = game.system) {
+        return discoveryState().mysteries[mysteryRecordKey(system)] || null;
+      }
+      function discoveryCollectionProgress(def) {
+        if (def.mode === "mysteries") {
+          const families = new Set(
+            Object.values(discoveryState().mysteries)
+              .filter((entry) => entry.scanned)
+              .map((entry) => entry.archetype)
+              .filter(Boolean),
+          );
+          return Math.min(def.goal, families.size);
+        }
+        if (def.mode === "decisions")
+          return Math.min(def.goal, encounterState().decisions.length);
+        return Math.min(
+          def.goal,
+          Object.values(game.codex || {}).filter(
+            (entry) => entry.archetypeKey === def.archetype,
+          ).length,
+        );
+      }
+      function checkDiscoveryCollections() {
+        const state = discoveryState(),
+          unlocked = [];
+        for (const def of discoveryCollections) {
+          if (
+            state.claimedCollections.has(def.key) ||
+            discoveryCollectionProgress(def) < def.goal
+          )
+            continue;
+          state.claimedCollections.add(def.key);
+          Object.entries(def.reward || {}).forEach(
+            ([key, amount]) =>
+              (game.resources[key] = (game.resources[key] || 0) + amount),
+          );
+          game.captainLog.collectionsCompleted =
+            (game.captainLog.collectionsCompleted || 0) + 1;
+          unlocked.push(def);
+          addActivity(
+            "discovery",
+            def.name + " completed",
+            "Collection reward: " + fmt(def.reward),
+          );
+        }
+        if (unlocked.length)
+          toast(
+            "Collection completed: " +
+              unlocked.map((entry) => entry.name).join(" • "),
+          );
+        return unlocked;
+      }
+      function mysteryScanRadius() {
+        return 300 + Number(game.frigate?.scannerLevel || 0) * 35;
+      }
+      function scanSectorMystery() {
+        const nearest = nearestSectorEvent(),
+          event = nearest?.event,
+          profile = systemMysteryProfile();
+        if (!event || !profile) return toast("No unknown signal is available.");
+        if (event.mysteryScanned)
+          return toast(profile.name + " has already been decoded.");
+        if (nearest.d > mysteryScanRadius())
+          return toast(
+            "Move within " + Math.round(mysteryScanRadius()) + "u to scan.",
+          );
+        const state = discoveryState(),
+          key = mysteryRecordKey(),
+          scanBoost = 1 + Number(game.frigate?.scannerLevel || 0) * 0.05,
+          reward = scaleReward(profile.reward, scanBoost);
+        state.mysteries[key] = {
+          ...(state.mysteries[key] || {}),
+          key,
+          system: game.system.name,
+          archetype:
+            game.system.specialType || game.system.archetype?.key || "unknown",
+          archetypeName: game.system.archetype?.name || "Unknown Frontier",
+          mysteryKey: profile.key,
+          name: profile.name,
+          clue: profile.clue,
+          encounterKey: event.encounterKey || null,
+          scanned: true,
+          resolved: false,
+          scannedAt: Date.now(),
+        };
+        state.totalScans++;
+        event.mysteryKey = profile.key;
+        event.mysteryScanned = true;
+        event.mysteryClue = profile.clue;
+        game.captainLog.mysteriesScanned =
+          (game.captainLog.mysteriesScanned || 0) + 1;
+        Object.entries(reward).forEach(
+          ([resource, amount]) =>
+            (game.resources[resource] =
+              (game.resources[resource] || 0) + amount),
+        );
+        ensureSectorEventEncounter(event);
+        addActivity(
+          "discovery",
+          profile.name + " decoded",
+          game.system.name + " • " + fmt(reward),
+        );
+        checkDiscoveryCollections();
+        showMissionPanel("Mystery Decoded: " + profile.name, profile.clue, [
+          ["System Family", game.system.archetype?.name || "Unknown Frontier"],
+          ["Survey Reward", fmt(reward)],
+          ["Encounter Insight", "One response now carries a decoded advantage"],
+        ]);
+        saveGame(false);
+        renderMenu();
       }
       function encounterState() {
         if (!game.encounters) game.encounters = defaultEncounterState();
@@ -11753,11 +12114,19 @@
             (game.system?.seed || 1) + 5581,
             event.type,
           );
-        const template = encounterByKey(event.encounterKey);
+        const template = encounterByKey(event.encounterKey),
+          profile = systemMysteryProfile();
         if (template) {
-          event.name = template.title;
-          event.desc = template.summary;
-          event.need = "Approach the signal and choose how Starling responds.";
+          event.mysteryKey = event.mysteryKey || profile?.key || null;
+          event.name = event.mysteryScanned
+            ? template.title
+            : "Unresolved Deep-Space Signal";
+          event.desc = event.mysteryScanned
+            ? template.summary
+            : profile?.signal || "An unknown signal is crossing the system.";
+          event.need = event.mysteryScanned
+            ? "Approach the source and choose how Starling responds."
+            : "Move into scanning range to decode the signal.";
         }
         return template;
       }
@@ -11907,7 +12276,12 @@
         const n = nearestSectorEvent();
         if (!n || n.d > 115) return toast("Move closer to the signal.");
         const event = n.event,
+          profile = systemMysteryProfile(),
           template = ensureSectorEventEncounter(event);
+        if (!event.mysteryScanned) {
+          scanSectorMystery();
+          return;
+        }
         if (!template) return toast("The signal could not be decoded.");
         event.opened = true;
         closeMenu();
@@ -11941,22 +12315,30 @@
               ? faction.perk + " active"
               : "Trust 3 unlocks " + faction.perk,
           ) +
+          '</div><div class="chip"><b>Decoded Mystery</b><br>' +
+          esc(profile?.name || "Unknown Signal") +
           "</div>";
         ui.encounterChoices.innerHTML = template.choices
           .map((choice, index) => {
             const requirement = encounterRequirementState(choice.requirement),
+              insight =
+                !!event.mysteryScanned &&
+                Number(profile?.insightChoice) === Number(index),
               reason = requirement.met
-                ? encounterRewardPreview(choice)
+                ? encounterRewardPreview(choice) +
+                  (insight ? " • Decoded reward +25%" : "")
                 : "Locked • " + requirement.label;
             return (
-              '<button class="encounter-choice" type="button" data-encounter-choice="' +
+              '<button class="encounter-choice ' +
+              (insight ? "insight" : "") +
+              '" type="button" data-encounter-choice="' +
               index +
               '" ' +
               (requirement.met ? "" : "disabled") +
               "><strong>" +
               esc(choice.label) +
               "</strong><em>" +
-              esc(choice.tag || "Decision") +
+              esc(insight ? "Decoded Advantage" : choice.tag || "Decision") +
               "</em><small>" +
               esc(choice.desc + " " + reason) +
               "</small></button>"
@@ -11987,7 +12369,12 @@
           );
         const state = encounterState(),
           outcome = choice.outcome || {},
-          reward = scaledEncounterReward(outcome.reward || {});
+          profile = systemMysteryProfile(),
+          usedInsight =
+            !!event.mysteryScanned &&
+            Number(profile?.insightChoice) === Number(choiceIndex),
+          baseReward = scaledEncounterReward(outcome.reward || {}),
+          reward = usedInsight ? scaleReward(baseReward, 1.25) : baseReward;
         Object.entries(reward).forEach(
           ([key, amount]) =>
             (game.resources[key] = (game.resources[key] || 0) + amount),
@@ -12013,6 +12400,13 @@
           state.reputation[key] = after;
           repChanges[key] = after - before;
         }
+        if (usedInsight && template.faction) {
+          const before = Number(state.reputation[template.faction] || 0),
+            after = clamp(before + 1, -5, 10);
+          state.reputation[template.faction] = after;
+          repChanges[template.faction] =
+            Number(repChanges[template.faction] || 0) + (after - before);
+        }
         if (outcome.flag) state.flags.add(outcome.flag);
         if (Number(outcome.storyStage || 0) > state.storyStage)
           state.storyStage = Number(outcome.storyStage);
@@ -12036,6 +12430,15 @@
         };
         state.decisions.unshift(decision);
         state.decisions = state.decisions.slice(0, 60);
+        const mystery = currentMysteryRecord();
+        if (mystery) {
+          mystery.resolved = true;
+          mystery.resolvedAt = Date.now();
+          mystery.choice = choice.label;
+          mystery.result = outcome.result || "Decision recorded.";
+          mystery.encounter = template.title;
+          mystery.usedInsight = usedInsight;
+        }
         event.complete = true;
         event.opened = true;
         game.captainLog.eventsCompleted =
@@ -12044,6 +12447,7 @@
           (game.captainLog.encountersResolved || 0) + 1;
         trackDaily("event", 1);
         const perks = checkFactionPerks(),
+          collections = checkDiscoveryCollections(),
           repText = Object.entries(repChanges)
             .filter(([, amount]) => amount)
             .map(
@@ -12078,7 +12482,14 @@
                 : "No damage",
           ],
           ["Captain's Log", "Encounter archived"],
+          [
+            "Mystery Insight",
+            usedInsight
+              ? "Decoded advantage applied: +25% resources and +1 standing"
+              : "A different response was chosen",
+          ],
           ...perks.map((perk) => ["Technology Unlocked", perk]),
+          ...collections.map((entry) => ["Collection Completed", entry.name]),
         ];
         ui.encounterResultGrid.innerHTML = rows
           .map(
@@ -12112,7 +12523,10 @@
         const seed = (systems[i]?.seed || 1) + 5500,
           type = rareEventTypes[Math.floor(rand(seed) * rareEventTypes.length)],
           ang = between(seed + 11, 0, TAU),
-          rad = between(seed + 12, 520, 1250);
+          rad = between(seed + 12, 520, 1250),
+          profile = systemMysteryProfile(systems[i]),
+          savedRecord =
+            discoveryState().mysteries[mysteryRecordKey(systems[i])] || null;
         const event = {
           id: i + "-" + type.key,
           type: type.key,
@@ -12122,8 +12536,12 @@
           reward: scaleReward(type.reward, game.system?.modifier?.reward || 1),
           x: Math.cos(ang) * rad,
           y: Math.sin(ang) * rad,
-          complete: false,
-          opened: false,
+          complete: !!savedRecord?.resolved,
+          opened: !!savedRecord?.resolved,
+          mysteryKey: savedRecord?.mysteryKey || profile?.key || null,
+          mysteryScanned: !!savedRecord?.scanned,
+          mysteryClue: savedRecord?.clue || null,
+          encounterKey: savedRecord?.encounterKey || null,
         };
         ensureSectorEventEncounter(event);
         return event;
@@ -12850,7 +13268,13 @@
             sub: "Parallel breach distance: " + Math.round(bh.d) + "u",
             menu: "system",
           };
-        if (ev && ev.d < 115)
+        if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
+          return {
+            title: "Scan Unknown Signal",
+            sub: systemMysteryProfile()?.name || "Deep-space mystery",
+            menu: "system",
+          };
+        if (ev && ev.event.mysteryScanned && ev.d < 115)
           return {
             title: "Investigate Signal",
             sub: ev.event.name,
@@ -12903,7 +13327,13 @@
           frigate: (fr ? 1 : 0) + fleetReadyCount(),
           echoes: h && h.d < 70 && !h.echo.harvested ? 1 : 0,
           planets: cap ? 1 : 0,
-          system: (ev && ev.d < 115) || (bh && bh.d < 360) ? 1 : 0,
+          system:
+            (ev &&
+              ((!ev.event.mysteryScanned && ev.d < mysteryScanRadius()) ||
+                (ev.event.mysteryScanned && ev.d < 115))) ||
+            (bh && bh.d < 360)
+              ? 1
+              : 0,
         };
       }
       function upgradeReady() {
@@ -13325,7 +13755,9 @@
       }
       function disabledReason(reason) {
         return reason
-          ? '<div class="disabled-reason"><b>Why?</b> ' + esc(reason) + "</div>"
+          ? '<div class="disabled-reason"><b>Details:</b> ' +
+              esc(reason) +
+              "</div>"
           : "";
       }
       function btnWhy(label, fn, arg = null, en = true, reason = "") {
@@ -13691,7 +14123,7 @@
         return (
           '<div class="card section-summary"><div class="section-focus-title"><h4>' +
           esc(title) +
-          '</h4><span class="tag">Section</span></div><p>' +
+          '</h4><span class="tag">Command Deck</span></div><p>' +
           desc +
           "</p>" +
           (chips ? '<div class="grid">' + chips + "</div>" : "") +
@@ -13756,7 +14188,7 @@
               "resources",
               "◆",
               "Resources",
-              "Collect production and review materials.",
+              "Gather colony output and review your cargo.",
               rs.resources,
             ],
             [
@@ -13930,7 +14362,7 @@
           " of " +
           s.total +
           '</span></p><div class="actions">' +
-          btn("Open Related Menu", "openSection", s.menu) +
+          btn("View Objective", "openSection", s.menu) +
           "</div></div></div></div>"
         );
       }
@@ -14029,11 +14461,11 @@
             .join(" • ") || "Nothing ready yet";
         ui.menuContent.innerHTML =
           card(
-            "Planet Production",
-            "Captured planets produce resources over time.",
-            '<div class="list"><div class="prod"><b>Unclaimed Production</b><span>' +
+            "Colony Output",
+            "Captured worlds supply your expedition over time.",
+            '<div class="list"><div class="prod"><b>Ready to Gather</b><span>' +
               esc(pending) +
-              '</span><div class="actions"><button type="button" data-action="claimProduction" data-arg="">Collect Production</button></div></div>' +
+              '</span><div class="actions"><button type="button" data-action="claimProduction" data-arg="">Gather All Output</button></div></div>' +
               rows +
               "</div>",
           ) +
@@ -14059,7 +14491,7 @@
           return "Surveys, anomalies, Echoes, and Research Arrays.";
         if (k === "Plasma")
           return "Speed contracts, volcanic worlds, and high-tier systems.";
-        return "Capture, raid, produce, or complete contracts.";
+        return "Earned from colonies, salvage, encounters, and contracts.";
       }
       function renderPlanets() {
         const s = body(selectedPlanetName),
@@ -14284,7 +14716,7 @@
           br.station +
           " • Research " +
           br.research +
-          "</span><span>Memory: Refuels " +
+          "</span><span>World History: Refuels " +
           m.refuels +
           " • Extracted " +
           Math.round(m.extracted) +
@@ -14328,7 +14760,7 @@
         const chips =
           '<div class="chip">Ship: ' +
           esc(cls.name) +
-          '</div><div class="chip">Subsystem Levels: ' +
+          '</div><div class="chip">Ship System Levels: ' +
           progress.total +
           '</div><div class="chip">Selected Planet: ' +
           esc(sel?.name || "None") +
@@ -14338,7 +14770,7 @@
         let html =
           tabIntro(
             "Upgrade Center",
-            "Upgrade depth is split into focused sections so mobile players can understand one upgrade path at a time without losing the full system depth.",
+            "Strengthen the Starling or invest in captured worlds. Choose a command deck below to begin.",
             chips,
           ) + tabs;
         if (tab === "planet") {
@@ -14398,7 +14830,7 @@
               nextCls.name +
               " at " +
               progress.next +
-              " total subsystem levels"
+              " total ship system levels"
             : "Maximum hull class reached";
         return (
           '<div class="card upgrade-card ready"><h4>Hull Class: ' +
@@ -14409,7 +14841,7 @@
           esc(nextText) +
           '</p><div class="progress"><div style="width:' +
           progress.pct +
-          '%"></div></div><div class="grid"><div class="chip">Subsystem Levels: ' +
+          '%"></div></div><div class="grid"><div class="chip">Ship System Levels: ' +
           progress.total +
           '</div><div class="chip">Fuel: ' +
           Math.round(shipStats().maxFuel) +
@@ -14423,7 +14855,7 @@
       function shipSubsystemsHtml() {
         const factoryReady = hasFactoryAccess();
         return (
-          '<div class="card"><h4>Starship Systems</h4><p>Upgrade systems independently. Costs scale each level, so growth has depth without making the starter ship feel underpowered.</p><div class="list">' +
+          '<div class="card"><h4>Starship Systems</h4><p>Tune each Starling system to match the way you fly and explore.</p><div class="list">' +
           Object.entries(shipSubsystemDefs)
             .map(([key, def]) => shipSubsystemCard(key, def, factoryReady))
             .join("") +
@@ -14876,7 +15308,7 @@
         ui.menuContent.innerHTML =
           tabIntro(
             "Cosmetic Hangar",
-            "Preview the exact in-game hull geometry and equip owned designs from anywhere. Cosmetics never change ship stats.",
+            "Inspect and equip hull designs for your command ships. Cosmetics never change ship performance.",
             '<div class="chip">Owned: ' +
               owned +
               " / " +
@@ -14912,12 +15344,12 @@
           purchaseLabel = (price) =>
             nativeStore
               ? "Unlock $" + price
-              : "Test Unlock (Browser — No Charge)";
+              : "Claim Web Edition Design";
         return (
           '<div class="card"><h4>Complete Hull Sets</h4><p>' +
           (nativeStore
-            ? "Unlock matching designs for both command ships through the native store."
-            : "Browser test mode uses simulated unlocks and does not process a real payment.") +
+            ? "Unlock matching designs for both command ships."
+            : "Web Edition designs are complimentary and never require payment.") +
           '</p><div class="grid">' +
           skinCombos
             .map((c) => {
@@ -14976,14 +15408,14 @@
               ? btn(
                   game.monetization?.storeKitReady
                     ? "Buy Combo"
-                    : "Test Combo Unlock (No Charge)",
+                    : "Claim Web Edition Set",
                   "buyCombo",
                   "Ancient Hunter Combo",
                 )
               : btn(
                   game.monetization?.storeKitReady
                     ? "Unlock $" + s.price
-                    : "Test Unlock (No Charge)",
+                    : "Claim Web Edition Design",
                   "buySkinKind",
                   kind + "|" + s.key,
                 );
@@ -15003,9 +15435,11 @@
             ? "Owned"
             : s.type === "achievement"
               ? "Achievement"
-              : s.type === "paidCombo"
-                ? "$2 Combo"
-                : "$" + s.price) +
+              : !game.monetization?.storeKitReady
+                ? "Web Edition"
+                : s.type === "paidCombo"
+                  ? "$2 Combo"
+                  : "$" + s.price) +
           '</span><div class="actions">' +
           action +
           "</div></div>"
@@ -15119,7 +15553,14 @@
           readyDaily = ensureDailyOps(false).ops.filter(
             (op) => op.complete && !op.claimed,
           ).length,
-          eventReady = nearestSectorEvent()?.d <= 115 ? 1 : 0,
+          nearbyEvent = nearestSectorEvent(),
+          eventReady =
+            nearbyEvent &&
+            ((!nearbyEvent.event.mysteryScanned &&
+              nearbyEvent.d <= mysteryScanRadius()) ||
+              (nearbyEvent.event.mysteryScanned && nearbyEvent.d <= 115))
+              ? 1
+              : 0,
           bhReady = nearestBlackHole()?.d <= 140 ? 1 : 0;
         const tabs = tabBar("system", [
           { key: "status", label: "Status" },
@@ -15131,7 +15572,7 @@
         let html =
           tabIntro(
             "System",
-            "System tools are grouped into clearer tabs so save/settings, travel, daily ops, and records are not stacked into one overwhelming mobile page.",
+            "Review local conditions, field assignments, travel routes, expedition records, and ship settings.",
             '<div class="chip">Sector: ' +
               esc(game.system.name) +
               '</div><div class="chip">Target: ' +
@@ -15159,17 +15600,17 @@
                 esc(mod.name) +
                 ":</b> " +
                 esc(mod.desc),
-                btn("Jump to Random Uncharted System", "jumpSystem") +
-                btn("New Contracts", "rerollContracts"),
+                btn("Begin Uncharted Jump", "jumpSystem") +
+                btn("Request New Contracts", "rerollContracts"),
             ) +
             card(
               "Exploration Encounter",
-              "Each non-tutorial sector contains a choice-driven contact. Ship systems, fleet support, resources, reputation, and earlier decisions unlock different responses.",
+              "Beyond Sol, unknown signals can reveal contacts whose responses depend on your ship, fleet, supplies, reputation, and earlier decisions.",
               '<div class="list">' + rareEventHtml() + "</div>",
             ) +
             card(
               "Black Hole / Parallel Access",
-              "Black holes are ultra-rare one-use gates. A normal procedural system has only a 0.5% chance to contain one.",
+              "Black holes are exceptionally rare, single-use gateways to unstable Parallel systems.",
               '<div class="list">' + blackHoleHtml() + "</div>",
             ) +
             atlasHtml();
@@ -15207,7 +15648,7 @@
                 esc(mod.name) +
                 ":</b> " +
                 esc(mod.desc),
-              btn("Jump to Random Uncharted System", "jumpSystem") +
+              btn("Begin Uncharted Jump", "jumpSystem") +
                 btn("Save Now", "saveGame", true) +
                 btn("Load Save", "loadGame", true),
             ) + questHtml();
@@ -15311,14 +15752,15 @@
         );
       }
       function settingsHtml() {
-        return (
+        const panel = (
           monetizationSettingsHtml() +
           card(
             "Settings",
-            "Tune controls, visuals, audio, motion, guidance, privacy, and mobile comfort.",
+              "Tune visuals, audio, motion, guidance, and on-screen controls.",
             '<div class="list"><div class="setting-row"><span>Graphics Quality</span><select id="graphicsSelect"><option>Low</option><option>Medium</option><option>High</option></select></div><div class="setting-row"><span>Motion Effects</span><select id="motionSelect"><option>On</option><option>Reduced</option></select></div><div class="setting-row"><span>Tutorial Tips</span><select id="tipsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Autosave Indicator</span><select id="autosaveSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Touch Sensitivity</span><select id="touchSelect"><option value="0.75">Low</option><option value="1">Normal</option><option value="1.25">High</option></select></div><div class="setting-row"><span>Performance Mode</span><select id="perfSelect"><option>Auto</option><option>High</option><option>Battery Saver</option></select></div><div class="setting-row"><span>Sound</span><select id="soundSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Music</span><select id="musicSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Vibration FX</span><select id="vibrationSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Music Volume</span><select id="musicVolumeSelect"><option value="0.25">Low</option><option value="0.55">Normal</option><option value="0.85">High</option></select></div><div class="setting-row"><span>SFX Volume</span><select id="sfxVolumeSelect"><option value="0.35">Low</option><option value="0.75">Normal</option><option value="1">High</option></select></div><div class="setting-row"><span>Touch Controls</span><select id="controlsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Control Hints</span><select id="hintsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Joystick Size</span><select id="joystickSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Thrust Button Size</span><select id="thrustSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Release Button Size</span><select id="releaseSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Brake Button Size</span><select id="brakeSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Control Layout</span><select id="controlLayoutSelect"><option>Fixed</option><option>Move Controls</option></select></div><div class="actions"><button type="button" data-action="resetControlLayout" data-arg="">Reset Control Layout</button></div><div class="sound-meter"></div></div><div class="actions"><button type="button" data-action="applySettingsFromMenu" data-arg="">Apply Settings</button><button type="button" class="danger" data-action="resetSaveAndRun" data-arg="">Reset Save + Run</button></div>',
           )
         );
+        return panel.replace("Reset Save + Run", "Start New Journey");
       }
       function debugHtml() {
         if (!DEV_BUILD) return "";
@@ -15374,7 +15816,7 @@
           game.system?.isTutorial ? "Training Flight" : "Quest Log",
           (game.system?.isTutorial
             ? "One objective is active at a time. Complete each step in order before leaving Sol."
-            : "Post-tutorial infinite exploration loop.") +
+            : "Your current expedition objectives.") +
             " Current target: " +
             (target ? esc(target.name) : "None") +
             ".",
@@ -15424,7 +15866,7 @@
       function atlasHtml() {
         return card(
           "Star Atlas",
-          "Return to visited sectors or continue outward into uncharted space. Parallel systems are intentionally non-returnable.",
+          "Revisit charted systems or order the Pioneer toward an unknown destination. Parallel systems collapse from the atlas after departure.",
           '<div class="list">' +
             game.visitedSectors
               .map((s) => {
@@ -15437,13 +15879,9 @@
                   '"><b>' +
                   (s.index === currentSystemIndex ? "Current: " : "") +
                   esc(s.name) +
-                  "</b><span>Sector " +
-                  s.index +
-                  " • Visits: " +
+                  "</b><span>Charted visits: " +
                   s.visits +
-                  " • Seed: " +
-                  s.seed +
-                  (locked ? " • Non-returnable Parallel breach" : "") +
+                  (locked ? " • Collapsed Parallel route" : "") +
                   '</span><div class="actions">' +
                   btn(
                     locked ? "Non-returnable" : "Travel",
@@ -15455,9 +15893,9 @@
                 );
               })
               .join("") +
-            '<div class="sector rarity-rare"><b>Random Uncharted Route</b>' +
-            '<span>The Pioneer will select a new, unvisited destination from a varied route pool. Outward jumps never follow the Star Atlas in numerical order.</span><div class="actions">' +
-            btn("Jump to Random System", "jumpSystem") +
+            '<div class="sector rarity-rare"><b>Uncharted Expedition</b>' +
+            '<span>The Pioneer will chart a fresh destination you have not visited before.</span><div class="actions">' +
+            btn("Begin Uncharted Jump", "jumpSystem") +
             "</div></div></div>",
         );
       }
@@ -15465,7 +15903,7 @@
         const d = ensureDailyOps(false);
         return card(
           "Daily Operations",
-          "Local rotating objectives refresh by device date. They reward steady play without forcing purchases.",
+          "New assignments arrive each day and reward consistent exploration.",
           '<div class="list">' +
             d.ops
               .map(
@@ -15531,22 +15969,98 @@
       }
       function collectionHtml() {
         const c = collectionStats();
+        return (
+          card(
+            "Discovery Archive",
+            "Expand the Codex by seeking rare worlds, decoding mysteries, and recording the choices that shape the frontier.",
+            '<div class="grid"><div class="chip">Codex Entries: ' +
+              c.total +
+              '</div><div class="chip">Worlds Claimed: ' +
+              c.captured +
+              '</div><div class="chip rarity-rare">Rare: ' +
+              c.rare +
+              '</div><div class="chip rarity-exotic">Exotic: ' +
+              c.exotic +
+              '</div><div class="chip rarity-mythic">Mythic: ' +
+              c.mythic +
+              '</div><div class="chip">Mysteries: ' +
+              c.mysteries +
+              " decoded • " +
+              c.resolvedMysteries +
+              ' resolved</div><div class="chip">Collections: ' +
+              c.collections +
+              " / " +
+              discoveryCollections.length +
+              "</div></div>",
+          ) + discoveryCollectionsHtml()
+        );
+      }
+      function discoveryCollectionsHtml() {
+        const claimed = discoveryState().claimedCollections;
         return card(
-          "Collection Goals",
-          "Codex completion gives exploration players a reason to keep pushing outward.",
-          '<div class="grid"><div class="chip">Codex Entries: ' +
-            c.total +
-            '</div><div class="chip">Captured Archived: ' +
-            c.captured +
-            '</div><div class="chip rarity-rare">Rare: ' +
-            c.rare +
-            '</div><div class="chip rarity-exotic">Exotic: ' +
-            c.exotic +
-            '</div><div class="chip rarity-mythic">Mythic: ' +
-            c.mythic +
-            '</div><div class="chip">Factory Worlds: ' +
-            c.factory +
-            "</div></div>",
+          "Codex Collections",
+          "Complete themed records to earn permanent expedition supplies.",
+          '<div class="list">' +
+            discoveryCollections
+              .map((def) => {
+                const progress = discoveryCollectionProgress(def),
+                  complete = claimed.has(def.key),
+                  pct = clamp((progress / def.goal) * 100, 0, 100);
+                return (
+                  '<div class="quest ' +
+                  (complete ? "done" : "") +
+                  '"><b>' +
+                  (complete ? "✓ " : "") +
+                  esc(def.name) +
+                  "</b><span>" +
+                  esc(def.desc) +
+                  '</span><div class="progress"><div style="width:' +
+                  pct +
+                  '%"></div></div><span>' +
+                  progress +
+                  " / " +
+                  def.goal +
+                  " • Reward: " +
+                  esc(fmt(def.reward)) +
+                  "</span></div>"
+                );
+              })
+              .join("") +
+            "</div>",
+        );
+      }
+      function mysteryArchiveHtml() {
+        const records = Object.values(discoveryState().mysteries).sort(
+          (a, b) => Number(b.scannedAt || 0) - Number(a.scannedAt || 0),
+        );
+        return card(
+          "Decoded Mysteries",
+          "Every signal preserves its clue, your response, and the system where it was found.",
+          records.length
+            ? '<div class="list">' +
+                records
+                  .map(
+                    (record) =>
+                      '<div class="log ' +
+                      (record.resolved ? "done" : "") +
+                      '"><b>' +
+                      (record.resolved ? "✓ " : "") +
+                      esc(record.name) +
+                      "</b><span>" +
+                      esc(record.system + " • " + record.archetypeName) +
+                      "</span><span>" +
+                      esc(record.clue) +
+                      "</span><span>" +
+                      esc(
+                        record.resolved
+                          ? "Response: " + record.choice
+                          : "Decoded • Encounter unresolved",
+                      ) +
+                      "</span></div>",
+                  )
+                  .join("") +
+                "</div>"
+            : '<div class="log"><b>No Mysteries Decoded</b><span>Travel beyond Sol and approach an unknown signal to begin the archive.</span></div>',
         );
       }
       function reputationHtml() {
@@ -15652,7 +16166,7 @@
         const n = nearestBlackHole(),
           bh = game.system?.blackHole;
         if (!bh)
-          return '<div class="log"><b>No Black Hole Detected</b><span>Black holes have a 0.5% chance to appear only in normal procedural systems.</span></div>';
+          return '<div class="log"><b>No Black Hole Detected</b><span>No gravitational breach has been detected in this system.</span></div>';
         if (bh.collapsed)
           return '<div class="log done"><b>Collapsed Black Hole</b><span>This singularity was already used and can no longer reach a Parallel system.</span></div>';
         return (
@@ -15675,7 +16189,9 @@
         const n = nearestSectorEvent(),
           e = game.sectorEvent,
           encounter = ensureSectorEventEncounter(e),
-          faction = encounterFactions[encounter?.faction];
+          faction = encounterFactions[encounter?.faction],
+          profile = systemMysteryProfile(),
+          record = currentMysteryRecord();
         if (!e)
           return '<div class="log"><b>No Exploration Encounter</b><span>Choice-driven encounters begin appearing beyond Sol.</span></div>';
         return (
@@ -15685,31 +16201,60 @@
           esc(e.complete ? "✓ " : "") +
           esc(e.name) +
           "</b><span>" +
-          esc(faction?.name || "Unknown Contact") +
+          esc(
+            e.mysteryScanned
+              ? faction?.name || "Unknown Contact"
+              : game.system.archetype?.name || "Unknown Frontier",
+          ) +
           " • " +
-          esc(encounter?.chapter || "Exploration Encounter") +
+          esc(
+            e.mysteryScanned
+              ? encounter?.chapter || "Exploration Encounter"
+              : "Long-Range Mystery",
+          ) +
           "</span><span>" +
           esc(e.desc) +
-          "</span><span>" +
-          esc(e.need) +
-          " Distance: " +
-          (n ? Math.round(n.d) : "unknown") +
-          "u</span><span>Outcome: Your choice affects resources, reputation, technology, and the Captain's Log." +
+          "</span>" +
+          (e.mysteryScanned
+            ? "<span><b>Decoded clue:</b> " +
+              esc(record?.clue || profile?.clue || e.mysteryClue) +
+              "</span>"
+            : "<span>Move within " +
+              Math.round(mysteryScanRadius()) +
+              "u to decode this signal.</span>") +
+          "<span>" +
+          (e.complete
+            ? "Archived outcome: " + esc(record?.choice || "Decision recorded")
+            : esc(e.need) +
+              " Distance: " +
+              (n ? Math.round(n.d) : "unknown") +
+              "u") +
+          "</span><span>Your response can change resources, reputation, technology, and future discoveries." +
           '</span><div class="actions">' +
-          btnWhy(
-            e.complete ? "Decision Recorded" : "Open Encounter",
-            "completeSectorEvent",
-            null,
-            !!(n && n.d <= 115 && !e.complete),
-            n ? "Move closer to the signal." : "No signal nearby.",
-          ) +
+          (e.complete
+            ? btn("Decision Archived", "noop", null, false)
+            : !e.mysteryScanned
+              ? btnWhy(
+                  "Scan Mystery",
+                  "scanSectorMystery",
+                  null,
+                  !!(n && n.d <= mysteryScanRadius()),
+                  n ? "Move closer to enter scanning range." : "No signal nearby.",
+                )
+              : btnWhy(
+                  "Open Encounter",
+                  "completeSectorEvent",
+                  null,
+                  !!(n && n.d <= 115),
+                  n ? "Move closer to the decoded source." : "No signal nearby.",
+                )) +
           "</div></div>"
         );
       }
       function contractsHtml() {
         return card(
-          "Replay Contracts",
-          "Optional objectives add replayability alongside Daily Operations, Pilot Rank milestones, rare sector events, and collection goals. Completed: " +
+          "Frontier Contracts",
+          "Optional contracts provide extra goals between major discoveries. Completed: " +
             game.completedContracts,
           '<div class="list">' +
             game.contracts
@@ -15814,8 +16359,10 @@
         ui.menuContent.innerHTML =
           card(
             "Planet Codex",
-            "Discovered worlds are permanently archived here with rarity, resources, capture status, and upgrade history.",
+            "Discovered worlds are permanently archived with their system family, rarity, resources, and expedition history.",
           ) +
+          mysteryArchiveHtml() +
+          discoveryCollectionsHtml() +
           (entries.length
             ? '<div class="codex-grid">' +
               entries
@@ -15834,7 +16381,7 @@
                     "</span></b><span>" +
                     esc(e.system) +
                     " • " +
-                    esc(e.className || "Planet") +
+                    esc(e.archetypeName || e.className || "Planet") +
                     "</span><span>" +
                     esc(e.biome) +
                     " • " +
@@ -15861,7 +16408,7 @@
         ui.menuContent.innerHTML =
           card(
             "Echo System",
-            "Only clean route segments are saved, so the system never becomes one giant Echo.",
+            "Precise slingshot routes leave distinct Echoes that can be followed, harvested, and mastered.",
             btnWhy(
               "Harvest Nearest Echo",
               "harvestEcho",
@@ -15928,11 +16475,19 @@
           ],
           [
             "Frigate",
-            "The ODF Pioneer is your mobile base. Build it at Earth Factory, then upgrade its reactor, hangar, scanner, capacity, and Fleet Command systems. Once built, it can push endlessly into newly generated sectors.",
+            "The ODF Pioneer is your mobile base. Build it at Earth Factory, then upgrade its reactor, hangar, scanner, capacity, and Fleet Command systems. Once built, it can lead the expedition into uncharted space.",
           ],
           [
             "Exploration Encounters",
             "Every sector beyond Sol contains a contact with multiple responses. Approach its signal, then choose based on your ship systems, fleet, resources, faction standing, and earlier decisions. Outcomes are permanent and recorded in the Captain's Log.",
+          ],
+          [
+            "Deep-Space Mysteries",
+            "Each system family carries a unique mystery. Enter scanning range to decode its clue before approaching the source. The decoded clue highlights one informed encounter response with stronger rewards and additional faction standing.",
+          ],
+          [
+            "Codex Collections",
+            "The Codex groups discoveries into themed collections. Catalogue worlds, decode mysteries, and resolve encounters to earn automatic collection rewards.",
           ],
           [
             "Faction Reputation",
@@ -15952,7 +16507,7 @@
           ],
           [
             "Black Holes",
-            "Black holes are ultra-rare one-use gates found only in normal procedural systems. Entering one costs 22% of stored resources, collapses the black hole, and sends you to a non-returnable Parallel system.",
+            "Black holes are exceptionally rare, single-use gateways. Entering one costs 22% of stored resources, collapses the breach, and sends you to a one-way Parallel system.",
           ],
           [
             "Parallel Systems",
@@ -15960,7 +16515,7 @@
           ],
           [
             "Cosmic Spirit Systems",
-            "Cosmic Spirit systems are rare 2% special discoveries that appear instead of a normal generated sector. They are luminous, seed-varied, and the first one unlocks the Spirit Voyager frigate skin.",
+            "Cosmic Spirit systems are legendary luminous discoveries. Reaching your first one unlocks the Spirit Voyager frigate design.",
           ],
           [
             "Troubleshooting",
@@ -15970,7 +16525,7 @@
         ui.menuContent.innerHTML =
           card(
             "Pilot Manual",
-            "A polished game guide for players who want more detail than tutorial tips.",
+            "A complete field guide to flight, exploration, progression, and the unknown frontier.",
           ) +
           '<div class="list">' +
           sections
@@ -16054,6 +16609,15 @@
               typeof resolveExplorationEncounter === "function",
           },
           {
+            group: "Gameplay",
+            label: "Discovery mysteries and Codex collections available",
+            pass:
+              discoveryMysteries.length >= 8 &&
+              discoveryCollections.length >= 8 &&
+              typeof scanSectorMystery === "function" &&
+              typeof discoveryCollectionsHtml === "function",
+          },
+          {
             group: "Save",
             label: "Save metadata exists",
             pass: typeof saveMeta === "function",
@@ -16063,7 +16627,8 @@
             label: "Activity log saved",
             pass:
               String(saveState).includes("activity") &&
-              String(saveState).includes("universeSeed"),
+              String(saveState).includes("universeSeed") &&
+              String(saveState).includes("discovery"),
           },
           {
             group: "Save",
@@ -16164,7 +16729,15 @@
           ],
           [
             "Exploration Encounters",
-            "Investigate the marked signal in each non-tutorial sector. Choices can require upgrades, fleet support, resources, Echoes, or faction trust and may affect hull, rewards, reputation, and story progression.",
+            "Investigate marked signals beyond Sol. Choices can require upgrades, fleet support, resources, Echoes, or faction trust and may affect your hull, rewards, reputation, and story.",
+          ],
+          [
+            "Mystery Scans",
+            "Unknown signals can be decoded from long range. Scanning reveals a persistent clue and highlights one informed response when you reach the encounter.",
+          ],
+          [
+            "Codex Collections",
+            "Complete themed world, mystery, and encounter records to receive expedition supplies automatically.",
           ],
           [
             "Factory Worlds",
@@ -16176,7 +16749,7 @@
           ],
           [
             "Black Holes",
-            "A 0.5% black hole in a normal procedural system can be entered from the System menu or nearby action button. It collapses after use.",
+            "An exceptionally rare black hole can be entered from the System menu or its nearby action. The breach collapses after use.",
           ],
           [
             "Parallel Systems",
@@ -16184,7 +16757,7 @@
           ],
           [
             "Cosmic Spirit Systems",
-            "Rare 2% special systems with luminous green-white-gold visuals. The first discovery unlocks Spirit Voyager.",
+            "Legendary systems alive with luminous green, white, and gold currents. The first discovery unlocks Spirit Voyager.",
           ],
           [
             "Menus",
@@ -16417,8 +16990,8 @@
       }
       function resetSaveAndRun() {
         confirmAction(
-          "Reset Save + Run?",
-          "Delete the local save and restart this run?",
+          "Start a New Journey?",
+          "This will replace your current local journey and begin again at Earth. Continue?",
           () => {
             deleteSave();
             onboardingDismissed = false;
@@ -16631,7 +17204,7 @@
             esc(objective.text);
         } else
           ui.missionBox.innerHTML =
-            "<b>Mission:</b> Explore, capture worlds with on-screen actions, upgrade from the menu, and record Echo routes.";
+            "<b>Expedition:</b> Chart worlds, decode unknown signals, choose your response, and complete Codex collections.";
         const ready = Object.values(unclaimedProduction).reduce(
             (a, v) => a + Math.floor(v || 0),
             0,
@@ -16672,12 +17245,6 @@
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
-        if (ev && ev.d < 115)
-          return {
-            label: "Investigate Signal",
-            run: completeSectorEvent,
-            show: true,
-          };
         if (game.ship.orbitLocked && game.ship.lockBody) {
           const b = body(game.ship.lockBody);
           if (b && b.capturable && !game.captured.has(b.name))
@@ -16690,6 +17257,18 @@
           game.ship.fuel < game.ship.maxFuel * 0.94
         )
           return { label: "Refuel", run: refuel, show: true };
+        if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
+          return {
+            label: "Scan Mystery",
+            run: scanSectorMystery,
+            show: true,
+          };
+        if (ev && ev.event.mysteryScanned && ev.d < 115)
+          return {
+            label: "Investigate Signal",
+            run: completeSectorEvent,
+            show: true,
+          };
         return { label: "", run: noop, show: false };
       }
       function showOnboarding(i = onboardStep) {
@@ -22405,8 +22984,8 @@
 
         ok(
           "Save schema is current",
-          SAVE_VERSION === 16 &&
-            APP_VERSION === "0.18.0" &&
+          SAVE_VERSION === 17 &&
+            APP_VERSION === "0.19.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -22786,11 +23365,14 @@
       }
       function canShowRewardedAd() {
         game.monetization = restoreMonetization(game.monetization);
-        return Date.now() >= (game.monetization.rewardAdCooldownUntil || 0);
+        return (
+          !!game.monetization.adMobReady &&
+          Date.now() >= (game.monetization.rewardAdCooldownUntil || 0)
+        );
       }
       function canShowInterstitial(reason = "break") {
         game.monetization = restoreMonetization(game.monetization);
-        if (isRemoveAdsOwned()) return false;
+        if (!game.monetization.adMobReady || isRemoveAdsOwned()) return false;
         if (
           titleOpen ||
           paused ||
@@ -22824,15 +23406,13 @@
       }
       function monetizationStatusText() {
         const m = restoreMonetization(game.monetization);
+        if (!m.storeKitReady && !m.adMobReady)
+          return "Web Edition has no advertisements or payments. All progression remains available.";
         return (
           (isRemoveAdsOwned()
             ? "Automatic ads removed permanently. "
             : "Automatic ads allowed only at natural breaks. ") +
-          "Rewarded ads remain optional for bonus rewards. StoreKit: " +
-          (m.storeKitReady ? "ready" : "web placeholder") +
-          " • AdMob: " +
-          (m.adMobReady ? "ready" : "web placeholder") +
-          "."
+          "Sponsored rewards remain optional and are never required for progression."
         );
       }
       function nativePurchase(productId) {
@@ -22906,18 +23486,22 @@
           type: "nonconsumable",
         };
         if (!productId)
-          return toast("This item is not configured for purchase yet.");
+          return toast("This design is not available yet.");
         if (hasPurchasedProduct(productId)) {
           if (typeof opts.onVerified === "function")
             opts.onVerified({ productId, verified: true, restored: true });
           return toast(product.label + " is already owned.");
         }
+        const nativeStore = !!game.monetization?.storeKitReady;
         confirmAction(
-          "Confirm Purchase",
-          product.label +
-            " " +
-            (product.price ? "(" + product.price + ")" : "") +
-            " will use Apple in-app purchase when packaged for iOS. In browser testing, this uses a verified placeholder transaction. Continue?",
+          nativeStore ? "Confirm Purchase" : "Claim Web Edition Design?",
+          nativeStore
+            ? product.label +
+                " " +
+                (product.price ? "(" + product.price + ")" : "") +
+                " will be added to your collection. Continue?"
+            : product.label +
+                " is complimentary in Web Edition. Add it to your collection?",
           () => {
             nativePurchase(productId)
               .then((tx) => completePurchase(productId, tx, opts))
@@ -22944,9 +23528,11 @@
         if (typeof opts.onVerified === "function") opts.onVerified(record);
         addActivity(
           "system",
-          "Purchase unlocked",
+          tx.environment === "web-placeholder"
+            ? "Web Edition design claimed"
+            : "Purchase unlocked",
           (productById[productId]?.label || opts.label || productId) +
-            " verified.",
+            " added to the hangar.",
         );
         saveGame(false);
         renderMenu();
@@ -23178,6 +23764,11 @@
         showRewardedAd("emergencyFuel", () => grantAdReward("emergencyFuel"));
       }
       function monetizationRewardHtml() {
+        if (!game.monetization?.adMobReady)
+          return card(
+            "Web Edition Rewards",
+            "Sponsored rewards are inactive in Web Edition. The complete journey remains available without them.",
+          );
         return (
           '<div class="card"><h4>Sponsored Rewards</h4><p>Ads are optional. Watching a rewarded ad grants a bonus, but progression is never locked behind ads.</p><div class="actions">' +
           btnWhy(
@@ -23207,14 +23798,21 @@
         );
       }
       function monetizationSettingsHtml() {
+        if (
+          !game.monetization?.storeKitReady &&
+          !game.monetization?.adMobReady
+        )
+          return card(
+            "Web Edition",
+            "This edition has no advertisements or payments. Complimentary Web Edition hull designs can be claimed from the Cosmetic Hangar.",
+            '<div class="grid"><div class="chip"><b>Advertisements</b><br>Inactive</div><div class="chip"><b>Payments</b><br>Inactive</div><div class="chip"><b>Game Progress</b><br>Fully available</div></div>',
+          );
         return (
           '<div class="card"><h4>Ads & Purchases</h4><p>' +
           esc(monetizationStatusText()) +
           '</p><div class="grid"><div class="chip"><b>Remove Ads</b><br>' +
           (isRemoveAdsOwned() ? "Owned" : "$2.99") +
-          '</div><div class="chip"><b>Rewarded Ads</b><br>Always optional</div><div class="chip"><b>StoreKit Product</b><br>' +
-          esc(monetizationProducts.removeAds.id) +
-          '</div><div class="chip"><b>Privacy Options</b><br>Ready for native consent screen</div></div><div class="actions">' +
+          '</div><div class="chip"><b>Sponsored Rewards</b><br>Always optional</div><div class="chip"><b>Privacy</b><br>Manage your choices</div></div><div class="actions">' +
           btn(
             isRemoveAdsOwned() ? "Ads Removed" : "Remove Ads Permanently $2.99",
             "removeAdsPermanent",
@@ -23227,9 +23825,7 @@
         );
       }
       function openPrivacyOptions() {
-        toast(
-          "Privacy options will open the native consent screen in the iOS/Android build. Browser test mode has no ad tracking enabled.",
-        );
+        toast("Privacy choices are available whenever advertising is active.");
       }
       Object.assign(window, {
         setMenuTab,
@@ -23269,6 +23865,7 @@
         buildFrigate,
         rerollContracts,
         harvestEcho,
+        scanSectorMystery,
         completeSectorEvent,
         openExplorationEncounter,
         resolveExplorationEncounter,
@@ -23570,8 +24167,8 @@
       $("tipsPauseBtn").onclick = replayTips;
       $("resetBtn").onclick = () =>
         confirmAction(
-          "Reset this run?",
-          "This restarts the current run without using a browser popup. Continue?",
+          "Restart This Journey?",
+          "Return to Earth and begin this journey again? Your saved journey is not deleted.",
           () => {
             initGame(false);
             modalFreeze = false;
