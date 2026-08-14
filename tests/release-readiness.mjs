@@ -164,6 +164,10 @@ vm.runInContext(
     initGame, body, nearestBody, finishCapture, upgradeShip, upgradePlanet, updateShip,
     buildFrigate, frigatePosition, toggleOrbit, jumpSystem,
     chooseUnchartedSystemIndex, unchartedSystemCandidates,
+    ensureSystemIndex, menuNavigationHtml, normalizeMenuName,
+    fleetFormationSlot, fleetEscortMotion, fleetSkinForKey,
+    startFleetMission, updateFleetMissions, completeFleetMission,
+    systemVisualProfile, systemRarityClass, proc, parallelSystem,
     saveState, saveGame, loadGame, validSavePayload,
     setShipSkin, setFrigateSkin, owns, smartAction, releaseChecks,
     dismissPanels(){
@@ -183,23 +187,33 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.17.0", "Expected release candidate version");
-assert.equal(api.SAVE_VERSION, 15, "Expected current save schema");
+assert.equal(api.APP_VERSION, "0.18.0", "Expected release candidate version");
+assert.equal(api.SAVE_VERSION, 16, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
-assert.ok(api.systems.length >= 13, "New runs need a deep uncharted route pool");
+assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
+assert.equal(api.game.system.name, "Sol System", "Every pilot must start in Sol");
+assert.equal(api.game.system.isTutorial, true, "Sol must remain the tutorial route");
 assert.equal(
   new Set(api.systems.map((system) => system.name)).size,
   api.systems.length,
   "Generated systems must have unique names",
 );
 
+api.unchartedSystemCandidates(8);
 const firstRunNames = api.systems.slice(1, 9).map((system) => system.name);
 const firstRunSeed = api.universeSeed;
 api.initGame(false);
 checkpoint("second new run initialized");
+assert.equal(api.systems.length, 1, "Restarting must not pre-chart random systems");
+api.unchartedSystemCandidates(8);
 const secondRunNames = api.systems.slice(1, 9).map((system) => system.name);
 assert.notEqual(api.universeSeed, firstRunSeed, "Every new run needs a new seed");
 assert.notDeepEqual(secondRunNames, firstRunNames, "New runs need different systems");
+assert.ok(
+  !api.menuNavigationHtml().includes('data-arg="&quot;flight&quot;"'),
+  "Flight controls must not be duplicated in menu navigation",
+);
+assert.notEqual(api.normalizeMenuName("flight"), "flight", "Legacy Flight links must redirect");
 
 for (const subsystem of ["thrust", "fuel", "brake", "accel", "handling", "cargo"]) {
   checkpoint(`tutorial path: ${subsystem}`);
@@ -268,6 +282,50 @@ assert.equal(new Set(visited).size, visited.length, "Outward jumps must never re
 assert.ok(visited.some((index, position) => index !== position + 1), "Outward routing must not be a linear index walk");
 assert.ok(archetypes.size >= 3, "Early jumps should expose multiple system archetypes");
 assert.ok(modifiers.size >= 2, "Early jumps should expose multiple sector modifiers");
+
+api.game.frigate.commandLevel = 5;
+api.game.frigate.hangarLevel = 4;
+api.game.resources = Object.fromEntries(Object.keys(api.game.resources).map((key) => [key, 9999]));
+api.game.fleet.ships.push({
+  id: "fleet-test-scout",
+  type: "scout",
+  level: 2,
+  name: "Scout Test",
+  status: "idle",
+  missionId: null,
+});
+const slot = api.fleetFormationSlot(0);
+assert.ok(Math.hypot(slot.x, slot.y) > 220, "Fleet formation must clear the Starling orbit lane");
+const missionTemplate = api.game.fleet.available[0];
+api.startFleetMission(missionTemplate.id, "fleet-test-scout");
+const fleetShip = api.game.fleet.ships.find((ship) => ship.id === "fleet-test-scout");
+assert.equal(fleetShip.status, "launching", "Expeditions must begin with a departure animation");
+assert.ok(api.fleetEscortMotion(fleetShip, slot), "Departing escorts remain visible while flying out");
+fleetShip.departureAt = Date.now() - 3000;
+api.updateFleetMissions();
+assert.equal(fleetShip.status, "mission", "Departed escorts must become deployed");
+assert.equal(api.fleetEscortMotion(fleetShip, slot), null, "Deployed escorts must disappear from formation");
+const fleetMission = api.game.fleet.missions.find((mission) => mission.shipId === fleetShip.id);
+fleetMission.endAt = Date.now() - 10;
+api.updateFleetMissions();
+assert.equal(fleetShip.status, "returning", "Completed expeditions must fly back to base");
+assert.ok(api.fleetEscortMotion(fleetShip, slot), "Returning escorts must be visible on approach");
+fleetShip.returnStartedAt = Date.now() - 3000;
+api.updateFleetMissions();
+assert.equal(fleetShip.status, "ready", "Returned escorts must settle into formation before claiming");
+api.completeFleetMission(fleetMission.id);
+api.dismissPanels();
+assert.equal(fleetShip.status, "idle", "Claimed escorts must resume formation duty");
+
+const commandPalette = api.fleetSkinForKey("Command Match");
+assert.equal(commandPalette.key, "Command Match", "Command Match must resolve a live palette");
+assert.match(commandPalette.primary, /^#[0-9a-f]{6}$/i, "Adaptive fleet palettes need valid hull colors");
+assert.notDeepEqual(
+  api.systemVisualProfile(api.proc(41021)),
+  api.systemVisualProfile(api.parallelSystem(41021)),
+  "Parallel space must have a unique visual-event identity",
+);
+assert.equal(api.systemRarityClass(api.parallelSystem(41022)), "Parallel");
 
 api.game.ownedShipSkins.add("Solar Flare");
 api.setShipSkin("Solar Flare");

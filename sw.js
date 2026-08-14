@@ -1,4 +1,4 @@
-const CACHE_NAME = "orbital-drift-v0.17.0";
+const CACHE_NAME = "orbital-drift-v0.18.0";
 const CORE_ASSETS = [
   "./",
   "./index.html",

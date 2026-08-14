@@ -40,13 +40,20 @@ for (const required of [
   "function tutorialObjective(",
   "function renderCosmetics(",
   "function renderSkinPreviews(",
+  "function pioneerCommandHubHtml(",
+  "function fleetFormationSlot(",
+  "function fleetEscortMotion(",
+  "function drawFleetShipVisual(",
+  "function systemVisualProfile(",
+  "function updateSystemVisualPhenomena(",
+  "function drawRareSystemAura(",
   "function chooseUnchartedSystemIndex(",
   "function exportSaveFile(",
   "function importSaveFile(",
   "function registerOfflineSupport(",
   "function runTests(",
-  "SAVE_VERSION = 15",
-  'APP_VERSION = "0.17.0"',
+  "SAVE_VERSION = 16",
+  'APP_VERSION = "0.18.0"',
   "SAVE_BACKUP_KEY",
   'key: "silent_choir_3"',
   "height: 100dvh",
@@ -62,6 +69,11 @@ for (const required of [
     `Missing required implementation: ${required}`,
   );
 }
+
+assert.ok(
+  !markup.includes('data-menu="flight"'),
+  "Menu dock must not duplicate the on-screen flight controls",
+);
 
 assert.ok(
   !html.includes("ORBITAL DRIFT GAMEPLAY PATCH"),
