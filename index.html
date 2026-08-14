@@ -2361,6 +2361,176 @@
           height: 142px;
         }
       }
+      .vault-hero {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(103, 232, 249, 0.24);
+        border-radius: 20px;
+        padding: 15px;
+        margin-bottom: 12px;
+        background:
+          radial-gradient(circle at 84% 12%, rgba(251, 191, 36, 0.14), transparent 31%),
+          radial-gradient(circle at 12% 88%, rgba(34, 211, 238, 0.12), transparent 36%),
+          linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(5, 10, 23, 0.9));
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 50px rgba(0, 0, 0, 0.22);
+      }
+      .vault-hero:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.3;
+        background-image:
+          linear-gradient(rgba(103, 232, 249, 0.08) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(103, 232, 249, 0.08) 1px, transparent 1px);
+        background-size: 34px 34px;
+        mask-image: linear-gradient(90deg, black, transparent 78%);
+      }
+      .vault-hero > * { position: relative; z-index: 1; }
+      .vault-hero h4 { margin: 0 0 5px; font-size: 16px; }
+      .vault-progress-track {
+        height: 9px;
+        margin: 10px 0 5px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(2, 6, 23, 0.86);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .vault-progress-track > div {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #22d3ee, #fbbf24);
+        box-shadow: 0 0 15px rgba(103, 232, 249, 0.45);
+      }
+      .vault-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .card > .actions > .vault-grid,
+      .card > .actions > .cosmetic-preview-live,
+      .card > .actions > .vault-progress-track {
+        flex: 1 1 100%;
+        width: 100%;
+      }
+      .vault-entry {
+        --vaultColor: #67e8f9;
+        --vaultAccent: #fbbf24;
+        position: relative;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 104px minmax(0, 1fr);
+        gap: 11px;
+        min-height: 142px;
+        border: 1px solid color-mix(in srgb, var(--vaultColor) 34%, transparent);
+        border-radius: 17px;
+        padding: 10px;
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.92), rgba(3, 7, 18, 0.92));
+      }
+      .vault-entry.pending {
+        border-style: dashed;
+        filter: saturate(0.76);
+      }
+      .vault-entry.pending:after {
+        content: "QUARANTINE";
+        position: absolute;
+        right: -31px;
+        top: 16px;
+        width: 120px;
+        padding: 3px 0;
+        transform: rotate(38deg);
+        text-align: center;
+        color: #fef3c7;
+        background: rgba(180, 83, 9, 0.72);
+        border: 1px solid rgba(253, 230, 138, 0.25);
+        font-size: 7px;
+        font-weight: 950;
+        letter-spacing: 1.3px;
+      }
+      .vault-specimen {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: 120px;
+        overflow: hidden;
+        border-radius: 13px;
+        background:
+          radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--vaultColor) 28%, transparent), transparent 43%),
+          linear-gradient(160deg, rgba(2, 6, 23, 0.64), rgba(15, 23, 42, 0.78));
+        border: 1px solid color-mix(in srgb, var(--vaultColor) 27%, transparent);
+        box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.48);
+      }
+      .vault-specimen:before,
+      .vault-specimen:after {
+        content: "";
+        position: absolute;
+        border: 1px solid color-mix(in srgb, var(--vaultColor) 45%, transparent);
+        border-radius: 50%;
+      }
+      .vault-specimen:before { width: 82px; height: 82px; }
+      .vault-specimen:after { width: 62px; height: 28px; transform: rotate(-18deg); }
+      .vault-specimen-core {
+        position: relative;
+        z-index: 2;
+        width: 38px;
+        height: 38px;
+        border-radius: 9px 55% 42% 55%;
+        transform: rotate(45deg);
+        background: linear-gradient(135deg, var(--vaultAccent), var(--vaultColor) 52%, rgba(2, 6, 23, 0.9));
+        border: 1px solid rgba(255, 255, 255, 0.52);
+        box-shadow: 0 0 20px color-mix(in srgb, var(--vaultColor) 60%, transparent);
+      }
+      .vault-specimen.kind-lifeform .vault-specimen-core {
+        width: 50px;
+        height: 29px;
+        border-radius: 68% 36% 62% 42%;
+        transform: rotate(-8deg);
+        animation: vaultBreathe 3.4s ease-in-out infinite;
+      }
+      .vault-specimen.kind-lifeform .vault-specimen-core:before,
+      .vault-specimen.kind-lifeform .vault-specimen-core:after {
+        content: "";
+        position: absolute;
+        left: 8px;
+        bottom: -18px;
+        width: 2px;
+        height: 23px;
+        background: linear-gradient(var(--vaultColor), transparent);
+        border-radius: 999px;
+        transform: rotate(24deg);
+      }
+      .vault-specimen.kind-lifeform .vault-specimen-core:after { left: 34px; transform: rotate(-31deg); }
+      .vault-specimen.kind-phenomenon .vault-specimen-core {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: radial-gradient(circle, white 0 5%, var(--vaultAccent) 12%, transparent 44%), conic-gradient(from 30deg, transparent, var(--vaultColor), transparent, var(--vaultAccent), transparent);
+        animation: vaultTurn 8s linear infinite;
+      }
+      .vault-specimen.visual-disc .vault-specimen-core,
+      .vault-specimen.visual-halo .vault-specimen-core,
+      .vault-specimen.visual-orb .vault-specimen-core { border-radius: 50%; }
+      .vault-specimen.visual-crystal .vault-specimen-core { border-radius: 5px 55% 5px 55%; }
+      .vault-specimen.visual-wing .vault-specimen-core { width: 58px; height: 25px; border-radius: 75% 10%; }
+      .vault-specimen.visual-bloom .vault-specimen-core { border-radius: 50% 12% 50% 12%; }
+      .vault-entry-copy { min-width: 0; }
+      .vault-entry-copy b { display: block; padding-right: 20px; color: #f8fbff; font-size: 12px; }
+      .vault-entry-copy > span { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.42; }
+      .vault-entry-copy .vault-origin { color: color-mix(in srgb, var(--vaultColor) 82%, white); }
+      .vault-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+      .vault-tags .tag { margin: 0; font-size: 7px; }
+      @keyframes vaultBreathe { 50% { transform: rotate(-8deg) scale(1.08); filter: brightness(1.18); } }
+      @keyframes vaultTurn { to { transform: rotate(405deg); } }
+      @media (max-width: 760px) {
+        .vault-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 430px) {
+        .vault-entry { grid-template-columns: 88px minmax(0, 1fr); }
+        .vault-specimen { min-height: 126px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .vault-specimen-core { animation: none !important; }
+      }
       .title-feature {
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 16px;
@@ -4430,7 +4600,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Discovery Depth • v0.19.0</div>
+        <div class="title-version">Pioneer Relic Vault • v0.20.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -4834,8 +5004,8 @@
         TAU = Math.PI * 2,
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
-        SAVE_VERSION = 17,
-        APP_VERSION = "0.19.0";
+        SAVE_VERSION = 18,
+        APP_VERSION = "0.20.0";
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -5230,6 +5400,19 @@
           type: "achievement",
           price: 0,
           desc: "Encounter an ice world to unlock this layered glacier-blue ODF Pioneer hull with frosted command glass, crystalline armor ribs, cold reactor vents, and white-blue defensive trim.",
+        },
+        {
+          key: "Astral Archaeologist",
+          primary: "#c9a66b",
+          secondary: "#29251f",
+          accent: "#67e8f9",
+          glow: "#fbbf24",
+          rarity: "Rare",
+          visualTier: 2,
+          motif: "archaeologist",
+          type: "achievement",
+          price: 0,
+          desc: "Secure 18 discoveries in the Pioneer Vault to earn this field-research refit: weathered expedition plating, illuminated specimen canisters, survey lamps, a dorsal excavation scanner, and etched star-chart routes.",
         },
         {
           key: "Abyss",
@@ -6113,7 +6296,78 @@
           goal: 3,
           reward: { Crystal: 16, Titanium: 16, DataCores: 12 },
         },
+        {
+          key: "vaultInitiate",
+          name: "Pioneer Vault Register",
+          desc: "Secure six discoveries inside the ODF Pioneer.",
+          mode: "vaultSecured",
+          goal: 6,
+          reward: { DataCores: 18, Alloy: 28 },
+        },
+        {
+          key: "relicCabinet",
+          name: "Relic Cabinet",
+          desc: "Secure six artifacts recovered from planets or deep space.",
+          mode: "vaultKind",
+          kind: "artifact",
+          goal: 6,
+          reward: { Crystal: 20, Titanium: 18 },
+        },
+        {
+          key: "xenobiologyWing",
+          name: "Xenobiology Wing",
+          desc: "Safely contain six living specimens from the frontier.",
+          mode: "vaultKind",
+          kind: "lifeform",
+          goal: 6,
+          reward: { BioGel: 24, DataCores: 14 },
+        },
+        {
+          key: "hazardArchive",
+          name: "Red-Seal Archive",
+          desc: "Secure a Volatile or more dangerous discovery.",
+          mode: "vaultThreat",
+          minThreat: 4,
+          goal: 1,
+          reward: { DarkMatter: 1, Plasma: 22 },
+        },
       ];
+      const VAULT_SKIN_GOAL = 18,
+        vaultThreatLabels = [
+          "Unrated",
+          "Benign",
+          "Reactive",
+          "Hazardous",
+          "Volatile",
+          "Cataclysmic",
+          "Reality-Bending",
+        ],
+        vaultCatalog = [
+          { key: "ember-reliquary", name: "Ember Reliquary", kind: "artifact", source: "planet", families: ["innerForge"], threat: 2, rarity: "Unusual", colors: ["#fb923c", "#fde68a"], visual: "reliquary", entry: "A heat-blackened casket whose inner rings remain aligned with a star that no longer exists. It warms whenever the Pioneer changes course." },
+          { key: "foundry-heart", name: "Foundry Heart", kind: "artifact", source: "space", families: ["innerForge"], threat: 4, rarity: "Rare", colors: ["#ef4444", "#fbbf24"], visual: "core", entry: "A self-heating alloy engine recovered between worlds. Its chambers forge microscopic tools, then dismantle them before anyone can learn their purpose." },
+          { key: "cinder-mite", name: "Cinder Mite Colony", kind: "lifeform", source: "planet", families: ["innerForge"], threat: 3, rarity: "Rare", colors: ["#f97316", "#fef3c7"], visual: "swarm", entry: "Silicate organisms that swim through molten metal. The colony arranges itself into tiny constellations when exposed to engine vibration." },
+          { key: "storm-ray", name: "Storm Ray", kind: "lifeform", source: "space", families: ["gasFrontier"], threat: 2, rarity: "Unusual", colors: ["#38bdf8", "#e0f2fe"], visual: "wing", entry: "A translucent drifter that rides charged magnetospheres. Its fins flash with the weather pattern of the world where it was born." },
+          { key: "thunder-pearl", name: "Thunder Pearl", kind: "artifact", source: "planet", families: ["gasFrontier"], threat: 3, rarity: "Rare", colors: ["#818cf8", "#f0abfc"], visual: "orb", entry: "A pressure-grown sphere holding a continuous lightning storm. The discharge repeats a navigational warning every eleven minutes." },
+          { key: "choir-eel", name: "Choir Eel", kind: "lifeform", source: "planet", families: ["gasFrontier"], threat: 4, rarity: "Rare", colors: ["#22d3ee", "#c4b5fd"], visual: "serpent", entry: "A ribbon-bodied organism from a gas giant's upper atmosphere. It answers radio signals with chords too precise to be instinctive." },
+          { key: "mnemonic-shard", name: "Mnemonic Shard", kind: "artifact", source: "planet", families: ["crystalReach"], threat: 2, rarity: "Unusual", colors: ["#a78bfa", "#67e8f9"], visual: "crystal", entry: "A crystal that replays the last shadow cast across it. Older layers contain silhouettes belonging to no known species." },
+          { key: "prism-beetle", name: "Prism Beetle", kind: "lifeform", source: "planet", families: ["crystalReach"], threat: 1, rarity: "Unusual", colors: ["#f0abfc", "#bae6fd"], visual: "beetle", entry: "A gentle mineral grazer with a shell that splits starlight into moving maps. It sleeps facing the nearest uncharted system." },
+          { key: "refraction-ghost", name: "Refraction Ghost", kind: "phenomenon", source: "space", families: ["crystalReach"], threat: 5, rarity: "Exotic", colors: ["#c084fc", "#ffffff"], visual: "halo", entry: "A contained knot of light that arrives a fraction before its own reflection. Vault instruments record two incompatible positions at once." },
+          { key: "spore-cathedral", name: "Spore Cathedral", kind: "lifeform", source: "planet", families: ["bioCluster"], threat: 3, rarity: "Rare", colors: ["#4ade80", "#fde68a"], visual: "bloom", entry: "A dormant fungal city folded into a seed-sized lattice. Under moonlight, its towers briefly unfold and broadcast a scent-based history." },
+          { key: "orbiting-kelp", name: "Orbital Kelp", kind: "lifeform", source: "space", families: ["bioCluster"], threat: 2, rarity: "Unusual", colors: ["#2dd4bf", "#bbf7d0"], visual: "tendrils", entry: "Vacuum flora that grows along magnetic field lines. Its fronds point toward nearby life long before the scanners do." },
+          { key: "genesis-pod", name: "Genesis Pod", kind: "artifact", source: "planet", families: ["bioCluster"], threat: 5, rarity: "Exotic", colors: ["#84cc16", "#fef08a"], visual: "pod", entry: "An engineered seed vault with room for an entire lost biosphere. Something inside is patiently adapting to the containment field." },
+          { key: "witness-coin", name: "Witness Coin", kind: "artifact", source: "planet", families: ["ancientArchive"], threat: 1, rarity: "Unusual", colors: ["#d6b36a", "#fff7d6"], visual: "disc", entry: "A ceremonial disc engraved on both sides with the same night sky, separated by twelve thousand years." },
+          { key: "cartographer-sarcophagus", name: "Cartographer Sarcophagus", kind: "artifact", source: "space", families: ["ancientArchive"], threat: 4, rarity: "Rare", colors: ["#b45309", "#fde68a"], visual: "reliquary", entry: "A sealed navigation cradle whose occupant mapped routes by dreaming. The lid now draws new lines toward every system the Pioneer visits." },
+          { key: "archive-moth", name: "Archive Moth", kind: "lifeform", source: "planet", families: ["ancientArchive"], threat: 2, rarity: "Rare", colors: ["#eab308", "#fef9c3"], visual: "wing", entry: "Its metallic wings carry microscopic text. Each generation adds a chapter, turning the species into a living library." },
+          { key: "absence-glass", name: "Absence Glass", kind: "artifact", source: "planet", families: ["voidRim"], threat: 4, rarity: "Rare", colors: ["#334155", "#38bdf8"], visual: "crystal", entry: "A pane cut from material that refuses to reflect its surroundings. Looking through it reveals stars that sensors cannot confirm." },
+          { key: "void-mimic", name: "Void Mimic", kind: "lifeform", source: "space", families: ["voidRim"], threat: 5, rarity: "Exotic", colors: ["#020617", "#22d3ee"], visual: "tendrils", entry: "A lightless organism that imitates the outline of nearby vessels. It has begun copying the Pioneer from memory rather than sight." },
+          { key: "gravity-knot", name: "Gravity Knot", kind: "phenomenon", source: "space", families: ["voidRim"], threat: 6, rarity: "Mythic", colors: ["#111827", "#a78bfa"], visual: "halo", entry: "A pinched loop of spacetime held in a counter-rotating cage. Objects placed near it briefly remember falling in another direction." },
+          { key: "pilgrim-moth", name: "Pilgrim Lightwing", kind: "lifeform", source: "space", families: ["cosmicSpirit"], threat: 2, rarity: "Rare", colors: ["#d9f99d", "#fef9c3"], visual: "wing", entry: "A luminous traveler that follows acts of mercy across interstellar distances. Its wingbeats leave no measurable force, only warmth." },
+          { key: "mercy-seed", name: "Mercy Seed", kind: "artifact", source: "planet", families: ["cosmicSpirit"], threat: 3, rarity: "Exotic", colors: ["#bbf7d0", "#ffffff"], visual: "bloom", entry: "A pearl-white seed found at the center of a barren world. It germinates only while two strangers choose to trust each other." },
+          { key: "memory-tide", name: "Memory Tide", kind: "phenomenon", source: "space", families: ["cosmicSpirit"], threat: 5, rarity: "Mythic", colors: ["#a7f3d0", "#fbcfe8"], visual: "halo", entry: "A slow wave of borrowed recollection. The vault hears distant homecomings whenever it passes through the containment rings." },
+          { key: "inverted-astrolabe", name: "Inverted Astrolabe", kind: "artifact", source: "planet", families: ["parallel"], threat: 5, rarity: "Exotic", colors: ["#f472b6", "#22d3ee"], visual: "disc", entry: "A navigation instrument that points to places the Pioneer chose not to visit. Its needles move whenever a decision becomes irreversible." },
+          { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism sharing Starling's genetic telemetry without sharing its history. It reacts before the crew touches the controls." },
+          { key: "causality-lace", name: "Causality Lace", kind: "phenomenon", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#c084fc", "#fef08a"], visual: "swarm", entry: "Threads of probability braided into a stable specimen. Every strand records a different outcome for the same discovery." },
+        ];
       const encounterFactions = {
         coalition: {
           name: "Frontier Coalition",
@@ -6906,6 +7160,7 @@
         hangarLevel: 0,
         scannerLevel: 0,
         commandLevel: 0,
+        vaultLevel: 0,
         armorLevel: 0,
         cargoLevel: 0,
         navLevel: 0,
@@ -6940,6 +7195,11 @@
             name: "Fleet Command Bay",
             desc: "Adds command crews, escort berths, and tactical coordination for a larger support fleet.",
             stat: "Fleet Slots",
+          },
+          vault: {
+            name: "Pioneer Vault",
+            desc: "Expands secure specimen storage and strengthens containment for dangerous frontier discoveries.",
+            stat: "Vault Security",
           },
         };
       }
@@ -6986,6 +7246,37 @@
         claimedCollections: new Set(),
         totalScans: 0,
       });
+      const defaultVault = () => ({ entries: [], discoveryKeys: [] });
+      function hydrateVault(raw = {}) {
+        const knownCatalog = new Set(vaultCatalog.map((item) => item.key));
+        return {
+          entries: Array.isArray(raw.entries)
+            ? raw.entries
+                .filter((entry) => entry && knownCatalog.has(entry.catalogKey))
+                .slice(-120)
+                .map((entry) => ({
+                  ...entry,
+                  threat: clamp(Number(entry.threat || 1), 1, 6),
+                  status: entry.status === "secured" ? "secured" : "pending",
+                }))
+            : [],
+          discoveryKeys: Array.isArray(raw.discoveryKeys)
+            ? [...new Set(raw.discoveryKeys.map(String))].slice(-180)
+            : [],
+        };
+      }
+      function vaultState() {
+        if (!game.vault) game.vault = defaultVault();
+        if (!Array.isArray(game.vault.entries)) game.vault = hydrateVault(game.vault);
+        return game.vault;
+      }
+      function serializeVault() {
+        const vault = vaultState();
+        return {
+          entries: vault.entries.map((entry) => ({ ...entry })),
+          discoveryKeys: [...vault.discoveryKeys],
+        };
+      }
       function hydrateDiscoveryState(raw = {}) {
         return {
           mysteries:
@@ -7169,6 +7460,7 @@
         specialRewards: { cosmicSpirit: [], parallel: [] },
         encounters: defaultEncounterState(),
         discovery: defaultDiscoveryState(),
+        vault: defaultVault(),
         encounteredIceWorld: false,
         ownedShipSkins: new Set(["High Tech"]),
         ownedFrigateSkins: new Set(["Frigate Standard"]),
@@ -8485,6 +8777,7 @@
         game.specialRewards = { cosmicSpirit: [], parallel: [] };
         game.encounters = defaultEncounterState();
         game.discovery = defaultDiscoveryState();
+        game.vault = defaultVault();
         game.collapsedBlackHoles = new Set();
         game.encounteredIceWorld = false;
         game.ownedShipSkins = new Set(["High Tech"]);
@@ -8971,6 +9264,7 @@
           captainLog: game.captainLog,
           encounters: serializeEncounterState(),
           discovery: serializeDiscoveryState(),
+          vault: serializeVault(),
           specialRewards: game.specialRewards || {
             cosmicSpirit: [],
             parallel: [],
@@ -9222,6 +9516,8 @@
           game.captainLog = { ...defaultLog(), ...(d.captainLog || {}) };
           game.encounters = hydrateEncounterState(d.encounters || {});
           game.discovery = hydrateDiscoveryState(d.discovery || {});
+          game.vault = hydrateVault(d.vault || {});
+          unlockVaultSkin(false);
           game.specialRewards = {
             cosmicSpirit: [...((d.specialRewards || {}).cosmicSpirit || [])],
             parallel: [...((d.specialRewards || {}).parallel || [])],
@@ -10634,6 +10930,7 @@
             hangar: { Alloy: 85, Titanium: 50, Crystal: 28, DataCores: 16 },
             scanner: { Alloy: 70, Crystal: 45, DataCores: 26, Plasma: 12 },
             command: { Alloy: 120, Titanium: 72, DataCores: 22, Plasma: 16 },
+            vault: { Alloy: 78, Titanium: 54, Crystal: 34, DataCores: 24 },
           }[k] || { Alloy: 90, Titanium: 60, DataCores: 18 },
           out = {};
         Object.entries(base).forEach(
@@ -10704,6 +11001,25 @@
             stat: d.stat + " " + fleetLimit() + " → " + clamp(1 + next, 1, 6),
             reward:
               "More fleet ships can be built, seen around the frigate, and sent on missions.",
+          };
+        if (type === "vault")
+          return {
+            title: d.name,
+            desc: d.desc,
+            before: vaultCapacity(level),
+            after: vaultCapacity(next),
+            stat:
+              d.stat +
+              " • " +
+              vaultCapacity(level) +
+              " → " +
+              vaultCapacity(next) +
+              " slots • " +
+              vaultThreatLabel(vaultContainment(level)) +
+              " → " +
+              vaultThreatLabel(vaultContainment(next)),
+            reward:
+              "Adds four secure slots and raises the maximum threat rating the Vault can safely contain.",
           };
         return {
           title: d.name,
@@ -10899,6 +11215,7 @@
           );
         } else
           toast("Survey reward: " + b.name + " yielded " + fmt(filtered) + ".");
+        registerVaultDiscovery("planet", b.name);
         checkAchievements();
         refreshSkins(false);
         saveGame(false);
@@ -11710,6 +12027,7 @@
                   Helium3: type === "reactor" ? 14 : 0,
                   Titanium: type === "capacity" ? 12 : 0,
                   Plasma: type === "hangar" || type === "command" ? 10 : 0,
+                  BioGel: type === "vault" ? 12 : 0,
                 },
                 "Frigate milestone reward",
               )
@@ -11925,7 +12243,9 @@
       }
       function collectionStats() {
         const entries = Object.values(game.codex || {}),
-          byR = { Common: 0, Unusual: 0, Rare: 0, Exotic: 0, Mythic: 0 };
+          byR = { Common: 0, Unusual: 0, Rare: 0, Exotic: 0, Mythic: 0 },
+          vault = vaultState(),
+          secured = vault.entries.filter((entry) => entry.status === "secured");
         entries.forEach((e) => {
           byR[e.rarity] = (byR[e.rarity] || 0) + 1;
         });
@@ -11946,7 +12266,166 @@
             (entry) => entry.resolved,
           ).length,
           collections: discoveryState().claimedCollections.size,
+          vaultDiscovered: vault.entries.length,
+          vaultSecured: secured.length,
+          vaultPending: vault.entries.length - secured.length,
         };
+      }
+      function vaultCapacity(level = game.frigate?.vaultLevel || 0) {
+        return 4 + clamp(Number(level || 0), 0, 6) * 4;
+      }
+      function vaultContainment(level = game.frigate?.vaultLevel || 0) {
+        return clamp(1 + Number(level || 0), 1, 6);
+      }
+      function vaultSecuredEntries() {
+        return vaultState().entries.filter((entry) => entry.status === "secured");
+      }
+      function vaultPendingEntries() {
+        return vaultState().entries.filter((entry) => entry.status !== "secured");
+      }
+      function vaultKindLabel(kind) {
+        return ({ artifact: "Artifact", lifeform: "Lifeform", phenomenon: "Phenomenon" })[kind] || "Discovery";
+      }
+      function vaultThreatLabel(level) {
+        return vaultThreatLabels[clamp(Number(level || 1), 1, 6)];
+      }
+      function vaultStringSeed(value) {
+        return [...String(value || "")].reduce(
+          (hash, char, index) =>
+            mixSeed(hash, char.charCodeAt(0), (index + 1) * 97),
+          2166136261,
+        );
+      }
+      function vaultFamily(system = game.system) {
+        return system?.specialType || system?.archetype?.key || "voidRim";
+      }
+      function vaultDiscoveryCandidates(source, system = game.system) {
+        const family = vaultFamily(system),
+          matching = vaultCatalog.filter(
+            (item) => item.source === source && item.families.includes(family),
+          ),
+          pool = matching.length
+            ? matching
+            : vaultCatalog.filter((item) => item.source === source),
+          unseen = pool.filter(
+            (item) => !vaultState().entries.some((entry) => entry.catalogKey === item.key),
+          );
+        return unseen.length ? unseen : pool;
+      }
+      function vaultCanSecureReason(entry) {
+        if (!game.frigate?.built) return "Build the ODF Pioneer first.";
+        if (!entry) return "Discovery record not found.";
+        if (entry.status === "secured") return "Already secured in the Vault.";
+        if (Number(entry.threat || 1) > vaultContainment())
+          return (
+            "Upgrade the Pioneer Vault to contain " +
+            vaultThreatLabel(entry.threat) +
+            " discoveries."
+          );
+        if (vaultSecuredEntries().length >= vaultCapacity())
+          return "The Pioneer Vault is full. Upgrade it to add more secure slots.";
+        return "";
+      }
+      function unlockVaultSkin(show = true) {
+        if (vaultSecuredEntries().length < VAULT_SKIN_GOAL) return false;
+        const locked = !game.ownedFrigateSkins.has("Astral Archaeologist");
+        game.ownedFrigateSkins.add("Astral Archaeologist");
+        if (locked) {
+          addActivity(
+            "discovery",
+            "Astral Archaeologist unlocked",
+            VAULT_SKIN_GOAL + " Pioneer Vault discoveries secured.",
+          );
+          if (show)
+            toast("Rare hull unlocked: Astral Archaeologist.");
+        }
+        return locked;
+      }
+      function registerVaultDiscovery(
+        source = "planet",
+        origin = "Unknown Frontier",
+        force = false,
+        catalogKey = null,
+      ) {
+        if (!game.frigate?.built || game.system?.isTutorial) return null;
+        const vault = vaultState(),
+          discoveryKey =
+            String(game.system?.seed || game.system?.name || "system") +
+            "|" +
+            source +
+            "|" +
+            String(origin || "unknown");
+        if (vault.discoveryKeys.includes(discoveryKey))
+          return vault.entries.find((entry) => entry.discoveryKey === discoveryKey) || null;
+        vault.discoveryKeys.push(discoveryKey);
+        const seed = mixSeed(
+            Number(game.system?.seed || universeSeed || 1),
+            vaultStringSeed(origin),
+            source === "space" ? 7727 : 3253,
+          ),
+          chance = source === "space" ? 0.78 : 0.48;
+        if (!force && rand(seed + 31) > chance) return null;
+        const candidates = vaultDiscoveryCandidates(source),
+          template = catalogKey
+            ? vaultCatalog.find((item) => item.key === catalogKey && item.source === source)
+            : candidates[Math.floor(rand(seed + 97) * candidates.length)];
+        if (!template) return null;
+        const canSecure =
+            template.threat <= vaultContainment() &&
+            vaultSecuredEntries().length < vaultCapacity(),
+          entry = {
+            id: "vault-" + seed.toString(36) + "-" + template.key,
+            discoveryKey,
+            catalogKey: template.key,
+            name: template.name,
+            kind: template.kind,
+            source,
+            threat: template.threat,
+            rarity: template.rarity,
+            colors: [...template.colors],
+            visual: template.visual,
+            entry: template.entry,
+            system: game.system.name,
+            origin: String(origin || game.system.name),
+            family: vaultFamily(),
+            status: canSecure ? "secured" : "pending",
+            discoveredAt: Date.now(),
+            securedAt: canSecure ? Date.now() : null,
+          };
+        vault.entries.push(entry);
+        const stateText = canSecure
+          ? "secured in the Pioneer Vault"
+          : "transferred to quarantine pending a Vault upgrade";
+        addActivity(
+          "discovery",
+          template.name + " discovered",
+          vaultKindLabel(template.kind) + " • " + vaultThreatLabel(template.threat) + " • " + stateText,
+        );
+        toast("New " + vaultKindLabel(template.kind).toLowerCase() + ": " + template.name + " • " + stateText + ".");
+        if (canSecure) {
+          checkDiscoveryCollections();
+          unlockVaultSkin(true);
+        }
+        return entry;
+      }
+      function secureVaultEntry(id) {
+        if (!requireFrigateOrbit()) return false;
+        const entry = vaultState().entries.find((item) => item.id === id),
+          reason = vaultCanSecureReason(entry);
+        if (reason) return toast(reason);
+        entry.status = "secured";
+        entry.securedAt = Date.now();
+        addActivity(
+          "discovery",
+          entry.name + " secured",
+          "Pioneer Vault • " + vaultThreatLabel(entry.threat),
+        );
+        toast(entry.name + " moved from quarantine into the Pioneer Vault.");
+        checkDiscoveryCollections();
+        unlockVaultSkin(true);
+        saveGame(false);
+        renderMenu();
+        return true;
       }
       function systemMysteryProfile(system = game.system) {
         const family = system?.specialType || system?.archetype?.key;
@@ -11962,6 +12441,20 @@
         return discoveryState().mysteries[mysteryRecordKey(system)] || null;
       }
       function discoveryCollectionProgress(def) {
+        if (def.mode === "vaultSecured")
+          return Math.min(def.goal, vaultSecuredEntries().length);
+        if (def.mode === "vaultKind")
+          return Math.min(
+            def.goal,
+            vaultSecuredEntries().filter((entry) => entry.kind === def.kind).length,
+          );
+        if (def.mode === "vaultThreat")
+          return Math.min(
+            def.goal,
+            vaultSecuredEntries().filter(
+              (entry) => Number(entry.threat || 0) >= Number(def.minThreat || 1),
+            ).length,
+          );
         if (def.mode === "mysteries") {
           const families = new Set(
             Object.values(discoveryState().mysteries)
@@ -12055,6 +12548,10 @@
               (game.resources[resource] || 0) + amount),
         );
         ensureSectorEventEncounter(event);
+        const vaultFind = registerVaultDiscovery(
+          "space",
+          profile.name + " signal",
+        );
         addActivity(
           "discovery",
           profile.name + " decoded",
@@ -12065,6 +12562,14 @@
           ["System Family", game.system.archetype?.name || "Unknown Frontier"],
           ["Survey Reward", fmt(reward)],
           ["Encounter Insight", "One response now carries a decoded advantage"],
+          ...(vaultFind
+            ? [[
+                "Vault Discovery",
+                vaultFind.name +
+                  " • " +
+                  (vaultFind.status === "secured" ? "Secured" : "Quarantine"),
+              ]]
+            : []),
         ]);
         saveGame(false);
         renderMenu();
@@ -12874,6 +13379,8 @@
         game.ownedFrigateSkins.add("Frigate Standard");
         game.ownedFleetSkins.add("Command Match");
         if (game.encounteredIceWorld) game.ownedFrigateSkins.add("Deep Freeze");
+        if (vaultSecuredEntries().length >= VAULT_SKIN_GOAL)
+          game.ownedFrigateSkins.add("Astral Archaeologist");
         game.ownedFleetSkins.add("Frontier Fleet");
         if (
           game.frigate &&
@@ -12891,6 +13398,7 @@
       }
       function refreshSkins(show = true) {
         ensureSkins();
+        unlockVaultSkin(show);
         if (game.encounteredIceWorld) {
           const locked = !game.ownedFrigateSkins.has("Deep Freeze");
           game.ownedFrigateSkins.add("Deep Freeze");
@@ -15119,6 +15627,144 @@
         selectedPlanetName = b.name;
         renderMenu();
       }
+      function vaultVisualHtml(entry) {
+        const colors = Array.isArray(entry.colors) ? entry.colors : ["#67e8f9", "#fbbf24"];
+        return (
+          '<div class="vault-specimen kind-' +
+          esc(entry.kind) +
+          " visual-" +
+          esc(entry.visual || "core") +
+          '" style="--vaultColor:' +
+          esc(colors[0]) +
+          ";--vaultAccent:" +
+          esc(colors[1] || colors[0]) +
+          '" role="img" aria-label="Contained visual record of ' +
+          esc(entry.name) +
+          '"><div class="vault-specimen-core"></div></div>'
+        );
+      }
+      function vaultEntryHtml(entry) {
+        const pending = entry.status !== "secured",
+          reason = vaultCanSecureReason(entry),
+          colors = Array.isArray(entry.colors) ? entry.colors : ["#67e8f9", "#fbbf24"];
+        return (
+          '<div class="vault-entry ' +
+          (pending ? "pending" : "secured") +
+          '" style="--vaultColor:' +
+          esc(colors[0]) +
+          ";--vaultAccent:" +
+          esc(colors[1] || colors[0]) +
+          '">' +
+          vaultVisualHtml(entry) +
+          '<div class="vault-entry-copy"><b>' +
+          esc(entry.name) +
+          '</b><span class="vault-origin">' +
+          esc(entry.system + " • " + entry.origin) +
+          "</span><span>" +
+          esc(entry.entry) +
+          '</span><div class="vault-tags"><span class="tag">' +
+          esc(vaultKindLabel(entry.kind)) +
+          '</span><span class="tag rarity-' +
+          esc(String(entry.rarity || "Unusual").toLowerCase()) +
+          '">' +
+          esc(entry.rarity || "Unusual") +
+          '</span><span class="tag">Threat ' +
+          esc(entry.threat) +
+          " • " +
+          esc(vaultThreatLabel(entry.threat)) +
+          "</span></div>" +
+          (pending
+            ? '<div class="actions">' +
+              btnWhy(
+                "Secure in Vault",
+                "secureVaultEntry",
+                entry.id,
+                !reason,
+                reason,
+              ) +
+              "</div>"
+            : '<span>Secure Vault Record</span>') +
+          "</div></div>"
+        );
+      }
+      function vaultHtml() {
+        const vault = vaultState(),
+          secured = vaultSecuredEntries(),
+          pending = vaultPendingEntries(),
+          level = Number(game.frigate.vaultLevel || 0),
+          capacity = vaultCapacity(level),
+          containment = vaultContainment(level),
+          skinOwned = game.ownedFrigateSkins.has("Astral Archaeologist"),
+          skinProgress = Math.min(VAULT_SKIN_GOAL, secured.length),
+          sorted = [...vault.entries].sort(
+            (a, b) =>
+              Number(a.status === "secured") - Number(b.status === "secured") ||
+              Number(b.discoveredAt || 0) - Number(a.discoveredAt || 0),
+          ),
+          upgradeReady =
+            level < 6 && hasFactoryAccess() && canAfford(frigateCost("vault"));
+        return (
+          '<div class="vault-hero"><h4>Pioneer Relic Vault</h4><p>Every specimen is a persistent record of where it was found and what makes it remarkable. Surface surveys and decoded deep-space signals can reveal new entries.</p><div class="grid"><div class="chip"><b>Secure Storage</b><br>' +
+          secured.length +
+          " / " +
+          capacity +
+          '</div><div class="chip"><b>Containment Rating</b><br>Threat ' +
+          containment +
+          " • " +
+          esc(vaultThreatLabel(containment)) +
+          '</div><div class="chip"><b>Quarantine</b><br>' +
+          pending.length +
+          '</div><div class="chip"><b>Total Discoveries</b><br>' +
+          vault.entries.length +
+          '</div></div><div class="actions">' +
+          btnWhy(
+            level >= 6 ? "Vault Fully Upgraded" : "Upgrade Pioneer Vault",
+            "upgradeFrigate",
+            "vault",
+            upgradeReady,
+            actionReason("frigateUpgrade", "vault"),
+          ) +
+          btn("Open Collections", "openSection", "log") +
+          "</div></div>" +
+          card(
+            "Rare Hull Project: Astral Archaeologist",
+            skinOwned
+              ? "Field-research refit unlocked. Its specimen canisters, expedition plating, survey lights, and star-chart markings are rendered on the live Pioneer hull."
+              : "Secure 18 Vault discoveries to earn an approachable Rare-class archaeology refit for the ODF Pioneer.",
+            cosmeticPreviewHtml(
+              "frigate",
+              "Astral Archaeologist",
+              skinOwned ? "Rare hull unlocked" : skinProgress + " / " + VAULT_SKIN_GOAL + " secured",
+            ) +
+              '<div class="vault-progress-track"><div style="width:' +
+              clamp((skinProgress / VAULT_SKIN_GOAL) * 100, 0, 100) +
+              '%"></div></div><span>' +
+              skinProgress +
+              " / " +
+              VAULT_SKIN_GOAL +
+              " secured</span>" +
+              (skinOwned
+                ? '<div class="actions">' +
+                  btn(
+                    game.frigate.skin === "Astral Archaeologist" ? "Equipped" : "Equip Astral Archaeologist",
+                    "setFrigateSkin",
+                    "Astral Archaeologist",
+                    game.frigate.skin !== "Astral Archaeologist",
+                  ) +
+                  "</div>"
+                : ""),
+          ) +
+          card(
+            "Vault Collection",
+            sorted.length
+              ? "Quarantine records appear first. Upgrade the Vault to secure larger and more dangerous finds."
+              : "The cases are waiting. Survey frontier planets and decode unknown signals beyond Sol to begin this collection.",
+            sorted.length
+              ? '<div class="vault-grid">' + sorted.map(vaultEntryHtml).join("") + "</div>"
+              : '<div class="log"><b>No Specimens Yet</b><span>Your first find could be waiting on the next world—or inside the next signal.</span></div>',
+          )
+        );
+      }
       function renderFrigate() {
         refreshSkins(false);
         if (game.frigate.built && !orbitingFrigate()) {
@@ -15160,6 +15806,7 @@
             "hangar",
             "scanner",
             "command",
+            "vault",
           ].filter(
             (k) =>
               hasFactoryAccess() &&
@@ -15170,6 +15817,7 @@
         const tabs = tabBar("frigate", [
           { key: "overview", label: "Overview" },
           { key: "fleet", label: "Fleet", count: readyFleet || "" },
+          { key: "vault", label: "Vault", count: vaultPendingEntries().length || "" },
           { key: "upgrades", label: "Upgrades", count: readyUpgrades || "" },
           { key: "cosmetics", label: "Cosmetics" },
         ]);
@@ -15183,6 +15831,10 @@
             (game.frigate.reactorLevel || 0) +
             '</div><div class="chip">Scanner: Lv. ' +
             (game.frigate.scannerLevel || 0) +
+            '</div><div class="chip">Vault: ' +
+            vaultSecuredEntries().length +
+            " / " +
+            vaultCapacity() +
             '</div><div class="chip">Fleet Ships: ' +
             (game.fleet?.ships?.length || 0) +
             " / " +
@@ -15201,6 +15853,7 @@
           "hangar",
           "scanner",
           "command",
+          "vault",
         ]
           .map((k) => {
             const cost = frigateCost(k),
@@ -15251,6 +15904,7 @@
             fleetShipyardHtml() +
             fleetMissionsHtml() +
             fleetHistoryHtml();
+        else if (tab === "vault") html += vaultHtml();
         else if (tab === "upgrades")
           html += card(
             "Frigate Upgrades",
@@ -15280,6 +15934,7 @@
                   chartedJumpCandidates().length > 0,
                 ) +
                 btn("Fleet Operations", "setMenuTab", "frigate|fleet") +
+                btn("Pioneer Vault", "setMenuTab", "frigate|vault") +
                 btn("Base Upgrades", "setMenuTab", "frigate|upgrades") +
                 btn("Cosmetic Store", "setMenuTab", "frigate|cosmetics") +
                 "</div>",
@@ -15399,7 +16054,14 @@
             )
           : s.type === "achievement"
             ? btn(
-                s.key === "Deep Freeze" ? "Find an Ice World" : "Earn",
+                s.key === "Deep Freeze"
+                  ? "Find an Ice World"
+                  : s.key === "Astral Archaeologist"
+                    ? Math.min(VAULT_SKIN_GOAL, vaultSecuredEntries().length) +
+                      " / " +
+                      VAULT_SKIN_GOAL +
+                      " Secured"
+                    : "Earn",
                 "noop",
                 null,
                 false,
@@ -15987,11 +16649,19 @@
               c.mysteries +
               " decoded • " +
               c.resolvedMysteries +
-              ' resolved</div><div class="chip">Collections: ' +
+              ' resolved</div><div class="chip">Vault Discoveries: ' +
+              c.vaultDiscovered +
+              '</div><div class="chip">Vault Secured: ' +
+              c.vaultSecured +
+              " / " +
+              vaultCapacity() +
+              '</div><div class="chip">Collections: ' +
               c.collections +
               " / " +
               discoveryCollections.length +
-              "</div></div>",
+              '</div></div><div class="actions">' +
+              btn("Open Pioneer Vault", "openSection", "frigate") +
+              "</div>",
           ) + discoveryCollectionsHtml()
         );
       }
@@ -16475,7 +17145,7 @@
           ],
           [
             "Frigate",
-            "The ODF Pioneer is your mobile base. Build it at Earth Factory, then upgrade its reactor, hangar, scanner, capacity, and Fleet Command systems. Once built, it can lead the expedition into uncharted space.",
+            "The ODF Pioneer is your mobile base. Build it at Earth Factory, then upgrade its reactor, hangar, scanner, capacity, Fleet Command, and Vault systems. Once built, it can lead the expedition into uncharted space.",
           ],
           [
             "Exploration Encounters",
@@ -16487,7 +17157,11 @@
           ],
           [
             "Codex Collections",
-            "The Codex groups discoveries into themed collections. Catalogue worlds, decode mysteries, and resolve encounters to earn automatic collection rewards.",
+            "The Codex groups discoveries into themed collections. Catalogue worlds, decode mysteries, resolve encounters, and secure Vault specimens to earn automatic collection rewards.",
+          ],
+          [
+            "Pioneer Relic Vault",
+            "Planet surveys and decoded deep-space signals can reveal artifacts, lifeforms, and phenomena. Safe discoveries enter secure storage; dangerous or overflow finds remain in quarantine until Vault capacity and containment are upgraded. Secure 18 specimens to unlock the Rare Astral Archaeologist frigate hull.",
           ],
           [
             "Faction Reputation",
@@ -16613,9 +17287,19 @@
             label: "Discovery mysteries and Codex collections available",
             pass:
               discoveryMysteries.length >= 8 &&
-              discoveryCollections.length >= 8 &&
+              discoveryCollections.length >= 12 &&
               typeof scanSectorMystery === "function" &&
               typeof discoveryCollectionsHtml === "function",
+          },
+          {
+            group: "Gameplay",
+            label: "Pioneer Vault progression available",
+            pass:
+              vaultCatalog.length >= 24 &&
+              typeof registerVaultDiscovery === "function" &&
+              typeof secureVaultEntry === "function" &&
+              vaultCapacity(6) === 28 &&
+              vaultContainment(5) === 6,
           },
           {
             group: "Save",
@@ -16628,7 +17312,8 @@
             pass:
               String(saveState).includes("activity") &&
               String(saveState).includes("universeSeed") &&
-              String(saveState).includes("discovery"),
+              String(saveState).includes("discovery") &&
+              String(saveState).includes("vault"),
           },
           {
             group: "Save",
@@ -19242,6 +19927,7 @@
           hangar = game.frigate.hangarLevel || 0,
           cap = game.frigate.capacityLevel || 0,
           scan = game.frigate.scannerLevel || 0,
+          vault = game.frigate.vaultLevel || 0,
           level = game.frigate.level || 1;
         c.save();
         c.globalCompositeOperation = "screen";
@@ -19293,6 +19979,29 @@
             c.stroke();
           }
         }
+        if (vault > 0) {
+          const canisterCount = Math.min(6, vault + 1);
+          for (let i = 0; i < canisterCount; i++) {
+            const x = (-84 + i * 31) * r;
+            c.fillStyle = rgba(i % 2 ? "#fbbf24" : "#67e8f9", 0.14 + vault * 0.025);
+            c.strokeStyle = rgba("#fde68a", 0.28 + vault * 0.025);
+            c.lineWidth = 0.8 * r;
+            c.beginPath();
+            rr(c, x, -72 * r, 18 * r, 12 * r, 4 * r);
+            c.fill();
+            c.stroke();
+            c.beginPath();
+            rr(c, x, 60 * r, 18 * r, 12 * r, 4 * r);
+            c.fill();
+            c.stroke();
+          }
+          c.strokeStyle = rgba("#67e8f9", 0.22 + vault * 0.03);
+          c.setLineDash([3 * r, 5 * r]);
+          c.beginPath();
+          c.ellipse(0, 0, (174 + vault * 3) * r, (62 + vault * 2) * r, 0, 0, TAU);
+          c.stroke();
+          c.setLineDash([]);
+        }
         if (level >= 4) {
           c.strokeStyle = rgba("#fbcfe8", 0.28);
           c.setLineDash([5 * r, 9 * r]);
@@ -19323,6 +20032,8 @@
                   ? "#22d3ee"
                   : motif === "ancient"
                     ? "#fde68a"
+                    : motif === "archaeologist"
+                      ? "#67e8f9"
                     : "#bae6fd";
         const P = (pts, fill, stroke = "rgba(255,255,255,.32)", lw = 1) => {
           c.beginPath();
@@ -19875,6 +20586,58 @@
               "rgba(253,230,138,.2)",
               0.45,
             );
+        }
+        if (motif === "archaeologist") {
+          c.save();
+          c.strokeStyle = rgba("#fde68a", 0.6);
+          c.lineWidth = 0.9 * r;
+          c.setLineDash([3 * r, 4 * r]);
+          c.beginPath();
+          c.moveTo(-112 * r, 9 * r);
+          c.bezierCurveTo(-58 * r, -28 * r, 8 * r, 35 * r, 126 * r, -7 * r);
+          c.stroke();
+          c.beginPath();
+          c.moveTo(-96 * r, -15 * r);
+          c.bezierCurveTo(-34 * r, 22 * r, 40 * r, -28 * r, 112 * r, 12 * r);
+          c.stroke();
+          c.setLineDash([]);
+          for (let i = 0; i < 6; i++) {
+            const x = (-83 + i * 30) * r;
+            c.fillStyle = rgba(i % 2 ? "#fbbf24" : "#67e8f9", 0.42);
+            c.strokeStyle = "rgba(255,255,255,.38)";
+            c.lineWidth = 0.65 * r;
+            c.beginPath();
+            rr(c, x, -55 * r, 17 * r, 10 * r, 4 * r);
+            c.fill();
+            c.stroke();
+            c.beginPath();
+            rr(c, x, 45 * r, 17 * r, 10 * r, 4 * r);
+            c.fill();
+            c.stroke();
+          }
+          c.fillStyle = rgba("#fbbf24", 0.92);
+          c.shadowColor = "#fbbf24";
+          c.shadowBlur = 9 * r;
+          for (const point of [[-118, -28], [-118, 28], [87, -25], [87, 25]]) {
+            c.beginPath();
+            c.arc(point[0] * r, point[1] * r, 2.8 * r, 0, TAU);
+            c.fill();
+          }
+          c.shadowBlur = 0;
+          c.strokeStyle = rgba("#67e8f9", 0.75);
+          c.lineWidth = 1.1 * r;
+          c.beginPath();
+          c.moveTo(33 * r, -48 * r);
+          c.lineTo(33 * r, -91 * r);
+          c.stroke();
+          c.beginPath();
+          c.arc(33 * r, -91 * r, 14 * r, Math.PI * 0.08, Math.PI * 1.1);
+          c.stroke();
+          c.beginPath();
+          c.arc(33 * r, -91 * r, 3 * r, 0, TAU);
+          c.fillStyle = "#e0f2fe";
+          c.fill();
+          c.restore();
         }
         c.restore();
       }
@@ -22984,8 +23747,8 @@
 
         ok(
           "Save schema is current",
-          SAVE_VERSION === 17 &&
-            APP_VERSION === "0.19.0" &&
+          SAVE_VERSION === 18 &&
+            APP_VERSION === "0.20.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -23018,6 +23781,12 @@
           !!serialized.encounters &&
             Array.isArray(serialized.encounters.decisions) &&
             Array.isArray(serialized.encounters.unlockedPerks),
+        );
+        ok(
+          "Save state contains Pioneer Vault records",
+          !!serialized.vault &&
+            Array.isArray(serialized.vault.entries) &&
+            Array.isArray(serialized.vault.discoveryKeys),
         );
         ok(
           "Save metadata is available",
@@ -23134,6 +23903,21 @@
             "startFleetMissionPair",
             "completeFleetMission",
           ]),
+        );
+        ok(
+          "Pioneer Vault and archaeology reward exist",
+          vaultCatalog.length >= 24 &&
+            discoveryCollections.length >= 12 &&
+            frigateSkins.find(
+              (skin) => skin.key === "Astral Archaeologist",
+            )?.rarity === "Rare" &&
+            hasFunctions([
+              "registerVaultDiscovery",
+              "secureVaultEntry",
+              "vaultHtml",
+              "vaultCapacity",
+              "vaultContainment",
+            ]),
         );
         ok(
           "Echo route system exists",
@@ -23850,6 +24634,7 @@
         setShipSkin,
         setFrigateSkin,
         upgradeFrigate,
+        secureVaultEntry,
         upgradePlanet,
         upgradeBranch,
         setTarget,
