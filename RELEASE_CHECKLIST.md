@@ -1,5 +1,18 @@
 # Orbital Drift release checklist
 
+## v0.25.0 spacecraft review
+
+- [x] Six distinct Starling skin geometries and seven distinct Pioneer skin geometries.
+- [x] Five role-specific escort hulls, reviewed across all five fleet skins.
+- [x] All raised decks and sidewalls fit their cached sprite bounds.
+- [x] Skin color, upgrade stage, and display density correctly select or regenerate hull artwork.
+- [x] Warm hulls reuse sprites; eviction releases old canvases within the 12 MiB hull-art budget.
+- [x] Fleet cosmetic silhouettes fit without intersecting at 180, 220, 320, and 480 px preview widths.
+- [x] Fleet command previews exclude unowned and deployed ships; shipyard thumbnails identify their actual hull type.
+- [x] Native Canvas asset review: all skins, narrow fleet previews, and Pioneer formation composition.
+- [x] Existing gameplay, tutorial reserves, fleet/rescue lifecycle, cosmetics, saves, and pause regressions pass.
+- [ ] Complete the real-browser/device checks below with v0.25.0, including landscape resize, cosmetic card text, and title artwork. The cloud browser's local-preview restriction remains unresolved.
+
 ## v0.24.0 rendering checks
 
 - [x] Deterministic planet pixels; rendering does not alter universe seeds or resources.

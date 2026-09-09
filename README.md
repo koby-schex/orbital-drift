@@ -20,6 +20,19 @@ npm test
 
 The test command runs static validation plus a functional release-readiness harness against the real game script. It covers all six first-upgrade tutorial paths, the fixed Sol start, Pioneer construction and rendezvous, repeat-safe Expedition Arcs, customizable crew progression, living-system events, major threats, non-linear multi-jump routes, fleet departure/return choreography, save migration and backup recovery, cosmetic equipping, responsive UI invariants, audio lifecycle hooks, and offline-app assets. The game also contains a browser-level `runTests()` suite used during release QA.
 
+## v0.25.0 spacecraft art and hangar pass
+
+The Starling, Pioneer, and all five escort roles now use shared, opaque hull models with extruded edges, raised decks, recessed drives, faceted command glass, material shading, and restrained running lights. The same artwork appears in flight, the title scene, shipyard thumbnails, and cosmetic previews.
+
+- Every Starling and Pioneer skin changes physical architecture. Fleet skins apply solar radiators, pearl fins, or asymmetric drive structures across the five role-specific hulls.
+- Individual subsystem indicators and bounded Pioneer upgrade modules remain visible. Existing unlocks, purchases, equipment, progression, flight handling, and save schema 20 remain compatible.
+- Finished hull artwork is cached by geometry, palette, upgrade stage, and display density, with an independent 12 MiB LRU budget. Engines are drawn separately so thrust can change without rebuilding hulls.
+- Fleet Operations shows the owned ships present with the Pioneer. Cosmetic previews show all five example roles in a non-overlapping layout; the shipyard displays the actual hull instead of a generic symbol.
+- Previews use their actual canvas size, refresh on resize, and keep status badges above the art. Narrow cosmetic titles wrap without colliding with Premium badges.
+- Idle escort motion follows simulation time, so opening a menu stops the idle formation animation.
+
+Automated checks cover geometry uniqueness, raised-deck bounds, sprite reuse and eviction, display-density/palette changes, all fleet skins at 180/220/320/480 px preview widths, and ownership/deployment filtering. Direct native Canvas review covered all six Starling skins, seven Pioneer skins, and 25 fleet role/skin combinations. The existing browser/device release checklist remains required; these asset checks do not certify touch or full DOM layout.
+
 ## v0.24.0 visual and performance pass
 
 - Seeded fractal nebula textures, dust lanes, distant galaxies, and slower stellar twinkle. Shooting stars now also appear in ordinary systems.
