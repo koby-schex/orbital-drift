@@ -20,6 +20,20 @@ npm test
 
 The test command runs static validation plus a functional release-readiness harness against the real game script. It covers all six first-upgrade tutorial paths, the fixed Sol start, Pioneer construction and rendezvous, repeat-safe Expedition Arcs, customizable crew progression, living-system events, major threats, non-linear multi-jump routes, fleet departure/return choreography, save migration and backup recovery, cosmetic equipping, responsive UI invariants, audio lifecycle hooks, and offline-app assets. The game also contains a browser-level `runTests()` suite used during release QA.
 
+## v0.24.0 visual and performance pass
+
+- Seeded fractal nebula textures, dust lanes, distant galaxies, and slower stellar twinkle. Shooting stars now also appear in ordinary systems.
+- Detailed spherical planet surfaces: terrain, clouds, polar ice, gas bands, craters, crystalline ice, and lava. Planet lighting faces the local star; atmospheric rims and occluded rings replace flat disc effects.
+- Cleaner Starling, Pioneer, and fleet materials, with inset hull panels, restrained lights, faceted fleet canopies, and fewer overlapping decorative rings. Fleet previews scale to their available space.
+- Background generation is spread across frames (eight raster rows per frame), with cancellation when a new system or quality setting supersedes it. Surface generation is limited to one new texture per frame and cached with a 12 MiB LRU budget.
+- Off-screen planet culling, a six-million-pixel main-canvas budget, HUD updates at most every 80 ms, navigation-map updates every 66 ms, and reuse of unchanged mission markup.
+- Hidden tabs skip rendering and simulation; returning resets frame timing and held flight inputs. Automatic quality changes now resize the actual canvas.
+- Save schema 20 and existing saves remain compatible. No external image downloads or new runtime dependencies are required.
+
+`npm test` includes deterministic texture pixels, cache reuse/eviction, staged sky generation/cancellation, viewport culling, HUD markup reuse, 4K resolution budgets, and hidden-tab suspension, in addition to gameplay regressions.
+
+Visual QA used the actual drawing functions with a native Canvas renderer. The cloud browser blocked the local preview, so this update still requires Safari/Chrome device playtesting before App Store release; native Canvas timings are not browser or phone frame-rate certification.
+
 ## Current systems
 
 - Gravity flight, orbit locking, braking, thrust, fuel, recovery, and slingshot release
@@ -31,7 +45,7 @@ The test command runs static validation plus a functional release-readiness harn
 - Visible fleet formations outside the Starling orbit lane, with launch, deployment, return, and reward-ready states
 - Adaptive Command Match fleet paint that inherits the equipped Starling and Pioneer palette, plus live escort previews
 - Per-save randomized uncharted routes with anti-repetition scoring, unique generated system names, Cosmic Spirit systems, black-hole breaches, Parallel systems, and rare events
-- Living systems with seeded ambient signatures, random visual phenomena, sector-specific palettes, nebulae, constellations, distant galaxies, and concealed unscanned worlds
+- Living systems with seeded ambient signatures, random visual phenomena, sector-specific palettes, nebulae, distant galaxies, and concealed unscanned worlds
 - Dramatically distinct Exotic, Mythic, Cosmic Spirit, and Parallel backdrops with prismatic tides, mythic blooms, spirit light, and reality fractures
 - Cinematic discovery reveals that visually distinguish planetary color, class, atmosphere, anomaly, and rarity
 - Ten choice-driven Exploration Encounters with ship, fleet, resource, and reputation requirements

@@ -1,5 +1,18 @@
 # Orbital Drift release checklist
 
+## v0.24.0 rendering checks
+
+- [x] Deterministic planet pixels; rendering does not alter universe seeds or resources.
+- [x] One new surface texture per frame, reuse of warm textures, and 12 MiB LRU eviction.
+- [x] Incremental sky work and cancellation of stale jobs after graphics changes.
+- [x] Off-screen planet culling retains visible stellar corona edges.
+- [x] Main-canvas resolution respects the pixel budget on a 4K display.
+- [x] Unchanged HUD markup is reused; hidden tabs do not simulate or draw.
+- [x] Direct Canvas rendering reviewed for planet surfaces, Earth, rings, ships, and flight.
+- [ ] Run the updated build on iOS Safari and Android Chrome for 15 minutes, including repeated jumps and background/resume, watching for heat, memory growth, or sustained frame drops.
+- [ ] Check the full DOM interface, skin previews, and touch controls at 390×844, 360×740, and landscape layouts in actual browsers. Cloud browser local preview was blocked in this pass.
+- [ ] Confirm first-view texture refinement and nebula fade feel smooth on the oldest supported phone; check High, Medium, Low, and Reduced Motion.
+
 ## Automated on every pull request
 
 - [x] Game JavaScript parses without syntax errors.

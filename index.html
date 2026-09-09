@@ -5023,7 +5023,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Command Deck Overhaul • v0.23.0</div>
+        <div class="title-version">Command Deck Overhaul • v0.24.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5434,7 +5434,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.23.0",
+        APP_VERSION = "0.24.0",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -18234,7 +18234,8 @@
                 activeFrigateSkin(),
               );
               c.restore();
-              const previewShips = ["scout", "miner", "tender", "probe", "warden"];
+              const previewShips = ["scout", "miner", "tender", "probe", "warden"],
+                fleetPreviewScale = Math.min(width / 410, height / 240);
               previewShips.forEach((type, index) => {
                 const lanes = [
                   [-0.3, -0.31],
@@ -18246,10 +18247,10 @@
                 c.save();
                 c.translate(lanes[index][0] * width, lanes[index][1] * height);
                 c.rotate(index % 2 ? -0.035 : 0.035);
-                drawFleetEngineTrail(c, 1.46, skin, 0.42 + index * 0.05);
+                drawFleetEngineTrail(c, fleetPreviewScale, skin, 0.42 + index * 0.05);
                 drawFleetShipVisual(
                   c,
-                  1.46,
+                  fleetPreviewScale,
                   { type, level: 2 },
                   skin,
                   0.42 + index * 0.05,
@@ -19971,6 +19972,11 @@
           "u"
         );
       }
+      const hudMarkup = new WeakMap();
+      function setHudMarkup(element, value) {
+        if (hudMarkup.get(element) === value) return;
+        element.innerHTML = value; hudMarkup.set(element, value);
+      }
       function updateUI() {
         if (!game.ship || !game.system) return;
         if (!ui.productionBadge) return;
@@ -20050,8 +20056,7 @@
           target &&
           target.name === manualTargetName;
         ui.missionTracker.classList.toggle("manual", !!manual);
-        ui.missionTracker.innerHTML =
-          "<b>" +
+        setHudMarkup(ui.missionTracker, "<b>" +
           (manual ? "Manual Target: " : "Target: ") +
           (target ? esc(target.name) : "None") +
           "</b><span>Distance: " +
@@ -20066,26 +20071,25 @@
           prog.done +
           "/" +
           prog.total +
-          " objectives complete</span>";
+          " objectives complete</span>");
         if (
           game.system.isTutorial &&
           game.missionStage < tutorialObjectives.length
         ) {
           const objective = tutorialObjective();
-          ui.missionBox.innerHTML =
-            '<b>Training ' +
+          setHudMarkup(ui.missionBox, '<b>Training ' +
             (game.missionStage + 1) +
             "/" +
             tutorialObjectives.length +
             ": " +
             esc(objective.action) +
             "</b><br>" +
-            esc(objective.text);
+            esc(objective.text));
         } else {
           const activeArc = expeditionState().active,
             arcStage = currentExpeditionStage(activeArc),
             livingEvent = currentLivingSystemEvent();
-          ui.missionBox.innerHTML = game.majorThreat?.status === "active"
+          setHudMarkup(ui.missionBox, game.majorThreat?.status === "active"
             ? "<b>Major Threat: " +
               esc(game.majorThreat.name) +
               "</b><br>Prepare the crew, fleet, and Pioneer before choosing a response."
@@ -20102,7 +20106,7 @@
                 ? "<b>Living System: " +
                   esc(livingEvent.name) +
                   "</b><br>Open System to choose how the Pioneer responds."
-                : "<b>Open Journey:</b> Chart worlds, follow independent leads, and return whenever you want another adventure.";
+                : "<b>Open Journey:</b> Chart worlds, follow independent leads, and return whenever you want another adventure.");
         }
         const ready = Object.values(unclaimedProduction).reduce(
             (a, v) => a + Math.floor(v || 0),
@@ -20501,9 +20505,10 @@
       }
       function resize() {
         DPR = Math.max(
-          1,
+          0.25,
           Math.min(
-            game.settings?.graphics === "Low" ? 1.35 : 2,
+            game.settings?.graphics === "Low" ? 1 : game.settings?.graphics === "Medium" ? 1.5 : 2,
+            Math.sqrt(6000000 / Math.max(1, innerWidth * innerHeight)),
             devicePixelRatio || 1,
           ),
         );
@@ -20760,6 +20765,183 @@
         root.style.setProperty("--sectorGlow", rgba(theme.accent, 0.18));
         document.body.dataset.visualTheme = theme.name;
       }
+      // Bounded, disposable render assets. None of these belong in a saved universe.
+      const renderAssets = { sky: null, skyJob: null, skyKey: "", skyFade: 0, surfaces: new Map(), bytes: 0, builds: 0 };
+      const SURFACE_CACHE_BYTES = 12 * 1024 * 1024;
+      function visualHash(x, y, z, seed) {
+        let n = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^
+          Math.imul(z, 2147483647) ^ seed;
+        n = Math.imul(n ^ (n >>> 13), 1274126177);
+        return ((n ^ (n >>> 16)) >>> 0) / 4294967295;
+      }
+      function visualNoise(x, y, z, seed) {
+        const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
+        let u = x - ix, v = y - iy, w = z - iz;
+        u *= u * (3 - 2 * u); v *= v * (3 - 2 * v); w *= w * (3 - 2 * w);
+        const mix = (a, b, f) => a + (b - a) * f;
+        const plane = dz => mix(
+          mix(visualHash(ix, iy, dz, seed), visualHash(ix + 1, iy, dz, seed), u),
+          mix(visualHash(ix, iy + 1, dz, seed), visualHash(ix + 1, iy + 1, dz, seed), u), v);
+        return mix(plane(iz), plane(iz + 1), w);
+      }
+      function visualFbm(x, y, z, seed, octaves = 4) {
+        let value = 0, weight = 0.55, total = 0;
+        for (let i = 0; i < octaves; i++) {
+          value += visualNoise(x, y, z, seed + i * 1013) * weight;
+          total += weight; weight *= 0.48;
+          x = x * 2.03 + 17; y = y * 2.03 + 9; z = z * 2.03 + 3;
+        }
+        return value / total;
+      }
+      function visualSeed(value) {
+        let seed = 2166136261;
+        for (const ch of String(value)) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
+        return seed >>> 0;
+      }
+      function rasterAsset(width, height, paint) {
+        const image = document.createElement("canvas");
+        image.width = width; image.height = height;
+        const c = image.getContext("2d");
+        if (!c) return null;
+        const pixels = c.createImageData(width, height);
+        if (!pixels?.data) return null;
+        paint(pixels.data);
+        c.putImageData(pixels, 0, 0);
+        return image;
+      }
+      function buildDeepSky() {
+        const quality = game.settings?.graphics || "High",
+          width = quality === "Low" ? 320 : quality === "Medium" ? 480 : 640,
+          height = Math.max(120, Math.min(640, Math.round(width * H / W))),
+          theme = activeVisualTheme || sectorVisualTheme(),
+          seed = visualSeed(game.system?.seed || "Sol"),
+          a = hex(theme.nebulas[0]), b = hex(theme.nebulas[1]), deep = hex(theme.deep);
+        const key = [width, height, theme.name, seed].join(":");
+        if (renderAssets.skyKey === key && (renderAssets.sky || renderAssets.skyJob)) return;
+        renderAssets.skyKey = key; renderAssets.sky = null; renderAssets.skyFade = 0;
+        const image = document.createElement("canvas"); image.width = width; image.height = height;
+        const c = image.getContext("2d"), pixels = c?.createImageData(width, height);
+        if (!pixels?.data) { renderAssets.skyJob = null; return; }
+        const paint = (data, startY, endY) => {
+          for (let y = startY; y < endY; y++) for (let x = 0; x < width; x++) {
+            const u = x / width, v = y / height,
+              warp = visualFbm(u * 3, v * 3, 0.7, seed, 3),
+              field = visualFbm(u * 5 + warp * 2, v * 4 + warp, 1.3, seed + 41, 5),
+              lane = Math.exp(-Math.pow((v - 0.54 + (u - 0.5) * 0.4 + (warp - 0.5) * 0.8) * 3.8, 2)),
+              density = Math.pow(Math.max(0, field - 0.26) * 1.5, 2) * lane,
+              filaments = Math.pow(Math.max(0, 1 - Math.abs(field - 0.5) * 13), 3),
+              dust = Math.max(0, visualFbm(u * 9 + warp, v * 8, 4.2, seed + 99, 3) - 0.48) * 3.2,
+              light = density * (1 - Math.min(0.88, dust)) * 0.9,
+              hue = Math.min(1, Math.max(0, warp * 1.7 - 0.3)), i = (y * width + x) * 4;
+            for (let c = 0; c < 3; c++) {
+              const k = ["r", "g", "b"][c], color = a[k] * (1 - hue) + b[k] * hue;
+              data[i + c] = deep[k] + color * light + filaments * density * (c === 2 ? 40 : 25);
+            }
+            data[i + 3] = 255;
+          }
+        };
+        renderAssets.skyJob = { image, c, pixels, paint, row: 0, height };
+      }
+      function advanceSkyBuild(rows = 8) {
+        const job = renderAssets.skyJob;
+        if (!job) return;
+        const end = Math.min(job.height, job.row + rows);
+        job.paint(job.pixels.data, job.row, end); job.row = end;
+        if (end === job.height) {
+          job.c.putImageData(job.pixels, 0, 0);
+          renderAssets.sky = job.image; renderAssets.skyJob = null;
+        }
+      }
+      function surfaceTexture(b, size) {
+        const seed = visualSeed(b.name + ":" + b.featureSeed),
+          key = [seed, b.pattern, b.color, b.atmosphere, size].join(":");
+        if (renderAssets.surfaces.has(key)) {
+          const image = renderAssets.surfaces.get(key);
+          renderAssets.surfaces.delete(key); renderAssets.surfaces.set(key, image);
+          return image;
+        }
+        // Amortize first-view work; never generate an entire system in one frame.
+        if (renderAssets.builds >= 1) return null;
+        renderAssets.builds++;
+        const base = hex(b.name === "Mars" ? "#be7250" : b.color),
+          gas = ["bands", "rings", "storm"].includes(b.pattern),
+          ocean = b.pattern === "continents", lava = b.pattern === "lava";
+        const image = rasterAsset(size, size, data => {
+          for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+            const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
+              rr = nx * nx + ny * ny;
+            if (rr > 1) continue;
+            const nz = Math.sqrt(1 - rr),
+              terrain = visualFbm(nx * 3 + 9, ny * 3 + 7, nz * 3 + 5, seed, 5),
+              fine = visualNoise(nx * 70 + 80, ny * 70 + 80, nz * 70, seed + 97),
+              bands = 0.5 + 0.26 * Math.sin(ny * 31 + (terrain - 0.5) * 7) +
+                0.14 * Math.sin(ny * 67 + terrain * 13),
+              relief = gas ? b.pattern === "storm" ? 0.58 + terrain * 0.5 :
+                0.65 + bands * (b.name === "Uranus" ? 0.13 : 0.28) + terrain * 0.15 :
+                0.5 + terrain * 0.65 + fine * 0.08,
+              cloud = b.atmosphere && !gas ? Math.pow(Math.max(0, visualFbm(nx * 5 + 20, ny * 4 + terrain, nz * 5, seed + 351, 3) - 0.52) * 3.3, 1.4) : 0,
+              limb = 0.48 + 0.52 * Math.pow(nz, 0.35),
+              i = (y * size + x) * 4;
+            let rgb = [base.r * relief, base.g * relief, base.b * relief];
+            if (ocean) {
+              const land = Math.max(0, Math.min(1, (terrain - 0.5) * 60)),
+                coast = [21, 64 + terrain * 32, 110 + terrain * 65],
+                ground = [68 + terrain * 62, 88 + terrain * 75, 43 + terrain * 42];
+              rgb = coast.map((v, c) => v * (1 - land) + ground[c] * land);
+              if (Math.abs(ny) > 0.87 + (terrain - 0.5) * 0.2) rgb = [213, 228, 232];
+            }
+            if (b.pattern === "craters") {
+              const longitude = Math.atan2(nx, nz), latitude = Math.asin(ny),
+                cellX = Math.floor(longitude * 7), cellY = Math.floor(latitude * 7),
+                cx = (cellX + 0.2 + visualHash(cellX, cellY, 1, seed) * 0.6) / 7,
+                cy = (cellY + 0.2 + visualHash(cellX, cellY, 2, seed) * 0.6) / 7,
+                radius = 0.014 + visualHash(cellX, cellY, 3, seed) * 0.027,
+                distance = Math.hypot(longitude - cx, latitude - cy) / radius;
+              if (distance < 1.3 && visualHash(cellX, cellY, 4, seed) > 0.63) {
+                const depth = distance < 0.84 ? 0.8 + distance * 0.14 : 1.07;
+                rgb = rgb.map(v => v * depth);
+              }
+            }
+            if (b.pattern === "crystal") {
+              const ice = Math.max(0, terrain - 0.45) * 1.4;
+              rgb = rgb.map((v, c) => v * (1 - ice) + [180, 225, 245][c] * ice);
+            }
+            if (lava) {
+              const crack = Math.pow(Math.max(0, 1 - Math.abs(terrain - 0.51) * 65), 2);
+              rgb = rgb.map((v, c) => v * 0.43 + [245, 80, 8][c] * crack);
+            }
+            for (let c = 0; c < 3; c++) data[i + c] = (rgb[c] * (1 - Math.min(0.8, cloud)) + 235 * Math.min(0.8, cloud)) * limb;
+            data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
+          }
+        });
+        if (!image) return null;
+        const bytes = size * size * 4;
+        while (renderAssets.bytes + bytes > SURFACE_CACHE_BYTES && renderAssets.surfaces.size) {
+          const oldest = renderAssets.surfaces.keys().next().value, entry = renderAssets.surfaces.get(oldest);
+          renderAssets.bytes -= entry.width * entry.height * 4;
+          entry.width = entry.height = 1; renderAssets.surfaces.delete(oldest);
+        }
+        renderAssets.bytes += bytes; renderAssets.surfaces.set(key, image);
+        return image;
+      }
+      function drawDetailedSurface(b, p, r) {
+        if (r < 5) return;
+        const quality = game.settings?.graphics || "High",
+          size = quality === "Low" ? 96 : r * DPR > 90 ? 256 : 128,
+          image = surfaceTexture(b, size);
+        if (!image) { drawSurface(b, p, r); return; }
+        ctx.save();
+        ctx.drawImage(image, p.x - r, p.y - r, r * 2, r * 2);
+        if (b.rarity === "Exotic" || b.rarity === "Mythic") {
+          ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.clip();
+          drawSurfaceAnomaly(b, p, r);
+        }
+        ctx.restore();
+      }
+      function bodyOnScreen(b, p, r) {
+        const margin = b.type === "star" ? r * 7.2 : Math.max(70, r * 3.2);
+        return p.x + margin >= 0 && p.x - margin <= W && p.y + margin >= 0 && p.y - margin <= H;
+      }
       function buildBackdrop() {
         stars = [];
         nebulas = [];
@@ -20775,20 +20957,26 @@
           asteroidDiv =
             quality === "Low" ? 130000 : quality === "Medium" ? 100000 : 80000;
         activeVisualTheme = theme;
+        let backdropRandomState = visualSeed(game.system?.seed || "Sol");
+        const random = () => {
+          backdropRandomState = (Math.imul(backdropRandomState, 1664525) + 1013904223) >>> 0;
+          return backdropRandomState / 4294967296;
+        };
+        buildDeepSky();
         for (let i = 0, c = Math.floor((W * H) / starDiv); i < c; i++) {
           stars.push({
-            x: Math.random() * W,
-            y: Math.random() * H,
-            r: Math.random() * 1.18 + 0.08,
-            a: Math.random() * 0.72 + 0.12,
-            d: Math.random() * 0.85 + 0.1,
-            tw: Math.random() * TAU,
+            x: random() * W,
+            y: random() * H,
+            r: random() * 1.18 + 0.08,
+            a: random() * 0.72 + 0.12,
+            d: random() * 0.85 + 0.1,
+            tw: random() * TAU,
             h:
-              Math.random() > 0.88
-                ? Math.random() > 0.5
+              random() > 0.88
+                ? random() > 0.5
                   ? "#bfdbfe"
                   : "#ddd6fe"
-                : Math.random() > 0.96
+                : random() > 0.96
                   ? "#fde68a"
                   : "#fff",
           });
@@ -20810,12 +20998,12 @@
           i++
         ) {
           nebulas.push({
-            x: Math.random() * W,
-            y: Math.random() * H,
+            x: random() * W,
+            y: random() * H,
             rx: between(i + 21, 230, 560),
             ry: between(i + 41, 95, 235),
-            rot: Math.random() * TAU,
-            color: colors[Math.floor(Math.random() * colors.length)],
+            rot: random() * TAU,
+            color: colors[Math.floor(random() * colors.length)],
             alpha: between(i + 61, 0.016, 0.05),
             drift: between(i + 81, 0.01, 0.034),
             d: between(i + 91, 0.1, 0.6),
@@ -20825,12 +21013,12 @@
         }
         for (let i = 0, c = Math.floor((W * H) / asteroidDiv); i < c; i++) {
           asteroids.push({
-            x: Math.random() * W,
-            y: Math.random() * H,
-            r: Math.random() * 2 + 0.7,
+            x: random() * W,
+            y: random() * H,
+            r: random() * 2 + 0.7,
             vx: between(i + 120, -0.02, 0.02),
             vy: between(i + 180, -0.015, 0.025),
-            spin: Math.random() * TAU,
+            spin: random() * TAU,
             ss: between(i + 210, -0.006, 0.006),
             pts: Math.floor(between(i + 250, 6, 9)),
             d: between(i + 300, 0.1, 0.32),
@@ -20854,6 +21042,7 @@
               alpha: between(g * 31 + 7, 0.055, 0.11),
               drift: between(g * 43 + 4, 0.04, 0.13),
             });
+          }
           const streakCount = quality === "High" ? 4 : 2;
           for (let i = 0; i < streakCount; i++)
             shootingStars.push({
@@ -20863,7 +21052,6 @@
               length: between(currentSystemIndex * 191 + i * 71, 72, 155),
               color: i % 2 ? theme.accent2 : theme.accent,
             });
-          }
           const galaxyCount = quality === "High" ? 3 : 2;
           for (let i = 0; i < galaxyCount; i++)
             distantGalaxies.push({
@@ -20884,136 +21072,38 @@
         const quality = game.settings?.graphics || "High",
           motion = game.settings?.motion || "On",
           theme = activeVisualTheme || sectorVisualTheme();
-        const bg = ctx.createRadialGradient(
-          W * 0.5,
-          H * 0.52,
-          0,
-          W * 0.5,
-          H * 0.52,
-          Math.max(W, H) * 0.78,
-        );
-        bg.addColorStop(0, theme.core);
-        bg.addColorStop(0.48, theme.mid);
-        bg.addColorStop(1, theme.deep);
-        ctx.fillStyle = bg;
+        ctx.fillStyle = theme.deep;
         ctx.fillRect(0, 0, W, H);
-        // A broad dust lane gives every sector a horizon and a sense of scale.
         ctx.save();
-        ctx.translate(W * 0.5, H * 0.48);
-        ctx.rotate(-0.22 + (currentSystemIndex % 5) * 0.07);
-        const dust = ctx.createLinearGradient(0, -H * 0.24, 0, H * 0.24);
-        dust.addColorStop(0, "rgba(0,0,0,0)");
-        dust.addColorStop(0.34, rgba(theme.accent2, 0.018));
-        dust.addColorStop(0.48, "rgba(2,6,23,.14)");
-        dust.addColorStop(0.58, rgba(theme.accent, 0.026));
-        dust.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = dust;
-        ctx.fillRect(-W, -H * 0.25, W * 2, H * 0.5);
-        ctx.restore();
+        if (renderAssets.sky) {
+          const offsetX = motion === "Reduced" ? 0 : Math.sin(cam.x * 0.00008) * 18,
+            offsetY = motion === "Reduced" ? 0 : Math.sin(cam.y * 0.00008) * 12;
+          renderAssets.skyFade = Math.min(1, renderAssets.skyFade + 0.035);
+          ctx.globalAlpha = renderAssets.skyFade;
+          ctx.drawImage(renderAssets.sky, -24 + offsetX, -18 + offsetY, W + 48, H + 36);
+          ctx.globalAlpha = 1;
+        }
+        // Distant galaxies remain subtle, luminous ellipses behind the local stars.
         ctx.save();
         ctx.globalCompositeOperation = "screen";
         for (const galaxy of distantGalaxies) {
-          ctx.save();
-          ctx.translate(galaxy.x, galaxy.y);
-          ctx.rotate(galaxy.rot);
-          const gg = ctx.createRadialGradient(0, 0, 0, 0, 0, galaxy.rx);
-          gg.addColorStop(0, rgba("#ffffff", galaxy.alpha * 1.45));
-          gg.addColorStop(0.18, rgba(galaxy.color, galaxy.alpha));
-          gg.addColorStop(0.55, rgba(galaxy.color, galaxy.alpha * 0.28));
-          gg.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = gg;
-          ctx.beginPath();
-          ctx.ellipse(0, 0, galaxy.rx, galaxy.ry, 0, 0, TAU);
-          ctx.fill();
-          ctx.strokeStyle = rgba(galaxy.color, galaxy.alpha * 1.2);
-          ctx.lineWidth = 0.7;
-          ctx.beginPath();
-          ctx.ellipse(0, 0, galaxy.rx * 0.7, galaxy.ry * 0.45, 0.18, 0, TAU);
-          ctx.stroke();
+          ctx.save(); ctx.translate(galaxy.x, galaxy.y); ctx.rotate(galaxy.rot);
+          ctx.scale(1, galaxy.ry / galaxy.rx);
+          const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, galaxy.rx);
+          glow.addColorStop(0, "rgba(255,240,210,.22)");
+          glow.addColorStop(0.12, rgba(galaxy.color, 0.1));
+          glow.addColorStop(0.5, rgba(galaxy.color, 0.035));
+          glow.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = glow; ctx.fillRect(-galaxy.rx, -galaxy.rx, galaxy.rx * 2, galaxy.rx * 2);
           ctx.restore();
         }
-        for (const n of nebulas) {
-          const sx = game.ship ? -game.ship.x * 0.018 * n.d : 0,
-            sy = game.ship ? -game.ship.y * 0.018 * n.d : 0,
-            alpha =
-              n.alpha *
-              (motion === "Reduced"
-                ? 1
-                : 0.88 + Math.sin(t * n.drift * n.pulse + n.rot) * 0.12);
-          ctx.save();
-          ctx.translate(
-            n.x +
-              (sx % (W + n.rx)) * 0.24 +
-              (motion === "Reduced" ? 0 : Math.sin(t * n.drift + n.rot) * 22),
-            n.y +
-              (sy % (H + n.ry)) * 0.24 +
-              (motion === "Reduced"
-                ? 0
-                : Math.cos(t * n.drift * 0.7 + n.rot) * 13),
-          );
-          ctx.rotate(
-            n.rot +
-              (motion === "Reduced" ? 0 : Math.sin(t * n.drift * 0.18) * 0.035),
-          );
-          const g = ctx.createRadialGradient(
-            0,
-            0,
-            0,
-            0,
-            0,
-            Math.max(n.rx, n.ry),
-          );
-          g.addColorStop(0, n.color + alpha + ")");
-          g.addColorStop(0.38, n.color + alpha * 0.36 + ")");
-          g.addColorStop(0.68, n.color + alpha * 0.12 + ")");
-          g.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = g;
-          ctx.beginPath();
-          ctx.ellipse(0, 0, n.rx, n.ry, 0, 0, TAU);
-          ctx.fill();
-          if (quality === "High") {
-            for (let lobe = 0; lobe < 4; lobe++) {
-              const a = n.rot + lobe * 1.73,
-                lx = Math.cos(a) * n.rx * 0.3,
-                ly = Math.sin(a) * n.ry * 0.34,
-                lr = Math.max(n.rx, n.ry) * (0.28 + lobe * 0.035),
-                cloud = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
-              cloud.addColorStop(0, n.color + alpha * 0.34 + ")");
-              cloud.addColorStop(0.55, n.color + alpha * 0.1 + ")");
-              cloud.addColorStop(1, "rgba(0,0,0,0)");
-              ctx.fillStyle = cloud;
-              ctx.fillRect(lx - lr, ly - lr, lr * 2, lr * 2);
-            }
-          }
-          ctx.restore();
-        }
-        for (const constellation of constellationLines) {
-          const sx = game.ship ? -game.ship.x * 0.008 * constellation.drift : 0,
-            sy = game.ship ? -game.ship.y * 0.008 * constellation.drift : 0;
-          ctx.strokeStyle = rgba(constellation.color, constellation.alpha);
-          ctx.lineWidth = 0.75;
-          ctx.beginPath();
-          constellation.points.forEach((point, i) => {
-            const x = point.x + sx,
-              y = point.y + sy;
-            if (i) ctx.lineTo(x, y);
-            else ctx.moveTo(x, y);
-          });
-          ctx.stroke();
-          for (const point of constellation.points) {
-            ctx.fillStyle = rgba(constellation.color, constellation.alpha * 3.2);
-            ctx.beginPath();
-            ctx.arc(point.x + sx, point.y + sy, 1.15, 0, TAU);
-            ctx.fill();
-          }
-        }
-        ctx.globalCompositeOperation = "source-over";
+        ctx.restore();
         for (const s of stars) {
           const sx = game.ship ? -game.ship.x * 0.022 * s.d : 0,
             sy = game.ship ? -game.ship.y * 0.022 * s.d : 0,
             x = (((s.x + sx) % W) + W) % W,
             y = (((s.y + sy) % H) + H) % H,
-            tw = s.a * (0.78 + Math.sin(t * 0.55 + s.tw) * 0.22);
+            tw = s.a * (motion === "Reduced" ? 0.9 : 0.78 + Math.sin(t * 0.015 + s.tw) * 0.22);
           ctx.globalAlpha = tw;
           ctx.fillStyle = s.h;
           ctx.beginPath();
@@ -21054,9 +21144,10 @@
           ctx.restore();
         }
         for (const a of asteroids) {
-          a.x += a.vx;
-          a.y += a.vy;
-          a.spin += a.ss;
+          const ambientStep = paused || titleOpen || modalFreeze || motion === "Reduced" ? 0 : Math.min(2, lastFrameMs / 16.67) * cinematicTimeScale;
+          a.x += a.vx * ambientStep;
+          a.y += a.vy * ambientStep;
+          a.spin += a.ss * ambientStep;
           if (a.x < -30) a.x = W + 30;
           if (a.x > W + 30) a.x = -30;
           if (a.y < -30) a.y = H + 30;
@@ -21144,7 +21235,10 @@
             game.captured.has(b.name) ||
             b.name === "Earth" ||
             b.name === "Mars";
+        if (!bodyOnScreen(b, p, r)) return;
         ctx.save();
+        const ringed = known && (b.name === "Saturn" || b.pattern === "rings");
+        if (ringed) drawPlanetRings(p, r, b, false);
         if (b.type === "star") {
           drawStarBody(b, p, r);
         } else if (!known) {
@@ -21152,11 +21246,10 @@
         } else {
           drawRarityField(b, p, r);
           drawPlanetBase(b, p, r);
-          drawSurface(b, p, r);
+          drawDetailedSurface(b, p, r);
           drawPlanetLighting(b, p, r);
           drawRarityDetails(b, p, r);
-          if (b.name === "Saturn" || b.pattern === "rings")
-            drawPlanetRings(p, r, b);
+          if (ringed) drawPlanetRings(p, r, b, true);
         }
         if (game.captured.has(b.name)) {
           ctx.save();
@@ -21262,19 +21355,11 @@
         ctx.fill();
         ctx.save();
         ctx.clip();
-        for (let i = 0; i < 8; i++) {
-          ctx.strokeStyle =
-            i % 2 ? "rgba(255,255,255,.18)" : "rgba(251,146,60,.22)";
-          ctx.lineWidth = Math.max(1, r * 0.035);
-          ctx.beginPath();
-          ctx.arc(
-            p.x + Math.sin(t * 0.014 + i) * r * 0.1,
-            p.y + Math.cos(t * 0.012 + i) * r * 0.08,
-            r * (0.25 + i * 0.08),
-            t * 0.015 + i,
-            t * 0.015 + i + 1.6,
-          );
-          ctx.stroke();
+        const surface = surfaceTexture(b, game.settings?.graphics === "Low" ? 96 : 256);
+        if (surface) {
+          ctx.globalCompositeOperation = "soft-light";
+          ctx.globalAlpha = 0.8;
+          ctx.drawImage(surface, p.x - r, p.y - r, r * 2, r * 2);
         }
         ctx.restore();
         ctx.strokeStyle = "rgba(255,255,255,.2)";
@@ -21282,6 +21367,20 @@
         ctx.beginPath();
         ctx.arc(p.x, p.y, r * 0.98, 0, TAU);
         ctx.stroke();
+        if (game.settings?.graphics !== "Low") {
+          ctx.save(); ctx.globalCompositeOperation = "screen";
+          for (let i = 0; i < 5; i++) {
+            const a = i * 1.31 + (b.featureSeed || 1),
+              pulse = game.settings?.motion === "Reduced" ? 1 : 1 + Math.sin(t * 0.012 + i) * 0.08;
+            ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(a);
+            const plume = ctx.createRadialGradient(r * 0.98, 0, 0, r * 1.05, 0, r * 0.6);
+            plume.addColorStop(0, rgba(b.color, 0.25));
+            plume.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = plume; ctx.scale(pulse, 0.36);
+            ctx.fillRect(r * 0.6, -r * 0.7, r, r * 1.4); ctx.restore();
+          }
+          ctx.restore();
+        }
         ctx.restore();
       }
       function drawPlanetBase(b, p, r) {
@@ -21296,8 +21395,9 @@
             r * 1.9,
           );
           atm.addColorStop(0, "rgba(0,0,0,0)");
-          atm.addColorStop(0.55, rgba(b.color, 0.08));
-          atm.addColorStop(1, rgba(b.color, 0.18));
+          atm.addColorStop(0.18, rgba(b.color, 0.12));
+          atm.addColorStop(0.55, rgba(b.color, 0.025));
+          atm.addColorStop(1, "rgba(0,0,0,0)");
           ctx.fillStyle = atm;
           ctx.beginPath();
           ctx.arc(p.x, p.y, r * 1.9, 0, TAU);
@@ -21322,86 +21422,40 @@
         ctx.restore();
       }
       function drawPlanetLighting(b, p, r) {
-        if (b.type === "star" || r < 4) return;
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, TAU);
-        ctx.clip();
-        const shade = ctx.createLinearGradient(
-          p.x - r * 0.9,
-          p.y - r * 0.94,
-          p.x + r * 0.92,
-          p.y + r * 0.92,
-        );
-        shade.addColorStop(0, "rgba(255,255,255,.24)");
-        shade.addColorStop(0.28, "rgba(255,255,255,.04)");
-        shade.addColorStop(0.62, "rgba(0,0,0,.12)");
-        shade.addColorStop(1, "rgba(0,0,0,.7)");
-        ctx.fillStyle = shade;
-        ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
-        const spec = ctx.createRadialGradient(
-          p.x - r * 0.43,
-          p.y - r * 0.47,
-          0,
-          p.x - r * 0.43,
-          p.y - r * 0.47,
-          r * 0.62,
-        );
-        spec.addColorStop(0, "rgba(255,255,255,.28)");
-        spec.addColorStop(0.5, "rgba(255,255,255,.045)");
-        spec.addColorStop(1, "rgba(255,255,255,0)");
-        ctx.fillStyle = spec;
-        ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2);
+        if (r < 4) return;
+        const star = game.system.bodies.find(body => body.type === "star"),
+          direction = star ? Math.atan2(star.y - b.y, star.x - b.x) : -2.4;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(direction);
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.clip();
+        const shade = ctx.createLinearGradient(-r, 0, r, 0);
+        shade.addColorStop(0, "rgba(0,2,9,.94)");
+        shade.addColorStop(0.38, "rgba(0,2,9,.74)");
+        shade.addColorStop(0.53, "rgba(0,2,9,.28)");
+        shade.addColorStop(0.72, "rgba(0,0,0,0)");
+        shade.addColorStop(1, "rgba(255,244,220,.13)");
+        ctx.fillStyle = shade; ctx.fillRect(-r, -r, r * 2, r * 2);
         ctx.restore();
-        ctx.save();
+        if (!b.atmosphere) return;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(direction);
         ctx.globalCompositeOperation = "screen";
-        ctx.strokeStyle = b.atmosphere
-          ? rgba(light(b.color, 0.55), 0.34)
-          : "rgba(255,255,255,.14)";
-        ctx.lineWidth = Math.max(1, r * 0.04);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 1.012, 0, TAU);
-        ctx.stroke();
-        const rim = ctx.createRadialGradient(
-          p.x,
-          p.y,
-          r * 0.82,
-          p.x,
-          p.y,
-          r * 1.2,
-        );
-        rim.addColorStop(0, "rgba(0,0,0,0)");
-        rim.addColorStop(0.82, "rgba(255,255,255,0)");
-        rim.addColorStop(
-          1,
-          b.atmosphere
-            ? rgba(light(b.color, 0.52), 0.18)
-            : "rgba(255,255,255,.06)",
-        );
-        ctx.fillStyle = rim;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 1.2, 0, TAU);
-        ctx.fill();
+        for (let i = 3; i >= 0; i--) {
+          ctx.strokeStyle = rgba(light(b.color, 0.62), 0.08 + (3 - i) * 0.08);
+          ctx.lineWidth = Math.max(0.75, r * (0.02 + i * 0.018));
+          ctx.beginPath(); ctx.arc(0, 0, r * 1.008, -1.55, 1.55); ctx.stroke();
+        }
         ctx.restore();
       }
-      function drawPlanetRings(p, r, b) {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(-0.25);
-        for (let i = 0; i < 4; i++) {
-          ctx.strokeStyle =
-            i % 2 ? "rgba(255,255,255,.22)" : rgba(b.color, 0.18);
-          ctx.lineWidth = Math.max(0.8, r * (0.018 + i * 0.004));
+      function drawPlanetRings(p, r, b, front = true) {
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(-0.32);
+        const count = game.settings?.graphics === "Low" ? 12 : 30;
+        for (let i = 0; i < count; i++) {
+          const q = i / count;
+          if (q > 0.51 && q < 0.59) continue; // Cassini-like division.
+          ctx.strokeStyle = rgba(light(b.color, 0.45), 0.16 + rand(i + (b.featureSeed || 1)) * 0.3);
+          ctx.lineWidth = Math.max(0.6, r * 0.8 / count);
           ctx.beginPath();
-          ctx.ellipse(
-            0,
-            0,
-            r * (1.55 + i * 0.16),
-            r * (0.42 + i * 0.05),
-            0,
-            0,
-            TAU,
-          );
+          ctx.ellipse(0, 0, r * (1.3 + q * 0.85), r * (0.34 + q * 0.25), 0,
+            front ? 0 : Math.PI, front ? Math.PI : TAU);
           ctx.stroke();
         }
         ctx.restore();
@@ -22259,6 +22313,41 @@
         c.stroke();
         c.restore();
       }
+      function drawHullFinish(c, scale, skin, kind) {
+        // Small inset panels and occlusion make hulls read as machined volumes.
+        if (scale < 0.18) return;
+        const large = kind === "frigate", fleet = kind === "fleet",
+          plates = large ? 7 : fleet ? 3 : 4,
+          start = large ? -97 : fleet ? -17 : -24,
+          stride = large ? 28 : fleet ? 10 : 12,
+          y = large ? 16 : fleet ? 4 : 6,
+          width = large ? 22 : fleet ? 7 : 9,
+          height = large ? 7 : fleet ? 3 : 3;
+        c.save(); c.scale(scale, scale); c.globalAlpha *= 0.42;
+        const metal = c.createLinearGradient(0, -y - height, 0, y + height);
+        metal.addColorStop(0, rgba(light(skin.primary, 0.38), 0.85));
+        metal.addColorStop(0.42, rgba(skin.secondary || "#0f172a", 0.88));
+        metal.addColorStop(0.7, rgba(skin.primary, 0.65));
+        metal.addColorStop(1, "rgba(2,6,12,.85)");
+        for (const side of [-1, 1]) for (let i = 0; i < plates; i++) {
+          const x = start + i * stride, py = side * y;
+          c.fillStyle = "rgba(0,2,8,.72)";
+          c.fillRect(x + 0.8, py + 1.8, width, height);
+          c.fillStyle = metal; c.fillRect(x, py, width, height);
+          c.strokeStyle = "rgba(235,247,255,.28)"; c.lineWidth = large ? 0.55 : 0.35;
+          c.beginPath(); c.moveTo(x, py + height); c.lineTo(x, py); c.lineTo(x + width, py); c.stroke();
+          if (large || scale > 0.8) {
+            c.fillStyle = "rgba(4,9,16,.8)";
+            for (let v = 0; v < 3; v++) c.fillRect(x + 2 + v * width * 0.22, py + 2, 0.75, height - 3);
+          }
+        }
+        // Quiet running lights preserve the silhouette instead of outlining every edge.
+        c.fillStyle = skin.accent || "#dff6ff";
+        for (const side of [-1, 1]) {
+          c.fillRect(large ? 93 : fleet ? 19 : 28, side * (large ? 22 : 5), large ? 8 : 2.5, large ? 1.4 : 0.7);
+        }
+        c.restore();
+      }
       function drawFleetShipVisual(c, scale, ship, skin, thrust = 0.25) {
         const def = fleetShipTypes[ship?.type] || fleetShipTypes.scout,
           primary = skin.primary || def.color || "#7dd3fc",
@@ -22287,13 +22376,7 @@
         };
         c.save();
         c.lineJoin = "round";
-        c.lineWidth = Math.max(0.8, 1.05 * scale);
-        c.shadowColor = "rgba(0,0,0,.8)";
-        c.shadowBlur = 10 * scale;
-        c.fillStyle = "rgba(0,0,0,.42)";
-        c.beginPath();
-        c.ellipse(-2 * scale, 8 * scale, 28 * scale, 7 * scale, 0, 0, TAU);
-        c.fill();
+        c.lineWidth = Math.max(0.45, 0.65 * scale);
         c.shadowBlur = 0;
         if (def.shape === "barge") {
           c.fillStyle = hull;
@@ -22392,7 +22475,12 @@
         c.shadowColor = glow;
         c.shadowBlur = 7 * scale;
         c.beginPath();
-        c.ellipse(10 * scale, 0, 9 * scale, 4.6 * scale, 0, 0, TAU);
+        c.moveTo(21 * scale, 0);
+        c.lineTo(8 * scale, -3.6 * scale);
+        c.lineTo(2 * scale, -2.8 * scale);
+        c.lineTo(2 * scale, 2.8 * scale);
+        c.lineTo(8 * scale, 3.6 * scale);
+        c.closePath();
         c.fill();
         c.shadowBlur = 0;
         c.strokeStyle = rgba("#ffffff", 0.32);
@@ -22417,6 +22505,7 @@
         c.beginPath();
         c.arc(23 * scale, 0, 1.8 * scale, 0, TAU);
         c.fill();
+        drawHullFinish(c, scale, skin, "fleet");
         c.restore();
       }
       function drawFrigateUpgradeModules(c, r, skin) {
@@ -22994,19 +23083,7 @@
         if (motif === "warp") {
           c.strokeStyle = rgba(accent, 0.72);
           c.lineWidth = 1.15 * r;
-          for (let i = 0; i < 5; i++) {
-            c.beginPath();
-            c.ellipse(
-              8 * r,
-              0,
-              (114 + i * 10) * r,
-              (31 + i * 6) * r,
-              0.08 * i,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
           c.strokeStyle = rgba(glow, 0.5);
           for (const sy of [-1, 1]) {
             c.beginPath();
@@ -23049,19 +23126,7 @@
           c.globalCompositeOperation = "screen";
           c.strokeStyle = rgba("#d9f99d", 0.62);
           c.lineWidth = 1.35 * r;
-          for (let i = 0; i < 5; i++) {
-            c.beginPath();
-            c.ellipse(
-              6 * r,
-              0,
-              (162 + i * 18) * r,
-              (58 + i * 8) * r,
-              t * 0.006 + i * 0.27,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
           c.fillStyle = rgba("#fef9c3", 0.72);
           c.shadowColor = "#d9f99d";
           c.shadowBlur = 13 * r;
@@ -23185,6 +23250,7 @@
           c.fill();
           c.restore();
         }
+        drawHullFinish(c, r, skin, "frigate");
         c.restore();
       }
       function drawFrigateDepthPass(c, r, skin, tier, o) {
@@ -23306,19 +23372,7 @@
         c.globalCompositeOperation = "screen";
         c.strokeStyle = rgba(glow, 0.18 + 0.035 * tier);
         c.lineWidth = (0.9 + 0.12 * tier) * r;
-        for (let i = 0; i < tier; i++) {
-          c.beginPath();
-          c.ellipse(
-            4 * r,
-            0,
-            (150 + i * 18) * r,
-            (52 + i * 7) * r,
-            (motif === "warp" ? t * 0.006 : 0) + i * 0.18,
-            0,
-            TAU,
-          );
-          c.stroke();
-        }
+
         c.globalCompositeOperation = "source-over";
         if (tier >= 2) {
           for (const sy of [-1, 1]) {
@@ -23369,19 +23423,7 @@
           c.globalCompositeOperation = "screen";
           c.strokeStyle = rgba("#fbcfe8", 0.38);
           c.setLineDash([5 * r, 9 * r]);
-          for (let i = 0; i < 3; i++) {
-            c.beginPath();
-            c.ellipse(
-              8 * r,
-              0,
-              (182 + i * 18) * r,
-              (66 + i * 11) * r,
-              t * 0.01 + i * 0.35,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
           c.setLineDash([]);
         }
         c.restore();
@@ -23806,19 +23848,7 @@
         if (motif === "warp") {
           c.strokeStyle = rgba(accent, 0.86);
           c.lineWidth = 1 * sc;
-          for (let i = 0; i < 3; i++) {
-            c.beginPath();
-            c.ellipse(
-              5 * sc,
-              0,
-              (42 + i * 6) * sc,
-              (12 + i * 3) * sc,
-              0.2,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
         }
         if (motif === "mythic") {
           c.strokeStyle = rgba("#fbcfe8", 0.9);
@@ -23864,6 +23894,7 @@
           motif,
           tier,
         });
+        drawHullFinish(c, sc, skin, "ship");
         c.restore();
       }
       function drawShipSkinSignature(c, sc, skin, o) {
@@ -23926,19 +23957,7 @@
           c.globalCompositeOperation = "screen";
           c.strokeStyle = rgba(glow, 0.54);
           c.lineWidth = 1.25 * sc;
-          for (let i = 0; i < 4; i++) {
-            c.beginPath();
-            c.ellipse(
-              7 * sc,
-              0,
-              (64 + i * 8) * sc,
-              (20 + i * 4) * sc,
-              t * 0.016 + i * 0.42,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
           c.globalCompositeOperation = "source-over";
           for (const sy of [-1, 1])
             P(
@@ -23956,19 +23975,7 @@
           c.strokeStyle = rgba("#fbcfe8", 0.58);
           c.lineWidth = 1.35 * sc;
           c.setLineDash([4 * sc, 6 * sc]);
-          for (let i = 0; i < 3; i++) {
-            c.beginPath();
-            c.ellipse(
-              5 * sc,
-              0,
-              (72 + i * 12) * sc,
-              (24 + i * 5) * sc,
-              t * 0.02 + i * 0.36,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
           c.setLineDash([]);
           c.globalCompositeOperation = "source-over";
           P(
@@ -23997,19 +24004,7 @@
           c.globalCompositeOperation = "screen";
           c.strokeStyle = rgba("#ff2bd6", 0.6);
           c.lineWidth = 1.25 * sc;
-          for (let i = 0; i < 5; i++) {
-            c.beginPath();
-            c.ellipse(
-              4 * sc,
-              0,
-              (58 + i * 8) * sc,
-              (18 + i * 5) * sc,
-              t * 0.025 + i * 0.53,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
           c.globalCompositeOperation = "source-over";
           const chaos = G(18, -30, 86, 30, [
             [0, rgba("#00f5ff", 0.08)],
@@ -24318,19 +24313,7 @@
         }
         if (tier >= 3) {
           c.strokeStyle = rgba(glow, 0.26);
-          for (let i = 0; i < 2; i++) {
-            c.beginPath();
-            c.ellipse(
-              5 * sc,
-              0,
-              (58 + i * 9) * sc,
-              (18 + i * 4) * sc,
-              t * 0.01 + i * 0.4,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
         }
         c.globalCompositeOperation = "source-over";
         if (motif === "ancient") {
@@ -24356,19 +24339,7 @@
         c.globalCompositeOperation = "screen";
         c.strokeStyle = rgba(glow, 0.16 + 0.04 * tier);
         c.lineWidth = (0.8 + 0.08 * tier) * sc;
-        for (let i = 0; i < tier; i++) {
-          c.beginPath();
-          c.ellipse(
-            3 * sc,
-            0,
-            (52 + i * 8) * sc,
-            (16 + i * 3) * sc,
-            (motif === "warp" ? t * 0.012 : 0) + i * 0.25,
-            0,
-            TAU,
-          );
-          c.stroke();
-        }
+
         c.globalCompositeOperation = "source-over";
         if (tier >= 2) {
           for (const sy of [-1, 1]) {
@@ -24417,19 +24388,7 @@
           c.globalCompositeOperation = "screen";
           c.strokeStyle = rgba("#fbcfe8", 0.45);
           c.setLineDash([3 * sc, 5 * sc]);
-          for (let i = 0; i < 3; i++) {
-            c.beginPath();
-            c.ellipse(
-              4 * sc,
-              0,
-              (66 + i * 7) * sc,
-              (21 + i * 4) * sc,
-              t * 0.018 + i * 0.4,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
+
           c.setLineDash([]);
         }
         c.restore();
@@ -24878,13 +24837,18 @@
         return "#7dd3fc";
       }
       function drawTargetPill(x, y, name, d, color) {
-        const text = name + " • " + d + " km",
+        ctx.save();
+        ctx.font = "900 10px Inter, system-ui";
+        let label = name;
+        const suffix = " • " + d + " km";
+        while (label.length > 4 && ctx.measureText(label + suffix).width > 160)
+          label = label.slice(0, -2).trimEnd() + "…";
+        const text = label + suffix,
           pad = 9,
           w = Math.min(178, ctx.measureText(text).width + pad * 2),
           h = 24;
         x = clamp(x, w / 2 + 8, W - w / 2 - 8);
         y = clamp(y, h / 2 + 8, H - h / 2 - 8);
-        ctx.save();
         ctx.translate(x - w / 2, y - h / 2);
         ctx.fillStyle = "rgba(6,10,23,.82)";
         ctx.strokeStyle = rgba(color, 0.32);
@@ -24924,19 +24888,7 @@
         ctx.strokeStyle = rgba(profile.color, rarity === "Mythic" ? 0.12 : 0.075);
         ctx.lineWidth = rarity === "Mythic" ? 1.4 : 1;
         const rings = rarity === "Mythic" ? 7 : 4;
-        for (let i = 0; i < rings; i++) {
-          ctx.beginPath();
-          ctx.ellipse(
-            W * 0.5,
-            H * 0.48,
-            W * (0.16 + i * 0.075),
-            H * (0.035 + i * 0.018),
-            reduced ? i * 0.24 : t * 0.0025 + i * 0.24,
-            0,
-            TAU,
-          );
-          ctx.stroke();
-        }
+
         ctx.restore();
       }
       function drawSystemSignature() {
@@ -25033,7 +24985,7 @@
         ctx.fillRect(0, 0, W, H);
         ctx.save();
         ctx.translate(W * 0.5, H * 0.5);
-        ctx.rotate(-0.12 + Math.sin(t * 0.003) * 0.035);
+        ctx.rotate(-0.12 + Math.sin((game.settings?.motion === "Reduced" ? 0 : t) * 0.003) * 0.035);
         const band = ctx.createLinearGradient(0, -H * 0.18, 0, H * 0.18);
         band.addColorStop(0, "rgba(0,0,0,0)");
         band.addColorStop(0.46, "rgba(0,0,0,.35)");
@@ -25043,25 +24995,10 @@
         ctx.fillStyle = band;
         ctx.fillRect(-W, -H * 0.22, W * 2, H * 0.44);
         ctx.restore();
-        for (let i = 0; i < 9; i++) {
-          ctx.strokeStyle =
-            i % 2 ? "rgba(255,43,214,.13)" : "rgba(0,245,255,.12)";
-          ctx.lineWidth = 1 + i * 0.1;
-          ctx.beginPath();
-          ctx.ellipse(
-            W * 0.5 + Math.sin(t * 0.006 + i) * 50,
-            H * 0.48 + Math.cos(t * 0.005 + i) * 34,
-            W * (0.18 + i * 0.055),
-            H * (0.045 + i * 0.018),
-            t * 0.006 + i * 0.41,
-            0,
-            TAU,
-          );
-          ctx.stroke();
-        }
+
         for (let i = 0; i < 34; i++) {
-          const x = (Math.sin(i * 41.7 + t * 0.018) * 0.5 + 0.5) * W,
-            y = (Math.cos(i * 27.3 - t * 0.014) * 0.5 + 0.5) * H;
+          const x = (Math.sin(i * 41.7 + (game.settings?.motion === "Reduced" ? 0 : t) * 0.018) * 0.5 + 0.5) * W,
+            y = (Math.cos(i * 27.3 - (game.settings?.motion === "Reduced" ? 0 : t) * 0.014) * 0.5 + 0.5) * H;
           ctx.fillStyle =
             i % 2 ? "rgba(255,43,214,.18)" : "rgba(0,245,255,.16)";
           ctx.beginPath();
@@ -25074,7 +25011,7 @@
           ctx.beginPath();
           for (let j = 0; j < 10; j++) {
             const x = W * (0.04 + j * 0.105),
-              y = H * (0.18 + i * 0.2) + Math.sin(j * 4.2 + i * 1.7 + t * 0.01) * 28;
+              y = H * (0.18 + i * 0.2) + Math.sin(j * 4.2 + i * 1.7 + (game.settings?.motion === "Reduced" ? 0 : t) * 0.01) * 28;
             if (!j) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
           }
@@ -25101,12 +25038,12 @@
         ctx.fillStyle = center;
         ctx.fillRect(0, 0, W, H);
         for (let i = 0; i < 7; i++) {
-          const x = W * (0.12 + i * 0.14) + Math.sin(t * 0.01 + i) * 28,
+          const x = W * (0.12 + i * 0.14) + Math.sin((game.settings?.motion === "Reduced" ? 0 : t) * 0.01 + i) * 28,
             y =
-              H * (0.18 + ((i * 37) % 60) / 100) + Math.cos(t * 0.008 + i) * 20,
+              H * (0.18 + ((i * 37) % 60) / 100) + Math.cos((game.settings?.motion === "Reduced" ? 0 : t) * 0.008 + i) * 20,
             rx = W * (0.18 + 0.035 * (i % 3)),
             ry = H * (0.08 + 0.022 * (i % 4));
-          const g = ctx.createRadialGradient(x, y, 0, x, y, Math.max(rx, ry));
+          const g = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(rx, ry));
           g.addColorStop(
             0,
             i % 2 ? "rgba(217,249,157,.15)" : "rgba(248,250,252,.13)",
@@ -25118,7 +25055,7 @@
           g.addColorStop(1, "rgba(0,0,0,0)");
           ctx.save();
           ctx.translate(x, y);
-          ctx.rotate(Math.sin(t * 0.004 + i) * 0.18);
+          ctx.rotate(Math.sin((game.settings?.motion === "Reduced" ? 0 : t) * 0.004 + i) * 0.18);
           ctx.fillStyle = g;
           ctx.beginPath();
           ctx.ellipse(0, 0, rx, ry, 0, 0, TAU);
@@ -25127,22 +25064,13 @@
         }
         ctx.strokeStyle = "rgba(254,249,195,.12)";
         ctx.lineWidth = 1;
-        for (let i = 0; i < 6; i++) {
-          ctx.beginPath();
-          ctx.ellipse(
-            W * 0.5,
-            H * 0.48,
-            W * (0.22 + i * 0.055),
-            H * (0.07 + i * 0.016),
-            t * 0.004 + i * 0.28,
-            0,
-            TAU,
-          );
-          ctx.stroke();
-        }
+
         ctx.restore();
       }
       function draw() {
+        renderAssets.builds = 0;
+        advanceSkyBuild();
+        if (titleOpen) { drawBackdrop(); drawTitleShowcase(); return; }
         ctx.imageSmoothingEnabled = game.settings?.graphics !== "Low";
         ctx.imageSmoothingQuality =
           game.settings?.graphics === "High" ? "high" : "medium";
@@ -25553,10 +25481,7 @@
         ctx.fillStyle = bloom;
         ctx.fillRect(0, 0, W, H);
         ctx.globalCompositeOperation = "source-over";
-        ctx.globalAlpha = 0.026;
-        ctx.fillStyle = "white";
-        for (let y = 0; y < H; y += 4) ctx.fillRect(0, y, W, 1);
-        ctx.globalAlpha = 1;
+
         ctx.restore();
       }
       function drawTitleMobileBackdrop(c, w, h) {
@@ -26400,6 +26325,7 @@
         return cinematicTimeScale;
       }
       function loop(now) {
+        if (document.hidden) { loop.last = now; requestAnimationFrame(loop); return; }
         lastFrameMs = now - (loop.last || now);
         if (lastFrameMs > 80) lastFrameMs = 80;
         fps = fps * 0.92 + (lastFrameMs ? 1000 / lastFrameMs : 60) * 0.08;
@@ -26419,8 +26345,9 @@
           cam.y += (game.ship.y - cam.y) * 0.08;
           autosave();
         }
-        updateUI();
-        updateDebugOverlay();
+        if (!loop.hudAt || now - loop.hudAt >= 80) {
+          updateUI(); updateDebugOverlay(); loop.hudAt = now;
+        }
         if (
           audio &&
           game.settings.music === "On" &&
@@ -26429,7 +26356,9 @@
         )
           scheduleMusic();
         draw();
-        drawMiniMap();
+        if (!loop.mapAt || now - loop.mapAt >= 66) {
+          drawMiniMap(); loop.mapAt = now;
+        }
         requestAnimationFrame(loop);
       }
       function performanceGuard(ms) {
@@ -26440,7 +26369,7 @@
           autoPerfDowngraded = true;
           game.settings.graphics = "Low";
           game.settings.motion = "Reduced";
-          buildBackdrop();
+          resize();
           return;
         }
         if (game.settings?.performanceMode !== "Auto" || autoPerfDowngraded)
@@ -26453,8 +26382,8 @@
           game.settings.graphics =
             game.settings.graphics === "High" ? "Medium" : "Low";
           game.settings.motion = "Reduced";
-          buildBackdrop();
-          toast("Performance mode adjusted visuals for smoother play.");
+          resize();
+          toast("Visual detail adjusted for smoother flight.");
           saveGame(false);
         }
       }
@@ -26508,7 +26437,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.23.0" &&
+            APP_VERSION === "0.24.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -27508,6 +27437,9 @@
       addEventListener("resize", resize);
       addEventListener("beforeunload", () => saveGame(false));
       document.addEventListener("visibilitychange", () => {
+        loop.last = 0;
+        keys.clear();
+        endTouch();
         if (document.hidden) {
           saveGame(false);
           if (audio?.ctx?.state === "running") audio.ctx.suspend().catch?.(() => {});
