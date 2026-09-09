@@ -236,7 +236,7 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.23.0", "Expected release candidate version");
+assert.equal(api.APP_VERSION, "0.24.0", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
@@ -817,6 +817,83 @@ assert.match(html, /Web Edition designs are complimentary and never require paym
 assert.match(html, /audio\.ctx\.suspend/, "Backgrounding should suspend audio");
 assert.match(html, /audio\.ctx\.resume/, "Returning should resume configured audio");
 
+// Rendering contracts use the production functions. The canvas stub records pixels;
+// physical browser/GPU frame rates remain a separate device release gate.
+checkpoint("visual budgets");
+const visual = vm.runInContext(`({
+  renderAssets, SURFACE_CACHE_BYTES, visualNoise, visualFbm, visualSeed,
+  surfaceTexture, buildDeepSky, advanceSkyBuild, buildBackdrop, bodyOnScreen,
+  setHudMarkup, resize, loop,
+  stars:()=>stars,
+  dpr:()=>DPR,
+  time:()=>t,
+})`, context);
+canvasContext.createImageData = (width, height) => ({data:new Uint8ClampedArray(width * height * 4)});
+canvasContext.putImageData = (pixels) => { canvasContext.lastPixels = pixels.data; };
+const visualWorld = {name:"Test Ocean",featureSeed:123,pattern:"continents",color:"#2979a3",atmosphere:true};
+const originalUniverse = api.universeSeed;
+const originalResources = JSON.stringify(api.game.resources);
+visual.renderAssets.builds = 0;
+const texture = visual.surfaceTexture(visualWorld, 24);
+const firstPixels = canvasContext.lastPixels.slice();
+assert.equal(firstPixels[3], 0, "Texture corners must be transparent");
+assert.equal(firstPixels[(12 * 24 + 12) * 4 + 3], 255, "Planet centers must be opaque");
+assert.ok(new Set(firstPixels).size > 50, "Planet texture must contain surface detail");
+assert.equal(visual.surfaceTexture(visualWorld, 24), texture, "Warm textures must be reused");
+assert.equal(visual.surfaceTexture({...visualWorld, name:"Second Ocean"}, 24), null,
+  "Only one new planet texture may be built per frame");
+visual.renderAssets.surfaces.clear(); visual.renderAssets.bytes = 0; visual.renderAssets.builds = 0;
+visual.surfaceTexture(visualWorld, 24);
+assert.deepEqual(canvasContext.lastPixels, firstPixels, "The same world must reproduce identical pixels");
+visual.renderAssets.builds = 0;
+visual.surfaceTexture({...visualWorld,featureSeed:456},24);
+assert.notDeepEqual(canvasContext.lastPixels,firstPixels,"Different worlds must receive different textures");
+assert.equal(api.universeSeed, originalUniverse, "Rendering cannot mutate the universe seed");
+assert.equal(JSON.stringify(api.game.resources), originalResources, "Rendering cannot alter progression");
+// Fill the cache budget with cheap fake canvases to test actual LRU eviction.
+visual.renderAssets.surfaces.clear(); visual.renderAssets.bytes = visual.SURFACE_CACHE_BYTES;
+const oldestTexture = {width:1024,height:1024};
+visual.renderAssets.surfaces.set("oldest",oldestTexture);
+visual.renderAssets.surfaces.set("middle",{width:1024,height:1024});
+visual.renderAssets.surfaces.set("newest",{width:1024,height:1024});
+visual.renderAssets.builds = 0; visual.surfaceTexture(visualWorld,24);
+assert.equal(visual.renderAssets.surfaces.has("oldest"),false,"Evict the oldest cached texture first");
+assert.equal(oldestTexture.width,1,"Release the evicted canvas backing allocation");
+assert.ok(visual.renderAssets.bytes <= visual.SURFACE_CACHE_BYTES,"Texture cache must stay within 12 MiB");
+assert.ok(visual.bodyOnScreen({type:"planet"},{x:100,y:100},20));
+assert.equal(visual.bodyOnScreen({type:"planet"},{x:-9000,y:100},20),false);
+assert.ok(visual.bodyOnScreen({type:"star"},{x:-100,y:100},40),"Keep partially visible stellar coronas");
+const hudElement = new FakeElement(); let markupWrites = 0;
+Object.defineProperty(hudElement,"innerHTML",{set(){markupWrites++}});
+visual.setHudMarkup(hudElement,"same"); visual.setHudMarkup(hudElement,"same"); visual.setHudMarkup(hudElement,"changed");
+assert.equal(markupWrites,2,"Unchanged HUD markup must not rebuild the DOM");
+api.game.settings.graphics = "Low";
+visual.buildBackdrop(); const seededStars = JSON.stringify(visual.stars());
+visual.buildBackdrop(); assert.equal(JSON.stringify(visual.stars()),seededStars,"Resizing must preserve seeded star placement");
+assert.ok(visual.renderAssets.skyJob,"Sky generation should queue instead of blocking system entry");
+visual.advanceSkyBuild(1);
+assert.equal(visual.renderAssets.skyJob.row,1,"Sky generation must respect its row budget");
+assert.equal(visual.renderAssets.sky,null,"Do not display an unfinished sky texture");
+const previousJob=visual.renderAssets.skyJob;
+api.game.settings.graphics="High"; visual.buildDeepSky();
+assert.notEqual(visual.renderAssets.skyJob,previousJob,"Quality changes cancel obsolete generation work");
+visual.renderAssets.skyJob.row=visual.renderAssets.skyJob.height-1;
+visual.advanceSkyBuild(1);
+assert.equal(visual.renderAssets.skyJob,null,"Completed sky jobs must be released");
+assert.ok(visual.renderAssets.sky,"Completed sky texture must become drawable");
+context.innerWidth=3840; context.innerHeight=2160; context.devicePixelRatio=3;
+visual.resize();
+assert.ok(getElement("game").width*getElement("game").height<=6000000,"Retina/4K rendering must respect the pixel budget");
+api.game.settings.graphics="Low"; context.innerWidth=390; context.innerHeight=844;
+visual.resize(); assert.equal(visual.dpr(),1,"Low quality must actually reduce the canvas resolution");
+const timeBeforeHide=visual.time(); const shipBeforeHide=JSON.stringify(api.game.ship);
+document.hidden=true; visual.loop(10000); document.hidden=false;
+assert.equal(visual.time(),timeBeforeHide,"Hidden tabs must not advance simulation");
+assert.equal(JSON.stringify(api.game.ship),shipBeforeHide,"Hidden tabs must not move the ship");
+assert.equal(visual.loop.last,10000,"Hidden frames must reset the frame timing origin");
+context.innerWidth=1280;context.innerHeight=800;context.devicePixelRatio=1;
+checkpoint("visual budgets verified");
+
 const manifest = JSON.parse(await readFile(new URL("manifest.webmanifest", root), "utf8"));
 assert.equal(manifest.display, "standalone");
 assert.ok(manifest.icons.some((icon) => icon.sizes === "192x192"));
@@ -832,5 +909,5 @@ assert.doesNotThrow(() => new Function(worker), "Service worker must parse");
 assert.match(worker, /caches\.match/, "Service worker needs an offline fallback");
 
 console.log(
-  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, audio lifecycle, and PWA assets.`,
+  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, audio lifecycle, and PWA assets.`,
 );
