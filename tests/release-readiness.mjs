@@ -98,6 +98,8 @@ const getElement = (id) => {
 };
 const body = new FakeElement("body");
 const documentElement = new FakeElement("html");
+const documentEvents = new Map();
+const windowEvents = new Map();
 const document = {
   body,
   documentElement,
@@ -105,7 +107,7 @@ const document = {
   fonts: { ready: Promise.resolve() },
   getElementById: getElement,
   createElement: (tag) => new FakeElement(tag),
-  addEventListener() {},
+  addEventListener(type, handler) { documentEvents.set(type, handler); },
   removeEventListener() {},
   querySelectorAll() { return []; },
   querySelector(selector) {
@@ -137,7 +139,7 @@ const context = {
   performance: { now: () => 1000 },
   requestAnimationFrame: () => 1,
   cancelAnimationFrame() {},
-  addEventListener() {},
+  addEventListener(type, handler) { windowEvents.set(type, handler); },
   removeEventListener() {},
   setTimeout: () => 1,
   clearTimeout() {},
@@ -171,7 +173,9 @@ vm.runInContext(
     fleetFormationSlot, fleetEscortMotion, fleetSkinForKey,
     startFleetMission, updateFleetMissions, completeFleetMission,
     systemVisualProfile, systemRarityClass, proc, parallelSystem, cosmicSpiritSystem,
-    saveState, saveGame, loadGame, validSavePayload,
+    saveState, saveGame, loadGame, validSavePayload, importSaveFile, acceptConfirm,
+    continueGame, getStoredSaveMeta, hydratePioneerRescue, autosave,
+    get hasActiveJourney(){return hasActiveJourney}, get zoom(){return zoom},
     setShipSkin, setFrigateSkin, setTrailSkin, owns, ownsTrailSkin, activeTrailSkin,
     trailSkins, refreshSkins, smartAction, releaseChecks,
     generateContracts, makeDailyOps, settingsHtml, storeHtml,
@@ -236,7 +240,24 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.25.0", "Expected release candidate version");
+// The animated title scene must never replace a journey before Continue.
+const titleSave = JSON.stringify(api.saveState());
+localStorage.setItem(api.SAVE_KEY, titleSave);
+localStorage.setItem(api.SAVE_BACKUP_KEY, titleSave);
+assert.equal(api.hasActiveJourney, false);
+assert.equal(api.saveGame(false), false);
+for (const event of ["beforeunload", "pagehide"]) windowEvents.get(event)();
+document.hidden = true; documentEvents.get("visibilitychange")(); document.hidden = false;
+assert.equal(localStorage.getItem(api.SAVE_KEY), titleSave);
+assert.equal(localStorage.getItem(api.SAVE_BACKUP_KEY), titleSave);
+localStorage.removeItem(api.SAVE_KEY);
+getElement("loadBtn").click();
+assert.equal(api.hasActiveJourney, true, "Continue must restore a backup-only journey");
+assert.equal(localStorage.getItem(api.SAVE_KEY), titleSave);
+api.dismissPanels();
+
+
+assert.equal(api.APP_VERSION, "0.25.1", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
@@ -961,6 +982,113 @@ for(const skin of craft.fleetSkins)for(const type of Object.keys(craft.fleetShip
 assert.ok(sprites.bytes<=sprites.budget,"Reviewing the full cosmetic catalog cannot exceed the hull cache limit");
 checkpoint("spacecraft models verified");
 
+// Stabilization: malformed imports, storage failures, menu input, and rescue reloads.
+api.initGame(false); api.dismissPanels();
+api.game.resources.Alloy = 4321;
+assert.equal(api.saveGame(false), true);
+const protectedSave = localStorage.getItem(api.SAVE_KEY);
+const protectedBackup = localStorage.getItem(api.SAVE_BACKUP_KEY);
+for (const mutate of [
+  d => d.currentSystemIndex = 1000000000,
+  d => d.systemCount = 1000000000,
+  d => d.bodyStates = [null],
+  d => d.captured = {},
+  d => d.resources.Alloy = "broken",
+  d => d.ship.x = null,
+]) {
+  const broken = JSON.parse(protectedSave); mutate(broken);
+  assert.equal(api.validSavePayload(broken), false, "Malformed state must be rejected before reconstruction");
+  assert.equal(await api.importSaveFile({text: async () => JSON.stringify(broken)}), false);
+  assert.equal(localStorage.getItem(api.SAVE_KEY), protectedSave);
+}
+const importCandidate = JSON.parse(protectedSave);
+importCandidate.resources.Alloy = 123;
+const originalSetItem = localStorage.setItem;
+localStorage.setItem = (key, value) => {
+  if (key === api.SAVE_KEY) throw new Error("Simulated storage quota failure");
+  originalSetItem(key, value);
+};
+await api.importSaveFile({text: async () => JSON.stringify(importCandidate)});
+assert.doesNotThrow(() => api.acceptConfirm(), "Async import confirmation must handle storage errors");
+localStorage.setItem = originalSetItem;
+assert.equal(api.game.resources.Alloy, 4321, "Failed import must restore the in-memory journey");
+assert.equal(localStorage.getItem(api.SAVE_KEY), protectedSave);
+assert.equal(localStorage.getItem(api.SAVE_BACKUP_KEY), protectedBackup);
+assert.equal(api.hasActiveJourney, true);
+// Storage failures must not trigger another autosave and toast every frame.
+let failedSaveWrites = 0;
+const saveConsole = context.console;
+context.console = {...console, error() {}};
+localStorage.setItem = (key, value) => {
+  if (key === api.SAVE_KEY) { failedSaveWrites++; throw new Error("Storage full"); }
+  originalSetItem(key, value);
+};
+assert.equal(api.saveGame(false), false);
+api.autosave(); api.autosave();
+assert.equal(failedSaveWrites, 1);
+localStorage.setItem = originalSetItem; context.console = saveConsole;
+await api.importSaveFile({text: async () => JSON.stringify(importCandidate)});
+api.acceptConfirm();
+assert.equal(api.game.resources.Alloy, 123);
+assert.equal(JSON.parse(localStorage.getItem(api.SAVE_KEY)).resources.Alloy, 123);
+assert.equal(localStorage.getItem(api.SAVE_BACKUP_KEY), protectedSave);
+
+// Failed Continue must not silently create a new journey.
+const quietConsole = context.console;
+context.console = {...console, error() {}};
+localStorage.setItem(api.SAVE_KEY, "{bad"); localStorage.removeItem(api.SAVE_BACKUP_KEY);
+api.continueGame();
+assert.equal(api.game.resources.Alloy, 123);
+assert.equal(localStorage.getItem(api.SAVE_KEY), "{bad");
+context.console = quietConsole;
+api.saveGame(false);
+
+api.dismissPanels();
+api.keys.add("w"); api.openPause();
+assert.equal(api.keys.size, 0, "Pausing must release held keyboard and touch inputs");
+api.closePause(); api.openSection("help");
+const zoomBeforeScroll = api.zoom;
+windowEvents.get("wheel")({deltaY:100});
+assert.equal(api.zoom, zoomBeforeScroll, "Menu scrolling must not zoom the flight camera");
+windowEvents.get("keydown")({key:"w", target:{closest:()=>null}, preventDefault(){}});
+assert.equal(api.keys.size, 0, "Menu input must not arm flight controls");
+windowEvents.get("keydown")({key:"Escape", preventDefault(){}});
+assert.equal(api.menuOpen, false, "Escape must dismiss the actual command menu");
+assert.equal(api.paused, false);
+windowEvents.get("keydown")({key:"w", target:{closest:()=>({})}, preventDefault(){}});
+assert.equal(api.keys.size, 0, "Editable inputs must retain normal keyboard behavior");
+api.keys.add("w"); windowEvents.get("blur")();
+assert.equal(api.keys.size, 0); assert.equal(api.pauseOpen, true);
+api.closePause();
+document.hidden=true; documentEvents.get("visibilitychange")();
+assert.equal(api.pauseOpen,true,"Backgrounding active flight must leave a resumable pause screen");
+document.hidden=false; documentEvents.get("visibilitychange")(); api.closePause();
+
+// Rescue state and frigate orbit must survive reload in each phase.
+api.prepareVaultTest(); api.dismissPanels();
+api.game.ship.orbitLocked=false; api.game.ship.lockBody=null; api.game.ship.fuel=0;
+api.startPioneerRescue();
+for (const phase of ["outbound", "service", "returning"]) {
+  assert.equal(api.pioneerRescue.phase, phase);
+  const position = {x:api.pioneerRescue.x, y:api.pioneerRescue.y};
+  api.saveGame(false); assert.equal(api.loadGame(false), true);
+  assert.equal(api.pioneerRescue.phase, phase);
+  assert.equal(api.pioneerRescue.x, position.x); assert.equal(api.pioneerRescue.y, position.y);
+  if (phase !== "outbound") {
+    assert.equal(api.game.ship.orbitLocked, true);
+    assert.equal(api.game.ship.lockBody, "__FRIGATE__");
+  }
+  api.updatePioneerRescue(api.pioneerRescue.duration);
+}
+assert.equal(api.pioneerRescue, null);
+api.saveGame(false); api.loadGame(false);
+assert.equal(api.game.ship.orbitLocked, true);
+assert.equal(api.game.ship.lockBody, "__FRIGATE__");
+api.game.ship.orbitLocked=false; api.startPioneerRescue(); api.initGame(false);
+assert.equal(api.pioneerRescue, null, "A fresh journey must clear the previous rescue");
+assert.equal(api.hydratePioneerRescue({phase:"outbound",duration:-1}), null);
+checkpoint("stabilization regressions verified");
+
 const manifest = JSON.parse(await readFile(new URL("manifest.webmanifest", root), "utf8"));
 assert.equal(manifest.display, "standalone");
 assert.ok(manifest.icons.some((icon) => icon.sizes === "192x192"));
@@ -976,5 +1104,5 @@ assert.doesNotThrow(() => new Function(worker), "Service worker must parse");
 assert.match(worker, /caches\.match/, "Service worker needs an offline fallback");
 
 console.log(
-  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, distinct spacecraft geometry, sprite budgets, all-skin preview fit, owned-fleet previews, audio lifecycle, and PWA assets.`,
+  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, distinct spacecraft geometry, sprite budgets, all-skin preview fit, owned-fleet previews, title save protection, transactional imports, rescue reloads, input isolation, audio lifecycle, and PWA assets.`,
 );

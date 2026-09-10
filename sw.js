@@ -1,4 +1,4 @@
-const CACHE_NAME = "orbital-drift-v0.25.0";
+const CACHE_NAME = "orbital-drift-v0.25.1";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -21,7 +21,8 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((keys) =>
         Promise.all(
-          keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)),
+          keys.filter((key) => key.startsWith("orbital-drift-v") && key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
         ),
       ),
   );
@@ -31,15 +32,20 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   if (event.request.mode === "navigate") {
-    event.respondWith(
+    const navigation =
       fetch(event.request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
+        .then(async (response) => {
+          const cache = await caches.open(CACHE_NAME);
+          if (!response.ok) return (await cache.match("./index.html")) || response;
+          try { await cache.put("./index.html", response.clone()); } catch (error) {}
           return response;
         })
-        .catch(() => caches.match("./index.html")),
-    );
+        .catch(async () => {
+          const cache = await caches.open(CACHE_NAME);
+          return (await cache.match("./index.html")) || Response.error();
+        });
+    event.respondWith(navigation);
+    event.waitUntil(navigation.then(() => {}));
     return;
   }
   event.respondWith(
