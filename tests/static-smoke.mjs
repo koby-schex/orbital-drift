@@ -87,7 +87,7 @@ for (const required of [
   "function registerOfflineSupport(",
   "function runTests(",
   "SAVE_VERSION = 20",
-  'APP_VERSION = "0.25.1"',
+  'APP_VERSION = "0.25.2"',
   "SAVE_BACKUP_KEY",
   'key: "silent_choir_3"',
   "height: 100dvh",

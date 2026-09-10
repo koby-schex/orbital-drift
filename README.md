@@ -20,6 +20,18 @@ npm test
 
 The test command runs static validation plus a functional release-readiness harness against the real game script. It covers all six first-upgrade tutorial paths, the fixed Sol start, Pioneer construction and rendezvous, repeat-safe Expedition Arcs, customizable crew progression, living-system events, major threats, non-linear multi-jump routes, fleet departure/return choreography, save migration and backup recovery, cosmetic equipping, responsive UI invariants, audio lifecycle hooks, and offline-app assets. The game also contains a browser-level `runTests()` suite used during release QA.
 
+## v0.25.2 travel and rendering cleanup
+
+- Preserve each system's pending signal, including its assigned encounter, across travel and saves. Previously the scan archive protected resolved mysteries, but an unscanned signal could change as other encounters were completed.
+- Reject jumps to the current system or invalid Atlas indices, and block normal/black-hole travel during Pioneer rescue.
+- Clear unfinished Echo recordings and transient capture/upgrade effects when travelling, loading, or starting a new journey.
+- Remove full-save reads from title animation frames. Continue updates on save changes and title entry, including storage events from other tabs.
+- Reuse fleet state objects instead of reconstructing fleet/boost/stat objects on frequent reads.
+- Draw title/menu backdrops and Battery Saver scenes at up to 30 fps; normal active flight retains the display cadence. Camera following uses elapsed time so its response matches at different refresh rates.
+- Use unique upgrade-panel tokens so two upgrades in the same millisecond cannot share a dismissal timer.
+
+Regression coverage verifies pending/resolved signals through travel and reload, invalid/no-op travel, rescue guards, Echo cleanup, fleet object reuse, title storage reads, frame scheduling, camera equivalence at 60/120 Hz, and overlapping upgrade timers. These are functional/operation-count checks, not measured device frame rates or battery savings. The schema remains 20, with optional per-system signal data.
+
 ## v0.25.1 stabilization
 
 - The title-screen demonstration cannot save over an existing journey. Continue also recovers a backup when the primary slot is missing, and failed loads no longer start a replacement journey.

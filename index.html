@@ -5031,7 +5031,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Deep-Space Exploration • v0.25.1</div>
+        <div class="title-version">Deep-Space Exploration • v0.25.2</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5442,7 +5442,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.25.1",
+        APP_VERSION = "0.25.2",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -5467,6 +5467,7 @@
         onboardingDismissed = false,
         titleMenuMode = false,
         pendingConfirm = null,
+        upgradePanelSequence = 0,
         lastAutosave = 0,
         hasActiveJourney = false,
         lastSaveMessage = "No save yet.",
@@ -9482,10 +9483,16 @@
         const d = dist(game.ship, b) - rad;
         return d < Math.min(well + 25, rad + 170);
       }
+      function resetFlightEffects() {
+        echoRecorder = null;
+        upgradeFX.length = 0;
+        captureFX.length = 0;
+        cleanControlButtons();
+      }
       function initGame(showTips = false, playable = true) {
         hasActiveJourney = playable;
         pioneerRescue = null;
-        cleanControlButtons();
+        resetFlightEffects();
         universeSeed = createUniverseSeed();
         routeRollCounter = 0;
         systems = [sol()];
@@ -9740,6 +9747,7 @@
         return lost;
       }
       function enterBlackHole() {
+        if (pioneerRescue) return toast("Wait for the Pioneer rescue to finish before travelling.");
         const n = nearestBlackHole();
         if (!n || n.d > 140)
           return toast("Move closer to the black hole to enter it.");
@@ -9748,6 +9756,8 @@
           "Enter Black Hole?",
           "This one-use black hole will collapse, remove 22% of your stored resources, and send you to a non-returnable Parallel system. Continue?",
           () => {
+            if (pioneerRescue) return toast("Wait for the Pioneer rescue to finish before travelling.");
+            resetFlightEffects();
             const first = (game.captainLog.parallelVisits || 0) === 0,
               lost = blackHolePenalty();
             bh.collapsed = true;
@@ -9872,6 +9882,11 @@
         return candidates[0]?.index ?? 1;
       }
       function jumpSystem(i = null) {
+        if (pioneerRescue) return toast("Wait for the Pioneer rescue to finish before travelling.");
+        if (i !== null && (!Number.isSafeInteger(Number(i)) || Number(i) < 0 || Number(i) >= systems.length))
+          return toast("Choose a charted system from the Atlas.");
+        if (i !== null && Number(i) === currentSystemIndex)
+          return toast("You are already in this system.");
         if (!game.frigate.built)
           return toast("System travel locked. Build the ODF Pioneer first.");
         const leavingTutorial = !!game.system?.isTutorial;
@@ -9893,6 +9908,7 @@
           return toast(
             "Parallel systems cannot be revisited. Find another black hole to enter a new one.",
           );
+        resetFlightEffects();
         currentSystemIndex = targetIndex;
         game.system = systems[currentSystemIndex];
         syncCurrentSystemSets();
@@ -10059,6 +10075,7 @@
             specialType: s.specialType || null,
             nonReturnable: !!s.nonReturnable,
             blackHole: s.blackHole ? { ...s.blackHole } : null,
+            sectorEvent: s === game.system ? game.sectorEvent : s.sectorEvent || null,
             bodies: s.bodies.map((b) => ({
               name: b.name,
               captured: !!b.captured,
@@ -10223,7 +10240,7 @@
             return false;
           }
           pioneerRescue = null;
-          cleanControlButtons();
+          resetFlightEffects();
           universeSeed = Number(d.universeSeed || 0) || createUniverseSeed();
           routeRollCounter = 0;
           systems = [sol()];
@@ -10247,6 +10264,8 @@
             }
             if (ss.blackHole && systems[idx])
               systems[idx].blackHole = { ...ss.blackHole };
+            if (ss.sectorEvent && typeof ss.sectorEvent === "object" && systems[idx])
+              systems[idx].sectorEvent = { ...ss.sectorEvent };
           });
           forceTutorialCommon();
           applyBodyStates(d.bodyStates || []);
@@ -10383,6 +10402,7 @@
           game.negotiationAnomaly = createAnomaly(currentSystemIndex);
           game.sectorEvent =
             d.sectorEvent || createSectorEvent(currentSystemIndex);
+          game.system.sectorEvent = game.sectorEvent;
           game.majorThreat = d.majorThreat && typeof d.majorThreat === "object"
             ? structuredClone(d.majorThreat)
             : null;
@@ -10668,11 +10688,12 @@
         return clamp(1 + Math.floor((game.frigate.hangarLevel || 0) / 2), 1, 3);
       }
       const FLEET_TRANSITION_MS = 2600;
+      const fleetDefaults = defaultFleet();
       function ensureFleet() {
         if (!game.ownedFleetSkins)
           game.ownedFleetSkins = new Set(["Command Match", "Frontier Fleet"]);
         game.ownedFleetSkins.add("Command Match");
-        game.fleet = { ...defaultFleet(), ...(game.fleet || {}) };
+        if (!game.fleet) game.fleet = defaultFleet();
         game.fleet.ships = Array.isArray(game.fleet.ships)
           ? game.fleet.ships
           : [];
@@ -10685,14 +10706,12 @@
         game.fleet.available = Array.isArray(game.fleet.available)
           ? game.fleet.available
           : [];
-        game.fleet.boosts = {
-          ...defaultFleet().boosts,
-          ...(game.fleet.boosts || {}),
-        };
-        game.fleet.stats = {
-          ...defaultFleet().stats,
-          ...(game.fleet.stats || {}),
-        };
+        if (!game.fleet.boosts) game.fleet.boosts = {};
+        if (!game.fleet.stats) game.fleet.stats = {};
+        for (const key in fleetDefaults.boosts)
+          if (game.fleet.boosts[key] === undefined) game.fleet.boosts[key] = fleetDefaults.boosts[key];
+        for (const key in fleetDefaults.stats)
+          if (game.fleet.stats[key] === undefined) game.fleet.stats[key] = fleetDefaults.stats[key];
         const now = Date.now();
         game.fleet.ships.forEach((ship) => {
           const mission = game.fleet.missions.find(
@@ -14495,6 +14514,7 @@
       }
       function createSectorEvent(i = currentSystemIndex) {
         if (i === 0) return null;
+        if (systems[i]?.sectorEvent) return systems[i].sectorEvent;
         const seed = (systems[i]?.seed || 1) + 5500,
           type = rareEventTypes[Math.floor(rand(seed) * rareEventTypes.length)],
           ang = between(seed + 11, 0, TAU),
@@ -14519,6 +14539,7 @@
           encounterKey: savedRecord?.encounterKey || null,
         };
         ensureSectorEventEncounter(event);
+        if (systems[i]) systems[i].sectorEvent = event;
         return event;
       }
       function nearestSectorEvent() {
@@ -20569,7 +20590,7 @@
           .join("");
         ui.upgradeOverlay.classList.remove("closing");
         ui.upgradeOverlay.classList.add("show");
-        const token = Date.now();
+        const token = ++upgradePanelSequence;
         ui.upgradeOverlay.dataset.token = String(token);
         setTimeout(() => {
           if (ui.upgradeOverlay?.dataset.token === String(token)) {
@@ -24684,7 +24705,6 @@
         c.restore();
       }
       function drawTitleShowcase() {
-        if (titleOpen) refreshTitleButtons();
         if (!titleOpen || !ui.titleCanvas) return;
         if (ui.titleCanvas.width < 4 || ui.titleCanvas.height < 4)
           resizeTitleCanvas();
@@ -24767,6 +24787,19 @@
         }
         return cinematicTimeScale;
       }
+      function shouldRenderFrame(now) {
+        const limited = titleOpen || paused || modalFreeze || game.settings?.performanceMode === "Battery Saver";
+        if (!limited || loop.drawAt === undefined || now < loop.drawAt || now - loop.drawAt >= 1000 / 30 - 0.1) {
+          loop.drawAt = now;
+          return true;
+        }
+        return false;
+      }
+      function followShipCamera(frameUnits = 1) {
+        const ease = 1 - Math.pow(0.92, Math.max(0, frameUnits));
+        cam.x += (game.ship.x - cam.x) * ease;
+        cam.y += (game.ship.y - cam.y) * ease;
+      }
       function loop(now) {
         if (document.hidden) { loop.last = now; requestAnimationFrame(loop); return; }
         lastFrameMs = now - (loop.last || now);
@@ -24784,8 +24817,7 @@
           updateShip(dt);
           updateProduction(dt);
           updateSystemVisualPhenomena();
-          cam.x += (game.ship.x - cam.x) * 0.08;
-          cam.y += (game.ship.y - cam.y) * 0.08;
+          followShipCamera(frameUnits);
           autosave();
         }
         if (!loop.hudAt || now - loop.hudAt >= 80) {
@@ -24798,7 +24830,7 @@
           audio.nextNote < audio.ctx.currentTime + 2
         )
           scheduleMusic();
-        draw();
+        if (shouldRenderFrame(now)) draw();
         if (!loop.mapAt || now - loop.mapAt >= 66) {
           drawMiniMap(); loop.mapAt = now;
         }
@@ -24880,7 +24912,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.25.1" &&
+            APP_VERSION === "0.25.2" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -25878,6 +25910,10 @@
         noop,
       });
       addEventListener("resize", resize);
+      addEventListener("storage", (event) => {
+        if (event.key === SAVE_KEY || event.key === SAVE_BACKUP_KEY || event.key === null)
+          refreshTitleButtons();
+      });
       addEventListener("beforeunload", () => saveGame(false));
       addEventListener("pagehide", () => saveGame(false));
       addEventListener("blur", () => {
@@ -26029,6 +26065,7 @@
         document.body.classList.remove("pause-open");
         ui.pauseOverlay.classList.remove("show");
         ui.titleOverlay.classList.add("show");
+        refreshTitleButtons();
       }
       function closePause() {
         document.body.classList.remove("pause-open");
