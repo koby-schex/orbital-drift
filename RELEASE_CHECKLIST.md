@@ -1,5 +1,18 @@
 # Orbital Drift release checklist
 
+## v0.25.2 travel and rendering cleanup
+
+- [x] Pending signals retain their encounter identity across visits; completed signals remain resolved after travel and save/load.
+- [x] Current-system and invalid Atlas targets cannot grant jump progress or generate extra systems.
+- [x] Rescue blocks normal and black-hole travel; travel/load/new journeys clear unfinished Echo recordings.
+- [x] Frequent fleet reads reuse state objects and retain custom/migrated values.
+- [x] Title drawing performs zero save-storage reads; storage events refresh Continue.
+- [x] Simulated 120 Hz scheduling produces 30 title/menu/Battery Saver draws per second and retains 120 active-flight draw opportunities.
+- [x] Camera following matches across equal elapsed time at 60 and 120 Hz.
+- [x] Same-millisecond upgrade panels have independent dismissal timers.
+- [ ] Verify these changes in a deployed browser and on phones, including paused menus, high-refresh displays, and Battery Saver. No new device-performance claims are made by this pass.
+
+
 ## v0.25.1 stabilization
 
 - [x] Title-screen unload, pagehide, and visibility events preserve existing primary and backup saves.

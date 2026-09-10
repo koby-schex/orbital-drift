@@ -126,6 +126,7 @@ const localStorage = {
   clear: () => storage.clear(),
 };
 
+const timeoutTasks = [];
 const context = {
   console,
   document,
@@ -141,7 +142,7 @@ const context = {
   cancelAnimationFrame() {},
   addEventListener(type, handler) { windowEvents.set(type, handler); },
   removeEventListener() {},
-  setTimeout: () => 1,
+  setTimeout: (fn, delay) => { timeoutTasks.push({fn, delay}); return timeoutTasks.length; },
   clearTimeout() {},
   setInterval: () => 1,
   clearInterval() {},
@@ -196,7 +197,10 @@ vm.runInContext(
     ensureLivingSystemEvent, resolveLivingSystemEvent, livingSystemEventHtml,
     majorThreatTemplates, spawnMajorThreat, prepareMajorThreat,
     resolveMajorThreat, majorThreatHtml, journeyPulseHtml,
-    resolveExplorationEncounter,
+    resolveExplorationEncounter, createSectorEvent, ensureSectorEventEncounter,
+    ensureFleet, enterBlackHole, startEcho, showUpgradePanel,
+    shouldRenderFrame, followShipCamera, drawTitleShowcase,
+    get echoRecorder(){return echoRecorder},
     closeUpgradePanel, closeMissionPanel, settleOverlayPause,
     showDiscovery, closeDiscoveryPanel, updateCinematicTimeScale,
     dismissPanels(){
@@ -257,7 +261,7 @@ assert.equal(localStorage.getItem(api.SAVE_KEY), titleSave);
 api.dismissPanels();
 
 
-assert.equal(api.APP_VERSION, "0.25.1", "Expected release candidate version");
+assert.equal(api.APP_VERSION, "0.25.2", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
@@ -1089,6 +1093,117 @@ assert.equal(api.pioneerRescue, null, "A fresh journey must clear the previous r
 assert.equal(api.hydratePioneerRescue({phase:"outbound",duration:-1}), null);
 checkpoint("stabilization regressions verified");
 
+// Travel boundaries: reject stale/invalid Atlas targets and prevent rescue relocation.
+api.initGame(false); api.dismissPanels();
+api.game.frigate.built = true;
+api.game.ship.orbitLocked = true; api.game.ship.lockBody = "__FRIGATE__";
+const beforeNoopJump = JSON.stringify(api.saveState().resources);
+const jumpsBefore = api.game.sectorJumps;
+const systemsBefore = api.systems.length;
+for (const target of [0, -1, Infinity, 1e9, 0.5, "bad"]) api.jumpSystem(target);
+assert.equal(api.game.sectorJumps,jumpsBefore);
+assert.equal(api.systems.length,systemsBefore,"Invalid Atlas inputs must not allocate systems");
+assert.equal(JSON.stringify(api.game.resources),beforeNoopJump);
+api.game.ship.orbitLocked=false; api.startPioneerRescue();
+api.jumpSystem(); api.enterBlackHole();
+assert.equal(api.currentSystemIndex,0,"Travel must wait for rescue completion");
+assert.equal(api.systems.length,systemsBefore);
+api.initGame(false); api.dismissPanels();
+api.game.frigate.built=true; api.game.ship.orbitLocked=true; api.game.ship.lockBody="__FRIGATE__";
+api.startEcho("route","Earth");
+assert.ok(api.echoRecorder);
+api.jumpSystem(); api.dismissPanels();
+assert.equal(api.echoRecorder,null,"A route recording cannot span a system jump");
+const firstSector = api.currentSystemIndex;
+const firstEvent = api.game.sectorEvent;
+const encounterIdentity = firstEvent.encounterKey;
+api.game.encounters.decisions.unshift({key:encounterIdentity});
+api.jumpSystem(); api.dismissPanels(); api.jumpSystem(firstSector); api.dismissPanels();
+assert.equal(api.game.sectorEvent.encounterKey,encounterIdentity,"An unscanned signal must retain its assigned encounter after other decisions");
+assert.equal(api.game.sectorEvent,firstEvent,"Returning to a system must reuse its pending signal");
+api.game.ship.x=firstEvent.x; api.game.ship.y=firstEvent.y;
+for (const key of Object.keys(api.game.resources)) api.game.resources[key]=9999;
+api.scanSectorMystery(); api.dismissPanels();
+const resolvedTemplate = api.ensureSectorEventEncounter();
+const freeChoice = resolvedTemplate.choices.findIndex(choice=>!choice.requirement);
+assert.ok(freeChoice>=0);
+api.resolveExplorationEncounter(freeChoice); api.dismissPanels();
+assert.equal(firstEvent.complete,true);
+api.jumpSystem(); api.dismissPanels();
+api.saveGame(false); api.initGame(false); api.loadGame(false); api.dismissPanels();
+api.jumpSystem(firstSector); api.dismissPanels();
+assert.equal(api.game.sectorEvent.complete,true,"Completed encounters must survive travel plus a save reload");
+const rewardBeforeDuplicate = JSON.stringify(api.game.resources);
+api.resolveExplorationEncounter(freeChoice);
+assert.equal(JSON.stringify(api.game.resources),rewardBeforeDuplicate,"Completed signals cannot pay twice");
+api.startEcho("route","Test"); api.saveGame(false); api.loadGame(false);
+assert.equal(api.echoRecorder,null,"Loading must clear an unfinished old route");
+api.startEcho("route","Test"); api.initGame(false);
+assert.equal(api.echoRecorder,null,"New journeys must clear unfinished routes");
+
+// Frequent fleet reads must preserve objects and custom values.
+api.ensureFleet();
+const fleetReferences = [api.game.fleet,api.game.fleet.boosts,api.game.fleet.stats];
+api.game.fleet.boosts.production=0.5;
+for(let read=0;read<120;read++) api.ensureFleet();
+assert.equal(api.game.fleet,fleetReferences[0]);
+assert.equal(api.game.fleet.boosts,fleetReferences[1]);
+assert.equal(api.game.fleet.stats,fleetReferences[2]);
+assert.equal(api.game.fleet.boosts.production,0.5);
+delete api.game.fleet.stats.completed; api.ensureFleet();
+assert.equal(api.game.fleet.stats.completed,0,"Missing migrated fields must still receive defaults");
+
+// Title rendering must not repeatedly read and parse saves.
+const originalGetItem = localStorage.getItem;
+let titleStorageReads=0;
+localStorage.getItem = key => {titleStorageReads++; return originalGetItem(key);};
+vm.runInContext("titleOpen=true;ui.titleCanvas.width=640;ui.titleCanvas.height=400",context);
+const titleShipSystems=JSON.stringify(api.game.shipSystems);
+for(let frame=0;frame<10;frame++) api.drawTitleShowcase();
+assert.equal(titleStorageReads,0,"Title drawing must not parse local saves each frame");
+assert.equal(JSON.stringify(api.game.shipSystems),titleShipSystems);
+windowEvents.get("storage")({key:api.SAVE_KEY});
+assert.ok(titleStorageReads>0,"Cross-tab save changes must still refresh Continue");
+localStorage.getItem=originalGetItem;
+
+function countDraws() {
+  delete visual.loop.drawAt;
+  let draws=0;
+  for(let frame=0;frame<120;frame++) if(api.shouldRenderFrame(frame*1000/120)) draws++;
+  return draws;
+}
+assert.equal(countDraws(),30,"Title artwork should render at 30 fps on a 120 Hz display");
+api.dismissPanels(); api.openSection("help");
+assert.equal(countDraws(),30,"Paused backdrops should render at 30 fps");
+api.closeMenu(); api.game.settings.performanceMode="Auto";
+assert.equal(countDraws(),120,"Active flight must keep the display's full rendering cadence");
+api.game.settings.performanceMode="Battery Saver";
+assert.equal(countDraws(),30);
+api.game.settings.performanceMode="Auto";
+api.game.ship.x=1000;api.game.ship.y=-500;
+vm.runInContext("cam={x:0,y:0}",context);
+for(let frame=0;frame<60;frame++) api.followShipCamera(1);
+const camera60=vm.runInContext("({...cam})",context);
+vm.runInContext("cam={x:0,y:0}",context);
+for(let frame=0;frame<120;frame++) api.followShipCamera(0.5);
+const camera120=vm.runInContext("({...cam})",context);
+assert.ok(Math.abs(camera60.x-camera120.x)<1e-8 && Math.abs(camera60.y-camera120.y)<1e-8,
+  "Camera following must match at 60 and 120 Hz for equal elapsed time");
+
+// Two upgrades in the same clock millisecond must have independent dismissal timers.
+const originalNow = Date.now;
+Date.now = () => 123456789;
+api.showUpgradePanel("First upgrade","Test");
+const firstTimer = timeoutTasks.at(-1);
+api.showUpgradePanel("Second upgrade","Test");
+const secondTimer = timeoutTasks.at(-1);
+Date.now = originalNow;
+firstTimer.fn();
+assert.equal(api.upgradePanelOpen,true,"A stale timer must not dismiss a newer upgrade");
+secondTimer.fn();
+assert.equal(api.upgradePanelOpen,false);
+checkpoint("travel and rendering stabilization verified");
+
 const manifest = JSON.parse(await readFile(new URL("manifest.webmanifest", root), "utf8"));
 assert.equal(manifest.display, "standalone");
 assert.ok(manifest.icons.some((icon) => icon.sizes === "192x192"));
@@ -1104,5 +1219,5 @@ assert.doesNotThrow(() => new Function(worker), "Service worker must parse");
 assert.match(worker, /caches\.match/, "Service worker needs an offline fallback");
 
 console.log(
-  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, distinct spacecraft geometry, sprite budgets, all-skin preview fit, owned-fleet previews, title save protection, transactional imports, rescue reloads, input isolation, audio lifecycle, and PWA assets.`,
+  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, distinct spacecraft geometry, sprite budgets, all-skin preview fit, owned-fleet previews, title save protection, transactional imports, rescue reloads, input isolation, persistent sector signals, travel boundaries, title storage reads, render cadence, refresh-independent camera, audio lifecycle, and PWA assets.`,
 );
