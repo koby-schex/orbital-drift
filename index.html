@@ -4895,6 +4895,14 @@
         .overlay .dialog { transition-duration: .01ms !important; }
         .menu-content-enter { animation: none !important; }
       }
+      .cosmetic-preview-label { top: 8px; bottom: auto; max-width: calc(100% - 18px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .cosmetic-card, .cosmetic-slot, .fleet-ship-card > div { min-width: 0; }
+      .cosmetic-card > b { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; overflow-wrap: anywhere; }
+      .cosmetic-card.premium > b:after { float: none; flex: 0 0 auto; margin-left: auto; }
+      .fleet-unit-preview { width: 100%; height: 84px; overflow: hidden; border-radius: 10px; margin: 7px 0; background: #07111d; }
+      .fleet-unit-preview canvas { display: block; position: static; width: 100%; height: 100%; }
+      .fleet-ship-card .fleet-ship-mark { width: 76px; height: 58px; padding: 0; overflow: hidden; border-radius: 10px; }
+      .fleet-ship-mark .fleet-unit-preview { width: 76px; height: 58px; margin: 0; }
     </style>
   </head>
   <body>
@@ -5023,7 +5031,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Command Deck Overhaul • v0.24.0</div>
+        <div class="title-version">Command Deck Overhaul • v0.25.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5434,7 +5442,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.24.0",
+        APP_VERSION = "0.25.0",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -5745,7 +5753,7 @@
           motif: "circuit",
           type: "free",
           price: 0,
-          desc: "Clean prototype-white panels with layered blue instrument lighting, exposed antenna rails, circuit-trace plating, and polished alloy panels.",
+          desc: "Clean prototype-white panels with layered blue instrument lighting, recessed twin drives, swept instrument housings, and polished alloy panels.",
         },
         {
           key: "Solar Flare",
@@ -5771,7 +5779,7 @@
           motif: "warp",
           type: "achievement",
           price: 0,
-          desc: "Warp-violet plating with cyan rift circuitry, gravitational lens lines, and a subtle distortion trail earned through Echo mastery.",
+          desc: "Warp-violet plating with cyan rift circuitry, detached drive nacelles, and a subtle distortion trail earned through Echo mastery.",
         },
         {
           key: "Mythic Mile",
@@ -5877,7 +5885,7 @@
           motif: "warp",
           type: "achievement",
           price: 0,
-          desc: "Violet warp-metal carrier plating with cyan route circuitry, lensing rings, Echo-reactive engine bands, and rift-lit armor.",
+          desc: "Violet warp-metal carrier plating with cyan route circuitry, raised drive nacelles, Echo-reactive engine bands, and rift-lit armor.",
         },
         {
           key: "Ancient Hunter",
@@ -6160,7 +6168,7 @@
           type: "achievement",
           price: 0,
           motif: "spirit",
-          desc: "Unlocked by reaching a Cosmic Spirit system. Escorts glow like pale celestial lanterns.",
+          desc: "Unlocked by reaching a Cosmic Spirit system. Escorts carry swept pearl fins and restrained celestial lighting.",
         },
         {
           key: "Parallel Swarm",
@@ -11233,7 +11241,7 @@
           fleetStatusStripHtml() +
           '<div class="fleet-hangar-stage"><canvas data-skin-kind="fleet" data-skin-key="' +
           esc(game.fleet.skin) +
-          '" role="img" aria-label="Current fleet formation preview"></canvas><span class="cosmetic-preview-label">Current cruising formation</span></div><div class="fleet-anchor-actions"><button type="button" data-action="scrollFleetSection" data-arg="fleetShipyard">Open Shipyard</button><button type="button" data-action="scrollFleetSection" data-arg="fleetMissions">Open Mission Board</button></div><div class="grid" style="margin-top:8px"><div class="chip"><b>Fleet Slots</b><br>' +
+          '" data-fleet-view="formation" role="img" aria-label="Current fleet formation preview"></canvas><span class="cosmetic-preview-label">Current cruising formation</span></div><div class="fleet-anchor-actions"><button type="button" data-action="scrollFleetSection" data-arg="fleetShipyard">Open Shipyard</button><button type="button" data-action="scrollFleetSection" data-arg="fleetMissions">Open Mission Board</button></div><div class="grid" style="margin-top:8px"><div class="chip"><b>Fleet Slots</b><br>' +
           game.fleet.ships.length +
           " / " +
           fleetLimit() +
@@ -11263,7 +11271,7 @@
                     canAfford(cost);
                 return (
                   '<div class="branch fleet-ship-card"><div class="fleet-ship-mark">' +
-                  fleetShipIcon(s.type) +
+                  fleetUnitPreviewHtml(s.type,s.level||1) +
                   '</div><div><b>' +
                   esc(s.name) +
                   " Lv. " +
@@ -11289,7 +11297,7 @@
                     s.id,
                     ready,
                     s.status !== "idle"
-                      ? "Fleet ship is deployed."
+                      ? s.status === "ready" ? "Claim this ship's mission reward before upgrading." : "This ship must return from its mission before upgrading."
                       : firstMissingReason(cost) || "Requirements not met yet.",
                   ) +
                   "</div></div></div>"
@@ -11306,10 +11314,8 @@
                 canAfford(cost);
             return (
               '<div class="shop"><b>' +
-              fleetShipIcon(k) +
-              " " +
               esc(d.name) +
-              "</b><span>" +
+              "</b>" + fleetUnitPreviewHtml(k) + "<span>" +
               esc(d.role) +
               " mission specialist. " +
               esc(d.desc) +
@@ -18155,6 +18161,41 @@
           "</div></div>"
         );
       }
+      function fleetUnitPreviewHtml(type,level=1) {
+        const label=fleetShipTypes[type]?.name||"Fleet craft";
+        return '<div class="fleet-unit-preview"><canvas data-skin-kind="fleet-unit" data-skin-key="'+
+          esc(game.fleet.skin)+'" data-ship-type="'+esc(type)+'" data-ship-level="'+Number(level)+
+          '" role="img" aria-label="'+esc(label+' hull preview')+'"></canvas></div>';
+      }
+      function fleetFormationPreviewShips() {
+        return (game.fleet?.ships||[]).slice(0,6).map((ship,index)=>({ship,slot:fleetFormationSlot(index)}))
+          .filter(({ship})=>!["mission","launching"].includes(ship.status));
+      }
+      function drawFleetFormationPreview(c,width,height,skin) {
+        const fit=Math.min(width/740,height/610);
+        c.save();c.translate(width*0.13,0);c.scale(fit,fit);
+        drawFrigateVisual(c,1,activeFrigateSkin());
+        drawFrigateUpgradeModules(c,1,activeFrigateSkin());
+        for(const {ship,slot} of fleetFormationPreviewShips()) {
+          c.save();c.translate(slot.x,slot.y);
+          drawFleetShipVisual(c,0.81,ship,skin,0.2);c.restore();
+        }
+        c.restore();
+      }
+      function fleetPreviewLayout(width,height) {
+        const types=["scout","miner","tender","probe","warden"],
+          slots=[[-0.31,-0.22],[0,-0.22],[0.31,-0.22],[-0.16,0.22],[0.16,0.22]],
+          scale=Math.min(width/250,height/140);
+        return types.map((type,i)=>({type,x:slots[i][0]*width,y:slots[i][1]*height,scale}));
+      }
+      function drawFleetPreview(c,width,height,skin) {
+        for(const slot of fleetPreviewLayout(width,height)) {
+          c.save();c.translate(slot.x,slot.y);
+          drawFleetShipVisual(c,slot.scale,{type:slot.type,level:1},skin,0.15);
+          c.fillStyle="rgba(204,220,230,.75)";c.font="500 8px system-ui";c.textAlign="center";
+          c.fillText(fleetShipTypes[slot.type].name,0,27*slot.scale, width*0.29);c.restore();
+        }
+      }
       function renderSkinPreviews() {
         if (!ui.menu?.classList.contains("open")) return;
         ui.menuContent
@@ -18166,15 +18207,15 @@
                 kind === "trail"
                   ? trailSkins.find((item) => item.key === key) ||
                     activeTrailSkin()
-                  : kind === "fleet"
+                  : kind.startsWith("fleet")
                   ? fleetSkinForKey(key)
                   : (kind === "ship" ? shipSkins : frigateSkins).find(
                         (item) => item.key === key,
                       ) ||
                     (kind === "ship" ? activeShipSkin() : activeFrigateSkin()),
               rect = canvas.getBoundingClientRect(),
-              width = Math.max(220, Math.round(rect.width || 320)),
-              height = Math.max(132, Math.round(rect.height || 156)),
+              width = Math.max(1, Math.round(rect.width || 320)),
+              height = Math.max(1, Math.round(rect.height || 156)),
               dpr = Math.min(2, window.devicePixelRatio || 1),
               c = canvas.getContext("2d");
             canvas.width = Math.round(width * dpr);
@@ -18225,44 +18266,18 @@
                 Math.min(width / 470, height / 235),
                 skin,
               );
+            } else if (kind === "fleet-unit") {
+              drawFleetShipVisual(c,Math.min(width/105,height/70),
+                {type:canvas.dataset.shipType,level:Number(canvas.dataset.shipLevel)||1},skin,0.15);
             } else if (kind === "fleet") {
-              c.save();
-              c.globalAlpha = 0.42;
-              drawFrigateVisual(
-                c,
-                Math.min(width / 760, height / 370),
-                activeFrigateSkin(),
-              );
-              c.restore();
-              const previewShips = ["scout", "miner", "tender", "probe", "warden"],
-                fleetPreviewScale = Math.min(width / 410, height / 240);
-              previewShips.forEach((type, index) => {
-                const lanes = [
-                  [-0.3, -0.31],
-                  [-0.28, 0.33],
-                  [-0.05, -0.4],
-                  [-0.02, 0.42],
-                  [0.22, 0.03],
-                ];
-                c.save();
-                c.translate(lanes[index][0] * width, lanes[index][1] * height);
-                c.rotate(index % 2 ? -0.035 : 0.035);
-                drawFleetEngineTrail(c, fleetPreviewScale, skin, 0.42 + index * 0.05);
-                drawFleetShipVisual(
-                  c,
-                  fleetPreviewScale,
-                  { type, level: 2 },
-                  skin,
-                  0.42 + index * 0.05,
-                );
-                c.restore();
-              });
+              if(canvas.dataset.fleetView === "formation")drawFleetFormationPreview(c,width,height,skin);
+              else drawFleetPreview(c,width,height,skin);
             }
             c.restore();
             const shade = c.createLinearGradient(0, 0, 0, height);
             shade.addColorStop(0, "rgba(255,255,255,.035)");
             shade.addColorStop(0.62, "rgba(0,0,0,0)");
-            shade.addColorStop(1, "rgba(2,6,23,.5)");
+            shade.addColorStop(1, "rgba(2,6,23,.22)");
             c.fillStyle = shade;
             c.fillRect(0, 0, width, height);
           });
@@ -20524,6 +20539,7 @@
           game.settings?.graphics === "High" ? "high" : "medium";
         resizeTitleCanvas();
         buildBackdrop();
+        if(ui.menu?.classList.contains("open")) renderSkinPreviews();
       }
       function resizeTitleCanvas() {
         if (!ui.titleCanvas) return;
@@ -22166,7 +22182,7 @@
       }
       function requireFrigateOrbit() {
         if (orbitingFrigate()) return true;
-        toast("Orbit-lock the frigate to access Frigate Base systems.");
+        toast("Orbit-lock with the Pioneer to use this deck.");
         return false;
       }
       function drawFrigate() {
@@ -22225,7 +22241,7 @@
           c.globalAlpha = motion.alpha;
           c.translate(motion.x * zoom, (motion.y + bob) * zoom);
           c.rotate(motion.angle);
-          drawFleetEngineTrail(c, scale, skin, cruisingThrust);
+
           drawFleetShipVisual(c, scale, ship, skin, cruisingThrust);
           if (ship.status === "ready") {
             c.globalCompositeOperation = "screen";
@@ -22286,7 +22302,7 @@
             thrust: 1.35 - q * 0.85,
           };
         }
-        const cruise = game.settings?.motion === "Reduced" ? 0 : now * 0.0012;
+        const cruise = game.settings?.motion === "Reduced" ? 0 : t * 0.02;
         return {
           x: slot.x + Math.sin(cruise + slot.y * 0.01) * 9,
           y: slot.y + Math.cos(cruise * 0.82 + slot.x * 0.01) * 7,
@@ -22294,6 +22310,343 @@
           alpha: 1,
           thrust: 0.34,
         };
+      }
+      // Shared opaque hull models for flight, the title scene, and every hangar preview.
+      // Coordinates are normalized; raised decks project upward into a shallow 3/4 view.
+      const spacecraftModels = new Map();
+      function craftModel(kind, role = "scout", motif = "standard", stage = 0) {
+        const key = [kind, role, motif, stage].join(":");
+        if (spacecraftModels.has(key)) return spacecraftModels.get(key);
+        const model = { parts: [], engines: [], lights: [], kind, role, motif, stage };
+        const part = (points, material = "hull", z = 2, depth = 2) =>
+          model.parts.push({ points, material, z, depth });
+        const box = (x, y, w, h, material = "hull", z = 2, depth = 2) =>
+          part([[x+2,y],[x+w-2,y],[x+w,y+2],[x+w,y+h-2],[x+w-2,y+h],[x+2,y+h],[x,y+h-2],[x,y+2]],material,z,depth);
+        const mirror = (points, material, z = 2, depth = 2) => {
+          for (const side of [-1,1]) part(points.map(([x,y])=>[x,y*side]),material,z,depth);
+        };
+        const engine = (x, y, size = 3) => {
+          box(x-1,y-size-1,10,size*2+2,"dark",2,3);
+          box(x+2,y-size,9,size*2,"metal",3,2);
+          model.engines.push({x:x-1,y:y-1,size});
+        };
+        const radiator = (x,y,w,h,material="dark") => {
+          box(x,y,w,h,material,2,1);
+          for(let i=3;i<w-1;i+=4) part([[x+i,y+1],[x+i+1,y+1],[x+i+1,y+h-1],[x+i,y+h-1]],"vent",2.4,0);
+        };
+        const light = (x,y,color="accent",size=0.7) => model.lights.push({x,y,color,size});
+        if (kind === "frigate") {
+          // A broad carrier keel, with independent drive nacelles and recessed flight deck.
+          mirror([[-46,15],[-32,27],[31,27],[44,17],[29,12]],"dark",1,4);
+          for(const side of [-1,1]) {
+            box(-48,side*24-7,75,14,"metal",3,4);
+            box(-34,side*24-5,31,10,"hull",6,3);
+            box(0,side*24-5,23,10,"paint",5,3);
+            radiator(-30,side*24-3,22,6);
+            engine(-50,side*24,4.2);
+            light(25,side*25,"white",0.65);
+          }
+          part([[-47,-14],[-12,-20],[30,-17],[59,-6],[63,0],[57,8],[28,18],[-11,20],[-47,14]],"dark",3,5);
+          part([[-34,-14],[27,-13],[54,-5],[59,0],[49,6],[20,13],[-34,14]],"hull",6,3);
+          // Dark flight-deck recess is surrounded by segmented armor instead of a glowing stripe.
+          box(-37,-8,41,16,"dark",6.5,0);
+          for(const side of [-1,1]) {
+            box(-36,side*13-2,38,4,"metal",7,2);
+            for(let i=0;i<6;i++) light(-32+i*6,side*6,"white",0.42);
+          }
+          box(-34,-5,25,10,"vent",6.8,0);
+          part([[6,-10],[30,-10],[41,-5],[41,5],[30,10],[6,10]],"metal",8,3);
+          box(13,-6,17,12,"hull",11,3);
+          part([[23,-5],[36,-3],[38,0],[34,4],[23,5]],"glass",12,1);
+          part([[42,-3],[55,0],[43,3],[38,0]],"paint",7,1);
+          for(let i=0;i<4;i++) {
+            box(-26+i*12,-18,9,4,"metal",5,2);
+            box(-26+i*12,16,9,4,"metal",5,2);
+          }
+          for(let i=0;i<3;i++) engine(-49,-8+i*8,2.5);
+          part([[10,-9],[12,-9],[12,-24],[10,-24]],"metal",10,0.7);
+          part([[6,-24],[17,-24],[14,-26],[7,-26]],"dark",10,1);
+        } else if (kind === "fleet") {
+          if (role === "miner") {
+            box(-39,-11,71,22,"dark",2,5);
+            for(const side of [-1,1]) {
+              for(let i=0;i<3;i++) box(-32+i*19,side*19-7,16,14,"cargo",4,5);
+              part([[18,side*9],[34,side*18],[49,side*18],[49,side*15],[36,side*14],[26,side*6]],"metal",4,2);
+              engine(-41,side*9,3.7);
+            }
+            box(-29,-7,37,14,"hull",6,3);
+            part([[8,-9],[31,-7],[40,0],[31,7],[8,9]],"paint",6,4);
+            part([[21,-5],[32,-3],[35,0],[29,4],[21,5]],"glass",8,1);
+          } else if (role === "tender") {
+            box(-39,-7,82,14,"dark",2,4);
+            for(const side of [-1,1]) {
+              part([[-37,side*11],[-27,side*25],[18,side*25],[31,side*18],[22,side*10]],"metal",3,5);
+              for(const x of [-24,-9,7]) box(x,side*18-5,3,10,"paint",5,1);
+              engine(-41,side*17,4);
+            }
+            box(-21,-6,42,12,"hull",6,4);
+            part([[20,-6],[43,-4],[51,0],[43,5],[20,7]],"hull",6,3);
+            part([[29,-4],[42,0],[31,4],[24,3],[24,-3]],"glass",8,1);
+          } else if (role === "probe") {
+            mirror([[-18,10],[-30,29],[2,36],[14,22],[7,12]],"dark",1,1);
+            for(const side of [-1,1]) {
+              radiator(-23,side*24-6,25,12,"solar");
+              part([[12,side*4],[33,side*19],[42,side*12],[28,side*4]],"metal",2,2);
+            }
+            part([[-30,-8],[-11,-16],[20,-9],[32,0],[20,9],[-11,16],[-30,8]],"hull",4,5);
+            box(-17,-6,20,12,"paint",7,2);
+            part([[5,-6],[20,-4],[25,0],[19,5],[5,6]],"glass",8,2);
+            part([[31,-1],[49,-1],[49,1],[31,1]],"metal",4,1);
+            light(49,0,"accent",1.5); engine(-32,0,4);
+          } else if (role === "warden") {
+            mirror([[-31,7],[-41,27],[2,31],[29,19],[37,10],[8,7]],"metal",2,4);
+            mirror([[-30,14],[-30,23],[-1,26],[22,17],[16,12]],"paint",5,3);
+            part([[-31,-11],[16,-13],[44,-8],[48,0],[44,8],[16,13],[-31,11]],"hull",6,5);
+            box(21,-7,24,14,"metal",8,3);
+            part([[25,-5],[41,-4],[44,0],[40,4],[25,5]],"glass",10,1);
+            for(const side of [-1,1]) {engine(-39,side*17,4.3);box(14,side*21-2,26,4,"dark",6,3);}
+          } else {
+            mirror([[-28,6],[-39,21],[-27,22],[14,9],[20,4]],"metal",2,2);
+            part([[-35,-7],[-8,-11],[25,-6],[54,0],[25,6],[-8,11],[-35,7]],"hull",5,4);
+            part([[-20,-5],[17,-4],[38,0],[17,4],[-20,5]],"paint",7,2);
+            part([[7,-4],[30,0],[8,4],[0,2],[0,-2]],"glass",9,1);
+            for(const side of [-1,1]) engine(-36,side*7,3);
+          }
+        } else {
+          // Starling: an expedition interceptor with swept wings and two recessed drives.
+          const wing = motif === "ancient" ? [[-29,8],[-50,27],[-24,26],[19,12],[33,5]] :
+            motif === "flare" ? [[-30,8],[-37,31],[-15,28],[23,11],[30,5]] :
+            motif === "parallel" ? [[-30,8],[-52,29],[-24,19],[8,25],[32,7]] :
+            motif === "mythic" ? [[-29,8],[-41,24],[-12,30],[25,15],[41,6]] :
+            [[-29,8],[-45,23],[-31,24],[11,12],[29,5]];
+          mirror(wing,"metal",2,3);
+          mirror([[-29,11],[-33,18],[-19,18],[13,9]],"paint",4,1.5);
+          for(const side of [-1,1]) {
+            box(-39,side*10-4,26,8,"dark",3,3);
+            box(-29,side*10-3,19,6,"metal",6,2);
+            engine(-41,side*10,3);
+          }
+          part([[-35,-6],[-13,-10],[23,-7],[57,-1],[61,1],[29,8],[-12,10],[-35,6]],"dark",4,4);
+          part([[-28,-6],[-6,-8],[24,-5],[53,0],[26,6],[-6,8],[-28,6]],"hull",7,3);
+          part([[-18,-4],[5,-5],[19,-3],[24,0],[17,4],[-18,4]],"metal",9,2);
+          part([[6,-3.5],[20,-2.8],[30,0],[20,3.2],[6,3.5],[2,1],[2,-1]],"glass",11,1.5);
+          part([[33,-2],[49,0],[33,2],[28,0]],"paint",8,0.8);
+          radiator(-26,-3,20,6);
+          for(const side of [-1,1]) light(-26,side*21,"white",0.55);
+        }
+        // Cosmetic architecture is opaque and purposeful; the skin changes more than its paint.
+        if (["flare","solar"].includes(motif)) {
+          for(const side of [-1,1]) {
+            part([[-9,side*14],[-6,side*32],[14,side*32],[23,side*18]],"cargo",3,2);
+            for(let i=0;i<4;i++) part([[-5+i*5,side*17],[-4+i*5,side*17],[-4+i*5,side*29],[-5+i*5,side*29]],"metal",4,0);
+          }
+        } else if (["warp","parallel"].includes(motif)) {
+          for(const side of [-1,1]) {
+            const shift=motif==="parallel" && side===1 ? 10 : 0;
+            part([[-24+shift,side*23],[-15+shift,side*30],[28+shift,side*21],[40+shift,side*12],[24+shift,side*16]],"dark",4,3);
+            part([[-16+shift,side*25],[24+shift,side*19],[26+shift,side*20],[-15+shift,side*27]],side===1&&motif==="parallel"?"energy2":"energy",5,0);
+          }
+        } else if (["spirit","mythic"].includes(motif)) {
+          mirror([[-29,20],[-17,31],[1,33],[26,24],[46,10],[22,17],[0,24],[-17,25]],"pearl",5,2);
+          mirror([[-14,28],[0,30],[22,22],[24,23],[0,32],[-14,30]],"energy",6,0);
+        } else if (motif === "ancient") {
+          mirror([[10,12],[21,28],[38,24],[50,10],[33,17],[24,16]],"cargo",4,4);
+          for(const side of [-1,1]) for(let i=0;i<3;i++)
+            part([[22+i*5,side*20],[24+i*5,side*18],[26+i*5,side*20],[24+i*5,side*22]],"energy",5,0);
+        } else if (motif === "freeze") {
+          mirror([[-29,21],[-19,33],[-2,31],[9,24],[27,18],[2,22]],"pearl",5,4);
+        } else if (motif === "abyss") {
+          mirror([[-36,16],[-45,24],[-13,29],[27,19],[41,9],[12,15]],"dark",6,3);
+          radiator(-25,-5,28,10);
+        } else if (motif === "archaeologist") {
+          for(const side of [-1,1]) for(let i=0;i<4;i++) {
+            box(-25+i*13,side*30-3,10,6,"cargo",4,3);
+            box(-23+i*13,side*30-1,6,2,"glass",6,0.5);
+          }
+          part([[10,-15],[12,-15],[12,-36],[10,-36]],"metal",6,1);
+          part([[4,-35],[19,-35],[17,-39],[7,-39]],"paint",7,2);
+          light(11,-36,"accent",1);
+        }
+        // Upgrades add bounded mechanical details and preserve the same collision footprint.
+        for(let i=0;i<Math.min(3,stage);i++) {
+          for(const side of [-1,1]) box(-17+i*10,side*12-1.5,7,3,"metal",8,1.5);
+        }
+        for(const side of [-1,1]) light(kind==="frigate"?47:33,side*(kind==="frigate"?9:5),side===1?"red":"cyan",0.6);
+        if(spacecraftModels.size>=96) spacecraftModels.delete(spacecraftModels.keys().next().value);
+        spacecraftModels.set(key,model); return model;
+      }
+      function craftMix(a,b,q) {
+        const x=hex(a),y=hex(b);
+        return `rgb(${Math.round(x.r+(y.r-x.r)*q)},${Math.round(x.g+(y.g-x.g)*q)},${Math.round(x.b+(y.b-x.b)*q)})`;
+      }
+      function craftPalette(skin) {
+        const primary=skin.primary||"#93c5fd", secondary=skin.secondary||"#162333",
+          stealth=skin.motif==="abyss";
+        return {
+          hull:craftMix(primary,stealth?"#364454":"#9caab6",stealth?0.34:0.48),
+          metal:craftMix(primary,"#8d9da9",0.68), dark:craftMix(secondary,"#15202c",0.6),
+          paint:craftMix(primary,"#5a6672",0.25), cargo:craftMix(primary,"#be8c51",0.55),
+          pearl:craftMix(primary,"#e5ebe4",0.7), solar:"#233d61", vent:"#0a121c",
+          glass:"#234c62", energy:skin.accent||"#67e8f9",energy2:skin.glow||"#c084fc"
+        };
+      }
+      function drawCraftEngine(c, engine, skin, thrust) {
+        const {x,y,size}=engine, length=size*(3+Math.max(0,thrust)*5), color=skin.glow||skin.accent||"#7dd3fc";
+        c.save(); c.globalCompositeOperation="screen";
+        const glow=c.createRadialGradient(x,y,0,x,y,size*4);
+        glow.addColorStop(0,rgba(color,0.38));glow.addColorStop(1,"rgba(0,0,0,0)");
+        c.fillStyle=glow;c.fillRect(x-size*4,y-size*4,size*8,size*8);
+        const plume=c.createLinearGradient(x-length,y,x,y);
+        plume.addColorStop(0,"rgba(0,0,0,0)");plume.addColorStop(0.6,rgba(color,0.32));plume.addColorStop(0.95,rgba(color,0.8));plume.addColorStop(1,"#e7f8ff");
+        c.fillStyle=plume;c.beginPath();c.moveTo(x,y-size*0.7);
+        c.bezierCurveTo(x-length*0.5,y-size*0.45,x-length*0.75,y-size*0.08,x-length,y);
+        c.bezierCurveTo(x-length*0.75,y+size*0.08,x-length*0.5,y+size*0.45,x,y+size*0.7);c.closePath();c.fill();
+        c.fillStyle="#def7ff";c.fillRect(x-0.6,y-size*0.6,1.2,size*1.2);c.restore();
+      }
+      const spacecraftSprites = { entries:new Map(), bytes:0, budget:12*1024*1024 };
+      function craftBounds(model) {
+        const points=model.parts.flatMap(part=>part.points.map(([x,y])=>[x,y-part.z+part.depth]));
+        const top=model.parts.flatMap(part=>part.points.map(([x,y])=>[x,y-part.z]));
+        return {left:Math.floor(Math.min(...points.map(p=>p[0]))-3),
+          right:Math.ceil(Math.max(...points.map(p=>p[0]))+3),
+          top:Math.floor(Math.min(...top.map(p=>p[1]))-3),
+          bottom:Math.ceil(Math.max(...points.map(p=>p[1]))+3)};
+      }
+      function paintCraftHull(c,model,skin) {
+        const palette=craftPalette(skin);
+        c.save();c.lineJoin="round";
+        const path=(points,z=0)=>{
+          c.beginPath();points.forEach(([x,y],i)=>i?c.lineTo(x,y-z):c.moveTo(x,y-z));c.closePath();
+        };
+        for(const piece of model.parts) {
+          const {points,material,z,depth}=piece, color=palette[material]||palette.hull;
+          // Extruded edge faces are dark, with a single coherent key light from upper left.
+          if(depth>0) for(let i=0;i<points.length;i++) {
+            const a=points[i],b=points[(i+1)%points.length];
+            if(b[0]>=a[0])continue;
+            path([[a[0],a[1]-z],[b[0],b[1]-z],[b[0],b[1]-z+depth],[a[0],a[1]-z+depth]]);
+            c.fillStyle=material==="glass"?"#091d2a":"#18232f";c.fill();
+          }
+          path(points,z);
+          if(material==="energy"||material==="energy2") {
+            c.fillStyle=color;c.fill();continue;
+          }
+          const ys=points.map(p=>p[1]),top=Math.min(...ys)-z,bottom=Math.max(...ys)-z,
+            finish=c.createLinearGradient(-15,top,18,bottom);
+          if(material==="glass") {
+            finish.addColorStop(0,"#a5cfdb");finish.addColorStop(0.16,"#4d8a9f");
+            finish.addColorStop(0.4,"#17435b");finish.addColorStop(1,"#071725");
+          } else {
+            finish.addColorStop(0,color);finish.addColorStop(0.12,color);
+            finish.addColorStop(0.42,color);finish.addColorStop(1,material==="vent"?"#050b11":"#263341");
+          }
+          c.fillStyle=finish;c.fill();c.strokeStyle="rgba(4,10,17,.72)";c.lineWidth=0.45;c.stroke();
+          if(material!=="vent"&&material!=="dark") {
+            c.beginPath();
+            for(let i=0;i<points.length;i++) {
+              const a=points[i],b=points[(i+1)%points.length];
+              if(b[0]>a[0]){c.moveTo(a[0],a[1]-z+0.3);c.lineTo(b[0],b[1]-z+0.3);}
+            }
+            c.strokeStyle="rgba(236,246,253,.48)";c.lineWidth=0.45;c.stroke();
+          }
+          if(material==="hull") {
+            const a=points[0],b=points[1];
+            c.fillStyle="rgba(240,247,250,.36)";c.fillRect(a[0]+2,a[1]-z+2,0.6,0.6);
+            c.fillRect(b[0]-2,b[1]-z+2,0.6,0.6);
+            const mid=(a[0]+b[0])*0.5;
+            c.strokeStyle="rgba(2,9,16,.27)";c.lineWidth=0.35;
+            c.beginPath();c.moveTo(mid,a[1]-z+1.5);c.lineTo(mid+1,a[1]-z+4.5);c.stroke();
+          }
+        }
+        for(const lamp of model.lights) {
+          c.fillStyle=lamp.color==="red"?"#f58d88":lamp.color==="cyan"?"#7ee4cf":lamp.color==="white"?"#e3eff1":skin.accent||"#8dddf5";
+          c.fillRect(lamp.x,lamp.y-3,lamp.size*2,lamp.size);
+        }
+        c.restore();
+      }
+      function craftSprite(model,skin,density) {
+        const key=[model.kind,model.role,model.motif,model.stage,skin.primary,skin.secondary,skin.accent,skin.glow,density].join(":");
+        const entries=spacecraftSprites.entries;
+        if(entries.has(key)) {const cached=entries.get(key);entries.delete(key);entries.set(key,cached);return cached;}
+        const bounds=craftBounds(model),canvas=document.createElement("canvas");
+        canvas.width=Math.ceil((bounds.right-bounds.left)*density);
+        canvas.height=Math.ceil((bounds.bottom-bounds.top)*density);
+        const c=canvas.getContext("2d");if(!c)return null;
+        c.setTransform(density,0,0,density,-bounds.left*density,-bounds.top*density);
+        paintCraftHull(c,model,skin);
+        const bytes=canvas.width*canvas.height*4;
+        while(spacecraftSprites.bytes+bytes>spacecraftSprites.budget&&entries.size) {
+          const oldest=entries.keys().next().value,entry=entries.get(oldest);
+          spacecraftSprites.bytes-=entry.bytes;entry.canvas.width=entry.canvas.height=1;entries.delete(oldest);
+        }
+        const sprite={canvas,bounds,bytes,density};entries.set(key,sprite);spacecraftSprites.bytes+=bytes;return sprite;
+      }
+      function drawCraftModel(c, scale, skin, kind, role="scout", thrust=0.2, stage=0) {
+        if(!Number.isFinite(scale)||scale<=0)return;
+        const model=craftModel(kind,role,skin.motif,stage),factor=kind==="frigate"?3:kind==="fleet"?0.62:1,
+          // Include the destination transform so Retina previews stay sharp too.
+          transform=typeof c.getTransform==="function"?c.getTransform():null,
+          displayScale=transform&&Number.isFinite(transform.a)?Math.hypot(transform.a,transform.b):DPR,
+          target=scale*factor*displayScale,
+          density=target>3?4:target>1.5?3:target>0.8?2:1,
+          sprite=craftSprite(model,skin,density);
+        c.save();c.scale(scale*factor,scale*factor);
+        if(sprite) {
+          const b=sprite.bounds;
+          c.imageSmoothingEnabled=true;c.imageSmoothingQuality="high";
+          c.drawImage(sprite.canvas,b.left,b.top,sprite.canvas.width/density,sprite.canvas.height/density);
+        } else paintCraftHull(c,model,skin);
+        for(const e of model.engines)drawCraftEngine(c,e,skin,thrust);
+        c.restore();
+      }
+      function drawFleetShipVisual(c, scale, ship, skin, thrust = 0.25) {
+        drawCraftModel(c,scale,skin,"fleet",ship?.type||"scout",thrust,Math.min(3,(ship?.level||1)-1));
+      }
+      function drawFrigateVisual(c, r, skin) {
+        drawCraftModel(c,r,skin,"frigate","carrier",pioneerRescue?0.65:0.24,Math.min(3,(game.frigate?.level||1)-1));
+      }
+      function drawShipVisual(c, sc, skin, thrusting = false) {
+        drawCraftModel(c,sc,skin,"ship","starling",thrusting?0.85:0.1,Math.min(3,game.upgradeLevel||0));
+        const systems=game.shipSystems||{};
+        c.save();c.scale(sc,sc);
+        for(const [index,key] of ["thrust","fuel","brake","accel","handling","cargo"].entries()) {
+          const level=Math.min(4,Math.max(0,systems[key]||0));
+          for(let i=0;i<level;i++) {
+            c.fillStyle=i===level-1?(skin.accent||"#8dddf5"):"#718793";
+            c.fillRect(-24+index*7,-4+i*1.3,3,0.65);
+          }
+        }
+        c.restore();
+      }
+      function drawFrigateUpgradeModules(c,r,skin) {
+        const f=game.frigate||{};
+        c.save();c.scale(r*3,r*3);
+        // Upgrades occupy real mount points. Cap counts so high levels remain legible.
+        const count=Math.min(4,f.vaultLevel||0);
+        for(let i=0;i<count;i++)for(const side of [-1,1]) {
+          const x=-22+i*12,y=side*31;
+          c.fillStyle="#182733";c.fillRect(x-1,y-4,10,6);
+          c.fillStyle=i%2?"#b49865":"#6da8b0";c.fillRect(x,y-4,8,3);
+          c.fillStyle="#cde9ed";c.fillRect(x+2,y-3.5,4,0.6);
+        }
+        if(f.scannerLevel>0) {
+          c.strokeStyle="#90a5b4";c.lineWidth=0.7;c.beginPath();c.moveTo(15,-14);c.lineTo(15,-37);c.stroke();
+          c.fillStyle="#526d7e";c.beginPath();c.ellipse(15,-37,6,2.2,-0.3,0,TAU);c.fill();
+          c.fillStyle=skin.accent;c.fillRect(14,-38,1,1);
+        }
+        if(f.capacityLevel>0) {
+          for(let i=0;i<Math.min(4,f.capacityLevel);i++) {
+            c.fillStyle="#364b5b";c.fillRect(-27+i*10,12,8,3);
+            c.fillStyle="#93a6b4";c.fillRect(-27+i*10,12,8,0.5);
+          }
+        }
+        if(f.hangarLevel>1) {
+          c.strokeStyle="rgba(211,188,123,.7)";c.lineWidth=0.5;c.strokeRect(-31,-8,22,7);
+        }
+        if(f.reactorLevel>1) {
+          c.fillStyle=rgba(skin.accent,0.7);for(let i=0;i<Math.min(4,f.reactorLevel);i++)c.fillRect(-41+i*3,-2,1,2);
+        }
+        c.restore();
       }
       function drawFleetEngineTrail(c, scale, skin, thrust = 0.25) {
         const glow = skin.glow || skin.accent || "#7dd3fc",
@@ -22311,1121 +22664,6 @@
         c.moveTo(-26 * scale - length, 0);
         c.lineTo(-23 * scale, 0);
         c.stroke();
-        c.restore();
-      }
-      function drawHullFinish(c, scale, skin, kind) {
-        // Small inset panels and occlusion make hulls read as machined volumes.
-        if (scale < 0.18) return;
-        const large = kind === "frigate", fleet = kind === "fleet",
-          plates = large ? 7 : fleet ? 3 : 4,
-          start = large ? -97 : fleet ? -17 : -24,
-          stride = large ? 28 : fleet ? 10 : 12,
-          y = large ? 16 : fleet ? 4 : 6,
-          width = large ? 22 : fleet ? 7 : 9,
-          height = large ? 7 : fleet ? 3 : 3;
-        c.save(); c.scale(scale, scale); c.globalAlpha *= 0.42;
-        const metal = c.createLinearGradient(0, -y - height, 0, y + height);
-        metal.addColorStop(0, rgba(light(skin.primary, 0.38), 0.85));
-        metal.addColorStop(0.42, rgba(skin.secondary || "#0f172a", 0.88));
-        metal.addColorStop(0.7, rgba(skin.primary, 0.65));
-        metal.addColorStop(1, "rgba(2,6,12,.85)");
-        for (const side of [-1, 1]) for (let i = 0; i < plates; i++) {
-          const x = start + i * stride, py = side * y;
-          c.fillStyle = "rgba(0,2,8,.72)";
-          c.fillRect(x + 0.8, py + 1.8, width, height);
-          c.fillStyle = metal; c.fillRect(x, py, width, height);
-          c.strokeStyle = "rgba(235,247,255,.28)"; c.lineWidth = large ? 0.55 : 0.35;
-          c.beginPath(); c.moveTo(x, py + height); c.lineTo(x, py); c.lineTo(x + width, py); c.stroke();
-          if (large || scale > 0.8) {
-            c.fillStyle = "rgba(4,9,16,.8)";
-            for (let v = 0; v < 3; v++) c.fillRect(x + 2 + v * width * 0.22, py + 2, 0.75, height - 3);
-          }
-        }
-        // Quiet running lights preserve the silhouette instead of outlining every edge.
-        c.fillStyle = skin.accent || "#dff6ff";
-        for (const side of [-1, 1]) {
-          c.fillRect(large ? 93 : fleet ? 19 : 28, side * (large ? 22 : 5), large ? 8 : 2.5, large ? 1.4 : 0.7);
-        }
-        c.restore();
-      }
-      function drawFleetShipVisual(c, scale, ship, skin, thrust = 0.25) {
-        const def = fleetShipTypes[ship?.type] || fleetShipTypes.scout,
-          primary = skin.primary || def.color || "#7dd3fc",
-          secondary = skin.secondary || "#0f172a",
-          accent = skin.accent || def.color || "#e0f2fe",
-          glow = skin.glow || accent,
-          motif = skin.motif || "frontier",
-          hull = c.createLinearGradient(-24 * scale, -14 * scale, 25 * scale, 13 * scale);
-        hull.addColorStop(0, dark(secondary, 0.18));
-        hull.addColorStop(0.34, dark(primary, 0.18));
-        hull.addColorStop(0.62, primary);
-        hull.addColorStop(0.82, light(primary, 0.32));
-        hull.addColorStop(1, dark(primary, 0.34));
-        const path = (points, fill = hull, stroke = rgba(light(accent, 0.35), 0.72)) => {
-          c.beginPath();
-          points.forEach(([x, y], i) =>
-            i ? c.lineTo(x * scale, y * scale) : c.moveTo(x * scale, y * scale),
-          );
-          c.closePath();
-          c.fillStyle = fill;
-          c.fill();
-          if (stroke) {
-            c.strokeStyle = stroke;
-            c.stroke();
-          }
-        };
-        c.save();
-        c.lineJoin = "round";
-        c.lineWidth = Math.max(0.45, 0.65 * scale);
-        c.shadowBlur = 0;
-        if (def.shape === "barge") {
-          c.fillStyle = hull;
-          c.strokeStyle = rgba(light(accent, 0.35), 0.72);
-          rr(c, -26 * scale, -10 * scale, 52 * scale, 20 * scale, 4 * scale);
-          c.fill();
-          c.stroke();
-          for (const y of [-16, 16]) {
-            rr(c, -18 * scale, (y - 5) * scale, 34 * scale, 10 * scale, 3 * scale);
-            c.fill();
-            c.stroke();
-          }
-          path([[18, -8], [34, 0], [18, 8], [23, 0]], hull);
-        } else if (def.shape === "diamond") {
-          path([[30, 0], [1, -21], [-27, 0], [1, 21]]);
-          c.strokeStyle = rgba(accent, 0.48);
-          c.beginPath();
-          c.ellipse(0, 0, 35 * scale, 10 * scale, t * 0.012, 0, TAU);
-          c.stroke();
-        } else if (def.shape === "wing") {
-          path([[34, 0], [-10, -24], [-5, -7], [-25, -3], [-25, 3], [-5, 7], [-10, 24]]);
-          path([[7, -6], [25, 0], [7, 6], [-14, 0]], rgba(dark(secondary, 0.12), 0.78));
-        } else if (def.shape === "pod") {
-          c.fillStyle = hull;
-          c.strokeStyle = rgba(light(accent, 0.35), 0.72);
-          c.beginPath();
-          c.ellipse(0, 0, 29 * scale, 12 * scale, 0, 0, TAU);
-          c.fill();
-          c.stroke();
-          for (const y of [-17, 17]) {
-            c.beginPath();
-            c.ellipse(-5 * scale, y * scale, 16 * scale, 5.5 * scale, 0, 0, TAU);
-            c.fill();
-            c.stroke();
-          }
-          path([[20, -7], [35, 0], [20, 7], [25, 0]], hull);
-        } else {
-          path([[35, 0], [-9, -13], [-27, -20], [-18, -4], [-23, 0], [-18, 4], [-27, 20], [-9, 13]]);
-        }
-
-        // Fleet designs alter physical architecture, not only paint.
-        if (motif === "solar") {
-          for (const sy of [-1, 1])
-            path(
-              [[-6, sy * 10], [18, sy * 31], [30, sy * 28], [11, sy * 8]],
-              rgba("#f97316", 0.72),
-              rgba("#fde68a", 0.7),
-            );
-          c.strokeStyle = rgba("#fde68a", 0.62);
-          for (const sy of [-1, 1]) {
-            c.beginPath();
-            c.moveTo(0, sy * 14 * scale);
-            c.lineTo(22 * scale, sy * 28 * scale);
-            c.stroke();
-          }
-        } else if (motif === "spirit") {
-          c.fillStyle = rgba("#f8fafc", 0.34);
-          c.strokeStyle = rgba(glow, 0.72);
-          for (const sy of [-1, 1]) {
-            c.beginPath();
-            c.moveTo(-14 * scale, sy * 7 * scale);
-            c.quadraticCurveTo(6 * scale, sy * 34 * scale, 36 * scale, sy * 14 * scale);
-            c.quadraticCurveTo(12 * scale, sy * 18 * scale, -14 * scale, sy * 7 * scale);
-            c.fill();
-            c.stroke();
-          }
-        } else if (motif === "parallel") {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba("#ff2bd6", 0.72);
-          c.lineWidth = 1.3 * scale;
-          c.beginPath();
-          c.moveTo(-24 * scale, -12 * scale);
-          c.lineTo(7 * scale, 2 * scale);
-          c.lineTo(31 * scale, -9 * scale);
-          c.stroke();
-          c.strokeStyle = rgba("#00f5ff", 0.68);
-          c.beginPath();
-          c.moveTo(-24 * scale, 12 * scale);
-          c.lineTo(7 * scale, -2 * scale);
-          c.lineTo(31 * scale, 9 * scale);
-          c.stroke();
-          c.beginPath();
-          c.ellipse(2 * scale, 0, 38 * scale, 14 * scale, t * 0.015, 0, TAU);
-          c.stroke();
-          c.globalCompositeOperation = "source-over";
-        } else {
-          for (const sy of [-1, 1])
-            path([[-18, sy * 8], [-5, sy * 16], [17, sy * 10], [9, sy * 6]], rgba(accent, 0.17), null);
-        }
-
-        const canopy = c.createLinearGradient(2 * scale, -5 * scale, 16 * scale, 5 * scale);
-        canopy.addColorStop(0, "rgba(255,255,255,.78)");
-        canopy.addColorStop(0.28, rgba(light(accent, 0.55), 0.88));
-        canopy.addColorStop(1, rgba(dark(accent, 0.28), 0.64));
-        c.fillStyle = canopy;
-        c.shadowColor = glow;
-        c.shadowBlur = 7 * scale;
-        c.beginPath();
-        c.moveTo(21 * scale, 0);
-        c.lineTo(8 * scale, -3.6 * scale);
-        c.lineTo(2 * scale, -2.8 * scale);
-        c.lineTo(2 * scale, 2.8 * scale);
-        c.lineTo(8 * scale, 3.6 * scale);
-        c.closePath();
-        c.fill();
-        c.shadowBlur = 0;
-        c.strokeStyle = rgba("#ffffff", 0.32);
-        c.lineWidth = Math.max(0.55, 0.7 * scale);
-        c.beginPath();
-        c.moveTo(-17 * scale, -3 * scale);
-        c.lineTo(24 * scale, -2 * scale);
-        c.moveTo(-17 * scale, 4 * scale);
-        c.lineTo(19 * scale, 3 * scale);
-        c.stroke();
-        c.globalCompositeOperation = "screen";
-        c.fillStyle = rgba(glow, 0.7 + Math.min(0.2, thrust * 0.12));
-        c.shadowColor = glow;
-        c.shadowBlur = 7 * scale;
-        for (const y of [-5, 5]) {
-          c.beginPath();
-          c.ellipse(-25 * scale, y * scale, 3.8 * scale, 2.1 * scale, 0, 0, TAU);
-          c.fill();
-        }
-        c.shadowBlur = 0;
-        c.fillStyle = rgba(def.color || accent, 0.78);
-        c.beginPath();
-        c.arc(23 * scale, 0, 1.8 * scale, 0, TAU);
-        c.fill();
-        drawHullFinish(c, scale, skin, "fleet");
-        c.restore();
-      }
-      function drawFrigateUpgradeModules(c, r, skin) {
-        const accent = skin.accent || "#7dd3fc",
-          glow = skin.glow || accent,
-          reactor = game.frigate.reactorLevel || 0,
-          hangar = game.frigate.hangarLevel || 0,
-          cap = game.frigate.capacityLevel || 0,
-          scan = game.frigate.scannerLevel || 0,
-          vault = game.frigate.vaultLevel || 0,
-          level = game.frigate.level || 1;
-        c.save();
-        c.globalCompositeOperation = "screen";
-        if (reactor > 1) {
-          c.fillStyle = rgba(glow, 0.18 + 0.04 * reactor);
-          c.shadowColor = glow;
-          c.shadowBlur = (10 + reactor * 3) * r;
-          c.beginPath();
-          c.arc(-132 * r, 0, Math.min(22, 8 + reactor * 3) * r, 0, TAU);
-          c.fill();
-          c.shadowBlur = 0;
-        }
-        if (hangar > 1) {
-          c.strokeStyle = rgba("#fde68a", 0.24 + 0.025 * hangar);
-          c.lineWidth = 1.1 * r;
-          for (let i = 0; i < Math.min(5, hangar); i++) {
-            const y = (-28 + i * 14) * r;
-            c.beginPath();
-            c.moveTo(-62 * r, y);
-            c.lineTo(38 * r, y * 0.45);
-            c.stroke();
-          }
-        }
-        if (cap > 0) {
-          c.fillStyle = rgba(accent, 0.18);
-          for (let i = 0; i < Math.min(6, cap + 1); i++) {
-            const x = (-104 + i * 34) * r;
-            for (const sy of [-1, 1]) {
-              c.beginPath();
-              rr(c, x, sy * 54 * r, 22 * r, 10 * r, 3 * r);
-              c.fill();
-              c.strokeStyle = rgba(accent, 0.2);
-              c.stroke();
-            }
-          }
-        }
-        if (scan > 0) {
-          c.strokeStyle = rgba("#e0f2fe", 0.24 + 0.03 * scan);
-          c.lineWidth = 0.8 * r;
-          for (let i = 0; i < scan; i++) {
-            const x = (28 + i * 18) * r,
-              y = (-78 - i * 6) * r;
-            c.beginPath();
-            c.moveTo(x, -42 * r);
-            c.lineTo(x, y);
-            c.stroke();
-            c.beginPath();
-            c.arc(x, y, (5 + i) * r, Math.PI * 0.25, Math.PI * 1.75);
-            c.stroke();
-          }
-        }
-        if (vault > 0) {
-          const canisterCount = Math.min(6, vault + 1);
-          for (let i = 0; i < canisterCount; i++) {
-            const x = (-84 + i * 31) * r;
-            c.fillStyle = rgba(i % 2 ? "#fbbf24" : "#67e8f9", 0.14 + vault * 0.025);
-            c.strokeStyle = rgba("#fde68a", 0.28 + vault * 0.025);
-            c.lineWidth = 0.8 * r;
-            c.beginPath();
-            rr(c, x, -72 * r, 18 * r, 12 * r, 4 * r);
-            c.fill();
-            c.stroke();
-            c.beginPath();
-            rr(c, x, 60 * r, 18 * r, 12 * r, 4 * r);
-            c.fill();
-            c.stroke();
-          }
-          c.strokeStyle = rgba("#67e8f9", 0.22 + vault * 0.03);
-          c.setLineDash([3 * r, 5 * r]);
-          c.beginPath();
-          c.ellipse(0, 0, (174 + vault * 3) * r, (62 + vault * 2) * r, 0, 0, TAU);
-          c.stroke();
-          c.setLineDash([]);
-        }
-        if (level >= 4) {
-          c.strokeStyle = rgba("#fbcfe8", 0.28);
-          c.setLineDash([5 * r, 9 * r]);
-          c.beginPath();
-          c.ellipse(4 * r, 0, 190 * r, 70 * r, t * 0.01, 0, TAU);
-          c.stroke();
-          c.setLineDash([]);
-        }
-        c.restore();
-      }
-      function drawFrigateVisual(c, r, skin) {
-        const primary = skin.primary,
-          secondary = skin.secondary || dark(primary, 0.55),
-          accent = skin.accent,
-          glow = skin.glow || accent,
-          motif = skin.motif || "standard",
-          tier = skin.visualTier || 1;
-        const hi = light(primary, 0.34 + Math.min(0.14, tier * 0.025)),
-          mid = primary,
-          lo = dark(secondary, 0.12),
-          deep = dark(secondary, 0.44),
-          glass =
-            motif === "abyss"
-              ? "#38bdf8"
-              : motif === "freeze"
-                ? "#e0f2fe"
-                : motif === "warp"
-                  ? "#22d3ee"
-                  : motif === "ancient"
-                    ? "#fde68a"
-                    : motif === "archaeologist"
-                      ? "#67e8f9"
-                    : "#bae6fd";
-        const P = (pts, fill, stroke = "rgba(255,255,255,.32)", lw = 1) => {
-          c.beginPath();
-          pts.forEach(([x, y], i) =>
-            i ? c.lineTo(x * r, y * r) : c.moveTo(x * r, y * r),
-          );
-          c.closePath();
-          c.fillStyle = fill;
-          c.fill();
-          if (stroke) {
-            c.strokeStyle = stroke;
-            c.lineWidth = lw * r;
-            c.stroke();
-          }
-        };
-        const R = (
-          x,
-          y,
-          w,
-          h,
-          rad,
-          fill,
-          stroke = "rgba(255,255,255,.24)",
-          lw = 0.9,
-        ) => {
-          c.beginPath();
-          rr(c, x * r, y * r, w * r, h * r, rad * r);
-          c.fillStyle = fill;
-          c.fill();
-          if (stroke) {
-            c.strokeStyle = stroke;
-            c.lineWidth = lw * r;
-            c.stroke();
-          }
-        };
-        const G = (x1, y1, x2, y2, stops) => {
-          const g = c.createLinearGradient(x1 * r, y1 * r, x2 * r, y2 * r);
-          stops.forEach((s) => g.addColorStop(s[0], s[1]));
-          return g;
-        };
-        c.save();
-        c.lineJoin = "round";
-        c.lineCap = "round";
-        c.shadowColor = "rgba(0,0,0,.88)";
-        c.shadowBlur = 24 * r;
-        c.fillStyle = "rgba(0,0,0,.44)";
-        c.beginPath();
-        c.ellipse(-10 * r, 43 * r, 172 * r, 27 * r, 0, 0, TAU);
-        c.fill();
-        c.shadowBlur = 0;
-        c.globalCompositeOperation = "screen";
-        c.strokeStyle = rgba(glow, 0.14);
-        c.lineWidth = 1.3 * r;
-        c.beginPath();
-        c.ellipse(4 * r, 0, 158 * r, 56 * r, 0, 0, TAU);
-        c.stroke();
-        c.globalCompositeOperation = "source-over";
-        if (motif === "spirit") {
-          for (const sy of [-1, 1]) {
-            c.fillStyle = rgba("#f8fafc", 0.18);
-            c.strokeStyle = rgba(glow, 0.44);
-            c.lineWidth = 1.3 * r;
-            c.beginPath();
-            c.moveTo(-112 * r, sy * 26 * r);
-            c.bezierCurveTo(-18 * r, sy * 112 * r, 116 * r, sy * 96 * r, 184 * r, sy * 18 * r);
-            c.bezierCurveTo(82 * r, sy * 61 * r, -18 * r, sy * 52 * r, -112 * r, sy * 26 * r);
-            c.fill();
-            c.stroke();
-          }
-        } else if (motif === "freeze") {
-          for (const sy of [-1, 1])
-            P(
-              [[-116, sy * 32], [-72, sy * 92], [-5, sy * 70], [68, sy * 90], [138, sy * 28], [42, sy * 45]],
-              rgba("#67e8f9", 0.22),
-              rgba("#e0f2fe", 0.48),
-              0.9,
-            );
-        } else if (motif === "abyss") {
-          for (const sy of [-1, 1])
-            P(
-              [[-152, sy * 19], [-38, sy * 69], [136, sy * 30], [196, 0], [88, sy * 13]],
-              rgba("#020617", 0.9),
-              rgba("#38bdf8", 0.28),
-              0.65,
-            );
-        } else if (motif === "warp") {
-          c.strokeStyle = rgba(glow, 0.45);
-          c.lineWidth = 7 * r;
-          c.beginPath();
-          c.ellipse(-12 * r, 0, 126 * r, 82 * r, 0, 0, TAU);
-          c.stroke();
-        } else if (motif === "ancient") {
-          for (const sy of [-1, 1])
-            P(
-              [[-145, sy * 24], [-118, sy * 87], [-61, sy * 66], [-8, sy * 101], [61, sy * 58], [151, sy * 25]],
-              rgba("#78350f", 0.72),
-              rgba("#f59e0b", 0.38),
-              1,
-            );
-        } else if (motif === "archaeologist") {
-          for (const sy of [-1, 1])
-            for (let i = 0; i < 4; i++)
-              R(-98 + i * 52, sy * 66 - 9, 34, 18, 6, rgba(i % 2 ? "#67e8f9" : "#fbbf24", 0.28), rgba("#fde68a", 0.36), 0.8);
-        }
-        const engine = G(-164, 0, -103, 0, [
-          [0, "#020617"],
-          [0.36, deep],
-          [0.72, lo],
-          [1, dark(mid, 0.08)],
-        ]);
-        for (const y of [-34, -18, 0, 18, 34])
-          R(-168, y - 8, 58, 16, 4, engine, "rgba(255,255,255,.28)", 0.75);
-        c.fillStyle = rgba(glow, 0.94);
-        c.shadowColor = glow;
-        c.shadowBlur = 18 * r;
-        for (const y of [-34, -18, 0, 18, 34]) {
-          c.beginPath();
-          c.ellipse(-172 * r, y * r, 9 * r, 4 * r, 0, 0, TAU);
-          c.fill();
-          c.beginPath();
-          c.moveTo(-178 * r, (y - 3) * r);
-          c.lineTo(-204 * r, y * r);
-          c.lineTo(-178 * r, (y + 3) * r);
-          c.closePath();
-          c.globalAlpha = 0.32;
-          c.fill();
-          c.globalAlpha = 1;
-        }
-        c.shadowBlur = 0;
-        const side = G(-150, 30, 150, 52, [
-          [0, deep],
-          [0.24, lo],
-          [0.55, dark(mid, 0.18)],
-          [0.82, dark(accent, 0.18)],
-          [1, deep],
-        ]);
-        P(
-          [
-            [-148, 9],
-            [-111, 37],
-            [-37, 57],
-            [48, 49],
-            [132, 18],
-            [155, 0],
-            [132, 18],
-            [48, 49],
-            [-37, 57],
-            [-111, 37],
-          ],
-          side,
-          "rgba(0,0,0,.38)",
-          0.7,
-        );
-        const top = G(-145, -54, 157, 24, [
-          [0, deep],
-          [0.14, lo],
-          [0.38, dark(mid, 0.04)],
-          [0.58, mid],
-          [0.76, hi],
-          [1, light(accent, 0.42)],
-        ]);
-        P(
-          [
-            [-149, -13],
-            [-111, -44],
-            [-31, -61],
-            [54, -51],
-            [130, -19],
-            [158, 0],
-            [130, 19],
-            [54, 51],
-            [-31, 61],
-            [-111, 44],
-            [-149, 13],
-            [-134, 0],
-          ],
-          top,
-          "rgba(255,255,255,.52)",
-          1.05,
-        );
-        const bevel = G(-116, -28, 128, 23, [
-          [0, dark(lo, 0.08)],
-          [0.35, mid],
-          [0.67, light(mid, 0.17)],
-          [1, accent],
-        ]);
-        P(
-          [
-            [-101, -23],
-            [-37, -36],
-            [55, -29],
-            [119, -6],
-            [137, 0],
-            [119, 6],
-            [55, 29],
-            [-37, 36],
-            [-101, 23],
-            [-121, 0],
-          ],
-          bevel,
-          "rgba(255,255,255,.28)",
-          0.85,
-        );
-        const upper = G(-89, -17, 102, 17, [
-          [0, dark(secondary, 0.05)],
-          [0.48, mid],
-          [0.78, light(mid, 0.18)],
-          [1, light(accent, 0.18)],
-        ]);
-        R(-92, -18, 200, 36, 8, upper, "rgba(255,255,255,.25)", 0.85);
-        const keel = G(-72, 15, 84, 34, [
-          [0, deep],
-          [0.48, dark(mid, 0.15)],
-          [1, dark(accent, 0.16)],
-        ]);
-        P(
-          [
-            [-78, 16],
-            [82, 13],
-            [116, 4],
-            [96, 29],
-            [18, 43],
-            [-70, 33],
-          ],
-          keel,
-          "rgba(255,255,255,.13)",
-          0.65,
-        );
-        for (const sy of [-1, 1]) {
-          const fin = G(-120, sy * 55, 72, sy * 15, [
-            [0, deep],
-            [0.48, mid],
-            [1, accent],
-          ]);
-          P(
-            [
-              [-56, sy * 17],
-              [-121, sy * 70],
-              [-18, sy * 51],
-              [75, sy * 19],
-              [50, sy * 10],
-              [-24, sy * 12],
-            ],
-            fin,
-            "rgba(255,255,255,.27)",
-            0.75,
-          );
-          const pod = G(-77, sy * 42, 50, sy * 42, [
-            [0, deep],
-            [0.52, dark(mid, 0.05)],
-            [1, light(accent, 0.1)],
-          ]);
-          R(-73, sy * 38, 104, sy * 12, 5, pod, "rgba(255,255,255,.16)", 0.65);
-        }
-        const bridge = G(0, -47, 65, 43, [
-          [0, light(mid, 0.36)],
-          [0.52, mid],
-          [1, lo],
-        ]);
-        R(0, -42, 63, 84, 11, bridge, "rgba(255,255,255,.34)", 0.85);
-        c.fillStyle = rgba(glass, 0.86);
-        c.shadowColor = glow;
-        c.shadowBlur = 12 * r;
-        R(14, -30, 28, 60, 5, rgba(glass, 0.78), "rgba(255,255,255,.42)", 0.7);
-        R(49, -16, 22, 32, 4, rgba(glass, 0.48), "rgba(255,255,255,.22)", 0.6);
-        c.shadowBlur = 0;
-        const nose = G(105, -31, 178, 28, [
-          [0, dark(mid, 0.04)],
-          [0.54, accent],
-          [1, light(accent, 0.45)],
-        ]);
-        P(
-          [
-            [113, -31],
-            [171, 0],
-            [113, 31],
-            [133, 0],
-          ],
-          nose,
-          "rgba(255,255,255,.32)",
-          0.8,
-        );
-        for (let i = 0; i < 11; i++)
-          R(-82 + i * 17, -11, 10, 22, 2, rgba(deep, 0.66), null);
-        const ridge = G(-116, -42, 122, -18, [
-          [0, "rgba(255,255,255,.05)"],
-          [0.5, rgba(hi, 0.42)],
-          [1, "rgba(255,255,255,.05)"],
-        ]);
-        for (let i = 0; i < 7 + tier; i++)
-          P(
-            [
-              [-98 + i * 30, -34],
-              [-82 + i * 30, -43 - tier * 2],
-              [-56 + i * 30, -36],
-              [-72 + i * 30, -28],
-            ],
-            ridge,
-            "rgba(255,255,255,.12)",
-            0.45,
-          );
-        const belly = G(-112, 26, 118, 50, [
-          [0, "rgba(0,0,0,.28)"],
-          [0.45, rgba(deep, 0.72)],
-          [1, "rgba(0,0,0,.22)"],
-        ]);
-        for (let i = 0; i < 6 + tier; i++)
-          P(
-            [
-              [-92 + i * 32, 28],
-              [-70 + i * 32, 35 + tier * 1.2],
-              [-50 + i * 32, 30],
-              [-67 + i * 32, 23],
-            ],
-            belly,
-            "rgba(0,0,0,.16)",
-            0.35,
-          );
-        c.strokeStyle = "rgba(255,255,255,.18)";
-        c.lineWidth = 0.75 * r;
-        for (const y of [-34, -25, -17, -9, 9, 17, 25, 34]) {
-          c.beginPath();
-          c.moveTo(-106 * r, y * r);
-          c.lineTo(108 * r, y * 0.42 * r);
-          c.stroke();
-        }
-        c.strokeStyle = rgba(accent, 0.46);
-        for (let i = 0; i < 10; i++) {
-          c.beginPath();
-          c.moveTo((-86 + i * 18) * r, -17 * r);
-          c.lineTo((-79 + i * 18) * r, 17 * r);
-          c.stroke();
-        }
-        c.fillStyle = rgba(glow, 0.92);
-        c.shadowColor = glow;
-        c.shadowBlur = 10 * r;
-        for (const x of [-86, -58, -30, -2, 26, 56, 86, 118, 142])
-          for (const y of [-13, 13]) {
-            c.beginPath();
-            c.arc(x * r, y * r, 1.8 * r, 0, TAU);
-            c.fill();
-          }
-        c.shadowBlur = 0;
-        c.strokeStyle = rgba(glass, 0.42);
-        c.lineWidth = 0.8 * r;
-        for (const x of [-38, 5, 47]) {
-          c.beginPath();
-          c.moveTo(x * r, -50 * r);
-          c.lineTo((x + 10) * r, (-73 - tier * 4) * r);
-          c.stroke();
-          c.fillStyle = rgba(glass, 0.7);
-          c.beginPath();
-          c.arc(
-            (x + 10) * r,
-            (-73 - tier * 4) * r,
-            (2.3 + tier * 0.25) * r,
-            0,
-            TAU,
-          );
-          c.fill();
-        }
-        drawFrigateTierDetails(c, r, skin, tier, {
-          P,
-          R,
-          G,
-          primary,
-          secondary,
-          accent,
-          glow,
-          glass,
-          motif,
-        });
-        drawFrigateDepthPass(c, r, skin, tier, {
-          P,
-          R,
-          G,
-          primary,
-          secondary,
-          accent,
-          glow,
-          glass,
-          motif,
-        });
-        if (motif === "freeze") {
-          c.strokeStyle = rgba("#e0f2fe", 0.52);
-          c.lineWidth = 1.05 * r;
-          for (const sy of [-1, 1]) {
-            c.beginPath();
-            c.moveTo(-102 * r, sy * 31 * r);
-            c.lineTo(94 * r, sy * 19 * r);
-            c.stroke();
-          }
-          c.fillStyle = rgba("#e0f2fe", 0.42);
-          for (let i = 0; i < 7; i++)
-            P(
-              [
-                [-86 + i * 24, -55],
-                [-80 + i * 24, -65],
-                [-72 + i * 24, -55],
-              ],
-              rgba("#e0f2fe", 0.38),
-              null,
-            );
-          for (let i = 0; i < 5; i++)
-            P(
-              [
-                [-55 + i * 28, 55],
-                [-50 + i * 28, 64],
-                [-43 + i * 28, 55],
-              ],
-              rgba("#bae6fd", 0.32),
-              null,
-            );
-          R(
-            -50,
-            -5,
-            104,
-            10,
-            5,
-            rgba("#e0f2fe", 0.09),
-            "rgba(224,242,254,.16)",
-            0.45,
-          );
-          for (let i = 0; i < 4; i++)
-            R(
-              -70 + i * 34,
-              -43,
-              14,
-              4,
-              2,
-              rgba("#e0f2fe", 0.16),
-              "rgba(224,242,254,.2)",
-              0.35,
-            );
-        }
-        if (motif === "abyss") {
-          const stealth = G(-120, -33, 132, 32, [
-            [0, "rgba(0,0,0,.86)"],
-            [0.5, "rgba(2,6,23,.78)"],
-            [1, "rgba(15,23,42,.66)"],
-          ]);
-          R(-122, -36, 260, 72, 15, stealth, "rgba(56,189,248,.18)", 0.75);
-          c.fillStyle = rgba(accent, 0.9);
-          c.shadowColor = accent;
-          c.shadowBlur = 10 * r;
-          for (let i = 0; i < 16; i++) {
-            c.beginPath();
-            c.arc((-91 + i * 13) * r, 0, 1.6 * r, 0, TAU);
-            c.fill();
-          }
-          for (const y of [-28, 28])
-            for (let i = 0; i < 5; i++) {
-              c.beginPath();
-              c.arc((-58 + i * 36) * r, y * r, 1.5 * r, 0, TAU);
-              c.fill();
-            }
-          c.shadowBlur = 0;
-        }
-        if (motif === "warp") {
-          c.strokeStyle = rgba(accent, 0.72);
-          c.lineWidth = 1.15 * r;
-
-          c.strokeStyle = rgba(glow, 0.5);
-          for (const sy of [-1, 1]) {
-            c.beginPath();
-            c.moveTo(-83 * r, sy * 11 * r);
-            c.bezierCurveTo(
-              -25 * r,
-              sy * 42 * r,
-              42 * r,
-              sy * -32 * r,
-              133 * r,
-              sy * 7 * r,
-            );
-            c.stroke();
-          }
-          c.fillStyle = rgba(glow, 0.28);
-          P(
-            [
-              [72, -34],
-              [101, -25],
-              [87, -8],
-              [58, -17],
-            ],
-            rgba(glow, 0.18),
-            "rgba(34,211,238,.25)",
-            0.5,
-          );
-          P(
-            [
-              [72, 34],
-              [101, 25],
-              [87, 8],
-              [58, 17],
-            ],
-            rgba(glow, 0.18),
-            "rgba(34,211,238,.25)",
-            0.5,
-          );
-        }
-        if (motif === "spirit") {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba("#d9f99d", 0.62);
-          c.lineWidth = 1.35 * r;
-
-          c.fillStyle = rgba("#fef9c3", 0.72);
-          c.shadowColor = "#d9f99d";
-          c.shadowBlur = 13 * r;
-          for (const x of [-112, -76, -40, -4, 32, 68, 104, 138])
-            for (const y of [-19, 19]) {
-              c.beginPath();
-              c.arc(x * r, y * r, 2.1 * r, 0, TAU);
-              c.fill();
-            }
-          c.shadowBlur = 0;
-          c.globalCompositeOperation = "source-over";
-          for (const sy of [-1, 1]) {
-            const veil = G(38, sy * 42, 158, sy * 22, [
-              [0, rgba("#f8fafc", 0.08)],
-              [0.5, rgba("#d9f99d", 0.35)],
-              [1, rgba("#fef9c3", 0.12)],
-            ]);
-            P(
-              [
-                [38, sy * 36],
-                [104, sy * 72],
-                [168, sy * 30],
-                [112, sy * 15],
-              ],
-              veil,
-              "rgba(255,255,255,.18)",
-              0.5,
-            );
-          }
-        } else if (motif === "ancient") {
-          c.fillStyle = rgba("#fde68a", 0.94);
-          c.shadowColor = "#f59e0b";
-          c.shadowBlur = 8 * r;
-          for (const x of [-67, -45, -21, 6, 32, 60, 90, 124])
-            R(x, -18, 3, 36, 1.5, rgba("#fde68a", 0.9), null);
-          c.shadowBlur = 0;
-          P(
-            [
-              [120, -35],
-              [180, 0],
-              [120, 35],
-              [141, 0],
-            ],
-            rgba(accent, 0.62),
-            "rgba(253,230,138,.34)",
-            0.8,
-          );
-          c.strokeStyle = rgba("#fde68a", 0.62);
-          for (const sy of [-1, 1]) {
-            c.beginPath();
-            c.moveTo(14 * r, sy * 38 * r);
-            c.lineTo(72 * r, sy * 66 * r);
-            c.stroke();
-            c.beginPath();
-            c.moveTo(63 * r, sy * 24 * r);
-            c.lineTo(116 * r, sy * 48 * r);
-            c.stroke();
-          }
-          for (let i = 0; i < 5; i++)
-            P(
-              [
-                [-102 + i * 32, -50],
-                [-88 + i * 32, -61],
-                [-74 + i * 32, -50],
-                [-88 + i * 32, -44],
-              ],
-              rgba("#92400e", 0.52),
-              "rgba(253,230,138,.2)",
-              0.45,
-            );
-        }
-        if (motif === "archaeologist") {
-          c.save();
-          c.strokeStyle = rgba("#fde68a", 0.6);
-          c.lineWidth = 0.9 * r;
-          c.setLineDash([3 * r, 4 * r]);
-          c.beginPath();
-          c.moveTo(-112 * r, 9 * r);
-          c.bezierCurveTo(-58 * r, -28 * r, 8 * r, 35 * r, 126 * r, -7 * r);
-          c.stroke();
-          c.beginPath();
-          c.moveTo(-96 * r, -15 * r);
-          c.bezierCurveTo(-34 * r, 22 * r, 40 * r, -28 * r, 112 * r, 12 * r);
-          c.stroke();
-          c.setLineDash([]);
-          for (let i = 0; i < 6; i++) {
-            const x = (-83 + i * 30) * r;
-            c.fillStyle = rgba(i % 2 ? "#fbbf24" : "#67e8f9", 0.42);
-            c.strokeStyle = "rgba(255,255,255,.38)";
-            c.lineWidth = 0.65 * r;
-            c.beginPath();
-            rr(c, x, -55 * r, 17 * r, 10 * r, 4 * r);
-            c.fill();
-            c.stroke();
-            c.beginPath();
-            rr(c, x, 45 * r, 17 * r, 10 * r, 4 * r);
-            c.fill();
-            c.stroke();
-          }
-          c.fillStyle = rgba("#fbbf24", 0.92);
-          c.shadowColor = "#fbbf24";
-          c.shadowBlur = 9 * r;
-          for (const point of [[-118, -28], [-118, 28], [87, -25], [87, 25]]) {
-            c.beginPath();
-            c.arc(point[0] * r, point[1] * r, 2.8 * r, 0, TAU);
-            c.fill();
-          }
-          c.shadowBlur = 0;
-          c.strokeStyle = rgba("#67e8f9", 0.75);
-          c.lineWidth = 1.1 * r;
-          c.beginPath();
-          c.moveTo(33 * r, -48 * r);
-          c.lineTo(33 * r, -91 * r);
-          c.stroke();
-          c.beginPath();
-          c.arc(33 * r, -91 * r, 14 * r, Math.PI * 0.08, Math.PI * 1.1);
-          c.stroke();
-          c.beginPath();
-          c.arc(33 * r, -91 * r, 3 * r, 0, TAU);
-          c.fillStyle = "#e0f2fe";
-          c.fill();
-          c.restore();
-        }
-        drawHullFinish(c, r, skin, "frigate");
-        c.restore();
-      }
-      function drawFrigateDepthPass(c, r, skin, tier, o) {
-        const { P, R, G, primary, secondary, accent, glow, glass, motif } = o;
-        c.save();
-        c.lineJoin = "round";
-        c.lineCap = "round";
-        const rim = G(-150, -70, 168, 54, [
-          [0, "rgba(255,255,255,.03)"],
-          [0.18, rgba(light(primary, 0.55), 0.18)],
-          [0.52, "rgba(255,255,255,.06)"],
-          [0.8, rgba(accent, 0.18)],
-          [1, "rgba(0,0,0,.08)"],
-        ]);
-        P(
-          [
-            [-136, -10],
-            [-106, -36],
-            [-32, -54],
-            [56, -45],
-            [142, -7],
-            [160, 0],
-            [142, 7],
-            [56, 45],
-            [-32, 54],
-            [-106, 36],
-            [-136, 10],
-            [-122, 0],
-          ],
-          rim,
-          "rgba(255,255,255,.08)",
-          0.4,
-        );
-        const shadow = G(-120, 20, 145, 58, [
-          [0, "rgba(0,0,0,.34)"],
-          [0.55, "rgba(0,0,0,.08)"],
-          [1, "rgba(255,255,255,.035)"],
-        ]);
-        P(
-          [
-            [-122, 8],
-            [-76, 30],
-            [-10, 42],
-            [70, 35],
-            [139, 8],
-            [152, 0],
-            [139, 18],
-            [72, 54],
-            [-18, 64],
-            [-105, 42],
-            [-146, 14],
-          ],
-          shadow,
-          null,
-        );
-        c.globalCompositeOperation = "screen";
-        c.strokeStyle = rgba(glow, 0.16);
-        c.lineWidth = (0.7 + tier * 0.12) * r;
-        for (let i = 0; i < 4 + tier; i++) {
-          c.beginPath();
-          c.moveTo((-106 + i * 38) * r, (-26 - Math.sin(i) * 4) * r);
-          c.lineTo((-82 + i * 38) * r, (-38 - tier * 1.5) * r);
-          c.lineTo((-42 + i * 38) * r, (-31 + Math.cos(i) * 3) * r);
-          c.stroke();
-        }
-        c.globalCompositeOperation = "source-over";
-        const bay = G(-72, -7, 46, 8, [
-          [0, "rgba(0,0,0,.5)"],
-          [0.48, rgba(dark(secondary, 0.5), 0.72)],
-          [1, "rgba(0,0,0,.38)"],
-        ]);
-        R(-74, -8, 118, 16, 5, bay, "rgba(253,230,138,.12)", 0.55);
-        c.fillStyle = rgba(glass, 0.65);
-        c.shadowColor = glow;
-        c.shadowBlur = 8 * r;
-        for (const x of [-58, -38, -18, 2, 22]) {
-          c.beginPath();
-          c.arc(x * r, 0, 1.6 * r, 0, TAU);
-          c.fill();
-        }
-        c.shadowBlur = 0;
-        if (tier >= 3) {
-          for (const sy of [-1, 1]) {
-            const blade = G(80, sy * 22, 164, sy * 52, [
-              [0, rgba(accent, 0.1)],
-              [0.5, rgba(glow, 0.36)],
-              [1, rgba(primary, 0.05)],
-            ]);
-            P(
-              [
-                [74, sy * 22],
-                [128, sy * 47],
-                [168, sy * 30],
-                [118, sy * 13],
-              ],
-              blade,
-              "rgba(255,255,255,.13)",
-              0.45,
-            );
-          }
-        }
-        if (motif === "ancient") {
-          c.strokeStyle = "rgba(253,230,138,.35)";
-          c.lineWidth = 0.9 * r;
-          for (let i = 0; i < 6; i++) {
-            c.beginPath();
-            c.moveTo((-76 + i * 30) * r, -8 * r);
-            c.lineTo((-64 + i * 30) * r, 8 * r);
-            c.lineTo((-52 + i * 30) * r, -8 * r);
-            c.stroke();
-          }
-        }
-        c.restore();
-      }
-      function drawFrigateTierDetails(c, r, skin, tier, o) {
-        if (tier < 2) return;
-        const { P, R, G, accent, glow, motif } = o;
-        c.save();
-        c.globalCompositeOperation = "screen";
-        c.strokeStyle = rgba(glow, 0.18 + 0.035 * tier);
-        c.lineWidth = (0.9 + 0.12 * tier) * r;
-
-        c.globalCompositeOperation = "source-over";
-        if (tier >= 2) {
-          for (const sy of [-1, 1]) {
-            const g = G(42, sy * 44, 138, sy * 28, [
-              [0, rgba(accent, 0.16)],
-              [0.55, rgba(glow, 0.42)],
-              [1, rgba(accent, 0.12)],
-            ]);
-            P(
-              [
-                [42, sy * 37],
-                [86, sy * 58],
-                [138, sy * 38],
-                [103, sy * 25],
-              ],
-              g,
-              "rgba(255,255,255,.16)",
-              0.45,
-            );
-          }
-        }
-        if (tier >= 3) {
-          c.fillStyle = rgba(glow, 0.55);
-          c.shadowColor = glow;
-          c.shadowBlur = 14 * r;
-          for (const x of [-112, -78, -44, -10, 24, 58, 92, 126]) {
-            c.beginPath();
-            c.arc(x * r, -25 * r, 2.2 * r, 0, TAU);
-            c.fill();
-            c.beginPath();
-            c.arc(x * r, 25 * r, 2.2 * r, 0, TAU);
-            c.fill();
-          }
-          c.shadowBlur = 0;
-          for (const sy of [-1, 1])
-            P(
-              [
-                [122, sy * 42],
-                [154, sy * 60],
-                [140, sy * 18],
-              ],
-              rgba(accent, 0.26),
-              "rgba(255,255,255,.16)",
-              0.45,
-            );
-        }
-        if (tier >= 4) {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba("#fbcfe8", 0.38);
-          c.setLineDash([5 * r, 9 * r]);
-
-          c.setLineDash([]);
-        }
         c.restore();
       }
       function drawStarshipTrail(c, ship, trailSkin, hullSkin) {
@@ -23520,878 +22758,6 @@
         );
 
         ctx.restore();
-      }
-      function drawShipVisual(c, sc, skin, thrusting = false) {
-        const primary = skin.primary,
-          secondary = skin.secondary || dark(primary, 0.55),
-          accent = skin.accent,
-          glow = skin.glow || accent,
-          motif = skin.motif || "standard",
-          tier = skin.visualTier || 1,
-          shipTier = game.upgradeLevel || 0;
-        const hi = light(
-            primary,
-            0.34 + Math.min(0.12, tier * 0.025 + shipTier * 0.025),
-          ),
-          lo = dark(secondary, 0.16),
-          deep = dark(secondary, 0.38),
-          glass =
-            motif === "flare"
-              ? "#fde68a"
-              : motif === "ancient"
-                ? "#fbbf24"
-                : motif === "mythic"
-                  ? "#fbcfe8"
-                  : motif === "warp"
-                    ? "#22d3ee"
-                    : "#bae6fd";
-        const P = (pts, fill, stroke = "rgba(255,255,255,.34)", lw = 1) => {
-          c.beginPath();
-          pts.forEach(([x, y], i) =>
-            i ? c.lineTo(x * sc, y * sc) : c.moveTo(x * sc, y * sc),
-          );
-          c.closePath();
-          c.fillStyle = fill;
-          c.fill();
-          if (stroke) {
-            c.strokeStyle = stroke;
-            c.lineWidth = lw * sc;
-            c.stroke();
-          }
-        };
-        const R = (
-          x,
-          y,
-          w,
-          h,
-          rad,
-          fill,
-          stroke = "rgba(255,255,255,.24)",
-          lw = 0.9,
-        ) => {
-          c.beginPath();
-          rr(c, x * sc, y * sc, w * sc, h * sc, rad * sc);
-          c.fillStyle = fill;
-          c.fill();
-          if (stroke) {
-            c.strokeStyle = stroke;
-            c.lineWidth = lw * sc;
-            c.stroke();
-          }
-        };
-        const G = (x1, y1, x2, y2, stops) => {
-          const g = c.createLinearGradient(x1 * sc, y1 * sc, x2 * sc, y2 * sc);
-          stops.forEach((s) => g.addColorStop(s[0], s[1]));
-          return g;
-        };
-        c.save();
-        c.lineJoin = "round";
-        c.lineCap = "round";
-        if (thrusting && game.ship?.fuel > 0) {
-          const len = (keys.has("shift") ? 76 : 46) * sc,
-            fl = c.createLinearGradient(-26 * sc, 0, -len, 0);
-          fl.addColorStop(0, "rgba(255,255,255,.96)");
-          fl.addColorStop(0.23, rgba(glow, 0.95));
-          fl.addColorStop(0.66, rgba(accent, 0.36));
-          fl.addColorStop(1, "rgba(0,0,0,0)");
-          c.fillStyle = fl;
-          P(
-            [
-              [-24, -8],
-              [-len / sc, 0],
-              [-24, 8],
-            ],
-            fl,
-            null,
-          );
-        }
-        c.shadowColor = "rgba(0,0,0,.65)";
-        c.shadowBlur = 8 * sc;
-        c.fillStyle = "rgba(0,0,0,.32)";
-        c.beginPath();
-        c.ellipse(0, 14 * sc, 48 * sc, 8 * sc, 0, 0, TAU);
-        c.fill();
-        c.shadowBlur = 0;
-        if (motif === "parallel") {
-          for (const sy of [-1, 1])
-            P(
-              [[-38, sy * 8], [-18, sy * 30], [29, sy * 22], [67, sy * 7], [19, sy * 12]],
-              rgba(sy > 0 ? "#00f5ff" : "#ff2bd6", 0.28),
-              rgba(sy > 0 ? "#00f5ff" : "#ff2bd6", 0.62),
-              0.8,
-            );
-        } else if (motif === "warp") {
-          c.strokeStyle = rgba(glow, 0.5);
-          c.lineWidth = 4 * sc;
-          c.beginPath();
-          c.arc(-3 * sc, 0, 34 * sc, -1.1, 1.1);
-          c.stroke();
-          c.beginPath();
-          c.arc(-3 * sc, 0, 34 * sc, Math.PI - 1.1, Math.PI + 1.1);
-          c.stroke();
-        } else if (motif === "mythic") {
-          for (const sy of [-1, 1])
-            P(
-              [[-12, sy * 7], [9, sy * 38], [31, sy * 25], [62, sy * 8], [13, sy * 14]],
-              rgba("#fbcfe8", 0.3),
-              rgba("#ffffff", 0.42),
-              0.65,
-            );
-        } else if (motif === "ancient") {
-          for (const sy of [-1, 1])
-            P(
-              [[-30, sy * 8], [-55, sy * 30], [-14, sy * 22], [16, sy * 13], [5, sy * 7]],
-              rgba("#78350f", 0.74),
-              rgba("#f59e0b", 0.4),
-              0.7,
-            );
-        }
-        const wingG = G(-43, 0, 28, 0, [
-          [0, deep],
-          [0.45, primary],
-          [1, accent],
-        ]);
-        for (const sy of [-1, 1]) {
-          P(
-            [
-              [-6, 9 * sy],
-              [-45, 30 * sy],
-              [-29, 5 * sy],
-              [-8, 2 * sy],
-            ],
-            wingG,
-            "rgba(255,255,255,.31)",
-            0.8,
-          );
-          P(
-            [
-              [-25, 9 * sy],
-              [-40, 25 * sy],
-              [-11, 12 * sy],
-            ],
-            rgba(glow, 0.32),
-            null,
-          );
-        }
-        const side = G(-38, 8, 44, 15, [
-          [0, deep],
-          [0.45, lo],
-          [1, dark(accent, 0.1)],
-        ]);
-        P(
-          [
-            [-34, 4],
-            [-17, 11],
-            [17, 12],
-            [45, 2],
-            [35, 9],
-            [4, 18],
-            [-23, 14],
-            [-39, 7],
-          ],
-          side,
-          "rgba(0,0,0,.28)",
-          0.7,
-        );
-        const hull = G(-40, -15, 51, 12, [
-          [0, deep],
-          [0.18, lo],
-          [0.48, primary],
-          [0.75, hi],
-          [1, light(accent, 0.48)],
-        ]);
-        P(
-          [
-            [-38, -5],
-            [-20, -13],
-            [11, -15],
-            [42, -4],
-            [53, 0],
-            [42, 4],
-            [11, 15],
-            [-20, 13],
-            [-38, 5],
-            [-45, 0],
-          ],
-          hull,
-          "rgba(255,255,255,.58)",
-          1.05,
-        );
-        const top = G(-25, -9, 38, 8, [
-          [0, dark(primary, 0.18)],
-          [0.55, primary],
-          [1, light(accent, 0.3)],
-        ]);
-        P(
-          [
-            [-24, -7],
-            [7, -10],
-            [36, -2],
-            [45, 0],
-            [36, 2],
-            [7, 10],
-            [-24, 7],
-            [-32, 0],
-          ],
-          top,
-          "rgba(255,255,255,.32)",
-          0.75,
-        );
-        R(-17, -5, 33, 10, 2, rgba(deep, 0.54), null);
-        R(-4, -6, 10, 12, 2, rgba(deep, 0.48), null);
-        R(10, -5, 10, 10, 2, rgba(deep, 0.42), null);
-        c.fillStyle = rgba(glass, 0.88);
-        c.shadowColor = glow;
-        c.shadowBlur = 8 * sc;
-        R(14, -6, 17, 12, 5, rgba(glass, 0.8), "rgba(255,255,255,.42)", 0.6);
-        R(31, -3, 9, 6, 3, rgba(glass, 0.5), "rgba(255,255,255,.2)", 0.5);
-        c.shadowBlur = 0;
-        const engineG = G(-48, 0, -25, 0, [
-          [0, "#020617"],
-          [0.45, deep],
-          [1, primary],
-        ]);
-        for (const y of [-6, 6])
-          R(-50, y - 3, 20, 6, 3, engineG, "rgba(255,255,255,.22)", 0.6);
-        c.fillStyle = rgba(glow, 0.9);
-        c.shadowColor = glow;
-        c.shadowBlur = 9 * sc;
-        for (const y of [-6, 6]) {
-          c.beginPath();
-          c.ellipse(-53 * sc, y * sc, 4.8 * sc, 2.1 * sc, 0, 0, TAU);
-          c.fill();
-        }
-        c.shadowBlur = 0;
-        c.strokeStyle = rgba(glow, 0.72);
-        c.lineWidth = 1 * sc;
-        c.beginPath();
-        c.moveTo(-25 * sc, -7 * sc);
-        c.lineTo(35 * sc, -4 * sc);
-        c.stroke();
-        c.beginPath();
-        c.moveTo(-25 * sc, 7 * sc);
-        c.lineTo(35 * sc, 4 * sc);
-        c.stroke();
-        drawShipUpgradeStage(c, sc, skin, shipTier, {
-          P,
-          R,
-          G,
-          primary,
-          secondary,
-          accent,
-          glow,
-          motif,
-        });
-        drawShipSubsystemVisuals(c, sc, skin, {
-          P,
-          R,
-          G,
-          primary,
-          secondary,
-          accent,
-          glow,
-          motif,
-        });
-        drawShipTierDetails(c, sc, skin, tier, {
-          P,
-          R,
-          G,
-          accent,
-          glow,
-          motif,
-        });
-        drawShipDepthPass(c, sc, skin, tier, {
-          P,
-          R,
-          G,
-          primary,
-          secondary,
-          accent,
-          glow,
-          motif,
-        });
-        if (motif === "circuit") {
-          c.strokeStyle = rgba(accent, 0.92);
-          c.lineWidth = 0.8 * sc;
-          for (const y of [-3, 3]) {
-            c.beginPath();
-            c.moveTo(-18 * sc, y * sc);
-            c.lineTo(31 * sc, y * sc);
-            c.stroke();
-          }
-          for (const x of [-11, 2, 15, 27]) {
-            c.beginPath();
-            c.arc(x * sc, 3 * sc, 1.4 * sc, 0, TAU);
-            c.stroke();
-          }
-        }
-        if (motif === "flare") {
-          c.strokeStyle = rgba("#fde68a", 0.96);
-          c.lineWidth = 1.1 * sc;
-          for (let i = 0; i < 5; i++) {
-            c.beginPath();
-            c.moveTo((-22 + i * 10) * sc, -8 * sc);
-            c.lineTo((-9 + i * 9) * sc, 8 * sc);
-            c.stroke();
-          }
-          P(
-            [
-              [38, -9],
-              [61, 0],
-              [38, 9],
-              [48, 0],
-            ],
-            rgba("#fb923c", 0.42),
-            null,
-          );
-        }
-        if (motif === "warp") {
-          c.strokeStyle = rgba(accent, 0.86);
-          c.lineWidth = 1 * sc;
-
-        }
-        if (motif === "mythic") {
-          c.strokeStyle = rgba("#fbcfe8", 0.9);
-          c.lineWidth = 1 * sc;
-          c.setLineDash([2 * sc, 3 * sc]);
-          c.beginPath();
-          c.moveTo(-22 * sc, 0);
-          c.lineTo(7 * sc, -7 * sc);
-          c.lineTo(37 * sc, 4 * sc);
-          c.stroke();
-          c.setLineDash([]);
-          c.fillStyle = rgba("#fbcfe8", 0.48);
-          c.beginPath();
-          c.arc(0, 0, 3.2 * sc, 0, TAU);
-          c.fill();
-        }
-        if (motif === "ancient") {
-          c.fillStyle = rgba("#fde68a", 0.94);
-          c.shadowColor = "#f59e0b";
-          c.shadowBlur = 5 * sc;
-          for (const x of [-13, 0, 16, 31])
-            R(x, -6, 2.4, 12, 1, rgba("#fde68a", 0.88), null);
-          c.shadowBlur = 0;
-          P(
-            [
-              [38, -10],
-              [61, 0],
-              [38, 10],
-              [48, 0],
-            ],
-            rgba(accent, 0.46),
-            null,
-          );
-        }
-        drawShipSkinSignature(c, sc, skin, {
-          P,
-          R,
-          G,
-          primary,
-          secondary,
-          accent,
-          glow,
-          motif,
-          tier,
-        });
-        drawHullFinish(c, sc, skin, "ship");
-        c.restore();
-      }
-      function drawShipSkinSignature(c, sc, skin, o) {
-        const { P, R, G, primary, secondary, accent, glow, motif, tier } = o;
-        c.save();
-        c.lineJoin = "round";
-        c.lineCap = "round";
-        if (motif === "circuit") {
-          c.strokeStyle = rgba(accent, 0.72);
-          c.lineWidth = 0.85 * sc;
-          for (const sy of [-1, 1]) {
-            c.beginPath();
-            c.moveTo(-42 * sc, sy * 18 * sc);
-            c.lineTo(-62 * sc, sy * 28 * sc);
-            c.lineTo(-78 * sc, sy * 19 * sc);
-            c.stroke();
-          }
-          c.fillStyle = rgba("#e2e8f0", 0.72);
-          for (const y of [-24, 24])
-            R(
-              -82,
-              y - 3,
-              20,
-              6,
-              2,
-              rgba("#e2e8f0", 0.26),
-              "rgba(125,211,252,.26)",
-              0.45,
-            );
-        } else if (motif === "flare") {
-          const heat = G(16, -28, 80, 28, [
-            [0, rgba("#f97316", 0.08)],
-            [0.48, rgba("#fde68a", 0.5)],
-            [1, rgba("#f97316", 0.08)],
-          ]);
-          for (const sy of [-1, 1]) {
-            P(
-              [
-                [18, sy * 18],
-                [62, sy * 38],
-                [82, sy * 16],
-                [39, sy * 8],
-              ],
-              heat,
-              "rgba(253,230,138,.2)",
-              0.55,
-            );
-            P(
-              [
-                [-44, sy * 9],
-                [-72, sy * 17],
-                [-44, sy * 20],
-              ],
-              rgba("#f97316", 0.32),
-              "rgba(253,230,138,.18)",
-              0.45,
-            );
-          }
-        } else if (motif === "warp") {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba(glow, 0.54);
-          c.lineWidth = 1.25 * sc;
-
-          c.globalCompositeOperation = "source-over";
-          for (const sy of [-1, 1])
-            P(
-              [
-                [31, sy * 17],
-                [79, sy * 30],
-                [67, sy * 6],
-              ],
-              rgba(accent, 0.28),
-              "rgba(34,211,238,.24)",
-              0.5,
-            );
-        } else if (motif === "mythic") {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba("#fbcfe8", 0.58);
-          c.lineWidth = 1.35 * sc;
-          c.setLineDash([4 * sc, 6 * sc]);
-
-          c.setLineDash([]);
-          c.globalCompositeOperation = "source-over";
-          P(
-            [
-              [39, -16],
-              [78, 0],
-              [39, 16],
-              [52, 0],
-            ],
-            rgba("#fbcfe8", 0.34),
-            "rgba(125,211,252,.22)",
-            0.55,
-          );
-          for (const sy of [-1, 1])
-            P(
-              [
-                [-8, sy * 15],
-                [23, sy * 36],
-                [46, sy * 15],
-              ],
-              rgba("#7dd3fc", 0.16),
-              "rgba(251,207,232,.18)",
-              0.45,
-            );
-        } else if (motif === "parallel") {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba("#ff2bd6", 0.6);
-          c.lineWidth = 1.25 * sc;
-
-          c.globalCompositeOperation = "source-over";
-          const chaos = G(18, -30, 86, 30, [
-            [0, rgba("#00f5ff", 0.08)],
-            [0.35, rgba("#ff2bd6", 0.4)],
-            [0.7, rgba("#a855f7", 0.34)],
-            [1, rgba("#00f5ff", 0.1)],
-          ]);
-          P(
-            [
-              [28, -24],
-              [58, -7],
-              [90, -26],
-              [72, 0],
-              [92, 28],
-              [55, 9],
-              [24, 24],
-              [40, 0],
-            ],
-            chaos,
-            "rgba(255,255,255,.24)",
-            0.65,
-          );
-          for (const sy of [-1, 1])
-            P(
-              [
-                [-18, sy * 18],
-                [-68, sy * 42],
-                [-35, sy * 8],
-              ],
-              rgba("#00f5ff", 0.22),
-              "rgba(255,43,214,.2)",
-              0.45,
-            );
-          c.fillStyle = rgba("#00f5ff", 0.75);
-          c.shadowColor = "#ff2bd6";
-          c.shadowBlur = 9 * sc;
-          for (const x of [-32, -12, 8, 29, 48])
-            for (const y of [-11, 11]) {
-              c.beginPath();
-              c.arc(x * sc, y * sc, 1.35 * sc, 0, TAU);
-              c.fill();
-            }
-          c.shadowBlur = 0;
-        } else if (motif === "ancient") {
-          const bronze = G(23, -29, 87, 29, [
-            [0, rgba("#78350f", 0.12)],
-            [0.5, rgba("#f59e0b", 0.44)],
-            [1, rgba("#78350f", 0.1)],
-          ]);
-          P(
-            [
-              [34, -19],
-              [84, 0],
-              [34, 19],
-              [53, 0],
-            ],
-            bronze,
-            "rgba(253,230,138,.32)",
-            0.7,
-          );
-          for (const sy of [-1, 1]) {
-            P(
-              [
-                [-19, sy * 16],
-                [-57, sy * 39],
-                [-31, sy * 10],
-              ],
-              rgba("#92400e", 0.38),
-              "rgba(253,230,138,.22)",
-              0.55,
-            );
-            P(
-              [
-                [10, sy * 14],
-                [42, sy * 32],
-                [29, sy * 9],
-              ],
-              rgba("#f59e0b", 0.22),
-              "rgba(253,230,138,.18)",
-              0.45,
-            );
-          }
-        }
-        c.restore();
-      }
-      function drawShipSubsystemVisuals(c, sc, skin, o) {
-        const { P, R, G, accent, glow } = o,
-          s = { ...defaultShipSystems(), ...(game.shipSystems || {}) };
-        c.save();
-        c.globalCompositeOperation = "screen";
-        if (s.thrust > 0) {
-          c.fillStyle = rgba(glow, 0.18 + 0.025 * s.thrust);
-          for (const y of [-15, 15])
-            R(
-              -58,
-              y - 3,
-              12 + s.thrust * 2,
-              6,
-              2,
-              rgba(glow, 0.16 + 0.02 * s.thrust),
-              "rgba(255,255,255,.12)",
-              0.35,
-            );
-        }
-        if (s.fuel > 0) {
-          c.strokeStyle = rgba("#86efac", 0.18 + 0.025 * s.fuel);
-          c.lineWidth = 0.75 * sc;
-          for (let i = 0; i < Math.min(4, s.fuel); i++) {
-            c.beginPath();
-            c.arc((-20 + i * 10) * sc, 0, 7 * sc, 0, TAU);
-            c.stroke();
-          }
-        }
-        if (s.brake > 0) {
-          for (const sy of [-1, 1])
-            P(
-              [
-                [-46, sy * 20],
-                [-68, sy * (24 + s.brake * 2)],
-                [-49, sy * 12],
-              ],
-              rgba("#93c5fd", 0.13 + 0.025 * s.brake),
-              "rgba(147,197,253,.18)",
-              0.35,
-            );
-        }
-        if (s.accel > 0) {
-          c.strokeStyle = rgba("#fde68a", 0.18 + 0.025 * s.accel);
-          for (let i = 0; i < s.accel; i++) {
-            c.beginPath();
-            c.moveTo((-42 + i * 9) * sc, -11 * sc);
-            c.lineTo((-30 + i * 9) * sc, 11 * sc);
-            c.stroke();
-          }
-        }
-        if (s.handling > 0) {
-          c.strokeStyle = rgba("#7dd3fc", 0.14 + 0.022 * s.handling);
-          for (let i = 0; i < Math.min(3, s.handling); i++) {
-            c.beginPath();
-            c.ellipse(
-              4 * sc,
-              0,
-              (50 + i * 8) * sc,
-              (15 + i * 3) * sc,
-              t * 0.01 + i * 0.4,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
-        }
-        if (s.cargo > 0) {
-          for (const sy of [-1, 1])
-            R(
-              -15,
-              sy * 17 - 3,
-              12 + s.cargo * 2,
-              6,
-              2,
-              rgba("#c4b5fd", 0.12 + 0.02 * s.cargo),
-              "rgba(196,181,253,.15)",
-              0.3,
-            );
-        }
-        c.restore();
-      }
-      function drawShipUpgradeStage(c, sc, skin, stage, o) {
-        if (stage <= 0) return;
-        const { P, R, G, primary, secondary, accent, glow, motif } = o;
-        c.save();
-        c.globalCompositeOperation = "source-over";
-        const armor = G(-34, -20, 50, 18, [
-          [0, rgba(dark(secondary, 0.2), 0.72)],
-          [0.5, rgba(primary, 0.22)],
-          [1, rgba(accent, 0.28)],
-        ]);
-        if (stage >= 1) {
-          for (const sy of [-1, 1])
-            P(
-              [
-                [-30, sy * 12],
-                [-8, sy * 21],
-                [28, sy * 15],
-                [14, sy * 9],
-              ],
-              armor,
-              "rgba(255,255,255,.18)",
-              0.45,
-            );
-          R(
-            -35,
-            -4,
-            16,
-            8,
-            2,
-            rgba(accent, 0.18),
-            "rgba(255,255,255,.16)",
-            0.45,
-          );
-        }
-        if (stage >= 2) {
-          for (const sy of [-1, 1]) {
-            const fin = G(20, sy * 18, 67, sy * 9, [
-              [0, rgba(accent, 0.18)],
-              [0.6, rgba(glow, 0.4)],
-              [1, rgba(accent, 0.1)],
-            ]);
-            P(
-              [
-                [24, sy * 13],
-                [59, sy * 28],
-                [75, sy * 13],
-                [39, sy * 7],
-              ],
-              fin,
-              "rgba(255,255,255,.18)",
-              0.45,
-            );
-          }
-          c.fillStyle = rgba(glow, 0.6);
-          c.shadowColor = glow;
-          c.shadowBlur = 7 * sc;
-          for (const y of [-13, 13]) {
-            c.beginPath();
-            c.arc(-45 * sc, y * sc, 2.5 * sc, 0, TAU);
-            c.fill();
-          }
-          c.shadowBlur = 0;
-        }
-        if (stage >= 3) {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba("#fbcfe8", 0.3);
-          c.lineWidth = 1.1 * sc;
-          for (let i = 0; i < 2; i++) {
-            c.beginPath();
-            c.ellipse(
-              5 * sc,
-              0,
-              (70 + i * 10) * sc,
-              (23 + i * 4) * sc,
-              t * 0.016 + i * 0.55,
-              0,
-              TAU,
-            );
-            c.stroke();
-          }
-          c.globalCompositeOperation = "source-over";
-          R(33, -8, 18, 16, 4, rgba(glow, 0.2), "rgba(255,255,255,.2)", 0.45);
-        }
-        c.restore();
-      }
-      function drawShipDepthPass(c, sc, skin, tier, o) {
-        const { P, R, G, primary, secondary, accent, glow, motif } = o;
-        c.save();
-        const rim = G(-42, -18, 54, 16, [
-          [0, "rgba(255,255,255,.04)"],
-          [0.32, rgba(light(primary, 0.55), 0.22)],
-          [0.72, rgba(accent, 0.18)],
-          [1, "rgba(0,0,0,.1)"],
-        ]);
-        P(
-          [
-            [-36, -6],
-            [-19, -15],
-            [14, -17],
-            [48, -4],
-            [60, 0],
-            [48, 4],
-            [14, 17],
-            [-19, 15],
-            [-36, 6],
-            [-46, 0],
-          ],
-          rim,
-          "rgba(255,255,255,.08)",
-          0.42,
-        );
-        const under = G(-37, 6, 48, 20, [
-          [0, "rgba(0,0,0,.32)"],
-          [0.6, "rgba(0,0,0,.08)"],
-          [1, rgba(accent, 0.08)],
-        ]);
-        P(
-          [
-            [-37, 5],
-            [-16, 13],
-            [20, 13],
-            [52, 2],
-            [39, 12],
-            [4, 22],
-            [-24, 16],
-            [-45, 8],
-          ],
-          under,
-          null,
-        );
-        c.globalCompositeOperation = "screen";
-        c.strokeStyle = rgba(glow, 0.2);
-        c.lineWidth = (0.7 + tier * 0.08) * sc;
-        for (let i = 0; i < 3 + tier; i++) {
-          c.beginPath();
-          c.moveTo((-24 + i * 14) * sc, (-8 - Math.sin(i) * 2) * sc);
-          c.lineTo((-14 + i * 14) * sc, (-13 - tier * 0.6) * sc);
-          c.lineTo((2 + i * 14) * sc, (-9 + Math.cos(i) * 1.5) * sc);
-          c.stroke();
-        }
-        if (tier >= 3) {
-          c.strokeStyle = rgba(glow, 0.26);
-
-        }
-        c.globalCompositeOperation = "source-over";
-        if (motif === "ancient") {
-          c.fillStyle = rgba("#fde68a", 0.7);
-          c.shadowColor = "#f59e0b";
-          c.shadowBlur = 5 * sc;
-          for (const x of [-25, -9, 8, 26]) {
-            c.beginPath();
-            c.arc(x * sc, -8 * sc, 1.2 * sc, 0, TAU);
-            c.fill();
-            c.beginPath();
-            c.arc(x * sc, 8 * sc, 1.2 * sc, 0, TAU);
-            c.fill();
-          }
-          c.shadowBlur = 0;
-        }
-        c.restore();
-      }
-      function drawShipTierDetails(c, sc, skin, tier, o) {
-        if (tier < 2) return;
-        const { P, G, accent, glow, motif } = o;
-        c.save();
-        c.globalCompositeOperation = "screen";
-        c.strokeStyle = rgba(glow, 0.16 + 0.04 * tier);
-        c.lineWidth = (0.8 + 0.08 * tier) * sc;
-
-        c.globalCompositeOperation = "source-over";
-        if (tier >= 2) {
-          for (const sy of [-1, 1]) {
-            const g = G(18, sy * 19, 55, sy * 11, [
-              [0, rgba(accent, 0.15)],
-              [0.55, rgba(glow, 0.42)],
-              [1, rgba(accent, 0.08)],
-            ]);
-            P(
-              [
-                [18, sy * 15],
-                [42, sy * 25],
-                [66, sy * 12],
-                [38, sy * 6],
-              ],
-              g,
-              "rgba(255,255,255,.14)",
-              0.45,
-            );
-          }
-        }
-        if (tier >= 3) {
-          c.fillStyle = rgba(glow, 0.58);
-          c.shadowColor = glow;
-          c.shadowBlur = 8 * sc;
-          for (const x of [-29, -8, 13, 34])
-            for (const y of [-10, 10]) {
-              c.beginPath();
-              c.arc(x * sc, y * sc, 1.6 * sc, 0, TAU);
-              c.fill();
-            }
-          c.shadowBlur = 0;
-          P(
-            [
-              [42, -12],
-              [70, 0],
-              [42, 12],
-              [54, 0],
-            ],
-            rgba(accent, 0.36),
-            "rgba(255,255,255,.16)",
-            0.5,
-          );
-        }
-        if (tier >= 4) {
-          c.globalCompositeOperation = "screen";
-          c.strokeStyle = rgba("#fbcfe8", 0.45);
-          c.setLineDash([3 * sc, 5 * sc]);
-
-          c.setLineDash([]);
-        }
-        c.restore();
       }
       function triggerCaptureEffect(b) {
         if (!b) return;
@@ -26437,7 +24803,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.24.0" &&
+            APP_VERSION === "0.25.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -26727,17 +25093,17 @@
           "Layered ship renderers exist",
           hasFunctions([
             "drawShipVisual",
-            "drawShipTierDetails",
-            "drawShipDepthPass",
-            "drawShipSubsystemVisuals",
+            "craftModel",
+            "paintCraftHull",
+            "craftSprite",
           ]),
         );
         ok(
           "Layered frigate renderers exist",
           hasFunctions([
             "drawFrigateVisual",
-            "drawFrigateTierDetails",
-            "drawFrigateDepthPass",
+            "drawCraftModel",
+            "drawFleetFormationPreview",
             "drawFrigateUpgradeModules",
           ]),
         );

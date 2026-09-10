@@ -236,7 +236,7 @@ const checkpoint = (label) => {
 };
 checkpoint("script initialized");
 
-assert.equal(api.APP_VERSION, "0.24.0", "Expected release candidate version");
+assert.equal(api.APP_VERSION, "0.25.0", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
@@ -894,6 +894,73 @@ assert.equal(visual.loop.last,10000,"Hidden frames must reset the frame timing o
 context.innerWidth=1280;context.innerHeight=800;context.devicePixelRatio=1;
 checkpoint("visual budgets verified");
 
+checkpoint("spacecraft models");
+const craft = vm.runInContext(`({
+  craftModel,craftBounds,craftSprite,spacecraftModels,spacecraftSprites,
+  shipSkins,frigateSkins,fleetSkins,fleetShipTypes,fleetPreviewLayout,
+  fleetFormationPreviewShips,fleetUnitPreviewHtml,drawShipVisual,drawFrigateVisual,
+  drawFleetShipVisual,drawFrigateUpgradeModules,paintCraftHull,
+})`,context);
+const modelFingerprint=model=>JSON.stringify(model.parts);
+for(const [kind,skins] of [["ship",craft.shipSkins],["frigate",craft.frigateSkins]]) {
+  const fingerprints=new Set();
+  for(const skin of skins) {
+    const model=craft.craftModel(kind,"scout",skin.motif,0);
+    assert.equal(craft.craftModel(kind,"scout",skin.motif,0),model,"Warm hull geometry must be reused");
+    assert.ok(model.parts.length>12 && model.engines.length>0,"Every hull needs layered geometry and real drives");
+    const bounds=craft.craftBounds(model);
+    assert.ok(bounds.right>bounds.left && bounds.bottom>bounds.top);
+    for(const part of model.parts) for(const [x,y] of part.points) {
+      assert.ok(Number.isFinite(x)&&Number.isFinite(y));
+      assert.ok(x>=bounds.left && x<=bounds.right && y-part.z>=bounds.top && y-part.z+part.depth<=bounds.bottom,
+        "The sprite bounds must enclose every raised deck and hull side");
+    }
+    fingerprints.add(modelFingerprint(model));
+  }
+  assert.equal(fingerprints.size,skins.length,"Every Starling/Pioneer skin must change physical geometry");
+}
+const fleetFingerprints=Object.keys(craft.fleetShipTypes).map(type=>modelFingerprint(craft.craftModel("fleet",type,"frontier",0)));
+assert.equal(new Set(fleetFingerprints).size,5,"All five fleet roles need distinct hulls");
+const shipModel=craft.craftModel("ship","starling","circuit",0);
+assert.notEqual(modelFingerprint(craft.craftModel("ship","starling","circuit",3)),modelFingerprint(shipModel),"Upgrades must change hull details");
+const sprite=craft.craftSprite(shipModel,craft.shipSkins[1],2);
+assert.equal(craft.craftSprite(shipModel,craft.shipSkins[1],2),sprite,"Warm hull sprites must be reused");
+const higher=craft.craftSprite(shipModel,craft.shipSkins[1],3);
+assert.ok(higher.canvas.width>sprite.canvas.width,"Retina and enlarged previews need higher-resolution artwork");
+assert.notEqual(craft.craftSprite(shipModel,{...craft.shipSkins[1],primary:"#ff9900"},2),sprite,
+  "Dynamic fleet palette changes must invalidate the sprite key");
+const sprites=craft.spacecraftSprites;
+sprites.entries.clear();sprites.bytes=sprites.budget;
+const oldCanvas={width:1024,height:1024};
+for(let i=0;i<3;i++)sprites.entries.set("old-"+i,{canvas:i===0?oldCanvas:{width:1024,height:1024},bytes:4194304});
+craft.craftSprite(shipModel,craft.shipSkins[1],2);
+assert.equal(sprites.entries.has("old-0"),false);assert.equal(oldCanvas.width,1);
+assert.ok(sprites.bytes<=sprites.budget,"Hull art must respect its independent 12 MiB cache budget");
+for(const width of [180,220,320,480]) for(const skin of craft.fleetSkins) {
+  const height=176,layout=craft.fleetPreviewLayout(width,height),rects=[];
+  for(const slot of layout) {
+    const b=craft.craftBounds(craft.craftModel("fleet",slot.type,skin.motif,0)),q=slot.scale*0.62;
+    const rect={left:slot.x+b.left*q,right:slot.x+b.right*q,top:slot.y+b.top*q,bottom:slot.y+b.bottom*q};
+    assert.ok(rect.left>=-width/2 && rect.right<=width/2 && rect.top>=-height/2 && rect.bottom<=height/2,
+      "Every fleet skin must fit narrow preview canvases");
+    for(const other of rects)assert.ok(rect.right<=other.left||rect.left>=other.right||rect.bottom<=other.top||rect.top>=other.bottom,
+      "Fleet preview hulls must not overlap");
+    rects.push(rect);
+  }
+}
+const previousFleet=api.game.fleet.ships;
+api.game.fleet.ships=[{id:"visible",type:"scout",status:"idle"},{id:"away",type:"miner",status:"mission"},{id:"launch",type:"warden",status:"launching"}];
+assert.deepEqual(Array.from(craft.fleetFormationPreviewShips(),item=>item.ship.id),["visible"],
+  "The command preview must show owned, present ships only");
+assert.match(craft.fleetUnitPreviewHtml("miner"),/data-ship-type="miner"/);
+api.game.fleet.ships=previousFleet;
+for(const skin of craft.shipSkins)assert.doesNotThrow(()=>craft.drawShipVisual(canvasContext,0.4,skin,true));
+for(const skin of craft.frigateSkins)assert.doesNotThrow(()=>craft.drawFrigateVisual(canvasContext,0.4,skin));
+for(const skin of craft.fleetSkins)for(const type of Object.keys(craft.fleetShipTypes))
+  assert.doesNotThrow(()=>craft.drawFleetShipVisual(canvasContext,0.4,{type,level:6},skin,1));
+assert.ok(sprites.bytes<=sprites.budget,"Reviewing the full cosmetic catalog cannot exceed the hull cache limit");
+checkpoint("spacecraft models verified");
+
 const manifest = JSON.parse(await readFile(new URL("manifest.webmanifest", root), "utf8"));
 assert.equal(manifest.display, "standalone");
 assert.ok(manifest.icons.some((icon) => icon.sizes === "192x192"));
@@ -909,5 +976,5 @@ assert.doesNotThrow(() => new Function(worker), "Service worker must parse");
 assert.match(worker, /caches\.match/, "Service worker needs an offline fallback");
 
 console.log(
-  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, audio lifecycle, and PWA assets.`,
+  `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, distinct spacecraft geometry, sprite budgets, all-skin preview fit, owned-fleet previews, audio lifecycle, and PWA assets.`,
 );
