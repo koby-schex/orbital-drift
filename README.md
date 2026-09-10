@@ -20,6 +20,17 @@ npm test
 
 The test command runs static validation plus a functional release-readiness harness against the real game script. It covers all six first-upgrade tutorial paths, the fixed Sol start, Pioneer construction and rendezvous, repeat-safe Expedition Arcs, customizable crew progression, living-system events, major threats, non-linear multi-jump routes, fleet departure/return choreography, save migration and backup recovery, cosmetic equipping, responsive UI invariants, audio lifecycle hooks, and offline-app assets. The game also contains a browser-level `runTests()` suite used during release QA.
 
+## v0.25.1 stabilization
+
+- The title-screen demonstration cannot save over an existing journey. Continue also recovers a backup when the primary slot is missing, and failed loads no longer start a replacement journey.
+- Save imports validate reconstruction inputs, apply the candidate before writing it, and restore the current journey if loading or storage fails. Failed autosaves retry on the normal interval instead of every frame.
+- Pioneer rescue phases and Starling frigate-orbit locks persist across reloads. Starting a fresh journey clears any old rescue.
+- Escape dismisses the active panel or command menu. Typing and scrolling in menus cannot steer or zoom the ship, held inputs clear on pause, and backgrounding leaves flight paused.
+- Offline navigation retains the working cached game when the server fails. Cache cleanup removes only Orbital Drift caches.
+- Save schema remains 20; the rescue field is optional for older saves. The test command now includes the offline-recovery suite.
+
+The live v0.25.0 title, onboarding, and command menus were inspected in the cloud browser; Escape failing to close the menu was reproduced. The patched local preview was blocked by the browser, so v0.25.1 changes are verified by the regression suites, not certified as a completed device playtest. Phone performance, full touch playthroughs, and progression pacing remain on the release checklist.
+
 ## v0.25.0 spacecraft art and hangar pass
 
 The Starling, Pioneer, and all five escort roles now use shared, opaque hull models with extruded edges, raised decks, recessed drives, faceted command glass, material shading, and restrained running lights. The same artwork appears in flight, the title scene, shipyard thumbnails, and cosmetic previews.

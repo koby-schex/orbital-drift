@@ -5031,7 +5031,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Command Deck Overhaul • v0.25.0</div>
+        <div class="title-version">Deep-Space Exploration • v0.25.1</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5442,7 +5442,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.25.0",
+        APP_VERSION = "0.25.1",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -5468,6 +5468,7 @@
         titleMenuMode = false,
         pendingConfirm = null,
         lastAutosave = 0,
+        hasActiveJourney = false,
         lastSaveMessage = "No save yet.",
         lastSaveMeta = null,
         lastFrameMs = 16.67,
@@ -9481,7 +9482,10 @@
         const d = dist(game.ship, b) - rad;
         return d < Math.min(well + 25, rad + 170);
       }
-      function initGame(showTips = false) {
+      function initGame(showTips = false, playable = true) {
+        hasActiveJourney = playable;
+        pioneerRescue = null;
+        cleanControlButtons();
         universeSeed = createUniverseSeed();
         routeRollCounter = 0;
         systems = [sol()];
@@ -10008,6 +10012,7 @@
           activity: game.activity || [],
           encounteredIceWorld: !!game.encounteredIceWorld,
           frigate: { ...game.frigate },
+          pioneerRescue: pioneerRescue ? { ...pioneerRescue } : null,
           fleet: serializeFleet(),
           ownedShipSkins: [...game.ownedShipSkins],
           ownedFrigateSkins: [...game.ownedFrigateSkins],
@@ -10122,17 +10127,22 @@
         forceTutorialCommon();
       }
       function saveGame(manual = false) {
+        if (!hasActiveJourney) {
+          if (manual) toast("Start or continue a journey before saving.");
+          return false;
+        }
         try {
-          lastSaveMeta = saveMeta();
           const previous = localStorage.getItem(SAVE_KEY);
           if (previous) {
             try {
               const parsed = JSON.parse(previous);
-              if (parsed && Number(parsed.version || 0) <= SAVE_VERSION)
+              if (validSavePayload(parsed))
                 localStorage.setItem(SAVE_BACKUP_KEY, previous);
             } catch (e) {}
           }
-          localStorage.setItem(SAVE_KEY, JSON.stringify(saveState()));
+          const snapshot = saveState();
+          localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot));
+          lastSaveMeta = snapshot.meta;
           lastAutosave = Date.now();
           lastSaveMessage =
             (manual ? "Manual save" : "Autosave") +
@@ -10152,6 +10162,9 @@
           return true;
         } catch (e) {
           console.error(e);
+          lastAutosave = Date.now();
+          lastSaveMessage = "Save failed. Export a backup when storage is available.";
+          updateSaveStatus();
           toast("Save failed.");
           addActivity(
             "warning",
@@ -10161,9 +10174,21 @@
           return false;
         }
       }
-      function loadGame(manual = false) {
+      function loadGame(manual = false, supplied = null) {
+        if (supplied) return restoreGame(manual, supplied);
+        const previousReady = hasActiveJourney;
+        const previous = previousReady ? saveState() : null;
+        const loaded = restoreGame(manual);
+        if (!loaded) {
+          if (previous) restoreGame(false, previous);
+          else initGame(false, false);
+          hasActiveJourney = previousReady;
+        }
+        return loaded;
+      }
+      function restoreGame(manual = false, supplied = null) {
         try {
-          let raw = localStorage.getItem(SAVE_KEY),
+          let raw = supplied ? JSON.stringify(supplied) : localStorage.getItem(SAVE_KEY),
             recoveredBackup = false,
             d = null;
           if (!raw) {
@@ -10182,7 +10207,7 @@
             d = JSON.parse(raw);
             recoveredBackup = true;
           }
-          if (!validSavePayload(d)) {
+          if (!supplied && !validSavePayload(d)) {
             const backupRaw = localStorage.getItem(SAVE_BACKUP_KEY);
             if (backupRaw && backupRaw !== raw) {
               const backupData = JSON.parse(backupRaw);
@@ -10197,6 +10222,8 @@
             if (manual) toast("Save file is not compatible with this build.");
             return false;
           }
+          pioneerRescue = null;
+          cleanControlButtons();
           universeSeed = Number(d.universeSeed || 0) || createUniverseSeed();
           routeRollCounter = 0;
           systems = [sol()];
@@ -10340,14 +10367,19 @@
             : null;
           if (!game.ship) resetShip();
           else {
+            const frigateLock = !!d.ship.orbitLocked && d.ship.lockBody === "__FRIGATE__" && game.frigate.built;
             const wasLocked = !!d.ship.orbitLocked && !!body(d.ship.lockBody);
             game.ship.orbitLocked = wasLocked;
             if (wasLocked) lockShipToBody(body(d.ship.lockBody));
-            else {
+            else if (frigateLock) {
+              game.ship.orbitLocked = true;
+              game.ship.lockBody = "__FRIGATE__";
+            } else {
               game.ship.lockBody = null;
               game.ship.lockCharge = 0;
             }
           }
+          pioneerRescue = game.frigate.built ? hydratePioneerRescue(d.pioneerRescue) : null;
           game.negotiationAnomaly = createAnomaly(currentSystemIndex);
           game.sectorEvent =
             d.sectorEvent || createSectorEvent(currentSystemIndex);
@@ -10371,6 +10403,7 @@
               "The damaged primary save was replaced with its last valid backup.",
             );
           }
+          hasActiveJourney = true;
           refreshTitleButtons();
           renderMenu();
           return true;
@@ -10448,17 +10481,31 @@
         return null;
       }
       function validSavePayload(data) {
-        return !!(
-          data &&
-          typeof data === "object" &&
-          Number(data.version || 0) > 0 &&
-          Number(data.version || 0) <= SAVE_VERSION &&
-          data.resources &&
-          typeof data.resources === "object" &&
-          Array.isArray(data.bodyStates) &&
-          data.ship &&
-          typeof data.ship === "object"
-        );
+        const object = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+        const finite = (v) => typeof v === "number" && Number.isFinite(v);
+        if (!object(data) || !Number.isInteger(data.version) || data.version < 1 ||
+            data.version > SAVE_VERSION || !object(data.resources) ||
+            !Object.values(data.resources).every((v) => finite(v) && v >= 0) ||
+            !object(data.ship) || !["x", "y", "vx", "vy", "fuel"].every((k) => finite(data.ship[k])) ||
+            !Array.isArray(data.bodyStates) || !data.bodyStates.length) return false;
+        if (!data.bodyStates.every((s) => object(s) && Array.isArray(s.bodies) &&
+            s.bodies.every((b) => object(b) && typeof b.name === "string"))) return false;
+        for (const key of ["currentSystemIndex", "systemCount", "missionStage", "upgradeLevel"])
+          if (data[key] !== undefined && (!Number.isSafeInteger(data[key]) || data[key] < 0)) return false;
+        if ((data.currentSystemIndex || 0) >= data.bodyStates.length ||
+            (data.systemCount || 0) > data.bodyStates.length) return false;
+        for (const key of ["captured", "discovered", "ownedShipSkins", "ownedFrigateSkins",
+            "ownedTrailSkins", "ownedFleetSkins", "purchasedSkins", "milestonesClaimed",
+            "unlockedAchievements", "collapsedBlackHoles"])
+          if (data[key] !== undefined && !Array.isArray(data[key])) return false;
+        return true;
+      }
+      function hydratePioneerRescue(value) {
+        if (!value || !["outbound", "service", "returning"].includes(value.phase)) return null;
+        const fields = ["time", "duration", "x", "y", "vx", "vy", "startX", "startY", "lastX", "lastY"];
+        if (!fields.every((key) => Number.isFinite(value[key])) || value.time < 0 || value.duration <= 0)
+          return null;
+        return { ...value };
       }
       function exportSaveFile() {
         if (!saveGame(false)) return;
@@ -10501,13 +10548,43 @@
             "Import Save Backup?",
             "This replaces the current local save after preserving it as an automatic backup.",
             () => {
-              const current = localStorage.getItem(SAVE_KEY);
-              if (current) localStorage.setItem(SAVE_BACKUP_KEY, current);
-              localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-              if (loadGame(true)) {
-                toast("Save backup imported successfully.");
-                closeMenu();
+              const previousState = hasActiveJourney ? saveState() : null;
+              const previousReady = hasActiveJourney;
+              let current, backup, wroteBackup = false;
+              try {
+                current = localStorage.getItem(SAVE_KEY);
+                backup = localStorage.getItem(SAVE_BACKUP_KEY);
+                if (!loadGame(false, data)) throw new Error("Imported journey could not be restored");
+                if (current) {
+                  try {
+                    if (validSavePayload(JSON.parse(current))) {
+                      localStorage.setItem(SAVE_BACKUP_KEY, current);
+                      wroteBackup = true;
+                    }
+                  } catch (error) {
+                    if (error.name !== "SyntaxError") throw error;
+                  }
+                }
+                localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+              } catch (error) {
+                if (previousState) loadGame(false, previousState);
+                else initGame(false, false);
+                hasActiveJourney = previousReady;
+                if (wroteBackup) {
+                  try {
+                    if (backup === null) localStorage.removeItem(SAVE_BACKUP_KEY);
+                    else localStorage.setItem(SAVE_BACKUP_KEY, backup);
+                  } catch (restoreError) { console.warn(restoreError); }
+                }
+                errorToast("Import failed. Your current journey has been kept.");
+                return;
               }
+              titleOpen = false;
+              titleMenuMode = false;
+              ui.titleOverlay.classList.remove("show");
+              closeMenu();
+              settleOverlayPause();
+              toast("Save backup imported successfully.");
             },
           );
           return true;
@@ -15996,7 +16073,7 @@
           menuWasPaused = !!(paused || modalFreeze || titleOpen || titleMenuMode);
           paused = true;
           keys.clear();
-          touch.active = false;
+          cleanControlButtons();
         }
         activeMenu = normalizeMenuName(name);
         ui.menu.classList.remove("closing");
@@ -24803,7 +24880,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.25.0" &&
+            APP_VERSION === "0.25.1" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );
@@ -25802,11 +25879,17 @@
       });
       addEventListener("resize", resize);
       addEventListener("beforeunload", () => saveGame(false));
+      addEventListener("pagehide", () => saveGame(false));
+      addEventListener("blur", () => {
+        cleanControlButtons();
+        if (hasActiveJourney && canResumePlay()) openPause();
+      });
       document.addEventListener("visibilitychange", () => {
         loop.last = 0;
         keys.clear();
         endTouch();
         if (document.hidden) {
+          if (hasActiveJourney && canResumePlay()) openPause();
           saveGame(false);
           if (audio?.ctx?.state === "running") audio.ctx.suspend().catch?.(() => {});
         } else if (audio && (game.settings?.music === "On" || game.settings?.sound === "On")) {
@@ -25819,14 +25902,21 @@
       addEventListener("keydown", (e) => {
         const k = e.key.toLowerCase();
         if (k === "escape") {
-          if (ui.encounterOverlay.classList.contains("show")) {
-            e.preventDefault();
-            closeExplorationEncounter();
-            return;
-          }
-          paused ? closePause() : openPause();
+          e.preventDefault();
+          const dismiss = [
+            [ui.confirmOverlay, closeConfirm], [ui.discoveryOverlay, closeDiscoveryPanel],
+            [ui.upgradeOverlay, closeUpgradePanel], [ui.missionOverlay, closeMissionPanel],
+            [ui.encounterOverlay, closeExplorationEncounter], [ui.choiceOverlay, closeChoice],
+            [ui.onboardingOverlay, dismissOnboarding], [ui.tutorialOverlay, dismissTips],
+            [ui.pauseOverlay, closePause],
+          ].find(([panel]) => panel.classList.contains("show"));
+          if (dismiss) dismiss[1]();
+          else if (ui.menu.classList.contains("open")) closeMenu();
+          else if (!titleOpen) openPause();
           return;
         }
+        if (e.target?.closest?.("input, textarea, select, [contenteditable='true']") ||
+            !canResumePlay() || paused || modalFreeze) return;
         keys.add(k);
         if (
           [" ", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(k)
@@ -25837,6 +25927,7 @@
       addEventListener(
         "wheel",
         (e) => {
+          if (!canResumePlay() || paused || modalFreeze) return;
           zoom = clamp(zoom * (e.deltaY > 0 ? 0.9 : 1.1), 0.22, 2.1);
         },
         { passive: true },
@@ -25951,6 +26042,9 @@
       function startNew() {
         const begin = () => {
           initGame(false);
+          document.body.classList.remove("pause-open");
+          ui.pauseOverlay.classList.remove("show");
+          onboardingDismissed = false;
           addActivity("system", "New game started", "A fresh run has begun.");
           titleMenuMode = false;
           titleOpen = false;
@@ -25959,7 +26053,7 @@
           ui.titleOverlay.classList.remove("show");
           if (!onboardingDismissed) showOnboarding(0);
         };
-        if (localStorage.getItem(SAVE_KEY)) {
+        if (getStoredSaveMeta()) {
           const meta = getStoredSaveMeta();
           confirmAction(
             "Start New Game?",
@@ -25983,9 +26077,8 @@
       function continueGame() {
         const loaded = loadGame(true);
         if (!loaded) {
-          toast("No compatible save found. Starting a new game.");
-          onboardingDismissed = false;
-          initGame(false);
+          toast("Could not continue this save. Your saved files have been kept; try importing a backup.");
+          return;
         }
         titleMenuMode = false;
         titleOpen = false;
@@ -26015,6 +26108,7 @@
         $("titleActions")?.classList.toggle("has-save", has);
       }
       function replayTips() {
+        if (!hasActiveJourney) return startNew();
         tutorialDismissed = false;
         tutorialStep = 0;
         titleMenuMode = false;
@@ -26032,7 +26126,7 @@
       $("loadBtn").onclick = (e) => {
         resumeAudio();
         playSound("click");
-        localStorage.getItem(SAVE_KEY) ? continueGame() : startNew();
+        continueGame();
       };
       $("howToBtn").onclick = () => {
         resumeAudio();
@@ -26062,7 +26156,7 @@
       $("resetBtn").onclick = () =>
         confirmAction(
           "Restart This Journey?",
-          "Return to Earth and begin this journey again? Your saved journey is not deleted.",
+          "Return to Earth and begin again? This replaces your saved journey when the game next saves. Export a backup first if you want to keep it.",
           () => {
             initGame(false);
             modalFreeze = false;
@@ -26228,8 +26322,7 @@
         toast("Control layout saved.");
       }
       function cleanControlButtons() {
-        keys.delete("touch");
-        keys.delete("brake");
+        keys.clear();
         touch.active = false;
         if (ui.knob) {
           ui.knob.style.left = "var(--stickKnobHome)";
@@ -26377,7 +26470,7 @@
           .catch((error) => console.warn("Offline support unavailable", error));
       }
       resize();
-      initGame(false);
+      initGame(false, false);
       applySettings(false);
       sanitizeFlags();
       forceTutorialCommon();

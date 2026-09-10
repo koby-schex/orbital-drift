@@ -1,5 +1,20 @@
 # Orbital Drift release checklist
 
+## v0.25.1 stabilization
+
+- [x] Title-screen unload, pagehide, and visibility events preserve existing primary and backup saves.
+- [x] Continue restores a backup-only journey; failed Continue keeps saved files.
+- [x] Malformed reconstruction inputs are rejected; import storage failures retain the current journey and save slots.
+- [x] Save failures respect the autosave interval instead of retrying every frame.
+- [x] Outbound, service, and returning rescue phases reload correctly; frigate orbit lock survives reload.
+- [x] Escape closes menus; keyboard and wheel input stay out of flight while menus are open; focus loss/backgrounding releases controls and pauses.
+- [x] Offline navigation handles HTTP errors, disconnection, cache refresh, and quota failure; updates preserve unrelated caches.
+- [x] Existing tutorial, travel, collection, crew, fleet, cosmetics, rendering-budget, and save-migration regression suites pass.
+- [x] Live v0.25.0 desktop title/onboarding/command menus inspected; Escape defect reproduced.
+- [ ] Playtest the patched v0.25.1 build in a real browser after deployment. Local-preview navigation returned ERR_BLOCKED_BY_CLIENT.
+- [ ] Complete a full iPhone/Android journey and long-session performance pass below; measure early progression/reward pacing before changing balance.
+
+
 ## v0.25.0 spacecraft review
 
 - [x] Six distinct Starling skin geometries and seven distinct Pioneer skin geometries.
