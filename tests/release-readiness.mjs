@@ -261,7 +261,7 @@ assert.equal(localStorage.getItem(api.SAVE_KEY), titleSave);
 api.dismissPanels();
 
 
-assert.equal(api.APP_VERSION, "0.25.2", "Expected release candidate version");
+assert.equal(api.APP_VERSION, "0.26.0", "Expected release candidate version");
 assert.equal(api.SAVE_VERSION, 20, "Expected current save schema");
 assert.ok(api.universeSeed > 0, "New runs need a universe seed");
 assert.equal(api.systems.length, 1, "New runs must begin with only the fixed tutorial system");
@@ -1203,6 +1203,50 @@ assert.equal(api.upgradePanelOpen,true,"A stale timer must not dismiss a newer u
 secondTimer.fn();
 assert.equal(api.upgradePanelOpen,false);
 checkpoint("travel and rendering stabilization verified");
+
+// Cinematic art must degrade safely and stay bounded across travel and resize.
+const art = vm.runInContext(`({cinematicArt, cinematicArtKind, environmentImage, cinematicSky,
+  hex, rgba, light, earthAlbedo, paintEarthTexel})`, context);
+assert.equal(art.rgba(art.light("#000000",0.5),0.4),"rgba(128,128,128,0.4)","Composed lighting must not turn RGB highlights black");
+assert.equal(art.rgba("#abc",1),"rgba(170,187,204,1)");
+assert.equal(art.cinematicArtKind({specialType:"parallel"}),"parallel");
+assert.equal(art.cinematicArtKind({specialType:"cosmicSpirit"}),"spirit");
+assert.equal(art.cinematicArtKind({isTutorial:true}),"deep");
+art.cinematicArt.images.clear();
+assert.equal(art.environmentImage("deep"),null,"Pending images must leave procedural rendering available");
+const pending=art.cinematicArt.images.get("deep");
+pending.image.onerror();
+assert.equal(art.environmentImage("deep"),null);
+assert.equal(art.cinematicArt.images.get("deep"),pending,"Failed images must not retry every frame");
+art.environmentImage("parallel");art.environmentImage("spirit");
+assert.equal(art.cinematicArt.images.size,2,"Retain at most two decoded environments");
+assert.equal(art.cinematicArt.images.has("deep"),false);
+assert.equal(pending.image.onload,null,"Eviction must detach pending callbacks");
+const activeKind=art.cinematicArtKind(api.game.system);
+art.environmentImage(activeKind);
+const loaded=art.cinematicArt.images.get(activeKind);loaded.image.width=1536;loaded.image.height=1024;loaded.image.onload();
+vm.runInContext('W=3840;H=2160;game.settings.graphics="High"',context);
+const highArt=art.cinematicSky();
+assert.equal(Math.max(highArt.width,highArt.height),1920,"Cap viewport art independently of device pixel ratio");
+assert.equal(art.cinematicSky(),highArt,"Warm frames must reuse the graded image");
+vm.runInContext('game.settings.graphics="Low"',context);
+const lowArt=art.cinematicSky();
+assert.equal(Math.max(lowArt.width,lowArt.height),960);
+assert.equal(highArt.width,1,"Release old viewport rasters on resize/quality changes");
+const mapped=new Uint8ClampedArray(4);
+art.earthAlbedo.width=2;art.earthAlbedo.height=2;
+art.earthAlbedo.pixels=new Uint8ClampedArray([120,160,200,255,120,160,200,255,120,160,200,255,120,160,200,255]);
+art.paintEarthTexel(mapped,0,0,0,1,32,0);
+assert.deepEqual([...mapped],[120,160,200,255],"Albedo mapping must retain RGB and opaque sphere centers");
+art.paintEarthTexel(mapped,0,0,1,0,32,1);
+assert.equal(mapped[3],0,"Sphere edges must antialias to transparent");
+for(const asset of ["deep-field","parallel-rift","spirit-nebula","earth-albedo"]) {
+  const binary=await readFile(new URL("assets/"+asset+".webp",root));
+  assert.equal(binary.toString("ascii",0,4),"RIFF");assert.equal(binary.toString("ascii",8,12),"WEBP");
+  assert.ok(binary.length<500000,"Keep individual environment downloads small");
+  assert.ok((await readFile(new URL("sw.js",root),"utf8")).includes("./assets/"+asset+".webp"),"Art must be available offline");
+}
+checkpoint("cinematic art loading and budgets verified");
 
 const manifest = JSON.parse(await readFile(new URL("manifest.webmanifest", root), "utf8"));
 assert.equal(manifest.display, "standalone");

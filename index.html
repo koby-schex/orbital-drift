@@ -4903,6 +4903,92 @@
       .fleet-unit-preview canvas { display: block; position: static; width: 100%; height: 100%; }
       .fleet-ship-card .fleet-ship-mark { width: 76px; height: 58px; padding: 0; overflow: hidden; border-radius: 10px; }
       .fleet-ship-mark .fleet-unit-preview { width: 76px; height: 58px; margin: 0; }
+      /* Cinematic cockpit: quiet surfaces, clear hierarchy, restrained light. */
+      :root {
+        --panel: rgba(4, 10, 17, .93);
+        --panel2: rgba(136, 172, 190, .055);
+        --line: rgba(177, 207, 215, .18);
+        --text: #edf2ef;
+        --muted: #a3b4bd;
+        --a: #a4d9db;
+        --b: #cfbd94;
+        --glass: linear-gradient(145deg, rgba(140, 174, 190, .045), transparent 62%);
+        --deepShadow: 0 18px 58px rgba(0, 0, 0, .42), inset 0 1px rgba(223, 238, 237, .07);
+      }
+      .hud, .dock, .menu, .dialog, .smart, .pause-btn {
+        backdrop-filter: blur(16px);
+        border-color: rgba(165, 199, 209, .19);
+        box-shadow: var(--deepShadow);
+      }
+      .hud { border-radius: 12px; background: linear-gradient(115deg, rgba(6, 15, 24, .95), rgba(6, 13, 21, .84)); }
+      .hud:before, .menu-head:before, .menu .card:before { display: none; }
+      .logo { letter-spacing: .12em; text-shadow: none; }
+      .stat, .chip, .badge { border-radius: 6px; box-shadow: none; }
+      .stat { background: rgba(147, 177, 190, .035); }
+      .bar { border-radius: 2px; background: #08131d; }
+      .bar > i, .bar > div { border-radius: 2px; box-shadow: 0 0 12px rgba(133, 224, 222, .17); }
+      .menu {
+        background: linear-gradient(155deg, rgba(12, 24, 34, .985), rgba(3, 9, 16, .99) 52%);
+        border-radius: 16px;
+        border-color: rgba(182, 202, 206, .22);
+      }
+      .menu-head { background: rgba(5, 13, 21, .95); border-bottom: 1px solid var(--line); }
+      .menu-head h2 { letter-spacing: -.025em; font-weight: 650; text-shadow: none; }
+      .menu .card, .cosmetic-card, .dialog {
+        border-radius: 12px;
+        background: linear-gradient(130deg, rgba(24, 39, 50, .56), rgba(7, 16, 25, .84));
+        border-color: rgba(165, 199, 209, .15);
+        box-shadow: inset 0 1px rgba(210, 229, 230, .035);
+      }
+      .menu .card:hover { transform: none; box-shadow: inset 0 1px rgba(210, 229, 230, .07); }
+      .menu .card > b, .menu h3 { color: #e8efec; letter-spacing: -.015em; }
+      .menu .small, .menu p { line-height: 1.55; }
+      button { border-radius: 8px; text-shadow: none; box-shadow: none; }
+      button:focus-visible { outline: 2px solid #d4e9e8; outline-offset: 3px; }
+      .menu button, .dialog button { min-height: 42px; }
+      .menu button:hover { border-color: rgba(181, 225, 225, .55); }
+      .primary, button.primary { background: linear-gradient(120deg, #bfdedd, #82b7c3); color: #07121c; border-color: #bbd8d6; }
+      .frigate-deck-tabs { gap: 5px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+      .frigate-deck-tabs button { border-radius: 6px; background: rgba(106, 150, 172, .055); font-weight: 600; }
+      .frigate-deck-tabs button.active { background: rgba(139, 205, 215, .15); border-color: rgba(139, 205, 215, .5); }
+      .pioneer-hero {
+        background: linear-gradient(90deg, rgba(5, 13, 21, .94), rgba(5, 13, 21, .6)), url('./assets/deep-field.webp') center 25% / cover;
+      }
+      .fleet-hangar-stage, .cosmetic-preview-live {
+        border-radius: 9px;
+        background: radial-gradient(ellipse at 50% 38%, rgba(76, 116, 138, .17), transparent 70%), #030a11;
+        border-color: rgba(161, 194, 204, .17);
+      }
+      .cosmetic-preview-live:before, .cosmetic-preview-live:after { opacity: .18; }
+      .cosmetic-card.premium { background: linear-gradient(135deg, rgba(96, 75, 38, .17), rgba(6, 14, 23, .95)); border-color: rgba(208, 186, 132, .4); box-shadow: inset 0 1px rgba(242, 219, 171, .09); }
+      .cosmetic-card.premium > b:after { color: #e3c993; background: rgba(173, 139, 76, .12); border-radius: 4px; }
+      .title-screen { background: linear-gradient(180deg, rgba(2, 7, 12, .22), rgba(2, 7, 12, .6)); }
+      .title-logo { color: #edf1e9; background: none; -webkit-text-fill-color: #edf1e9; letter-spacing: -.045em; text-shadow: 0 4px 40px rgba(0, 0, 0, .7); }
+      .title-eyebrow { color: #d4c49c; letter-spacing: .32em; }
+      .title-sub { color: #a8bac4; }
+      .title-showcase { border-radius: 16px; border-color: rgba(207, 218, 211, .2); background: #040b12; }
+      .title-showcase:before { display: none; }
+      .title-feature { border-radius: 8px; background: rgba(6, 14, 23, .84); border-color: var(--line); }
+      .title-actions button { border-radius: 8px; }
+      .title-hangar-vignette { opacity: .45; }
+      .discovery-stage { border-radius: 10px; background: linear-gradient(0deg, rgba(2, 7, 13, .65), rgba(2, 7, 13, .45)), url('./assets/deep-field.webp') center / cover; }
+      .discovery-stage:before, .discovery-orbit, .discovery-world, .discovery-satellite { display: none; }
+      .discovery-stage:after { background: linear-gradient(0deg, rgba(2, 7, 13, .85), transparent 30%); }
+      #discoveryPortrait { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+      .discovery-classification { z-index: 5; background: rgba(3, 10, 17, .9); border-radius: 5px; letter-spacing: .06em; }
+      #discoveryOverlay .dialog { background: linear-gradient(155deg, #112330, #050d16 65%); border-color: rgba(182, 211, 216, .24); }
+      #discoveryOverlay h2 { color: #edf2ef; text-shadow: none; font-weight: 650; }
+      .objective-pill { border-radius: 8px; background: rgba(4, 11, 18, .88); border-color: rgba(180, 209, 215, .2); box-shadow: 0 4px 25px rgba(0, 0, 0, .3); }
+      .smart, .dock { border-radius: 12px; }
+      .stick, .touch, .orbit-release, .brake { background: radial-gradient(circle at 40% 30%, rgba(26, 47, 60, .78), rgba(4, 12, 20, .8)); box-shadow: inset 0 1px rgba(212, 231, 234, .09), 0 5px 20px rgba(0, 0, 0, .3); }
+      @media (max-width: 560px) {
+        .menu { border-radius: 14px 14px 0 0; }
+        .menu .card { padding: 12px; }
+        .frigate-deck-tabs button { min-height: 44px; }
+        .title-eyebrow { letter-spacing: .18em; }
+        .discovery-stage { height: min(260px, 31vh); }
+      }
+
     </style>
   </head>
   <body>
@@ -5031,7 +5117,7 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Deep-Space Exploration • v0.25.2</div>
+        <div class="title-version">Deep-Space Exploration • v0.26.0</div>
         <p class="title-sub">
           Command a deep-space drift vessel, ride gravity wells, claim frontier
           worlds, and carve lasting Echo routes across uncharted systems.
@@ -5322,6 +5408,7 @@
         <h2 id="discoveryTitle">New World Discovered</h2>
         <p id="discoveryText"></p>
         <div class="art discovery-stage" id="discoveryArt">
+          <canvas id="discoveryPortrait" aria-label="Surveyed planet"></canvas>
           <div class="discovery-orbit"></div>
           <div class="discovery-world" id="discoveryWorld"></div>
           <div class="discovery-satellite"></div>
@@ -5442,7 +5529,7 @@
         SAVE_KEY = "orbital-drift-save-v12",
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
-        APP_VERSION = "0.25.2",
+        APP_VERSION = "0.26.0",
         STORE_TITLE = "Orbital Drift: Sol";
       const DEV_BUILD = false;
       let W = 1,
@@ -8418,6 +8505,9 @@
           .join(" • ");
       }
       function hex(h) {
+        // Color helpers compose: light()/dark() return rgb(), not hexadecimal.
+        const rgb = String(h || "").match(/^rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/i);
+        if (rgb) return { r: clamp(Math.round(Number(rgb[1])), 0, 255), g: clamp(Math.round(Number(rgb[2])), 0, 255), b: clamp(Math.round(Number(rgb[3])), 0, 255) };
         const c = (h || "#fff").replace("#", ""),
           n = parseInt(
             c.length === 3
@@ -19947,7 +20037,7 @@
           !DEV_BUILD ||
           !ui.debugOverlay ||
           game.settings?.debug !== "On" ||
-          !game.ship
+          !game.ship || game.ship.orbitLocked
         ) {
           if (ui.debugOverlay) ui.debugOverlay.classList.remove("show");
           return;
@@ -20882,6 +20972,124 @@
       // Bounded, disposable render assets. None of these belong in a saved universe.
       const renderAssets = { sky: null, skyJob: null, skyKey: "", skyFade: 0, surfaces: new Map(), bytes: 0, builds: 0 };
       const SURFACE_CACHE_BYTES = 12 * 1024 * 1024;
+      // Art stays outside save data. Load only visited environments; keep at most
+      // two decoded images and one viewport raster, including on Retina screens.
+      const cinematicArt = { images: new Map(), frame: null, key: "" };
+      const CINEMATIC_ART = Object.freeze({
+        deep: "./assets/deep-field.webp",
+        parallel: "./assets/parallel-rift.webp",
+        spirit: "./assets/spirit-nebula.webp",
+      });
+      function cinematicArtKind(system = game.system) {
+        return system?.specialType === "parallel" ? "parallel" :
+          system?.specialType === "cosmicSpirit" ? "spirit" : "deep";
+      }
+      function environmentImage(kind = cinematicArtKind()) {
+        if (cinematicArt.images.has(kind)) {
+          const entry = cinematicArt.images.get(kind);
+          cinematicArt.images.delete(kind); cinematicArt.images.set(kind, entry);
+          return entry.ready ? entry.image : null;
+        }
+        while (cinematicArt.images.size >= 2) {
+          const key = cinematicArt.images.keys().next().value;
+          const old = cinematicArt.images.get(key);
+          old.image.onload = old.image.onerror = null;
+          cinematicArt.images.delete(key);
+        }
+        const image = new Image(), entry = { image, ready: false, failed: false, readyAt: 0 };
+        cinematicArt.images.set(kind, entry);
+        image.onload = () => { entry.ready = true; entry.readyAt = performance.now(); };
+        image.onerror = () => { entry.failed = true; };
+        image.decoding = "async";
+        image.src = CINEMATIC_ART[kind];
+        return null;
+      }
+      function cinematicSky() {
+        const kind = cinematicArtKind(), image = environmentImage(kind);
+        if (!image) return null; // The procedural sky is always a usable fallback.
+        const quality = game.settings?.graphics || "High",
+          cap = quality === "Low" ? 960 : quality === "Medium" ? 1440 : 1920,
+          ratio = Math.min(1, cap / Math.max(W, H)),
+          width = Math.max(1, Math.round(W * ratio)), height = Math.max(1, Math.round(H * ratio)),
+          seed = visualSeed(game.system?.seed || "Sol"),
+          key = [kind, width, height, seed].join(":");
+        if (cinematicArt.key === key && cinematicArt.frame) return cinematicArt.frame;
+        const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height;
+        const c = canvas.getContext("2d"); if (!c) return null;
+        c.imageSmoothingEnabled = true; c.imageSmoothingQuality = "high";
+        const scale = Math.max(width / image.width, height / image.height),
+          dw = image.width * scale, dh = image.height * scale,
+          tutorial = game.system?.isTutorial || currentSystemIndex === 0,
+          mirror = kind === "deep" && !tutorial && seed % 2;
+        c.save();
+        if (mirror) { c.translate(width, 0); c.scale(-1, 1); }
+        // Color grading is baked once, never a full-screen filter per frame.
+        const hues = [-18, 0, 22, 138, 206];
+        c.filter = kind === "deep" && !tutorial ? `hue-rotate(${hues[seed % hues.length]}deg) saturate(0.85)` : "none";
+        c.drawImage(image, (width - dw) * (kind === "parallel" ? 0.85 : 0.45), (height - dh) * 0.25, dw, dh);
+        c.restore();
+        const vignette = c.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
+        vignette.addColorStop(0, "rgba(0,3,9,0)"); vignette.addColorStop(1, "rgba(0,3,9,.4)");
+        c.fillStyle = vignette; c.fillRect(0, 0, width, height);
+        if (cinematicArt.frame) cinematicArt.frame.width = cinematicArt.frame.height = 1;
+        cinematicArt.frame = canvas; cinematicArt.key = key;
+        return canvas;
+      }
+      function drawCinematicEnvironment() {
+        const image = cinematicSky();
+        if (!image) return false;
+        const reduced = game.settings?.motion === "Reduced",
+          x = reduced ? 0 : Math.sin(cam.x * 0.00012) * 16,
+          y = reduced ? 0 : Math.sin(cam.y * 0.00012) * 12;
+        const entry = cinematicArt.images.get(cinematicArtKind()), fade = reduced ? 1 : clamp((performance.now() - (entry?.readyAt || 0)) / 700, 0, 1);
+        ctx.save(); ctx.globalAlpha = 0.92 * fade;
+        ctx.drawImage(image, -20 + x, -16 + y, W + 40, H + 32);
+        ctx.restore(); return true;
+      }
+      function paintPlanetPortrait(c, b, x, y, r) {
+        c.save(); c.translate(x, y);
+        const ringed = b.name === "Saturn" || b.pattern === "rings";
+        const rings = front => {
+          if (!ringed) return;
+          c.save(); c.rotate(-0.32);
+          for (let i = 0; i < 24; i++) {
+            if (i === 12 || i === 13) continue;
+            c.strokeStyle = rgba(light(b.color, 0.5), 0.18 + rand(i + 63) * 0.24);
+            c.lineWidth = r * 0.028;
+            c.beginPath(); c.ellipse(0, 0, r * (1.3 + i * 0.035), r * (0.34 + i * 0.011), 0, front ? 0 : Math.PI, front ? Math.PI : TAU); c.stroke();
+          }
+          c.restore();
+        };
+        rings(false);
+        const glow = c.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.8, 0, 0, r * 1.25);
+        glow.addColorStop(0, rgba(light(b.color, 0.4), b.atmosphere ? 0.22 : 0.06)); glow.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = glow; c.fillRect(-r * 1.3, -r * 1.3, r * 2.6, r * 2.6);
+        c.save(); c.beginPath(); c.arc(0, 0, r, 0, TAU); c.clip();
+        c.fillStyle = b.color; c.fillRect(-r, -r, r * 2, r * 2);
+        const texture = surfaceTexture(b, b.name === "Earth" && r > 180 ? 512 : 256);
+        if (texture) c.drawImage(texture, -r, -r, r * 2, r * 2);
+        const shade = c.createLinearGradient(-r, -r * 0.65, r, r * 0.65);
+        shade.addColorStop(0, "rgba(245,244,225,.17)"); shade.addColorStop(0.36, "rgba(0,0,0,0)");
+        shade.addColorStop(0.63, "rgba(0,3,10,.7)"); shade.addColorStop(1, "rgba(0,2,8,.99)");
+        c.fillStyle = shade; c.fillRect(-r, -r, r * 2, r * 2); c.restore();
+        if (b.atmosphere) {
+          c.strokeStyle = rgba(light(b.color, 0.75), 0.7); c.lineWidth = Math.max(1, r * 0.014);
+          c.beginPath(); c.arc(0, 0, r, Math.PI * 0.92, Math.PI * 1.82); c.stroke();
+        }
+        rings(true); c.restore();
+        return !!texture;
+      }
+      function renderDiscoveryPortrait() {
+        const b = activeDiscoveryBody, canvas = document.getElementById("discoveryPortrait");
+        if (!b || !canvas) return;
+        const key = [b.name, b.featureSeed, b.color, !!earthAlbedo.pixels].join(":");
+        if (canvas.dataset.planet === key) return;
+        canvas.width = 800; canvas.height = 420;
+        const c = canvas.getContext("2d"); if (!c) return;
+        c.clearRect(0, 0, 800, 420);
+        if (paintPlanetPortrait(c, b, 400, 208, b.pattern === "rings" ? 103 : 154)) canvas.dataset.planet = key;
+      }
+
       function visualHash(x, y, z, seed) {
         let n = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^
           Math.imul(z, 2147483647) ^ seed;
@@ -20966,9 +21174,46 @@
           renderAssets.sky = job.image; renderAssets.skyJob = null;
         }
       }
+      const earthAlbedo = { requested: false, pixels: null, width: 1024, height: 512 };
+      function requestEarthAlbedo() {
+        if (earthAlbedo.requested) return;
+        earthAlbedo.requested = true;
+        const image = new Image(); image.decoding = "async";
+        image.onload = () => {
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = earthAlbedo.width; canvas.height = earthAlbedo.height;
+            const c = canvas.getContext("2d"); if (!c) return;
+            c.drawImage(image, 0, 0, canvas.width, canvas.height);
+            earthAlbedo.pixels = c.getImageData(0, 0, canvas.width, canvas.height).data;
+            canvas.width = canvas.height = 1;
+          } catch (error) { /* A failed texture must never interrupt flight. */ }
+        };
+        image.onerror = () => {};
+        image.src = "./assets/earth-albedo.webp";
+      }
+      function paintEarthTexel(data, i, nx, ny, nz, size, rr) {
+        const {pixels, width, height} = earthAlbedo,
+          longitude = Math.atan2(nx, nz), latitude = Math.asin(ny),
+          u = (longitude / TAU + 0.52) * (width - 1),
+          v = (latitude / Math.PI + 0.5) * (height - 1),
+          x = Math.floor(u), y = Math.floor(v), fx = u - x, fy = v - y,
+          limb = 0.45 + 0.55 * Math.pow(nz, 0.32);
+        for (let c = 0; c < 3; c++) {
+          const a = pixels[(y * width + x) * 4 + c],
+            b = pixels[(y * width + Math.min(width - 1, x + 1)) * 4 + c],
+            d = pixels[(Math.min(height - 1, y + 1) * width + x) * 4 + c],
+            e = pixels[(Math.min(height - 1, y + 1) * width + Math.min(width - 1, x + 1)) * 4 + c];
+          data[i + c] = ((a * (1 - fx) + b * fx) * (1 - fy) + (d * (1 - fx) + e * fx) * fy) * limb;
+        }
+        data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
+      }
+
       function surfaceTexture(b, size) {
+        if (b.name === "Earth") requestEarthAlbedo();
+        const mappedEarth = b.name === "Earth" && !!earthAlbedo.pixels;
         const seed = visualSeed(b.name + ":" + b.featureSeed),
-          key = [seed, b.pattern, b.color, b.atmosphere, size].join(":");
+          key = [seed, b.pattern, b.color, b.atmosphere, size, mappedEarth].join(":");
         if (renderAssets.surfaces.has(key)) {
           const image = renderAssets.surfaces.get(key);
           renderAssets.surfaces.delete(key); renderAssets.surfaces.set(key, image);
@@ -20985,6 +21230,10 @@
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
               rr = nx * nx + ny * ny;
             if (rr > 1) continue;
+            if (mappedEarth) {
+              paintEarthTexel(data, (y * size + x) * 4, nx, ny, Math.sqrt(1 - rr), size, rr);
+              continue;
+            }
             const nz = Math.sqrt(1 - rr),
               terrain = visualFbm(nx * 3 + 9, ny * 3 + 7, nz * 3 + 5, seed, 5),
               fine = visualNoise(nx * 70 + 80, ny * 70 + 80, nz * 70, seed + 97),
@@ -20993,15 +21242,16 @@
               relief = gas ? b.pattern === "storm" ? 0.58 + terrain * 0.5 :
                 0.65 + bands * (b.name === "Uranus" ? 0.13 : 0.28) + terrain * 0.15 :
                 0.5 + terrain * 0.65 + fine * 0.08,
-              cloud = b.atmosphere && !gas ? Math.pow(Math.max(0, visualFbm(nx * 5 + 20, ny * 4 + terrain, nz * 5, seed + 351, 3) - 0.52) * 3.3, 1.4) : 0,
+              cloud = b.atmosphere && !gas ? Math.pow(Math.max(0, visualFbm(nx * 7 + terrain * 2 + 20, ny * 3 + terrain, nz * 7, seed + 351, 3) - 0.48) * 3.8, 1.6) : 0,
               limb = 0.48 + 0.52 * Math.pow(nz, 0.35),
               i = (y * size + x) * 4;
             let rgb = [base.r * relief, base.g * relief, base.b * relief];
             if (ocean) {
               const land = Math.max(0, Math.min(1, (terrain - 0.5) * 60)),
-                coast = [21, 64 + terrain * 32, 110 + terrain * 65],
-                ground = [68 + terrain * 62, 88 + terrain * 75, 43 + terrain * 42];
-              rgb = coast.map((v, c) => v * (1 - land) + ground[c] * land);
+                coast = [10 + terrain * 12, 31 + terrain * 38, 60 + terrain * 70],
+                ground = terrain > 0.58 ? [122 + terrain * 44, 108 + terrain * 36, 75 + terrain * 30] : [45 + terrain * 52, 65 + terrain * 62, 29 + terrain * 40];
+              const glint = Math.pow(Math.max(0, nz * 0.88 - nx * 0.34 - ny * 0.3), 48) * (1 - land) * 72;
+              rgb = coast.map((v, c) => v * (1 - land) + ground[c] * land + glint);
               if (Math.abs(ny) > 0.87 + (terrain - 0.5) * 0.2) rgb = [213, 228, 232];
             }
             if (b.pattern === "craters") {
@@ -21200,6 +21450,7 @@
         // Distant galaxies remain subtle, luminous ellipses behind the local stars.
         ctx.save();
         ctx.globalCompositeOperation = "screen";
+        drawCinematicEnvironment();
         for (const galaxy of distantGalaxies) {
           ctx.save(); ctx.translate(galaxy.x, galaxy.y); ctx.rotate(galaxy.rot);
           ctx.scale(1, galaxy.ry / galaxy.rx);
@@ -21294,16 +21545,16 @@
         if (
           game.settings?.graphics === "Low" ||
           game.settings?.motion === "Reduced" ||
-          !game.ship
+          !game.ship || game.ship.orbitLocked
         )
           return;
         const speed = Math.hypot(game.ship.vx || 0, game.ship.vy || 0),
-          intensity = clamp((speed - 0.65) / 2.8, 0, 1);
+          intensity = game.ship.orbitLocked ? 0 : clamp((speed - 1.6) / 4.5, 0, 1);
         if (intensity <= 0.01) return;
         const angle = Math.atan2(game.ship.vy || 0, game.ship.vx || 0),
           dx = Math.cos(angle),
           dy = Math.sin(angle),
-          count = Math.min(stars.length, Math.round(18 + intensity * 42));
+          count = Math.min(stars.length, Math.round(8 + intensity * 20));
         ctx.save();
         ctx.globalCompositeOperation = "screen";
         ctx.lineCap = "round";
@@ -21312,7 +21563,7 @@
             x = (((s.x - game.ship.x * 0.022 * s.d) % W) + W) % W,
             y = (((s.y - game.ship.y * 0.022 * s.d) % H) + H) % H,
             len = (7 + s.d * 24) * intensity;
-          ctx.strokeStyle = rgba(s.h, (0.07 + s.a * 0.16) * intensity);
+          ctx.strokeStyle = rgba(s.h, (0.035 + s.a * 0.08) * intensity);
           ctx.lineWidth = Math.max(0.45, s.r * 0.7);
           ctx.beginPath();
           ctx.moveTo(x, y);
@@ -21323,21 +21574,10 @@
       }
       function drawOrbit(b) {
         if (!b.parent) return;
-        const p = screen(b.parent.x, b.parent.y),
-          rad = b.orbitRadius * zoom;
-        ctx.save();
-        ctx.strokeStyle = "rgba(125,211,252,.055)";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([8, 14]);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, rad, 0, TAU);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.strokeStyle = "rgba(255,255,255,.035)";
-        ctx.beginPath();
-        ctx.ellipse(p.x, p.y, rad, rad * 0.985, -0.08, 0, TAU);
-        ctx.stroke();
-        ctx.restore();
+        const p = screen(b.parent.x, b.parent.y), rad = b.orbitRadius * zoom,
+          focused = game.ship.lockBody === b.name || manualTargetName === b.name;
+        ctx.save(); ctx.strokeStyle = focused ? "rgba(183,218,221,.14)" : "rgba(183,218,221,.035)";
+        ctx.lineWidth = 0.7; ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, TAU); ctx.stroke(); ctx.restore();
       }
       function drawBody(b) {
         const p = screen(b.x, b.y),
@@ -21368,12 +21608,12 @@
         if (game.captured.has(b.name)) {
           ctx.save();
           ctx.globalCompositeOperation = "screen";
-          ctx.strokeStyle = "rgba(134,239,172,.72)";
+          ctx.strokeStyle = "rgba(145,211,191,.42)";
           ctx.lineWidth = 2;
           ctx.shadowColor = "rgba(134,239,172,.6)";
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 3;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, r + 6, 0, TAU);
+          ctx.arc(p.x, p.y, r + 6, 0.18, 0.78);
           ctx.stroke();
           ctx.restore();
           drawPlanetDevelopment(b, p, r);
@@ -21382,7 +21622,7 @@
           drawFactory(p, r);
         }
         if (known && r > 3) {
-          ctx.font = "700 12px Inter, system-ui";
+          ctx.font = "500 11px Inter, system-ui";
           ctx.textAlign = "center";
           ctx.fillStyle = "rgba(238,245,255,.92)";
           ctx.fillText(b.name, p.x, p.y - r - 10);
@@ -21390,53 +21630,11 @@
         ctx.restore();
       }
       function drawUnchartedBody(b, p, r) {
-        ctx.save();
-        const pulse = 0.72 + Math.sin(t * 0.045 + (b.featureSeed || 1)) * 0.18,
-          halo = ctx.createRadialGradient(p.x, p.y, r * 0.72, p.x, p.y, r * 2.7);
-        halo.addColorStop(0, "rgba(30,41,59,.26)");
-        halo.addColorStop(0.46, "rgba(100,116,139,.07)");
-        halo.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = halo;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 2.7, 0, TAU);
-        ctx.fill();
-        const shadow = ctx.createRadialGradient(
-          p.x - r * 0.28,
-          p.y - r * 0.3,
-          0,
-          p.x,
-          p.y,
-          r * 1.08,
-        );
-        shadow.addColorStop(0, "rgba(71,85,105,.58)");
-        shadow.addColorStop(0.28, "rgba(30,41,59,.78)");
-        shadow.addColorStop(0.72, "rgba(7,12,24,.96)");
-        shadow.addColorStop(1, "rgba(1,3,10,1)");
-        ctx.fillStyle = shadow;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, TAU);
-        ctx.fill();
-        ctx.save();
-        ctx.globalCompositeOperation = "screen";
-        ctx.strokeStyle = `rgba(148,163,184,${0.18 * pulse})`;
-        ctx.lineWidth = Math.max(1, r * 0.025);
-        ctx.setLineDash([Math.max(2, r * 0.12), Math.max(3, r * 0.18)]);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r + 7, t * 0.018, t * 0.018 + TAU * 0.78);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.strokeStyle = `rgba(125,211,252,${0.12 * pulse})`;
-        ctx.beginPath();
-        ctx.ellipse(p.x, p.y, r * 1.42, r * 0.34, -0.18, 0, TAU);
-        ctx.stroke();
-        ctx.restore();
+        drawPlanetBase(b, p, r); drawDetailedSurface(b, p, r); drawPlanetLighting(b, p, r);
         if (r > 7) {
-          ctx.font = "900 8px Inter, system-ui";
-          ctx.textAlign = "center";
-          ctx.fillStyle = `rgba(191,219,254,${0.42 + pulse * 0.18})`;
-          ctx.fillText("UNIDENTIFIED", p.x, p.y + r + 22);
+          ctx.save(); ctx.font = "500 9px Inter, system-ui"; ctx.textAlign = "center";
+          ctx.fillStyle = "rgba(187,207,213,.72)"; ctx.fillText("UNCHARTED", p.x, p.y + r + 19); ctx.restore();
         }
-        ctx.restore();
       }
       function drawStarBody(b, p, r) {
         ctx.save();
@@ -21574,143 +21772,37 @@
         }
         ctx.restore();
       }
-      function drawFactory(p, r) {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(t * 0.012);
-        ctx.strokeStyle = "rgba(125,211,252,.85)";
-        ctx.fillStyle = "rgba(14,165,233,.2)";
-        ctx.shadowColor = "rgba(125,211,252,.65)";
-        ctx.shadowBlur = Math.max(6, r * 0.18);
-        for (let i = 0; i < 3; i++) {
-          ctx.rotate(TAU / 3);
-          ctx.beginPath();
-          rr(ctx, r + 8, -4, 22, 8, 3);
-          ctx.fill();
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.arc(r + 31, 0, 2.5, 0, TAU);
-          ctx.fill();
-        }
-        ctx.shadowBlur = 0;
-        ctx.strokeStyle = "rgba(255,255,255,.22)";
-        ctx.beginPath();
-        ctx.arc(0, 0, r + 16, 0, TAU);
-        ctx.stroke();
+      function drawOrbitalStation(x, y, scale, angle) {
+        ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.scale(scale, scale);
+        ctx.fillStyle="#213543";ctx.fillRect(-14,-7,10,14);ctx.fillRect(4,-7,10,14);
+        ctx.strokeStyle="#7198a7";ctx.lineWidth=.65;ctx.strokeRect(-14,-7,10,14);ctx.strokeRect(4,-7,10,14);
+        ctx.fillStyle="#17222c";ctx.fillRect(-4,-3,8,6);
+        ctx.fillStyle="#c6d6db";ctx.fillRect(-2,-6,4,10);
+        ctx.fillStyle="#acdfe5";ctx.fillRect(-1,-7,2,2);
         ctx.restore();
+      }
+      function drawFactory(p, r) {
+        const angle = game.settings?.motion === "Reduced" ? -.8 : t * .003 - .8;
+        drawOrbitalStation(p.x+Math.cos(angle)*(r+19),p.y+Math.sin(angle)*(r+19),.6,angle);
       }
       function drawPlanetDevelopment(b, p, r) {
         if (!b || b.type === "star" || r < 5) return;
-        const lvl = Math.max(1, b.level || 1),
-          br = b.branches || defaultBranches(),
-          color = b.factory ? "#7dd3fc" : "#86efac",
-          spin = t * (0.012 + 0.002 * lvl);
-        ctx.save();
-        ctx.globalCompositeOperation = "screen";
-        ctx.strokeStyle = rgba(color, 0.18 + 0.035 * Math.min(4, lvl));
-        ctx.lineWidth = Math.max(1, r * 0.018);
-        if (lvl >= 1) {
-          ctx.beginPath();
-          ctx.arc(
-            p.x,
-            p.y,
-            r + 8 + Math.sin(t * 0.05) * 1.5,
-            spin,
-            spin + TAU * 0.72,
-          );
-          ctx.stroke();
-          ctx.fillStyle = rgba(color, 0.82);
-          const a = spin + TAU * 0.18;
-          ctx.beginPath();
-          ctx.arc(
-            p.x + Math.cos(a) * (r + 10),
-            p.y + Math.sin(a) * (r + 10),
-            Math.max(2, r * 0.045),
-            0,
-            TAU,
-          );
-          ctx.fill();
-        }
-        if (lvl >= 2) {
-          for (let i = 0; i < Math.min(7, 3 + lvl); i++) {
-            const a = (i * TAU) / (3 + lvl) + spin * 0.7,
-              rrr = r * (0.42 + 0.08 * (i % 3)),
-              x = p.x + Math.cos(a) * rrr,
-              y = p.y + Math.sin(a) * rrr;
-            ctx.fillStyle = i % 2 ? rgba("#fde68a", 0.36) : rgba(color, 0.34);
-            ctx.beginPath();
-            ctx.arc(x, y, Math.max(1.2, r * 0.025), 0, TAU);
-            ctx.fill();
-            ctx.strokeStyle = rgba(color, 0.12);
-            ctx.beginPath();
-            ctx.moveTo(
-              p.x + Math.cos(a) * r * 0.18,
-              p.y + Math.sin(a) * r * 0.18,
-            );
-            ctx.lineTo(x, y);
-            ctx.stroke();
-          }
-        }
-        if (lvl >= 3) {
-          ctx.strokeStyle = rgba("#fde68a", 0.28);
-          ctx.lineWidth = Math.max(1, r * 0.012);
-          for (let i = 0; i < 3; i++) {
-            ctx.beginPath();
-            ctx.ellipse(
-              p.x,
-              p.y,
-              r * (0.62 + i * 0.12),
-              r * (0.18 + i * 0.03),
-              spin + i * 0.55,
-              0,
-              TAU,
-            );
-            ctx.stroke();
-          }
-          const sats = Math.min(4, 1 + Math.floor(lvl / 2) + br.station);
-          for (let i = 0; i < sats; i++) {
-            const a = spin * (1 + i * 0.08) + (i * TAU) / sats,
-              rrr = r + 18 + i * 5;
-            ctx.fillStyle = rgba("#e0f2fe", 0.72);
-            ctx.beginPath();
-            rr(
-              ctx,
-              p.x + Math.cos(a) * rrr - 3,
-              p.y + Math.sin(a) * rrr - 2,
-              6,
-              4,
-              1.5,
-            );
-            ctx.fill();
-            ctx.strokeStyle = rgba("#7dd3fc", 0.28);
-            ctx.stroke();
-          }
-        }
-        if (b.factory || lvl >= 4) {
-          ctx.strokeStyle = rgba("#7dd3fc", 0.46);
-          ctx.lineWidth = Math.max(1.2, r * 0.026);
-          ctx.beginPath();
-          ctx.ellipse(p.x, p.y, r * 1.42, r * 0.35, spin * 0.55, 0, TAU);
-          ctx.stroke();
-          ctx.strokeStyle = rgba("#fde68a", 0.22);
-          ctx.beginPath();
-          ctx.ellipse(p.x, p.y, r * 1.62, r * 0.42, spin * 0.55 + 0.08, 0, TAU);
-          ctx.stroke();
-          ctx.fillStyle = rgba("#7dd3fc", 0.28);
-          for (let i = 0; i < 5; i++) {
-            const a = spin * 0.7 + (i * TAU) / 5;
-            ctx.beginPath();
-            ctx.arc(
-              p.x + Math.cos(a) * r * 1.42,
-              p.y + Math.sin(a) * r * 0.35,
-              Math.max(1.8, r * 0.035),
-              0,
-              TAU,
-            );
-            ctx.fill();
-          }
+        const level=Math.max(1,b.level||1),seed=b.featureSeed||1,
+          star=game.system.bodies.find(body=>body.type==="star"),
+          angle=star?Math.atan2(star.y-b.y,star.x-b.x):-2.4;
+        ctx.save();ctx.globalCompositeOperation="screen";
+        // Settlements glow on the night side, rather than drawing wire cages over worlds.
+        for(let i=0;i<Math.min(24,level*5);i++) {
+          const a=rand(seed+i*31)*TAU, radius=r*(.18+rand(seed+i*47)*.65),
+            night=Math.max(0,-Math.cos(a-angle));
+          ctx.fillStyle=rgba("#eac993",night*.55);
+          ctx.beginPath();ctx.arc(p.x+Math.cos(a)*radius,p.y+Math.sin(a)*radius,Math.max(.55,r*.012),0,TAU);ctx.fill();
         }
         ctx.restore();
+        if(level>=3) {
+          const spin=game.settings?.motion==="Reduced"?1:t*.002;
+          drawOrbitalStation(p.x+Math.cos(spin)*(r+14),p.y+Math.sin(spin)*(r+14),.32,spin);
+        }
       }
       function drawRarityField(b, p, r) {
         if (!b || b.type === "star" || r < 4) return;
@@ -21739,18 +21831,16 @@
         ctx.restore();
       }
       function drawRarityDetails(b, p, r) {
-        if (b.type === "star" || r < 5) return;
-        ctx.save();
-        ctx.globalCompositeOperation = "screen";
-        const info = rarityInfo(b);
-        if (b.rarity === "Unusual" || b.rarity === "Rare") {
-          ctx.strokeStyle = rgba(info.color, b.rarity === "Rare" ? 0.13 : 0.07);
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, r + (b.rarity === "Rare" ? 7 : 4), 0, TAU);
-          ctx.stroke();
+        if (b.type === "star" || r < 5 || !["Exotic","Mythic"].includes(b.rarity)) return;
+        const info=rarityInfo(b),phase=game.settings?.motion==="Reduced"?0:t*.006;
+        ctx.save();ctx.globalCompositeOperation="screen";
+        const count=b.rarity==="Mythic"?7:4;
+        for(let i=0;i<count;i++) {
+          const a=i*2.4+phase, radius=r*(1.04+.08*Math.sin(i+phase)),
+            x=p.x+Math.cos(a)*radius,y=p.y+Math.sin(a)*radius,glow=ctx.createRadialGradient(x,y,0,x,y,r*.28);
+          glow.addColorStop(0,rgba(info.color,.14));glow.addColorStop(1,"rgba(0,0,0,0)");
+          ctx.fillStyle=glow;ctx.fillRect(x-r*.3,y-r*.3,r*.6,r*.6);
         }
-        if (b.rarity === "Exotic") drawExotic(b, p, r, info);
-        if (b.rarity === "Mythic") drawMythic(b, p, r, info);
         ctx.restore();
       }
       function drawExotic(b, p, r, info) {
@@ -22635,10 +22725,25 @@
             finish.addColorStop(0,"#a5cfdb");finish.addColorStop(0.16,"#4d8a9f");
             finish.addColorStop(0.4,"#17435b");finish.addColorStop(1,"#071725");
           } else {
-            finish.addColorStop(0,color);finish.addColorStop(0.12,color);
-            finish.addColorStop(0.42,color);finish.addColorStop(1,material==="vent"?"#050b11":"#263341");
+            finish.addColorStop(0,light(color,0.34));finish.addColorStop(0.12,color);
+            finish.addColorStop(0.32,light(color,0.08));finish.addColorStop(0.52,dark(color,0.12));finish.addColorStop(1,material==="vent"?"#050b11":"#263341");
           }
-          c.fillStyle=finish;c.fill();c.strokeStyle="rgba(4,10,17,.72)";c.lineWidth=0.45;c.stroke();
+          c.fillStyle=finish;c.fill();
+          // Fine plating, clipped to each actual hull section (cached, not per-frame).
+          if (material === "hull" || material === "trim") {
+            c.save(); c.clip();
+            const xs = points.map(p => p[0]), left = Math.min(...xs), right = Math.max(...xs);
+            c.strokeStyle = "rgba(1,6,12,.3)"; c.lineWidth = 0.28;
+            for (let row = top + 3; row < bottom; row += 5) {
+              c.beginPath(); c.moveTo(left, row); c.lineTo(right, row); c.stroke();
+              for (let col = left + 3 + (Math.round(row) % 2) * 4; col < right; col += 9) {
+                c.beginPath(); c.moveTo(col, row); c.lineTo(col, Math.min(bottom, row + 5)); c.stroke();
+                c.fillStyle = "rgba(232,243,241,.24)"; c.fillRect(col + .8, row + .8, .4, .4);
+              }
+            }
+            c.restore();
+          }
+          path(points,z);c.strokeStyle="rgba(4,10,17,.72)";c.lineWidth=0.45;c.stroke();
           if(material!=="vent"&&material!=="dark") {
             c.beginPath();
             for(let i=0;i<points.length;i++) {
@@ -23231,14 +23336,14 @@
         ctx.font = "900 12px Inter, system-ui";
         ctx.textAlign = "center";
         if (on) {
-          ctx.strokeStyle = rgba(color, 0.82);
-          ctx.setLineDash([6, 7]);
+          ctx.strokeStyle = rgba(color, 0.55);
+          ctx.setLineDash([]);
           ctx.beginPath();
-          ctx.arc(ts.x, ts.y, targetRad * zoom + 20 + pulse, 0, TAU);
+          for (let i=0;i<4;i++) { const a=i*Math.PI*.5+.15;ctx.moveTo(ts.x+Math.cos(a)*(targetRad*zoom+14),ts.y+Math.sin(a)*(targetRad*zoom+14));ctx.arc(ts.x,ts.y,targetRad*zoom+14,a,a+.22); }
           ctx.stroke();
           ctx.setLineDash([]);
           ctx.globalCompositeOperation = "screen";
-          ctx.fillStyle = rgba(color, 0.1);
+          ctx.fillStyle = rgba(color, 0.018);
           ctx.beginPath();
           ctx.arc(ts.x, ts.y, targetRad * zoom + 36 + pulse * 1.5, 0, TAU);
           ctx.fill();
@@ -23271,10 +23376,10 @@
           ctx.shadowColor = rgba(color, 0.6);
           ctx.shadowBlur = 14;
           ctx.beginPath();
-          ctx.moveTo(25, 0);
-          ctx.lineTo(-13, -15);
-          ctx.lineTo(-5, 0);
-          ctx.lineTo(-13, 15);
+          ctx.moveTo(12, 0);
+          ctx.lineTo(-7, -7);
+          ctx.lineTo(-3, 0);
+          ctx.lineTo(-7, 7);
           ctx.closePath();
           ctx.fill();
           ctx.shadowBlur = 0;
@@ -23302,7 +23407,7 @@
       }
       function drawTargetPill(x, y, name, d, color) {
         ctx.save();
-        ctx.font = "900 10px Inter, system-ui";
+        ctx.font = "500 10px Inter, system-ui";
         let label = name;
         const suffix = " • " + d + " km";
         while (label.length > 4 && ctx.measureText(label + suffix).width > 160)
@@ -23431,109 +23536,28 @@
       }
       function drawParallelBackdrop() {
         if (game.system?.specialType !== "parallel") return;
-        ctx.save();
-        ctx.globalCompositeOperation = "screen";
-        const g = ctx.createRadialGradient(
-          W * 0.5,
-          H * 0.5,
-          0,
-          W * 0.5,
-          H * 0.5,
-          Math.max(W, H) * 0.86,
-        );
-        g.addColorStop(0, "rgba(255,43,214,.16)");
-        g.addColorStop(0.26, "rgba(0,245,255,.09)");
-        g.addColorStop(0.52, "rgba(168,85,247,.08)");
-        g.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, W, H);
-        ctx.save();
-        ctx.translate(W * 0.5, H * 0.5);
-        ctx.rotate(-0.12 + Math.sin((game.settings?.motion === "Reduced" ? 0 : t) * 0.003) * 0.035);
-        const band = ctx.createLinearGradient(0, -H * 0.18, 0, H * 0.18);
-        band.addColorStop(0, "rgba(0,0,0,0)");
-        band.addColorStop(0.46, "rgba(0,0,0,.35)");
-        band.addColorStop(0.5, "rgba(255,43,214,.12)");
-        band.addColorStop(0.54, "rgba(0,0,0,.42)");
-        band.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = band;
-        ctx.fillRect(-W, -H * 0.22, W * 2, H * 0.44);
-        ctx.restore();
-
-        for (let i = 0; i < 34; i++) {
-          const x = (Math.sin(i * 41.7 + (game.settings?.motion === "Reduced" ? 0 : t) * 0.018) * 0.5 + 0.5) * W,
-            y = (Math.cos(i * 27.3 - (game.settings?.motion === "Reduced" ? 0 : t) * 0.014) * 0.5 + 0.5) * H;
-          ctx.fillStyle =
-            i % 2 ? "rgba(255,43,214,.18)" : "rgba(0,245,255,.16)";
-          ctx.beginPath();
-          ctx.rect(x - 2, y - 2, 4, 4);
-          ctx.fill();
-        }
-        for (let i = 0; i < 4; i++) {
-          ctx.strokeStyle = i % 2 ? "rgba(255,43,214,.24)" : "rgba(0,245,255,.22)";
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          for (let j = 0; j < 10; j++) {
-            const x = W * (0.04 + j * 0.105),
-              y = H * (0.18 + i * 0.2) + Math.sin(j * 4.2 + i * 1.7 + (game.settings?.motion === "Reduced" ? 0 : t) * 0.01) * 28;
-            if (!j) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-        }
-        ctx.restore();
+        drawRealmLight("#ac9eda", "#668cae", 0.035);
       }
       function drawCosmicSpiritBackdrop() {
         if (game.system?.specialType !== "cosmicSpirit") return;
-        ctx.save();
-        ctx.globalCompositeOperation = "screen";
-        const center = ctx.createRadialGradient(
-          W * 0.52,
-          H * 0.42,
-          0,
-          W * 0.52,
-          H * 0.42,
-          Math.max(W, H) * 0.78,
-        );
-        center.addColorStop(0, "rgba(248,250,252,.16)");
-        center.addColorStop(0.22, "rgba(217,249,157,.13)");
-        center.addColorStop(0.48, "rgba(254,249,195,.07)");
-        center.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = center;
-        ctx.fillRect(0, 0, W, H);
-        for (let i = 0; i < 7; i++) {
-          const x = W * (0.12 + i * 0.14) + Math.sin((game.settings?.motion === "Reduced" ? 0 : t) * 0.01 + i) * 28,
-            y =
-              H * (0.18 + ((i * 37) % 60) / 100) + Math.cos((game.settings?.motion === "Reduced" ? 0 : t) * 0.008 + i) * 20,
-            rx = W * (0.18 + 0.035 * (i % 3)),
-            ry = H * (0.08 + 0.022 * (i % 4));
-          const g = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(rx, ry));
-          g.addColorStop(
-            0,
-            i % 2 ? "rgba(217,249,157,.15)" : "rgba(248,250,252,.13)",
-          );
-          g.addColorStop(
-            0.42,
-            i % 3 ? "rgba(254,249,195,.055)" : "rgba(217,249,157,.065)",
-          );
-          g.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.save();
-          ctx.translate(x, y);
-          ctx.rotate(Math.sin((game.settings?.motion === "Reduced" ? 0 : t) * 0.004 + i) * 0.18);
-          ctx.fillStyle = g;
-          ctx.beginPath();
-          ctx.ellipse(0, 0, rx, ry, 0, 0, TAU);
-          ctx.fill();
-          ctx.restore();
+        drawRealmLight("#cdddb7", "#d9b97a", 0.045);
+      }
+      function drawRealmLight(color, secondary, strength) {
+        ctx.save(); ctx.globalCompositeOperation = "screen";
+        const reduced = game.settings?.motion === "Reduced", phase = reduced ? 0 : t * 0.003;
+        for (let i = 0; i < 3; i++) {
+          const x = W * (0.16 + i * 0.38), y = H * (0.12 + Math.sin(phase + i * 2) * 0.025), r = Math.max(W, H) * 0.48;
+          const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+          g.addColorStop(0, rgba(i % 2 ? secondary : color, strength)); g.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = g; ctx.fillRect(x-r, y-r, r*2, r*2);
         }
-        ctx.strokeStyle = "rgba(254,249,195,.12)";
-        ctx.lineWidth = 1;
-
         ctx.restore();
       }
       function draw() {
         renderAssets.builds = 0;
-        advanceSkyBuild();
+        if (cinematicArt.images.get(cinematicArtKind())?.ready) renderAssets.skyJob = null;
+        else advanceSkyBuild();
+        renderDiscoveryPortrait();
         if (titleOpen) { drawBackdrop(); drawTitleShowcase(); return; }
         ctx.imageSmoothingEnabled = game.settings?.graphics !== "Low";
         ctx.imageSmoothingQuality =
@@ -23949,187 +23973,24 @@
         ctx.restore();
       }
       function drawTitleMobileBackdrop(c, w, h) {
-        const bg = c.createLinearGradient(0, 0, 0, h);
-        bg.addColorStop(0, "#101b46");
-        bg.addColorStop(0.42, "#071026");
-        bg.addColorStop(1, "#020617");
-        c.fillStyle = bg;
-        c.fillRect(0, 0, w, h);
-        c.save();
-        c.globalCompositeOperation = "screen";
-        const neb = c.createRadialGradient(
-          w * 0.5,
-          h * 0.28,
-          0,
-          w * 0.5,
-          h * 0.28,
-          w * 0.55,
-        );
-        neb.addColorStop(0, "rgba(125,211,252,.16)");
-        neb.addColorStop(0.38, "rgba(167,139,250,.06)");
-        neb.addColorStop(1, "rgba(0,0,0,0)");
-        c.fillStyle = neb;
-        c.beginPath();
-        c.arc(w * 0.5, h * 0.28, w * 0.55, 0, TAU);
-        c.fill();
-        const gold = c.createRadialGradient(
-          w * 0.52,
-          h * 0.72,
-          0,
-          w * 0.52,
-          h * 0.72,
-          w * 0.48,
-        );
-        gold.addColorStop(0, "rgba(245,158,11,.11)");
-        gold.addColorStop(0.42, "rgba(253,230,138,.035)");
-        gold.addColorStop(1, "rgba(0,0,0,0)");
-        c.fillStyle = gold;
-        c.beginPath();
-        c.arc(w * 0.52, h * 0.72, w * 0.48, 0, TAU);
-        c.fill();
-        for (let i = 0; i < 86; i++) {
-          const x = (i * 61 + t * 0.55) % w,
-            y = (Math.sin(i * 10.43) * 0.5 + 0.5) * h,
-            r = i % 11 === 0 ? 1.25 : i % 5 === 0 ? 0.85 : 0.45;
-          c.fillStyle =
-            i % 9 === 0
-              ? "rgba(253,230,138,.32)"
-              : i % 7 === 0
-                ? "rgba(125,211,252,.34)"
-                : "rgba(255,255,255,.22)";
-          c.beginPath();
-          c.arc(x, y, r, 0, TAU);
-          c.fill();
+        c.fillStyle = "#030a12"; c.fillRect(0, 0, w, h);
+        const image = environmentImage("deep");
+        if (image) {
+          const scale = Math.max(w / image.width, h / image.height);
+          c.drawImage(image, (w-image.width*scale)*0.42, (h-image.height*scale)*0.25, image.width*scale, image.height*scale);
         }
-        c.restore();
       }
       function drawTitleMobilePlanet(c, w, h) {
-        const x = w * 0.5,
-          y = h * 0.78,
-          r = Math.min(w * 0.52, h * 0.34);
-        c.save();
-        const halo = c.createRadialGradient(x, y, r * 0.4, x, y, r * 1.25);
-        halo.addColorStop(0, "rgba(125,211,252,.06)");
-        halo.addColorStop(0.65, "rgba(245,158,11,.045)");
-        halo.addColorStop(1, "rgba(0,0,0,0)");
-        c.fillStyle = halo;
-        c.beginPath();
-        c.arc(x, y, r * 1.25, 0, TAU);
-        c.fill();
-        const g = c.createRadialGradient(
-          x - r * 0.36,
-          y - r * 0.5,
-          r * 0.08,
-          x,
-          y,
-          r * 1.1,
-        );
-        g.addColorStop(0, "#fef3c7");
-        g.addColorStop(0.34, "#92400e");
-        g.addColorStop(0.7, "#1e1b4b");
-        g.addColorStop(1, "#020617");
-        c.fillStyle = g;
-        c.beginPath();
-        c.arc(x, y, r, Math.PI, TAU);
-        c.lineTo(x + r, y + r);
-        c.lineTo(x - r, y + r);
-        c.closePath();
-        c.fill();
-        c.globalCompositeOperation = "screen";
-        c.strokeStyle = "rgba(253,230,138,.18)";
-        c.lineWidth = 1.2;
-        for (let i = 0; i < 3; i++) {
-          c.beginPath();
-          c.ellipse(
-            x,
-            y - r * 0.08,
-            r * (0.76 + i * 0.13),
-            r * (0.16 + i * 0.035),
-            -0.08,
-            Math.PI * 0.08,
-            Math.PI * 0.92,
-          );
-          c.stroke();
-        }
-        c.restore();
+        const earth = game.system.bodies.find(b => b.name === "Earth") ||
+          {name:"Earth",featureSeed:1,pattern:"continents",color:"#3989ac",atmosphere:true};
+        paintPlanetPortrait(c, earth, w * 0.74, h * 0.93, Math.min(w * 0.57, h * 0.5));
       }
       function drawTitleMobileHeroShip(c, w, h, shipSkin) {
-        c.save();
-        const glow = c.createRadialGradient(
-          w * 0.5,
-          h * 0.36,
-          0,
-          w * 0.5,
-          h * 0.36,
-          w * 0.33,
-        );
-        glow.addColorStop(0, "rgba(253,230,138,.18)");
-        glow.addColorStop(0.42, "rgba(125,211,252,.07)");
-        glow.addColorStop(1, "rgba(0,0,0,0)");
-        c.fillStyle = glow;
-        c.beginPath();
-        c.arc(w * 0.5, h * 0.36, w * 0.33, 0, TAU);
-        c.fill();
-        c.save();
-        c.globalCompositeOperation = "screen";
-        const trail = c.createLinearGradient(
-          w * 0.5,
-          h * 0.66,
-          w * 0.5,
-          h * 0.39,
-        );
-        trail.addColorStop(0, "rgba(0,0,0,0)");
-        trail.addColorStop(0.35, "rgba(125,211,252,.06)");
-        trail.addColorStop(0.72, "rgba(245,158,11,.16)");
-        trail.addColorStop(1, "rgba(253,230,138,.32)");
-        c.strokeStyle = trail;
-        c.lineWidth = Math.max(7, w * 0.018);
-        c.lineCap = "round";
-        c.beginPath();
-        c.moveTo(w * 0.5, h * 0.66);
-        c.quadraticCurveTo(w * 0.48, h * 0.52, w * 0.5, h * 0.39);
-        c.stroke();
-        c.strokeStyle = "rgba(253,230,138,.12)";
-        c.lineWidth = 1.2;
-        for (let i = -2; i <= 2; i++) {
-          c.beginPath();
-          c.moveTo(w * (0.5 + i * 0.026), h * 0.62);
-          c.quadraticCurveTo(
-            w * (0.49 + i * 0.012),
-            h * 0.52,
-            w * (0.5 + i * 0.006),
-            h * 0.42,
-          );
-          c.stroke();
-        }
-        c.restore();
-        const ss = clamp(w / 500, 0.9, 1.35);
-        c.save();
-        c.translate(w * 0.5, h * 0.35 + Math.sin(t * 0.016) * 2.5);
-        c.rotate(-Math.PI / 2);
-        c.shadowColor = "rgba(0,0,0,.9)";
-        c.shadowBlur = 18;
-        drawShipVisual(c, ss, shipSkin, true);
-        drawStarshipSeparationDetails(c, ss, shipSkin);
-        c.restore();
-        c.save();
-        c.globalCompositeOperation = "screen";
-        c.strokeStyle = "rgba(125,211,252,.18)";
-        c.lineWidth = 1;
-        for (let i = 0; i < 2; i++) {
-          c.beginPath();
-          c.ellipse(
-            w * 0.5,
-            h * 0.38,
-            w * (0.16 + i * 0.04),
-            h * (0.035 + i * 0.008),
-            0,
-            0,
-            TAU,
-          );
-          c.stroke();
-        }
-        c.restore();
+        const scale = clamp(Math.min(w / 400, h / 340), 0.55, 1.3);
+        c.save(); c.translate(w * 0.48, h * 0.42); c.rotate(-0.42);
+        drawFrigateVisual(c, scale * 0.68, frigateSkins[0]);
+        c.save(); c.translate(40*scale, 90*scale); drawShipVisual(c, scale * 1.15, shipSkin, true); c.restore();
+        c.save(); c.translate(-115*scale, -64*scale); drawFleetShipVisual(c, scale, {type:"scout"}, fleetSkin(), 0.3); c.restore();
         c.restore();
       }
       function drawTitleMobileForeground(c, w, h) {
@@ -24912,7 +24773,7 @@
         ok(
           "Save schema is current",
           SAVE_VERSION === 20 &&
-            APP_VERSION === "0.25.2" &&
+            APP_VERSION === "0.26.0" &&
             SAVE_KEY === "orbital-drift-save-v12" &&
             !!SAVE_BACKUP_KEY,
         );

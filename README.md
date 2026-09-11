@@ -20,6 +20,17 @@ npm test
 
 The test command runs static validation plus a functional release-readiness harness against the real game script. It covers all six first-upgrade tutorial paths, the fixed Sol start, Pioneer construction and rendezvous, repeat-safe Expedition Arcs, customizable crew progression, living-system events, major threats, non-linear multi-jump routes, fleet departure/return choreography, save migration and backup recovery, cosmetic equipping, responsive UI invariants, audio lifecycle hooks, and offline-app assets. The game also contains a browser-level `runTests()` suite used during release QA.
 
+## v0.26.0 cinematic universe
+
+- Three original compressed environment paintings: deep-space nebulae, Parallel gravitational rifts, and Cosmic Spirit gold/jade clouds. Seeded grading and mirrored framing vary ordinary systems; bounded parallax adds depth.
+- A detailed Earth albedo map projected onto the sphere, richer generated-world oceans/clouds, actual planet portraits in survey results, luminous settlement lights, and physical orbital stations.
+- Refined hull plating and material highlights for ships and previews; a Pioneer-and-Starling title composition above Earth.
+- A unified dark cockpit interface with quieter cards, clear controls, restrained borders, and fewer decorative orbital lines.
+- Fixed nested RGB color conversion that previously rendered some atmospheric highlights and rings black.
+- Asynchronous art loading with a procedural fallback, two-image environment retention, one bounded graded viewport raster, cached planet surfaces, Reduced Motion support, and offline precaching.
+
+Save schema remains version 20. Native Canvas visual review and automated tests cover this update; phone/browser layout and device-performance testing remain release gates. Art provenance is in `assets/ART_DIRECTION.md`.
+
 ## v0.25.2 travel and rendering cleanup
 
 - Preserve each system's pending signal, including its assigned encounter, across travel and saves. Previously the scan archive protected resolved mysteries, but an unscanned signal could change as other encounters were completed.

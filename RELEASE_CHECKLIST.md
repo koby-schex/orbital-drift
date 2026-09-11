@@ -1,5 +1,13 @@
 # Orbital Drift release checklist
 
+## v0.26.0 cinematic universe
+
+- [x] Native Canvas review of flight, all Starling/Pioneer skins, Sol planets, title composition, Parallel/Cosmic Spirit realms, and a 390 × 844 viewport.
+- [x] Image-load failure fallback, two-environment retention, callback eviction, viewport raster reuse and quality caps.
+- [x] Composed RGB lighting, Earth spherical mapping, texture headers and offline inclusion.
+- [x] Existing gameplay, save, menu/pause, rescue, cosmetics, and offline regression checks.
+- [ ] Browser CSS/layout review and iPhone/Android performance playtest of the deployed update. Native rendering is not a browser or physical-device performance measurement.
+
 ## v0.25.2 travel and rendering cleanup
 
 - [x] Pending signals retain their encounter identity across visits; completed signals remain resolved after travel and save/load.
