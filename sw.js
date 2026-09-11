@@ -1,8 +1,12 @@
-const CACHE_NAME = "orbital-drift-v0.25.2";
+const CACHE_NAME = "orbital-drift-v0.26.0";
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./assets/deep-field.webp",
+  "./assets/earth-albedo.webp",
+  "./assets/parallel-rift.webp",
+  "./assets/spirit-nebula.webp",
   "./assets/orbital-drift-icon.svg",
   "./assets/orbital-drift-icon-192.png",
   "./assets/orbital-drift-icon-512.png",
