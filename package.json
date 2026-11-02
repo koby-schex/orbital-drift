@@ -8,6 +8,13 @@
     "test:static": "node tests/static-smoke.mjs",
     "test:release": "node tests/release-readiness.mjs",
     "build:mobile": "node scripts/build-mobile.mjs",
-    "test:mobile": "node tests/mobile-package.mjs"
+    "test:mobile": "node tests/mobile-package.mjs",
+    "ios:sync": "npm run build:mobile && cap sync ios",
+    "test:ios": "node tests/ios-wrapper.mjs"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/ios": "8.6.0"
   }
 }
