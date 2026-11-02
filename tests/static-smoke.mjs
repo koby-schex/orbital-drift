@@ -124,14 +124,14 @@ assert.ok(
   "Legacy runtime patch global must stay removed",
 );
 
-const overlayRules = markup.match(/\\.overlay \\{([^}]+)\\}/)?.[1];
-const dialogRules = markup.match(/\\.dialog \\{([^}]+)\\}/)?.[1];
+const overlayRules = markup.match(/\.overlay \{([^}]+)\}/)?.[1];
+const dialogRules = markup.match(/\.dialog \{([^}]+)\}/)?.[1];
 assert.ok(overlayRules && dialogRules, "Dialog and overlay styles must exist");
-assert.match(overlayRules, /padding:\\s*calc\\(15px \\+ var\\(--safeTop\\)\\).*calc\\(15px \\+ var\\(--safeBottom\\)\\)/,
+assert.match(overlayRules, /padding:\s*calc\(15px \+ var\(--safeTop\)\).*calc\(15px \+ var\(--safeBottom\)\)/,
   "iOS overlays must reserve space for the notch and home indicator");
-assert.match(dialogRules, /max-height:\\s*100%/,
+assert.match(dialogRules, /max-height:\s*100%/,
   "Dialog height must fit within the safe-area-constrained overlay");
-assert.match(dialogRules, /-webkit-overflow-scrolling:\\s*touch/,
+assert.match(dialogRules, /-webkit-overflow-scrolling:\s*touch/,
   "Long dialogs must scroll smoothly on iOS");
 
 console.log(
