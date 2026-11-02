@@ -25378,11 +25378,25 @@
         );
       }
       function completePurchase(productId, tx = {}, opts = {}) {
+        // Only verified transactions can grant paid cosmetics or remove ads.
+        // The complimentary Web Edition is the sole deliberate exception.
+        const isWebClaim = tx?.environment === "web-placeholder" &&
+          !game.monetization?.storeKitReady &&
+          window.Capacitor?.isNativePlatform?.() !== true &&
+          !["ios", "android"].includes(window.Capacitor?.getPlatform?.());
+        const verified = tx?.verified === true &&
+          tx?.completed !== false && tx?.cancelled !== true &&
+          (!tx?.productId || tx.productId === productId) &&
+          (isWebClaim || tx?.environment !== "web-placeholder");
+        if (!verified) {
+          toast("Purchase was not verified. No item was unlocked.");
+          return false;
+        }
         game.monetization = restoreMonetization(game.monetization);
         const record = {
           productId,
           transactionId: tx.transactionId || tx.id || "tx-" + Date.now(),
-          verified: tx.verified !== false,
+          verified: true,
           date: Date.now(),
           environment: tx.environment || "native",
         };
@@ -25404,6 +25418,7 @@
         );
         saveGame(false);
         renderMenu();
+        return true;
       }
       function syncPurchasesFromHistory() {
         game.monetization = restoreMonetization(game.monetization);
@@ -25446,8 +25461,10 @@
           game.monetization = restoreMonetization(game.monetization);
           let count = 0;
           (Array.isArray(list) ? list : []).forEach((tx) => {
-            const productId = tx.productId || tx.id;
-            if (!productId) return;
+            const productId = tx?.productId;
+            if (!productId || !productById[productId] ||
+              tx.verified !== true || tx.completed === false || tx.cancelled === true)
+              return;
             game.monetization.purchaseHistory =
               game.monetization.purchaseHistory.filter(
                 (p) => p.productId !== productId,
@@ -25456,7 +25473,7 @@
               productId,
               transactionId:
                 tx.transactionId || tx.id || "restore-" + Date.now(),
-              verified: tx.verified !== false,
+              verified: true,
               date: Date.now(),
               environment: "restore",
             });
