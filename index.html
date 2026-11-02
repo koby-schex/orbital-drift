@@ -25252,15 +25252,17 @@
       function updateAdManager() {
         hydrateMonetization();
         game.monetization = restoreMonetization(game.monetization);
+        // Capacitor's presence only proves that the shell exists. Native
+        // monetization is available only when the corresponding bridge is installed.
         game.monetization.storeKitReady = !!(
-          window.webkit?.messageHandlers?.storeKit ||
-          window.OrbitalDriftNative?.purchase ||
-          window.Capacitor
+          window.webkit?.messageHandlers?.storeKit?.postMessage ||
+          typeof window.OrbitalDriftNative?.purchase === "function" ||
+          typeof window.Capacitor?.Plugins?.OrbitalDriftStoreKit?.purchase === "function"
         );
         game.monetization.adMobReady = !!(
-          window.webkit?.messageHandlers?.adMob ||
-          window.OrbitalDriftNative?.ads ||
-          window.Capacitor
+          window.webkit?.messageHandlers?.adMob?.postMessage ||
+          typeof window.OrbitalDriftNative?.ads?.showRewarded === "function" ||
+          typeof window.Capacitor?.Plugins?.OrbitalDriftAdMob?.showRewarded === "function"
         );
       }
       function monetizationStatusText() {
@@ -25351,7 +25353,14 @@
             opts.onVerified({ productId, verified: true, restored: true });
           return toast(product.label + " is already owned.");
         }
+        // Do not silently grant simulated paid products inside an unsigned
+        // native shell that does not have StoreKit installed yet.
+        const nativeShell = window.Capacitor?.isNativePlatform?.() === true ||
+          window.Capacitor?.getPlatform?.() === "ios" ||
+          window.Capacitor?.getPlatform?.() === "android";
         const nativeStore = !!game.monetization?.storeKitReady;
+        if (nativeShell && !nativeStore)
+          return toast("Store purchases are unavailable in this build.");
         confirmAction(
           nativeStore ? "Confirm Purchase" : "Claim Web Edition Design?",
           nativeStore
