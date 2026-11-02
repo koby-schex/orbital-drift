@@ -52,17 +52,28 @@ self.addEventListener("fetch", (event) => {
     event.waitUntil(navigation.then(() => {}));
     return;
   }
+  // Only cache our own explicit app shell resources. Do not intercept third-party
+  // requests or future API endpoints, which may contain private or dynamic data.
+  const requestUrl = new URL(event.request.url);
+  const scope = self.registration.scope;
+  const isCoreAsset =
+    requestUrl.origin === new URL(scope).origin &&
+    CORE_ASSETS.some((asset) => new URL(asset, scope).pathname === requestUrl.pathname);
+  if (!isCoreAsset) return;
+
   event.respondWith(
-    caches.match(event.request).then(
-      (cached) =>
-        cached ||
-        fetch(event.request).then((response) => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          }
-          return response;
-        }),
-    ),
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const cached = await cache.match(event.request);
+      if (cached) return cached;
+      const response = await fetch(event.request);
+      if (response.ok) {
+        try {
+          await cache.put(event.request, response.clone());
+        } catch (error) {
+          // Storage quota/private-mode failures must not break online gameplay.
+        }
+      }
+      return response;
+    }),
   );
 });

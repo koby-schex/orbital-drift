@@ -1260,7 +1260,9 @@ for (const path of [
 ]) await access(new URL(path, root));
 const worker = await readFile(new URL("sw.js", root), "utf8");
 assert.doesNotThrow(() => new Function(worker), "Service worker must parse");
-assert.match(worker, /caches\.match/, "Service worker needs an offline fallback");
+assert.match(worker, /cache\.match\(event\.request\)/, "Service worker must serve cached app assets");
+assert.match(worker, /cache\.match\("\.\/index\.html"\)/, "Service worker needs an offline navigation fallback");
+assert.match(worker, /CORE_ASSETS\.some/, "Service worker must scope runtime cache interception to bundled game assets");
 
 console.log(
   `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, distinct spacecraft geometry, sprite budgets, all-skin preview fit, owned-fleet previews, title save protection, transactional imports, rescue reloads, input isolation, persistent sector signals, travel boundaries, title storage reads, render cadence, refresh-independent camera, audio lifecycle, and PWA assets.`,
