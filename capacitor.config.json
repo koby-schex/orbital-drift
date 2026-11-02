@@ -1,0 +1,9 @@
+{
+  "appId": "com.orbitaldrift.game",
+  "appName": "Orbital Drift",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "never",
+    "allowsLinkPreview": false
+  }
+}
