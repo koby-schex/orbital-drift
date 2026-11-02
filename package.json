@@ -6,6 +6,8 @@
   "scripts": {
     "test": "node tests/static-smoke.mjs && node tests/release-readiness.mjs && node tests/offline-recovery.mjs",
     "test:static": "node tests/static-smoke.mjs",
-    "test:release": "node tests/release-readiness.mjs"
+    "test:release": "node tests/release-readiness.mjs",
+    "build:mobile": "node scripts/build-mobile.mjs",
+    "test:mobile": "node tests/mobile-package.mjs"
   }
 }
