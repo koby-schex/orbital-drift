@@ -124,8 +124,10 @@ assert.ok(
   "Legacy runtime patch global must stay removed",
 );
 
-const overlayRules = markup.match(/\.overlay \{([^}]+)\}/)?.[1];
-const dialogRules = markup.match(/\.dialog \{([^}]+)\}/)?.[1];
+// Anchor to the beginning of the selector: nested selectors such as
+// ".pause-dialog .dialog" must not masquerade as the base dialog rule.
+const overlayRules = markup.match(/^      \.overlay \{([^}]+)\}/m)?.[1];
+const dialogRules = markup.match(/^      \.dialog \{([^}]+)\}/m)?.[1];
 assert.ok(overlayRules && dialogRules, "Dialog and overlay styles must exist");
 assert.match(overlayRules, /padding:\s*calc\(15px \+ var\(--safeTop\)\).*calc\(15px \+ var\(--safeBottom\)\)/,
   "iOS overlays must reserve space for the notch and home indicator");
