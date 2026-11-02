@@ -17,7 +17,8 @@ const cache = {
 };
 const current = source.match(/CACHE_NAME = "([^"]+)"/)[1];
 const context = {
-  self: {addEventListener:(type, cb)=>handlers.set(type,cb), skipWaiting(){}, clients:{claim(){}}},
+  self: {addEventListener:(type, cb)=>handlers.set(type,cb), skipWaiting(){}, clients:{claim(){}}, registration:{scope:'https://example.com/orbital-drift/'}},
+  URL,
   caches: {
     keys:async()=>['orbital-drift-v0.24.0', current, 'another-app-cache'],
     delete:async key=>deleted.push(key),
@@ -54,4 +55,37 @@ fetchResult = async()=>new Response('Unavailable',{status:503});
 assert.equal((await navigate()).status,503);
 fetchResult = async()=>{throw new Error('Offline')};
 assert.equal((await navigate()).type,'error','An uncached offline request must return a valid error Response');
+
+function assetRequest(url) {
+  let intercepted = false;
+  let task;
+  handlers.get('fetch')({
+    request: {method:'GET',mode:'cors',url},
+    respondWith(value) { intercepted = true; task = value; },
+  });
+  return {intercepted, task};
+}
+
+assert.equal(assetRequest('https://other.example/assets/deep-field.webp').intercepted, false,
+  'Third-party resources must not be intercepted or cached');
+assert.equal(assetRequest('https://example.com/orbital-drift/api/account').intercepted, false,
+  'Dynamic or private endpoints must not be intercepted or cached');
+assert.equal(assetRequest('https://example.com/another-app/assets/deep-field.webp').intercepted, false,
+  'Assets outside the service worker scope must not be cached');
+
+cached = null;
+refuseWrites = true;
+fetchResult = async () => new Response('Asset online', {status:200});
+let asset = assetRequest('https://example.com/orbital-drift/assets/deep-field.webp');
+assert.equal(asset.intercepted, true, 'Bundled game art should be served through the offline cache');
+assert.equal(await (await asset.task).text(), 'Asset online',
+  'A failed runtime asset cache write must not fail the online response');
+assert.equal(writes, 1, 'Failed cache writes must not be counted as successful');
+refuseWrites = false;
+asset = assetRequest('https://example.com/orbital-drift/assets/deep-field.webp');
+assert.equal(await (await asset.task).text(), 'Asset online');
+assert.equal(writes, 2, 'Successful runtime asset fetches must enter the cache');
+
+console.log('Runtime caching passed: no third-party/private resource interception, scoped asset caching, and quota-safe delivery.');
+
 console.log('Offline recovery passed: scoped cache cleanup, HTTP-error fallback, offline launch, cache refresh, and quota failure.');
