@@ -44,3 +44,25 @@ npm run test:mobile
 
 The mobile package test verifies asset completeness, byte fidelity, and exclusion of
 development files. It is **not** a native-device performance or App Store approval test.
+
+## Capacitor iOS project foundation
+The repository pins Capacitor 8.6.0 and `capacitor.config.json` uses the local
+`dist/` bundle, not a remote server. The Bundle ID `com.orbitaldrift.game` is
+**provisional** until a final Apple Developer Bundle ID has been confirmed.
+
+The manual GitHub Actions workflow **Generate iOS Xcode Project** builds the game,
+checks the tests, generates the native iOS project on macOS, and uploads an **unsigned
+Xcode source project** as an artifact. This is not a signed IPA, not an automatic
+TestFlight upload, and not a certified iOS build. Signing, app icon assets, native
+save/device tests, and any ad SDK configuration remain future release gates.
+
+To recreate the native wrapper in a configured macOS development environment:
+```sh
+npm install
+npm run build:mobile
+npx cap add ios
+npm run ios:sync
+npx cap open ios
+```
+
+Ads are not linked or requested by the wrapper; the game must remain playable offline.
