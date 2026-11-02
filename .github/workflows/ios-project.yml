@@ -1,0 +1,34 @@
+name: Generate iOS Xcode Project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios-project:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pinned Capacitor toolchain
+        run: npm install --no-package-lock
+      - name: Run gameplay and packaging validation
+        run: npm test
+      - name: Build bundled game
+        run: npm run build:mobile
+      - name: Generate native iOS project
+        run: |
+          npx cap add ios
+          npx cap sync ios
+      - name: Upload unsigned iOS source project
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbital-drift-ios-xcode-project
+          path: ios/
+          if-no-files-found: error
+          retention-days: 7
