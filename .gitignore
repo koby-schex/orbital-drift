@@ -1,2 +1,6 @@
 # Generated mobile web bundle; produce with npm run build:mobile
 dist/
+
+# Installed native toolchain and generated local Xcode workspace
+node_modules/
+ios/
