@@ -10654,6 +10654,7 @@
           saveDeletedUntilExplicitSave = false;
           refreshTitleButtons();
           renderMenu();
+          refreshNativeEntitlements();
           return true;
         } catch (e) {
           console.error(e);
@@ -25712,6 +25713,76 @@
           renderMenu();
         });
       }
+      let nativeEntitlementSyncPending = false;
+      function refreshNativeEntitlements() {
+        const plugin = window.Capacitor?.Plugins?.OrbitalDriftStoreKit;
+        if (typeof plugin?.currentEntitlements !== "function" ||
+            nativeEntitlementSyncPending) return Promise.resolve(false);
+        nativeEntitlementSyncPending = true;
+        return plugin.currentEntitlements().then((result) => {
+          // Only Apple's successful, verified current-entitlement snapshot may
+          // reconcile the local paid unlocks. Failure or missing bridge never
+          // revokes offline access.
+          if (!Array.isArray(result?.purchases)) return false;
+          const verified = new Map();
+          for (const tx of result.purchases) {
+            if (tx?.verified === true && tx.completed !== false &&
+                tx.cancelled !== true && tx.environment === "app-store" &&
+                productById[tx.productId] && tx.transactionId)
+              verified.set(tx.productId, tx);
+          }
+          game.monetization = restoreMonetization(game.monetization);
+          const previous = game.monetization.purchaseHistory || [];
+          const oldIds = previous.map((tx) => tx.productId).sort().join(",");
+          const newIds = [...verified.keys()].sort().join(",");
+          const previousTransactions = previous.map((tx) => tx.transactionId).sort().join(",");
+          const currentTransactions = [...verified.values()].map((tx) => tx.transactionId).sort().join(",");
+          if (oldIds === newIds && previousTransactions === currentTransactions) return true;
+          // This list is authoritative only for Apple products. Other
+          // platforms remain independent of Apple's entitlement snapshot.
+          const otherPurchases = previous.filter((tx) => !productById[tx.productId]);
+          game.monetization.purchaseHistory = otherPurchases.concat(
+            [...verified.values()].map((tx) => ({
+              productId: tx.productId,
+              transactionId: tx.transactionId,
+              verified: true,
+              environment: "app-store",
+              date: Date.now(),
+            })),
+          );
+          game.monetization.removeAds = verified.has(monetizationProducts.removeAds.id);
+          for (const [id, collection, key] of [
+            ["orbitaldrift.ship.solarflare", game.ownedShipSkins, "Solar Flare"],
+            ["orbitaldrift.frigate.abyss", game.ownedFrigateSkins, "Abyss"],
+            ["orbitaldrift.fleet.solarconvoy", game.ownedFleetSkins, "Solar Convoy"],
+            ["orbitaldrift.trail.solarribbon", game.ownedTrailSkins, "Solar Ribbon"],
+            ["orbitaldrift.trail.relicember", game.ownedTrailSkins, "Relic Ember"],
+            ["orbitaldrift.combo.ancienthunter", game.ownedShipSkins, "Ancient Hunter"],
+            ["orbitaldrift.combo.ancienthunter", game.ownedFrigateSkins, "Ancient Hunter"],
+          ]) {
+            if (verified.has(id)) collection?.add(key);
+            else collection?.delete(key);
+          }
+          syncPurchasesFromHistory();
+          persistMonetization();
+          if (hasActiveJourney) saveGame(false);
+          if (ui.menu?.classList.contains("open")) renderMenu();
+          return true;
+        }).catch(() => false).finally(() => {
+          nativeEntitlementSyncPending = false;
+        });
+      }
+      function registerNativePurchaseUpdates() {
+        const plugin = window.Capacitor?.Plugins?.OrbitalDriftStoreKit;
+        if (typeof plugin?.currentEntitlements !== "function") return;
+        // Refresh on initial native launch and after a pending StoreKit
+        // approval, renewal of restored entitlement, or refund.
+        refreshNativeEntitlements();
+        if (typeof plugin.addListener === "function")
+          plugin.addListener("entitlementsChanged", () => {
+            refreshNativeEntitlements();
+          }).catch(() => {});
+      }
       function nativeShowRewardedAd(rewardType) {
         return new Promise((resolve) => {
           try {
@@ -25914,8 +25985,13 @@
         )
           return card(
             "Ads & Purchases",
-            "Advertising is inactive in this build. If available, native Apple purchases can still be restored. Web Edition cosmetic claims are only complimentary in a browser.",
-            '<div class="grid"><div class="chip"><b>Advertisements</b><br>Inactive</div><div class="chip"><b>Payments</b><br>Inactive</div><div class="chip"><b>Game Progress</b><br>Fully available</div></div>',
+            "Advertising is inactive in this build. All progression remains available. Apple purchases can be restored when the native StoreKit bridge is installed.",
+            '<div class="grid"><div class="chip"><b>Advertisements</b><br>Inactive</div><div class="chip"><b>Payments</b><br>' +
+              (game.monetization?.storeKitReady ? "Apple Store" : "Inactive") +
+              '</div><div class="chip"><b>Game Progress</b><br>Fully available</div></div>' +
+              (window.Capacitor?.isNativePlatform?.() === true
+                ? '<div class="actions">' + btn("Restore Apple Purchases", "restorePurchases") + '</div>'
+                : ''),
           );
         return (
           '<div class="card"><h4>Ads & Purchases</h4><p>' +
@@ -26646,6 +26722,7 @@
       paused = true;
       if (DEV_BUILD) runTests();
       registerOfflineSupport();
+      registerNativePurchaseUpdates();
       requestAnimationFrame(loop);
     </script>
   </body>
