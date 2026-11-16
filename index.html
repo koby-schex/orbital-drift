@@ -20855,7 +20855,7 @@
       }
       function showMissionPanel(title, summary, rows = []) {
         if (!ui.missionOverlay) return;
-        maybeShowInterstitial("major_reward");
+        // Never interrupt a major reward or active flight with an advertisement.
         paused = true;
         modalFreeze = true;
         playSound("confirm");
@@ -25423,6 +25423,9 @@
         );
       }
       function canShowInterstitial(reason = "break") {
+        // Orbital Drift deliberately ships without automatic full-screen ads.
+        // The only ad experience is a player-initiated optional reward.
+        return false;
         game.monetization = restoreMonetization(game.monetization);
         if (!game.monetization.adMobReady || isRemoveAdsOwned()) return false;
         if (
@@ -25442,6 +25445,8 @@
         }
         return true;
       }
+      let adStatusPending = false;
+      let lastAdStatusAt = 0;
       function updateAdManager() {
         hydrateMonetization();
         game.monetization = restoreMonetization(game.monetization);
@@ -25452,16 +25457,35 @@
           typeof window.OrbitalDriftNative?.purchase === "function" ||
           typeof window.Capacitor?.Plugins?.OrbitalDriftStoreKit?.purchase === "function"
         );
-        game.monetization.adMobReady = !!(
+        const adPlugin = window.Capacitor?.Plugins?.OrbitalDriftAdMob;
+        const nativeAdStatus = typeof adPlugin?.status === "function";
+        game.monetization.adMobReady = nativeAdStatus ? !!game.monetization.adMobReady && !!game.monetization.adsInitialized : !!(
           window.webkit?.messageHandlers?.adMob?.postMessage ||
           typeof window.OrbitalDriftNative?.ads?.showRewarded === "function" ||
-          typeof window.Capacitor?.Plugins?.OrbitalDriftAdMob?.showRewarded === "function"
+          typeof adPlugin?.showRewarded === "function"
         );
+        if (nativeAdStatus && !adStatusPending && Date.now() - lastAdStatusAt > 30000) {
+          adStatusPending = true;
+          lastAdStatusAt = Date.now();
+          adPlugin.status().then((status) => {
+            const available = status?.available === true;
+            const changed = game.monetization.adMobReady !== available;
+            game.monetization.adMobReady = available;
+            game.monetization.adsInitialized = available;
+            game.monetization.privacyOptionsAvailable = status?.privacyOptionsRequired === true;
+            if (changed && ui.menu?.classList.contains("open")) renderMenu();
+          }).catch(() => {
+            game.monetization.adMobReady = false;
+            game.monetization.adsInitialized = false;
+          }).finally(() => { adStatusPending = false; });
+        }
       }
       function monetizationStatusText() {
         const m = restoreMonetization(game.monetization);
         if (!m.storeKitReady && !m.adMobReady)
-          return "Web Edition has no advertisements or payments. All progression remains available.";
+          return window.Capacitor?.isNativePlatform?.() === true
+            ? "Ads are inactive in this build. All progression remains available without them."
+            : "Web Edition has no advertisements or payments. All progression remains available.";
         return (
           (isRemoveAdsOwned()
             ? "Automatic ads removed permanently. "
@@ -25889,18 +25913,18 @@
           !game.monetization?.adMobReady
         )
           return card(
-            "Web Edition",
-            "This edition has no advertisements or payments. Complimentary Web Edition hull designs can be claimed from the Cosmetic Hangar.",
+            "Ads & Purchases",
+            "Advertising is inactive in this build. If available, native Apple purchases can still be restored. Web Edition cosmetic claims are only complimentary in a browser.",
             '<div class="grid"><div class="chip"><b>Advertisements</b><br>Inactive</div><div class="chip"><b>Payments</b><br>Inactive</div><div class="chip"><b>Game Progress</b><br>Fully available</div></div>',
           );
         return (
           '<div class="card"><h4>Ads & Purchases</h4><p>' +
           esc(monetizationStatusText()) +
           '</p><div class="grid"><div class="chip"><b>Remove Ads</b><br>' +
-          (isRemoveAdsOwned() ? "Owned" : "$2.99") +
+          (isRemoveAdsOwned() ? "Owned" : "Apple confirms price") +
           '</div><div class="chip"><b>Sponsored Rewards</b><br>Always optional</div><div class="chip"><b>Privacy</b><br>Manage your choices</div></div><div class="actions">' +
           btn(
-            isRemoveAdsOwned() ? "Ads Removed" : "Remove Ads Permanently $2.99",
+            isRemoveAdsOwned() ? "Ads Removed" : "Remove Ads Permanently",
             "removeAdsPermanent",
             null,
             !isRemoveAdsOwned(),
@@ -25911,7 +25935,15 @@
         );
       }
       function openPrivacyOptions() {
-        toast("Privacy choices are available whenever advertising is active.");
+        const plugin = window.Capacitor?.Plugins?.OrbitalDriftAdMob;
+        if (typeof plugin?.privacyOptions !== "function")
+          return toast("Advertising privacy options are unavailable in this build.");
+        plugin.privacyOptions().then((status) => {
+          game.monetization.adMobReady = status?.available === true;
+          game.monetization.adsInitialized = status?.available === true;
+          toast("Advertising privacy choices updated.");
+          renderMenu();
+        }).catch(() => toast("Privacy options are not available in this region or build."));
       }
       Object.assign(window, {
         setMenuTab,
