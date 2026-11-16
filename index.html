@@ -12341,15 +12341,25 @@
         updateIdentity(b);
       }
       function nearestLockTarget() {
-        const n = nearestBody(),
-          f = frigatePosition();
-        let best = n.body ? { body: n.body, d: n.d } : null;
-        if (f) {
-          const fd =
-            Math.hypot(game.ship.x - f.x, game.ship.y - f.y) - f.radius;
-          if (!best || fd < best.d) best = { body: f, d: fd };
-        }
-        return best || { body: null, d: Infinity };
+        if (!game.ship || !game.system) return { body: null, d: Infinity };
+        // The closest stellar body might be a star or outside lock range.
+        // Only eligible, reachable targets can win the LOCK action.
+        const candidates = [
+          ...game.system.bodies.filter((b) => b.type !== "star"),
+          frigatePosition(),
+        ].filter((b) => b && canOrbitLock(b));
+        const selected = candidates.find((b) => b.name === selectedPlanetName);
+        const target = selected || candidates.reduce((best, b) => {
+          const edge = Math.hypot(game.ship.x - b.x, game.ship.y - b.y) -
+            (b.type === "frigate" ? b.radius || 42 : visualRadius(b));
+          return !best || edge < best.d ? { body: b, d: edge } : best;
+        }, null)?.body;
+        if (!target) return { body: null, d: Infinity };
+        return {
+          body: target,
+          d: Math.hypot(game.ship.x - target.x, game.ship.y - target.y) -
+            (target.type === "frigate" ? target.radius || 42 : visualRadius(target)),
+        };
       }
       function toggleOrbit() {
         const s = game.ship;
@@ -12448,7 +12458,9 @@
           s.lockDirection *
           (0.014 + Math.min(0.014, s.lockCharge * 0.0021)) *
           dt;
-        const br = Math.sin(t * 0.08) * 2.5;
+        const br = pioneerRescue && s.lockBody === "__FRIGATE__"
+          ? 0
+          : Math.sin(t * 0.08) * 2.5;
         s.x = b.x + Math.cos(s.lockAngle) * (s.lockRadius + br);
         s.y = b.y + Math.sin(s.lockAngle) * (s.lockRadius + br);
         const ta = s.lockAngle + (Math.PI / 2) * s.lockDirection,
@@ -12550,7 +12562,7 @@
           s.fuel = Math.max(0, s.fuel - 0.035 * dt);
         }
         updateDrift(dt, cls);
-        if (!updateOrbit(dt)) {
+        if (!updateOrbit(dt) && !pioneerRescue) {
           gravity(dt);
           s.x += s.vx * dt;
           s.y += s.vy * dt;
@@ -14999,6 +15011,10 @@
           startY: home.y,
           lastX: home.x,
           lastY: home.y,
+          heading: home.heading,
+          // Park alongside the stranded ship rather than occupying its center.
+          targetX: game.ship.x - 118,
+          targetY: game.ship.y,
         };
         game.captainLog.rescueCount++;
         toast((game.frigate.name || "ODF Pioneer") + " received the fuel distress call and is breaking orbit.");
@@ -15013,17 +15029,17 @@
         if (rescue.phase === "outbound") {
           const q0 = clamp(rescue.time / rescue.duration, 0, 1),
             q = q0 * q0 * (3 - 2 * q0),
-            tx = s.x,
-            ty = s.y;
+            tx = rescue.targetX ?? (s.x - 118),
+            ty = rescue.targetY ?? s.y;
           rescue.x = rescue.startX + (tx - rescue.startX) * q;
           rescue.y = rescue.startY + (ty - rescue.startY) * q;
-          s.vx *= Math.pow(0.993, dt);
-          s.vy *= Math.pow(0.993, dt);
+          s.vx = 0;
+          s.vy = 0;
           if (q0 >= 1) {
             rescue.phase = "service";
             rescue.time = 0;
             rescue.duration = 82;
-            const a = Math.atan2(s.y - rescue.y, s.x - rescue.x) || Math.PI;
+            const a = Math.atan2(s.y - rescue.y, s.x - rescue.x);
             Object.assign(s, {
               orbitLocked: true,
               lockBody: "__FRIGATE__",
@@ -15060,8 +15076,17 @@
             return;
           }
         }
-        rescue.vx = (rescue.x - rescue.lastX) / Math.max(dt, 0.001);
-        rescue.vy = (rescue.y - rescue.lastY) / Math.max(dt, 0.001);
+        const dx = rescue.x - rescue.lastX,
+          dy = rescue.y - rescue.lastY;
+        rescue.vx = dx / Math.max(dt, 0.001);
+        rescue.vy = dy / Math.max(dt, 0.001);
+        // Near arrival velocity approaches zero; atan2(0, 0) otherwise
+        // snaps the Pioneer to a different orientation on every frame.
+        if (Math.hypot(dx, dy) > 0.01) {
+          const desired = Math.atan2(dy, dx);
+          rescue.heading = (rescue.heading ?? desired) +
+            angleDiff(desired, rescue.heading ?? desired) * clamp(dt * 0.09, 0, 1);
+        }
         rescue.lastX = rescue.x;
         rescue.lastY = rescue.y;
       }
@@ -16377,16 +16402,10 @@
           ui.menuContent.querySelector(".menu-quick-actions")
         )
           return;
-        const nba = nextBestAction(),
-          recommended = menuLabel(nba?.menu || "hub"),
-          note =
-            activeMenu === "hub"
-              ? "Choose a category or use Recommended to jump straight to the best current action."
-              : "Use Menu Home to switch categories, Recommended for the best current action, or Close to return to flight.";
+        // Keep navigation available without another explanatory card
+        // competing with the actual menu content on a narrow phone.
         const html =
-          '<div class="mobile-menu-note card section-intro"><p><b>Menu Tip:</b> ' +
-          esc(note) +
-          '</p></div><div class="menu-quick-actions"><button type="button" data-action="backToMainMenu" data-arg="" ' +
+          '<div class="menu-quick-actions"><button type="button" data-action="backToMainMenu" data-arg="" ' +
           (activeMenu === "hub" ? "disabled" : "") +
           '>Menu Home</button><button type="button" data-action="openRecommendedMenu" data-arg="">Recommended</button><button type="button" data-action="closeMenuAction" data-arg="">Close</button></div>';
         ui.menuContent.insertAdjacentHTML("beforeend", html);
@@ -16795,14 +16814,6 @@
                 esc(label(b.resource)) +
                 "</b><span>" +
                 esc(productionPreview(b)) +
-                " • Lv. " +
-                b.level +
-                " • " +
-                esc(
-                  (planetIdentities[b.identity || "Frontier"] || [
-                    "Frontier",
-                  ])[0],
-                ) +
                 "</span></div>",
             )
             .join("") ||
@@ -16830,9 +16841,7 @@
                 Math.round(game.resources[k] || 0) +
                 " " +
                 esc(v) +
-                "</b><span>" +
-                esc(resourceHint(k)) +
-                "</span></div>",
+                "</b></div>",
             )
             .join("") +
           "</div>";
@@ -22393,8 +22402,8 @@
           y: pioneerRescue.y,
           vx: pioneerRescue.vx || 0,
           vy: pioneerRescue.vy || 0,
-          heading: Math.atan2(pioneerRescue.vy || 0, pioneerRescue.vx || 0),
-          angle: Math.atan2(pioneerRescue.vy || 0, pioneerRescue.vx || 0),
+          heading: pioneerRescue.heading ?? home.heading,
+          angle: pioneerRescue.heading ?? home.heading,
           rescuePhase: pioneerRescue.phase,
         };
       }
