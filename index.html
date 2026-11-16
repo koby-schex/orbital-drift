@@ -10407,9 +10407,8 @@
           );
           game.ownedFleetSkins.add("Command Match");
           game.purchasedSkins = new Set(d.purchasedSkins || []);
-          ensureSkins();
-          if (!game.frigate.skin || !owns("frigate", game.frigate.skin))
-            game.frigate.skin = "Frigate Standard";
+          // Reconcile earned cosmetics only AFTER restoring the statistics,
+          // vault and achievements that establish their unlock conditions.
           game.contracts = Array.isArray(d.contracts) ? d.contracts : [];
           game.completedContracts = Number(d.completedContracts || 0);
           game.dailyOps = d.dailyOps || null;
@@ -10445,6 +10444,16 @@
             if (sys.blackHole && game.collapsedBlackHoles.has(sys.blackHole.id))
               sys.blackHole.collapsed = true;
           game.unlockedAchievements = new Set(d.unlockedAchievements || []);
+          refreshSkins(false);
+          // Keep the saved selection when it is owned; otherwise fall back to
+          // a guaranteed starter appearance instead of displaying a locked one.
+          if (!game.frigate.shipSkin || !owns("ship", game.frigate.shipSkin))
+            game.frigate.shipSkin = "High Tech";
+          if (!game.frigate.skin || !owns("frigate", game.frigate.skin))
+            game.frigate.skin = "Frigate Standard";
+          if (!ownsFleetSkin(game.fleet.skin))
+            game.fleet.skin = "Command Match";
+          game.frigate.fleetSkin = game.fleet.skin;
           unclaimedProduction = {
             ...blankResources(),
             ...(d.unclaimedProduction || {}),
