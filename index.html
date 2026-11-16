@@ -13235,9 +13235,14 @@
       }
       function scaleReward(reward, m = 1) {
         const out = {};
-        Object.entries(reward || {}).forEach(
-          ([k, v]) => (out[k] = Math.max(1, Math.round(v * m))),
-        );
+        const multiplier = Number.isFinite(Number(m)) ? Math.max(0, Number(m)) : 0;
+        Object.entries(reward || {}).forEach(([key, amount]) => {
+          const value = Number(amount);
+          // Zero-value entries are intentionally absent: scaling must not
+          // manufacture a resource reward that the source never granted.
+          if (!Number.isFinite(value) || value <= 0 || multiplier <= 0) return;
+          out[key] = Math.max(1, Math.round(value * multiplier));
+        });
         return out;
       }
       function makeDailyOps() {
