@@ -12152,13 +12152,14 @@
         let total = 0,
           parts = [];
         for (const [k, v] of Object.entries(unclaimedProduction)) {
-          if (v >= 0.5) {
-            const n = Math.floor(v);
-            game.resources[k] = (game.resources[k] || 0) + n;
-            unclaimedProduction[k] = v - n;
-            total += n;
-            parts.push(n + " " + label(k));
-          }
+          // Keep fractional production accumulated until a full unit exists.
+          // A fractional balance must not appear as a zero-unit collection.
+          if (!Number.isFinite(v) || v < 1) continue;
+          const n = Math.floor(v);
+          game.resources[k] = (game.resources[k] || 0) + n;
+          unclaimedProduction[k] = v - n;
+          total += n;
+          parts.push(n + " " + label(k));
         }
         if (!total) return toast("No planet production ready yet.");
         game.captainLog.productionClaimed += total;
@@ -16787,7 +16788,7 @@
           '<div class="prod"><b>No production network</b><span>Capture planets to start passive generation.</span></div>';
         const pending =
           Object.entries(unclaimedProduction)
-            .filter(([, v]) => v >= 0.5)
+            .filter(([, v]) => Number.isFinite(v) && v >= 1)
             .map(([k, v]) => Math.floor(v) + " " + label(k))
             .join(" • ") || "Nothing ready yet";
         ui.menuContent.innerHTML =
