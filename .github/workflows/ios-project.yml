@@ -2,6 +2,18 @@ name: Verify iOS Simulator Build
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/ios-project.yml
+      - scripts/smoke-ios-simulator.sh
+      - tests/ios-wrapper.mjs
+      - capacitor.config.json
+      - package.json
+      - index.html
+      - assets/**
+      - manifest.webmanifest
+      - sw.js
+      - scripts/build-mobile.mjs
   push:
     branches:
       - main
@@ -14,6 +26,7 @@ on:
       - manifest.webmanifest
       - sw.js
       - scripts/build-mobile.mjs
+      - scripts/smoke-ios-simulator.sh
 
 permissions:
   contents: read
@@ -21,7 +34,7 @@ permissions:
 jobs:
   ios-project:
     runs-on: macos-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -61,6 +74,16 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build
           test -d "$RUNNER_TEMP/orbital-drift-derived-data/Build/Products/Debug-iphonesimulator/App.app"
+      - name: Boot iPhone Simulator and verify app launch, relaunch and screenshot
+        run: bash scripts/smoke-ios-simulator.sh
+      - name: Upload native Simulator smoke-test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbital-drift-ios-simulator-smoke-evidence
+          path: ${{ runner.temp }}/orbital-drift-simulator-evidence/
+          if-no-files-found: warn
+          retention-days: 14
       - name: Upload unsigned iOS source project
         uses: actions/upload-artifact@v4
         with:
