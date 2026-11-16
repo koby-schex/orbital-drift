@@ -1,0 +1,34 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const base=new URL("../",import.meta.url);
+const read=(s)=>readFileSync(new URL(s,base),"utf8");
+const native=read("native/ios/OrbitalDriftStoreKitPlugin.swift");
+const controller=read("native/ios/OrbitalDriftBridgeViewController.swift");
+const installer=read("scripts/install-ios-storekit.mjs");
+const preparation=read("scripts/prepare-ios-release.mjs");
+const ci=read(".github/workflows/ios-project.yml");
+const distribution=read(".github/workflows/ios-distribution.yml");
+const html=read("index.html");
+for(const id of ["removeads.permanent","ship.solarflare","frigate.abyss","fleet.solarconvoy","trail.solarribbon","trail.relicember","combo.ancienthunter"]) {
+  assert.ok(native.includes('"orbitaldrift.'+id+'"'),"Native product allowlist missing "+id);
+  assert.ok(html.includes('"orbitaldrift.'+id+'"'),"Web storefront missing "+id);
+}
+assert.match(native,/CAPBridgedPlugin/);
+assert.match(native,/Product\.products\(for:/);
+assert.match(native,/case \.verified\(let transaction\)/);
+assert.match(native,/transaction\.revocationDate == nil/);
+assert.match(native,/transaction\.productType == \.nonConsumable/);
+assert.match(native,/case \.userCancelled:/);
+assert.match(native,/case \.pending:/);
+assert.match(native,/Transaction\.currentEntitlements/);
+assert.match(native,/AppStore\.sync\(\)/);
+assert.doesNotMatch(native,/web-placeholder/);
+assert.match(controller,/registerPluginInstance\(OrbitalDriftStoreKitPlugin\(\)\)/);
+assert.match(installer,/AppDelegate\.swift/);
+assert.match(installer,/Main\.storyboard/);
+assert.match(preparation,/install-ios-storekit\.mjs/);
+assert.match(ci,/native\/ios\/\*\*/);
+assert.match(ci,/scripts\/install-ios-storekit\.mjs/);
+assert.match(distribution,/node scripts\/prepare-ios-release\.mjs/);
+assert.match(html,/Apple's purchase confirmation sheet/);
+console.log("StoreKit 2 bridge tests passed: verified nonconsumables, native registration, restore, cancel/pending, and build inclusion.");
