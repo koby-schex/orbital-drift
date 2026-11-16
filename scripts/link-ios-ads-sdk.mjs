@@ -33,20 +33,27 @@ const target=content.indexOf("/* Begin PBXNativeTarget section */");
 const targetEnd=content.indexOf("/* End PBXNativeTarget section */",target);
 if(target<0 || targetEnd<0) throw new Error("No native target section");
 let snippet=content.slice(target,targetEnd);
-const appTarget=snippet.match(/([A-F0-9]{24}) \/\* App \*\/ = \{isa = PBXNativeTarget;[\s\S]*?\n\t\t\};/);
+const appTarget=snippet.match(/([A-F0-9]{24}) \/\* App \*\/ = \{\s*isa = PBXNativeTarget;[\s\S]*?\n\s*\};/);
 if(!appTarget) throw new Error("Unexpected Capacitor App target layout");
 let updated=appTarget[0];
-if(updated.includes("packageProductDependencies"))throw new Error("Native App target has unexpected package dependencies");
-updated=updated.replace(/(productName = App;)/,`packageProductDependencies = ( ${packages.map(p=>p.dep+" /* "+p.name+" */").join(", ")} );\n\t\t\t$1`);
+const dependencies=packages.map(p=>p.dep+" /* "+p.name+" */").join(", ");
+if (updated.includes("packageProductDependencies = ("))
+  updated=updated.replace("packageProductDependencies = (", "packageProductDependencies = ( "+dependencies+", ");
+else
+  updated=updated.replace(/(productName = App;)/, "packageProductDependencies = ( "+dependencies+" );\n\t\t\t$1");
 snippet=snippet.replace(appTarget[0],updated);
 content=content.slice(0,target)+snippet+content.slice(targetEnd);
 const projectStart=content.indexOf("/* Begin PBXProject section */");
 const projectEnd=content.indexOf("/* End PBXProject section */",projectStart);
 let projectSection=content.slice(projectStart,projectEnd);
-const projectObject=projectSection.match(/([A-F0-9]{24}) \/\* Project object \*\/ = \{isa = PBXProject;[\s\S]*?\n\t\t\};/);
+const projectObject=projectSection.match(/([A-F0-9]{24}) \/\* Project object \*\/ = \{\s*isa = PBXProject;[\s\S]*?\n\s*\};/);
 if(!projectObject) throw new Error("Unexpected project object layout");
 let projectUpdated=projectObject[0];
-projectUpdated=projectUpdated.replace(/(mainGroup = [^;]+;)/,`packageReferences = ( ${packages.map(p=>p.id).join(", ")} );\n\t\t\t$1`);
+const references=packages.map(p=>p.id).join(", ");
+if (projectUpdated.includes("packageReferences = ("))
+  projectUpdated=projectUpdated.replace("packageReferences = (", "packageReferences = ( "+references+", ");
+else
+  projectUpdated=projectUpdated.replace(/(mainGroup = [^;]+;)/,"packageReferences = ( "+references+" );\n\t\t\t$1");
 projectSection=projectSection.replace(projectObject[0],projectUpdated);
 content=content.slice(0,projectStart)+projectSection+content.slice(projectEnd);
 const frameworksStart=content.indexOf("/* Begin PBXFrameworksBuildPhase section */");
