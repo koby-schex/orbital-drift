@@ -12,7 +12,7 @@ guard let source = NSImage(contentsOfFile: input) else {
 let size = 1024
 guard let bitmap = NSBitmapImageRep(
     bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size,
-    bitsPerSample: 8, samplesPerPixel: 3, hasAlpha: false,
+    bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true,
     isPlanar: false, colorSpaceName: .deviceRGB,
     bytesPerRow: 0, bitsPerPixel: 0
 ) else { fatalError("Could not allocate icon pixels") }
