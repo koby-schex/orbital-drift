@@ -28,7 +28,8 @@ public class OrbitalDriftAdMobPlugin: CAPPlugin, CAPBridgedPlugin {
     private var rewardedAd: RewardedAd?
 
     private var appConfigured: Bool {
-        guard let id = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String,
+        guard Bundle.main.object(forInfoDictionaryKey: "OrbitalDriftAdsEnabled") as? Bool == true,
+              let id = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String,
               id.hasPrefix("ca-app-pub-") else { return false }
         return true
     }
