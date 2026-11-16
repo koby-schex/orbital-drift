@@ -25500,6 +25500,13 @@
                 .catch(reject);
               return;
             }
+            // A missing native bridge must never manufacture a verified purchase.
+            const nativeShell = window.Capacitor?.isNativePlatform?.() === true ||
+              ["ios", "android"].includes(window.Capacitor?.getPlatform?.());
+            if (nativeShell) {
+              reject(new Error("Native StoreKit bridge is unavailable"));
+              return;
+            }
             resolve({
               productId,
               verified: true,
@@ -25714,11 +25721,8 @@
                 .catch(() => resolve({ completed: false }));
               return;
             }
-            setTimeout(
-              () =>
-                resolve({ completed: true, environment: "web-placeholder" }),
-              450,
-            );
+            // No bridge means no watched ad and therefore no reward.
+            resolve({ completed: false, reason: "ad-unavailable" });
           } catch (e) {
             resolve({ completed: false });
           }
@@ -25748,7 +25752,9 @@
       }
       function showRewardedAd(rewardType, onReward) {
         if (!canShowRewardedAd())
-          return toast("Sponsored reward is cooling down.");
+          return toast(game.monetization?.adMobReady
+            ? "Sponsored reward is cooling down."
+            : "Sponsored rewards are unavailable in this build.");
         confirmAction(
           "Watch Sponsored Reward?",
           rewardedAdDescription(rewardType) +
@@ -26575,6 +26581,11 @@
         toggleOrbit();
       };
       function registerOfflineSupport() {
+        // Capacitor already packages local assets; a web service worker can
+        // cache stale builds across native app upgrades.
+        if (window.Capacitor?.isNativePlatform?.() === true ||
+            ["ios", "android"].includes(window.Capacitor?.getPlatform?.()))
+          return;
         if (!("serviceWorker" in navigator) || location.protocol === "file:")
           return;
         navigator.serviceWorker
