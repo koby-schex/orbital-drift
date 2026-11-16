@@ -1,0 +1,32 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const manifest = JSON.parse(readFileSync(new URL("../manifest.webmanifest", import.meta.url),"utf8"));
+const workflow = readFileSync(new URL("../.github/workflows/ios-project.yml", import.meta.url),"utf8");
+function extract(start, end) {
+  const a=html.indexOf("      function "+start+"("), b=html.indexOf("      function "+end+"(",a+1);
+  assert.ok(a>=0 && b>a, start+" found");
+  return html.slice(a,b);
+}
+const purchaseFn = new Function("window","game",extract("nativePurchase","nativeRestorePurchases")+"\nreturn nativePurchase;");
+const native = {Capacitor:{isNativePlatform:()=>true,getPlatform:()=>"ios",Plugins:{}}};
+const web = {};
+const pending={monetization:{}};
+await assert.rejects(purchaseFn(native,pending)("premium-hull"),/unavailable/);
+const free = await purchaseFn(web,pending)("web-hull");
+assert.equal(free.environment,"web-placeholder");
+assert.equal(free.verified,true);
+const adFn = new Function("window",extract("nativeShowRewardedAd","nativeShowInterstitial")+"\nreturn nativeShowRewardedAd;");
+assert.equal((await adFn(native)("fleetBoost")).completed,false);
+assert.equal((await adFn(web)("fleetBoost")).completed,false);
+const offlineStart=html.indexOf("      function registerOfflineSupport(");
+const offlineEnd=html.indexOf("      resize();",offlineStart);
+assert.ok(offlineStart>=0 && offlineEnd>offlineStart);
+const offline=html.slice(offlineStart,offlineEnd);
+assert.match(offline,/isNativePlatform\?\.\(\) === true/);
+assert.match(offline,/navigator\.serviceWorker/);
+assert.equal(manifest.orientation,"portrait");
+assert.match(workflow,/Enforce portrait-only iPhone orientation/);
+assert.match(workflow,/UIInterfaceOrientationPortrait/);
+assert.match(workflow,/CODE_SIGNING_ALLOWED=NO/);
+console.log("iOS release safeguards verified: no simulated native purchases or ads, portrait wrapper, web-only service worker.");

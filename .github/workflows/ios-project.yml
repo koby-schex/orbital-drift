@@ -41,6 +41,14 @@ jobs:
         run: |
           npx cap add ios --packagemanager SPM
           npx cap sync ios
+      - name: Enforce portrait-only iPhone orientation
+        run: |
+          PLIST="ios/App/App/Info.plist"
+          test -f "$PLIST"
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Print :UISupportedInterfaceOrientations:0" "$PLIST" | grep -Fx UIInterfaceOrientationPortrait
       - name: Compile unsigned iOS Simulator app
         run: |
           xcodebuild \
