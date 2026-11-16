@@ -86,3 +86,19 @@ files change on `main`, and can also be started manually from **GitHub > Actions
 Verify iOS Simulator Build > Run workflow**. Inspect the *macOS simulator-build*
 workflow result and any failure logs. Do not interpret passing normal pull-request
 checks as evidence of native compilation.
+
+## Pass 8 — native Simulator launch and relaunch evidence
+
+The macOS workflow now runs for relevant pull requests **before merge**, not only on main.
+After a successful unsigned Xcode Simulator compile it boots an available iPhone
+Simulator, installs the app, launches the native process, captures a screenshot,
+terminates the app, relaunches it, and captures a second screenshot.
+
+Both screenshots and process logs are attached to the workflow run as
+`orbital-drift-ios-simulator-smoke-evidence`. Review screenshots before
+merging. The app's built-in tests and mobile packaging checks still run first.
+
+This verifies installation and **basic launch/relaunch only**. A successful
+screenshot does not verify gameplay input, HUD readability, background
+suspension, network-offline behavior, stable frame rate, memory usage,
+purchases or advertising. Those remain physical-device and TestFlight gates.
