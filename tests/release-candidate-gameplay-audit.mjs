@@ -60,7 +60,10 @@ const rewards = new Function("game","crewState",getCode("grantCrewXp","recruitCr
   function(){return this.crew;}.bind({crew:{members:[{id:"pilot",xp:0},{id:"science",xp:5}]}}));
 assert.equal(typeof rewards,"function");
 
-const importCode = getCode("importSaveFile","deleteSave");
+const importStart = html.indexOf("      async function importSaveFile(");
+const importEnd = html.indexOf("      function deleteSave(", importStart);
+assert.ok(importStart >= 0 && importEnd > importStart);
+const importCode = html.slice(importStart, importEnd);
 assert.match(importCode,/const previousDeletedState = saveDeletedUntilExplicitSave/);
 assert.match(importCode,/saveDeletedUntilExplicitSave = previousDeletedState/);
 assert.match(importCode,/localStorage\.setItem\(SAVE_KEY, JSON\.stringify\(data\)\)/);
