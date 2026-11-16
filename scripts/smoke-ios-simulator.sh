@@ -12,6 +12,13 @@ BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP_PATH/In
 ORIENTATION=$(/usr/libexec/PlistBuddy -c 'Print :UISupportedInterfaceOrientations:0' "$APP_PATH/Info.plist")
 test "$ORIENTATION" = "UIInterfaceOrientationPortrait"
 test "$BUNDLE_ID" = "com.orbitaldrift.game"
+DISPLAY_NAME=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' "$APP_PATH/Info.plist")
+VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Info.plist")
+BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP_PATH/Info.plist")
+test "$DISPLAY_NAME" = "Orbital Drift"
+test "$VERSION" = "$(node -p 'require("./package.json").version')"
+test "$BUILD" = "$GITHUB_RUN_NUMBER"
+test -s "ios/App/App/Assets.xcassets/AppIcon.appiconset/OrbitalDrift-AppIcon-1024.png"
 
 # Choose a real available iPhone Simulator, not a generic simulator build target.
 DEVICE_ID="$(xcrun simctl list devices available -j | python3 -c '
