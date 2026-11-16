@@ -10,6 +10,7 @@ on:
       - scripts/render-ios-app-icon.swift
       - scripts/install-ios-storekit.mjs
       - native/ios/**
+      - scripts/link-ios-ads-sdk.mjs
       - tests/ios-wrapper.mjs
       - capacitor.config.json
       - package.json
@@ -35,6 +36,7 @@ on:
       - scripts/render-ios-app-icon.swift
       - scripts/install-ios-storekit.mjs
       - native/ios/**
+      - scripts/link-ios-ads-sdk.mjs
 
 permissions:
   contents: read
