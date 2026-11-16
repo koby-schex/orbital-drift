@@ -10023,23 +10023,51 @@
         }
         return candidates;
       }
+      function systemJourneySignature(sys) {
+        if (!sys) return null;
+        const planets = (sys.bodies || []).filter((body) => body.type !== "star"),
+          patternCount = {};
+        planets.forEach((body) => {
+          const pattern = body.pattern || "unknown";
+          patternCount[pattern] = (patternCount[pattern] || 0) + 1;
+        });
+        const dominantPattern = Object.entries(patternCount)
+          .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0]?.[0] || "none";
+        return {
+          archetype: sys.archetype?.key || "frontier",
+          modifier: sys.modifier?.key || "calm",
+          theme: systemVisualThemeIndex(sys),
+          dominantPattern,
+          bodyBand: planets.length <= 6 ? "sparse" : planets.length >= 10 ? "dense" : "balanced",
+          starColor: sys.bodies?.find((body) => body.type === "star")?.color || "",
+          special: sys.specialType || "",
+        };
+      }
+      function systemJourneySimilarity(a, b) {
+        if (!a || !b) return 0;
+        // Perceptually important scene identity outweighs minor seed differences.
+        return Number(a.archetype === b.archetype) * 4.5 +
+          Number(a.theme === b.theme) * 3.5 +
+          Number(a.dominantPattern === b.dominantPattern) * 1.5 +
+          Number(a.bodyBand === b.bodyBand) +
+          Number(a.modifier === b.modifier) * 0.75 +
+          Number(a.starColor === b.starColor) * 0.25 +
+          Number(a.special === b.special && !!a.special) * 3;
+      }
       function routeVarietyScore(entry) {
         const recent = [...(game.visitedSectors || [])]
-            .sort((a, b) => (b.lastVisit || 0) - (a.lastVisit || 0))
-            .slice(0, 3)
-            .map((visit) => systems[visit.index])
-            .filter(Boolean),
-          recentArchetypes = new Set(recent.map((s) => s.archetype?.key)),
-          recentModifiers = new Set(recent.map((s) => s.modifier?.key)),
-          system = entry.system;
-        return (
-          randomUnit() * 1.35 +
-          (recentArchetypes.has(system.archetype?.key) ? 0 : 1.15) +
-          (recentModifiers.has(system.modifier?.key) ? 0 : 0.8) +
-          (system.archetype?.key !== game.system?.archetype?.key ? 0.35 : 0) +
-          (system.modifier?.key !== game.system?.modifier?.key ? 0.25 : 0) +
-          (system.isSpecial ? 0.3 : 0)
-        );
+          .sort((a, b) => (b.lastVisit || 0) - (a.lastVisit || 0))
+          .slice(0, 4).map((visit) => systems[visit.index]).filter(Boolean),
+          current = game.system,
+          signature = systemJourneySignature(entry.system),
+          near = [current, ...recent.filter((sys) => sys !== current)],
+          recentSignatures = near.map(systemJourneySignature).filter(Boolean),
+          closest = Math.max(0, ...recentSignatures.map((old, index) =>
+            systemJourneySimilarity(signature, old) * (index === 0 ? 1 : 0.55))),
+          // Keep small tie-breaking variation, not enough to overpower visual contrast.
+          variety = randomUnit() * 0.15;
+        return 15 - closest + variety +
+          (entry.system.isSpecial ? 0.3 : 0);
       }
       function chooseUnchartedSystemIndex() {
         const candidates = unchartedSystemCandidates(8)
@@ -20989,6 +21017,19 @@
         toast(activeVisualPhenomenon.name + " detected — " + activeVisualPhenomenon.desc);
         addActivity("discovery", activeVisualPhenomenon.name, activeVisualPhenomenon.desc);
       }
+      function systemVisualThemeIndex(sys) {
+        // Six recognizable identities, driven by the actual kind of frontier.
+        // Existing system seeds/bodies are never rewritten, so saved worlds
+        // keep their names, resources, orbits and exploration history.
+        const archetype = sys?.archetype?.key;
+        const byArchetype = {
+          innerForge: 1, gasFrontier: 0, crystalReach: 3,
+          bioCluster: 2, ancientArchive: 4, voidRim: 5,
+        };
+        return Object.prototype.hasOwnProperty.call(byArchetype, archetype)
+          ? byArchetype[archetype]
+          : Math.abs(Number(sys?.seed || 0)) % sectorVisualThemes.length;
+      }
       function sectorVisualTheme() {
         if (game.system?.specialType === "parallel")
           return {
@@ -21032,10 +21073,7 @@
             accent2: "#2dd4bf",
             nebulas: ["#f59e0b", "#0f766e", "#22d3ee", "#a16207"],
           };
-        return sectorVisualThemes[
-          Math.abs(Number(game.system?.seed || currentSystemIndex || 0)) %
-            sectorVisualThemes.length
-        ];
+        return sectorVisualThemes[systemVisualThemeIndex(game.system)];
       }
       function applySectorVisualTheme(theme = sectorVisualTheme()) {
         const root = document.documentElement;
@@ -21100,10 +21138,32 @@
         c.save();
         if (mirror) { c.translate(width, 0); c.scale(-1, 1); }
         // Color grading is baked once, never a full-screen filter per frame.
-        const hues = [-18, 0, 22, 138, 206];
-        c.filter = kind === "deep" && !tutorial ? `hue-rotate(${hues[seed % hues.length]}deg) saturate(0.85)` : "none";
-        c.drawImage(image, (width - dw) * (kind === "parallel" ? 0.85 : 0.45), (height - dh) * 0.25, dw, dh);
+        const themeIndex = systemVisualThemeIndex(game.system),
+          hues = [-18, 18, 115, 190, 55, 225],
+          composition = [
+            [0.32, 0.3], [0.68, 0.17], [0.55, 0.6],
+            [0.25, 0.66], [0.75, 0.48], [0.46, 0.16],
+          ][themeIndex];
+        c.filter = kind === "deep" && !tutorial
+          ? `hue-rotate(${hues[themeIndex]}deg) saturate(0.93)` : "none";
+        c.drawImage(image,
+          (width - dw) * (kind === "parallel" ? 0.85 : composition[0]),
+          (height - dh) * (kind === "deep" && !tutorial ? composition[1] : 0.25),
+          dw, dh);
         c.restore();
+        if (kind === "deep" && !tutorial) {
+          // A single, cached color-light composition for each archetype.
+          // No additional artwork downloads or per-frame filters.
+          const theme = sectorVisualTheme(),
+            lightField = c.createRadialGradient(
+              width * composition[0], height * composition[1], 0,
+              width * composition[0], height * composition[1],
+              Math.max(width, height) * 0.7);
+          lightField.addColorStop(0, rgba(theme.accent, 0.23));
+          lightField.addColorStop(0.45, rgba(theme.nebulas[0], 0.10));
+          lightField.addColorStop(1, "rgba(0,0,0,0)");
+          c.fillStyle = lightField; c.fillRect(0, 0, width, height);
+        }
         const vignette = c.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
         vignette.addColorStop(0, "rgba(0,3,9,0)"); vignette.addColorStop(1, "rgba(0,3,9,.4)");
         c.fillStyle = vignette; c.fillRect(0, 0, width, height);
