@@ -10,7 +10,8 @@ public class OrbitalDriftStoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "OrbitalDriftStoreKit"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "restorePurchases", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "restorePurchases", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "currentEntitlements", returnType: CAPPluginReturnPromise)
     ]
 
     private let allowedProducts: Set<String> = [
@@ -37,6 +38,44 @@ public class OrbitalDriftStoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
             "completed": true,
             "environment": "app-store"
         ]
+    }
+
+    private var updatesTask: Task<Void, Never>?
+
+    public override func load() {
+        // Await pending Ask-to-Buy approvals and transactions completed outside
+        // the app. Only verified eligible transactions trigger a refresh.
+        updatesTask = Task { [weak self] in
+            for await result in StoreKit.Transaction.updates {
+                guard let self else { return }
+                guard case .verified(let transaction) = result else { continue }
+                if self.allowedProducts.contains(transaction.productID) {
+                    self.notifyListeners("entitlementsChanged", data: [:])
+                    await transaction.finish()
+                }
+            }
+        }
+    }
+
+    deinit {
+        updatesTask?.cancel()
+    }
+
+    private func verifiedEntitlements() async -> [[String: Any]] {
+        var purchases: [[String: Any]] = []
+        for await result in StoreKit.Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result, eligible(transaction) else {
+                continue
+            }
+            purchases.append(receipt(transaction))
+        }
+        return purchases
+    }
+
+    @objc public func currentEntitlements(_ call: CAPPluginCall) {
+        Task {
+            call.resolve(["purchases": await verifiedEntitlements()])
+        }
     }
 
     @objc public func purchase(_ call: CAPPluginCall) {
@@ -83,14 +122,7 @@ public class OrbitalDriftStoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
         Task {
             do {
                 try await AppStore.sync()
-                var purchases: [[String: Any]] = []
-                for await result in StoreKit.Transaction.currentEntitlements {
-                    guard case .verified(let transaction) = result, eligible(transaction) else {
-                        continue
-                    }
-                    purchases.append(receipt(transaction))
-                }
-                call.resolve(["purchases": purchases])
+                call.resolve(["purchases": await verifiedEntitlements()])
             } catch {
                 call.reject("Apple purchase restoration failed: \(error.localizedDescription)")
             }
