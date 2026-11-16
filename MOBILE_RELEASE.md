@@ -102,3 +102,19 @@ This verifies installation and **basic launch/relaunch only**. A successful
 screenshot does not verify gameplay input, HUD readability, background
 suspension, network-offline behavior, stable frame rate, memory usage,
 purchases or advertising. Those remain physical-device and TestFlight gates.
+
+## Pass 10 — protected manual iOS distribution
+
+A separate **Prepare Signed iOS TestFlight Build** workflow can generate a signed IPA
+only when an Apple Developer team, a matching App Store provisioning profile and
+an Apple Distribution certificate are configured in the protected `ios-release`
+GitHub environment. It is available by manual dispatch from main only.
+
+The default dispatch only exports the signed IPA as a private, short-lived artifact.
+A separate explicit `upload_to_testflight = true` choice uses the App Store Connect
+API key to upload the IPA to Apple. No upload or public release is automatic.
+See `IOS_TESTFLIGHT_RELEASE_PASS10.md` for setup and security constraints.
+
+The workflow is presently unverified for real signed distribution, because Apple
+credentials and a registered final Bundle ID have not yet been supplied. The
+standard unsigned iPhone Simulator compile/launch workflow remains independent.

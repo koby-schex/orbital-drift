@@ -1,0 +1,73 @@
+name: Prepare Signed iOS TestFlight Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_to_testflight:
+        description: "Explicitly upload a successfully signed IPA to App Store Connect"
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orbital-drift-ios-distribution
+  cancel-in-progress: false
+
+jobs:
+  ios-distribution:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    environment: ios-release
+    env:
+      IOS_TEAM_ID: ${{ vars.IOS_TEAM_ID }}
+      IOS_BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+      IOS_DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_BASE64 }}
+      IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
+      IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+      APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+      APPSTORE_API_KEY_ID: ${{ vars.APPSTORE_API_KEY_ID }}
+      APPSTORE_ISSUER_ID: ${{ vars.APPSTORE_ISSUER_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate signing inputs before generating an archive
+        run: bash scripts/ios-distribution.sh preflight
+      - name: Install Capacitor and run all game checks
+        run: |
+          npm install --no-package-lock
+          npm test
+          npm run build:mobile
+          npm run test:mobile
+          npm run test:ios
+      - name: Generate branded native project
+        run: |
+          npx cap add ios --packagemanager SPM
+          npx cap sync ios
+          PLIST="ios/App/App/Info.plist"
+          /usr/libexec/PlistBuddy -c "Delete :UISupportedInterfaceOrientations" "$PLIST" || true
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" "$PLIST"
+          node scripts/prepare-ios-release.mjs
+      - name: Import scoped signing materials
+        run: bash scripts/ios-distribution.sh import
+      - name: Archive and export distribution-signed IPA
+        run: bash scripts/ios-distribution.sh archive
+      - name: Upload IPA artifact for internal review
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbital-drift-signed-ios-ipa
+          path: ${{ runner.temp }}/orbital-drift-distribution/export/*.ipa
+          if-no-files-found: error
+          retention-days: 3
+      - name: Explicitly upload verified IPA to App Store Connect
+        if: inputs.upload_to_testflight == true
+        run: bash scripts/ios-distribution.sh upload
+      - name: Remove temporary signing keychain
+        if: always()
+        run: bash scripts/ios-distribution.sh cleanup
