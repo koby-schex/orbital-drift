@@ -4955,6 +4955,28 @@
       .frigate-deck-tabs { gap: 5px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
       .frigate-deck-tabs button { border-radius: 6px; background: rgba(106, 150, 172, .055); font-weight: 600; }
       .frigate-deck-tabs button.active { background: rgba(139, 205, 215, .15); border-color: rgba(139, 205, 215, .5); }
+      /* Pioneer Command: first-time pilots see decisions, not telemetry. */
+      .pioneer-command-landing { padding-bottom: 10px; }
+      .pioneer-command-landing .cosmetic-preview-live { height: 142px; margin: 8px 0 0; }
+      .pioneer-command-actions { margin-top: 10px; }
+      .pioneer-command-actions h4 { margin-bottom: 12px; }
+      .pioneer-primary-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .pioneer-primary-actions button { width: 100%; min-height: 54px; text-align: left; padding: 11px 13px; font-weight: 650; background: rgba(126, 187, 198, .085); border-color: rgba(151, 206, 213, .2); }
+      .pioneer-primary-actions button:first-child { background: linear-gradient(125deg, rgba(126, 195, 200, .18), rgba(126, 195, 200, .055)); border-color: rgba(151, 206, 213, .42); }
+      .pioneer-command-details { margin: 12px 0; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(165, 199, 209, .16); background: rgba(7, 17, 26, .67); }
+      .pioneer-command-details summary { cursor: pointer; color: var(--muted); font-size: 12px; font-weight: 650; min-height: 28px; }
+      .pioneer-command-metrics { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+      .pioneer-command-metrics span { font-size: 12px; padding: 7px 9px; border-radius: 7px; background: rgba(126, 195, 200, .075); }
+      .pioneer-command-details .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .pioneer-command-details input { min-width: 0; flex: 1 1 135px; }
+      @media (max-width: 560px) {
+        .pioneer-primary-actions { grid-template-columns: 1fr; gap: 7px; }
+        .pioneer-primary-actions button { min-height: 50px; }
+        .frigate-deck-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .frigate-deck-tabs button { padding: 10px 4px; font-size: 12px; }
+        .pioneer-command-landing .cosmetic-preview-live { height: 124px; }
+      }
+
       .pioneer-hero {
         background: linear-gradient(90deg, rgba(5, 13, 21, .94), rgba(5, 13, 21, .6)), url('./assets/deep-field.webp') center 25% / cover;
       }
@@ -18065,32 +18087,43 @@
           { key: "upgrades", label: "Systems", count: readyUpgrades || "" },
           { key: "cosmetics", label: "Appearance" },
         ]).replace('class="section-tabs"', 'class="section-tabs frigate-deck-tabs"');
+        // The Command landing view is task-focused; deck-specific technical
+        // information remains accessible only when the pilot requests it.
         const overview =
-          '<div class="card pioneer-hero"><div class="section-focus-title"><div><span class="command-kicker">Mobile Headquarters</span><h4>' +
+          '<div class="card pioneer-hero pioneer-command-landing"><div class="section-focus-title"><div><span class="command-kicker">Your Mobile Headquarters</span><h4>' +
           esc(game.frigate.name) +
           '</h4></div><span class="tag rarity-unusual">' +
-          (orbitingFrigate() ? "Docked" : "Remote Link") +
-          '</span></div><p>Command the expedition, refuel the Starling, deploy escorts, and prepare the next jump from one base.</p><div class="pioneer-hero-grid"><div><div class="grid"><div class="chip"><b>Base</b><br>Lv. ' +
+          (orbitingFrigate() ? "Docked" : "Remote") +
+          '</span></div><p>Choose your next move. Everything else is waiting in the decks above.</p>' +
+          cosmeticPreviewHtml("frigate", game.frigate.skin, "Pioneer") +
+          '</div>' +
+          '<div class="card pioneer-command-actions"><h4>What would you like to do?</h4><div class="pioneer-primary-actions">' +
+          btn("Explore a new system", "jumpSystem") +
+          btn("Start an adventure", "setMenuTab", "frigate|expeditions") +
+          btn("Manage my fleet", "setMenuTab", "frigate|fleet") +
+          btn("Meet the crew", "setMenuTab", "frigate|crew") +
+          '</div><div class="actions">' +
+          (game.ship.fuel < game.ship.maxFuel * 0.94
+            ? btn("Refuel Starling", "refuel")
+            : "") +
+          (!orbitingFrigate() ? btn("Locate Pioneer", "setFrigateTarget") : "") +
+          '</div></div>' +
+          '<details class="pioneer-command-details"><summary>Base details and settings</summary>' +
+          '<div class="pioneer-command-metrics"><span>Base Lv. ' +
           game.frigate.level +
-          '</div><div class="chip"><b>Frontier Slots</b><br>' +
+          '</span><span>World capacity ' +
           captureLimit() +
-          '</div><div class="chip"><b>Vault</b><br>' +
+          '</span><span>Vault ' +
           vaultSecuredEntries().length +
-          " / " +
+          ' / ' +
           vaultCapacity() +
-          '</div><div class="chip"><b>Escort Wing</b><br>' +
+          '</span><span>Fleet ' +
           (game.fleet?.ships?.length || 0) +
-          " / " +
+          ' / ' +
           fleetLimit() +
-          '</div></div><div class="actions"><input id="frigateNameInput" maxlength="24" aria-label="Frigate name" value="' +
+          '</span></div><div class="actions"><input id="frigateNameInput" maxlength="24" aria-label="Frigate name" value="' +
           esc(game.frigate.name) +
-          '"><button type="button" data-action="renameFrigate" data-arg="">Rename Base</button></div></div>' +
-          cosmeticPreviewHtml(
-            "frigate",
-            game.frigate.skin,
-            "Current Pioneer configuration",
-          ) +
-          '</div></div>';
+          '"><button type="button" data-action="renameFrigate" data-arg="">Rename Base</button></div></details>';
         const upgradeRows = [
           "capacity",
           "reactor",
@@ -18132,21 +18165,9 @@
             );
           })
           .join("");
-        const accessLabel = orbitingFrigate()
-          ? "Docked aboard Pioneer"
-          : "Remote command link";
-        let html =
-          tabIntro(
-            "Pioneer Base",
-            "Choose a deck below. Every expedition, escort, crew assignment, discovery, and base system stays organized here.",
-            '<div class="chip">Access: ' +
-              accessLabel +
-              '</div><div class="chip">Fleet Rewards: ' +
-              readyFleet +
-              '</div><div class="chip">System Upgrades: ' +
-              readyUpgrades +
-              "</div>",
-          ) + tabs;
+        // Deck navigation stays visible without a second wall of badges and
+        // counters. Context lives inside the deck that owns the information.
+        let html = tabs;
         if (tab === "expeditions") html += expeditionsHtml();
         else if (tab === "crew") html += crewHtml();
         else if (tab === "fleet")
@@ -18166,27 +18187,7 @@
           html +=
             storeHtml() +
             fleetSkinsHtml();
-        else
-          html +=
-            overview +
-            card(
-              "Command Shortcuts",
-              "The controls used most often while preparing a flight.",
-              '<div class="actions">' +
-                btn(
-                  game.ship.fuel < game.ship.maxFuel * 0.94 ? "Refuel Starling" : "Fuel Tanks Full",
-                  "refuel",
-                  null,
-                  game.ship.fuel < game.ship.maxFuel * 0.94,
-                ) +
-                btn("Jump Outward", "jumpSystem") +
-                btn("Fleet Operations", "setMenuTab", "frigate|fleet") +
-                btn("Adventure Board", "setMenuTab", "frigate|expeditions") +
-                (!orbitingFrigate()
-                  ? btn("Set Pioneer Target", "setFrigateTarget")
-                  : "") +
-                "</div>",
-            );
+        else html += overview;
         ui.menuContent.innerHTML = html;
       }
       function cosmeticPreviewHtml(kind, key, label = "Live hull preview") {
