@@ -29,6 +29,8 @@ on:
       - sw.js
       - scripts/build-mobile.mjs
       - scripts/smoke-ios-simulator.sh
+      - scripts/prepare-ios-release.mjs
+      - scripts/render-ios-app-icon.swift
 
 permissions:
   contents: read
