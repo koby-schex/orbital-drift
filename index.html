@@ -14014,7 +14014,23 @@
         }
         markMeaningfulMoment("threat-resolved");
         addActivity("discovery", threat.name + " resolved", strategy.label);
-        trackExpeditionProgress("threat", 1);
+        const activeExpedition = expeditionState().active,
+          finale = currentExpeditionStage(activeExpedition);
+        if (
+          threat.source === "expedition" &&
+          activeExpedition?.threatKey === threat.templateKey &&
+          finale?.type === "threat"
+        ) {
+          trackExpeditionProgress("threat", 1);
+        } else if (
+          threat.source === "ambient" &&
+          finale?.type === "threat" &&
+          !game.majorThreat
+        ) {
+          // An ambient encounter may predate the expedition finale.
+          // Resolving it clears the lane, but does not count as the finale.
+          spawnMajorThreat(activeExpedition.threatKey, "expedition");
+        }
         saveGame(false);
         renderMenu();
         return true;
