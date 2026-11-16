@@ -1,0 +1,32 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const root = new URL("../", import.meta.url);
+const wf = readFileSync(new URL(".github/workflows/ios-distribution.yml",root),"utf8");
+const sh = readFileSync(new URL("scripts/ios-distribution.sh",root),"utf8");
+const guide = readFileSync(new URL("IOS_TESTFLIGHT_RELEASE_PASS10.md",root),"utf8");
+assert.match(wf,/workflow_dispatch:/);
+assert.match(wf,/upload_to_testflight:/);
+assert.match(wf,/default: false/);
+assert.doesNotMatch(wf,/\n\s+push:/);
+assert.doesNotMatch(wf,/\n\s+pull_request:/);
+assert.match(wf,/github\.ref == 'refs\/heads\/main'/);
+assert.match(wf,/environment: ios-release/);
+assert.match(wf,/if: inputs\.upload_to_testflight == true/);
+assert.match(wf,/bash scripts\/ios-distribution\.sh preflight/);
+assert.match(wf,/bash scripts\/ios-distribution\.sh archive/);
+assert.match(wf,/bash scripts\/ios-distribution\.sh cleanup/);
+for (const key of ["IOS_TEAM_ID","IOS_BUNDLE_ID","IOS_DISTRIBUTION_CERTIFICATE_BASE64","IOS_DISTRIBUTION_CERTIFICATE_PASSWORD","IOS_PROVISIONING_PROFILE_BASE64"]) {
+  assert.match(wf,new RegExp(key));
+  assert.match(sh,new RegExp(key));
+}
+assert.match(sh,/PROVISIONING_PROFILE_SPECIFIER/);
+assert.match(sh,/CODE_SIGN_STYLE=Manual/);
+assert.match(sh,/app-store-connect/);
+assert.match(sh,/xcodebuild archive/);
+assert.match(sh,/xcodebuild -exportArchive/);
+assert.match(sh,/codesign --verify/);
+assert.match(sh,/xcrun altool --upload-app/);
+assert.match(sh,/APPSTORE_API_PRIVATE_KEY/);
+assert.match(sh,/rm -rf "\$WORK"/);
+assert.match(guide,/separate.*StoreKit/i);
+console.log("Manual, protected TestFlight distribution workflow preflight passed.");
