@@ -56,3 +56,21 @@ console.log(`iOS branding applied: Orbital Drift ${version} (${build}), real gam
 
 // StoreKit classes are compiled into the generated native App target.
 execFileSync(process.execPath, [path.join(root, "scripts/install-ios-storekit.mjs")], { stdio: "inherit" });
+
+const appId = process.env.IOS_ADMOB_APP_ID || "";
+const rewardedUnitId = process.env.IOS_ADMOB_REWARDED_UNIT_ID || "";
+if (Boolean(appId) !== Boolean(rewardedUnitId))
+  throw new Error("Configure both IOS_ADMOB_APP_ID and IOS_ADMOB_REWARDED_UNIT_ID or neither.");
+if (appId && (!/^ca-app-pub-\\d{16}~\\d{10}$/.test(appId) ||
+              !/^ca-app-pub-\\d{16}\\/\\d{10}$/.test(rewardedUnitId)))
+  throw new Error("Invalid AdMob application or rewarded-ad unit identifier.");
+// Default builds are test-only or entirely ad-free. Never ship test units as
+// live ads in the signed release workflow.
+const unsignedSimulator = process.env.GITHUB_WORKFLOW === "Verify iOS Simulator Build";
+setPlist("GADApplicationIdentifier", "string",
+  appId || "ca-app-pub-3940256099942544~1458002511");
+setPlist("OrbitalDriftRewardedUnitID", "string",
+  rewardedUnitId || "ca-app-pub-3940256099942544/1712485313");
+setPlist("OrbitalDriftAdsEnabled", "bool",
+  appId ? "true" : unsignedSimulator ? "true" : "false");
+execFileSync(process.execPath, [path.join(root, "scripts/link-ios-ads-sdk.mjs")], { stdio: "inherit" });
