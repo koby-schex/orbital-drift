@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 const root = new URL("../", import.meta.url);
 const wf = readFileSync(new URL(".github/workflows/ios-distribution.yml",root),"utf8");
 const sh = readFileSync(new URL("scripts/ios-distribution.sh",root),"utf8");
@@ -28,5 +29,6 @@ assert.match(sh,/codesign --verify/);
 assert.match(sh,/xcrun altool --upload-app/);
 assert.match(sh,/APPSTORE_API_PRIVATE_KEY/);
 assert.match(sh,/rm -rf "\$WORK"/);
-assert.match(guide,/separate.*StoreKit/i);
+assert.match(guide,/Real StoreKit 2/);
+assert.equal(spawnSync("bash",["-n",new URL("scripts/ios-distribution.sh",root).pathname],{encoding:"utf8"}).status,0,"Release shell script syntax");
 console.log("Manual, protected TestFlight distribution workflow preflight passed.");
