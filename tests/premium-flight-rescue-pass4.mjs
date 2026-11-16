@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const rescue = html.slice(html.indexOf("function startPioneerRescue()"), html.indexOf("function solarCrash("));
+const ship = html.slice(html.indexOf("function updateShip(dt)"), html.indexOf("function updateShip(dt)") + 1500);
+assert.match(rescue, /duration: 48,/);
+assert.match(rescue, /rescue\.duration = 18;/);
+assert.match(rescue, /rescue\.duration = 50;/);
+assert.match(ship, /if \(pioneerRescue\) \{\s*updatePioneerRescue\(dt\);\s*if \(pioneerRescue\) \{\s*updateOrbit\(dt\);\s*return;/);
+assert.match(html, /if \(pioneerRescue\) return toast\("Emergency recovery in progress\."\)/);
+assert.match(html, /"Lock orbit around " \+ lockName/);
+assert.match(html, /"Rescue • " \+ Math\.round\(fuelPct\)/);
+assert.match(html, /ui\.hudToggle\.setAttribute\("aria-expanded"/);
+assert.match(html, /hydratePioneerRescue\(d\.pioneerRescue\)/);
+console.log("Premium flight and rescue checks passed.");

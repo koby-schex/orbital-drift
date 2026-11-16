@@ -12463,6 +12463,7 @@
       }
       function toggleOrbit() {
         const s = game.ship;
+        if (pioneerRescue) return toast("Emergency recovery in progress.");
         if (s.orbitLocked) {
           releaseOrbit(true);
           return;
@@ -12626,7 +12627,14 @@
       function updateShip(dt) {
         const s = game.ship,
           cls = shipStats();
-        if (pioneerRescue) updatePioneerRescue(dt);
+        // Recovery owns the ship until docking. Suspend input and fuel burn.
+        if (pioneerRescue) {
+          updatePioneerRescue(dt);
+          if (pioneerRescue) {
+            updateOrbit(dt);
+            return;
+          }
+        }
         if (touch.active) {
           const a = Math.atan2(touch.y, touch.x);
           s.angle += angleDiff(a, s.angle) * 0.13 * dt;
@@ -15102,7 +15110,7 @@
         pioneerRescue = {
           phase: "outbound",
           time: 0,
-          duration: 132,
+          duration: 48,
           x: home.x,
           y: home.y,
           vx: home.vx,
@@ -15138,7 +15146,7 @@
           if (q0 >= 1) {
             rescue.phase = "service";
             rescue.time = 0;
-            rescue.duration = 82;
+            rescue.duration = 18;
             const a = Math.atan2(s.y - rescue.y, s.x - rescue.x);
             Object.assign(s, {
               orbitLocked: true,
@@ -15148,7 +15156,7 @@
               lockDirection: 1,
               lockCharge: 0,
             });
-            toast("Pioneer on station. Emergency reactor transfer connected.");
+            toast("Pioneer arrived. Emergency refuel underway.");
           }
         } else if (rescue.phase === "service") {
           s.fuel = Math.min(s.maxFuel, s.fuel + (s.maxFuel / rescue.duration) * dt);
@@ -15156,11 +15164,11 @@
           if (rescue.time >= rescue.duration) {
             rescue.phase = "returning";
             rescue.time = 0;
-            rescue.duration = 145;
+            rescue.duration = 50;
             rescue.startX = rescue.x;
             rescue.startY = rescue.y;
             s.fuel = s.maxFuel;
-            toast("Refuel complete. The Starling is secured while Pioneer returns to orbit.");
+            toast("Refueled. Pioneer returning to orbit.");
           }
         } else if (rescue.phase === "returning") {
           const home = frigateHomePosition(),
@@ -15172,7 +15180,7 @@
             pioneerRescue = null;
             placeShipAtFrigate();
             saveGame(false);
-            toast("Pioneer has resumed stellar orbit. Starling remains safely docked in formation.");
+            toast("Rescue complete. Starling docked and ready.");
             return;
           }
         }
@@ -20304,7 +20312,9 @@
         ui.fuelText.textContent = Math.round(fuelPct) + "%";
         ui.fuelBar.style.width = fuelPct + "%";
         if (ui.fuelMiniText && ui.fuelMiniBar && ui.fuelHud) {
-          ui.fuelMiniText.textContent = Math.round(fuelPct) + "%";
+          ui.fuelMiniText.textContent = pioneerRescue
+            ? "Rescue • " + Math.round(fuelPct) + "%"
+            : Math.round(fuelPct) + "%";
           ui.fuelMiniBar.style.width = fuelPct + "%";
           ui.fuelHud.classList.toggle("low", fuelPct < 25);
         }
@@ -20346,17 +20356,22 @@
           ui.orbitRelease.textContent = game.ship?.orbitLocked
             ? "RELEASE"
             : "LOCK";
+          const lockName = nLock.body?.type === "frigate"
+            ? (game.frigate.name || "ODF Pioneer")
+            : nLock.body?.name;
+          ui.orbitRelease.setAttribute("aria-label", game.ship?.orbitLocked
+            ? "Release orbit and slingshot"
+            : lockName ? "Lock orbit around " + lockName : "Lock orbit");
+          ui.orbitRelease.title = game.ship?.orbitLocked
+            ? "Release orbit"
+            : lockName ? "Lock " + lockName : "Approach a planet or Pioneer";
         }
         if (ui.touchBrake)
           ui.touchBrake.classList.toggle("show", !!controlsVisible);
-        ui.systemBadge.textContent =
-          game.system.name +
-          " • " +
-          sectorArchetypeName() +
-          " • " +
-          sectorModifierName() +
-          " • Target: " +
-          targetText();
+        ui.systemBadge.textContent = ui.hud?.classList.contains("collapsed")
+          ? game.system.name + " • " + sectorArchetypeName()
+          : game.system.name + " • " + sectorArchetypeName() +
+            " • " + sectorModifierName() + " • Target: " + targetText();
         const manual =
           manualTargetName &&
           !tutorialRequiresObjective() &&
@@ -20523,7 +20538,8 @@
         if (!ui.hud || !ui.hudToggle) return;
         ui.hud.classList.toggle("collapsed", !!collapsed);
         document.body.classList.toggle("hud-collapsed", !!collapsed);
-        ui.hudToggle.textContent = collapsed ? "Expand" : "Minimize";
+        ui.hudToggle.textContent = collapsed ? "Details" : "Minimize";
+        ui.hudToggle.setAttribute("aria-expanded", String(!collapsed));
       }
       function dismissOnboarding() {
         onboardingDismissed = true;
