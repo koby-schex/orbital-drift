@@ -17,7 +17,11 @@ for (const name of ["@capacitor/core", "@capacitor/cli", "@capacitor/ios"]) {
   assert.equal(pkg.devDependencies?.[name], "8.6.0", `Pin ${name} to the same version`);
 }
 assert.equal(pkg.scripts?.["ios:sync"], "npm run build:mobile && cap sync ios");
-assert.match(workflow, /workflow_dispatch:/, "Create iOS project only when intentionally requested");
+assert.match(workflow, /workflow_dispatch:/, "Permit manual iOS Simulator builds");
+assert.match(workflow, /push:\s*\n\s*branches:\s*\n\s*- main/, "Compile iOS after main merges");
+assert.match(workflow, /\.github\/workflows\/ios-project\.yml/, "Workflow edits must trigger a native compile");
+assert.match(workflow, /- index\.html/, "Gameplay changes must trigger a native compile");
+assert.match(workflow, /- capacitor\.config\.json/, "Native shell changes must trigger a native compile");
 assert.match(workflow, /macos-latest/, "Generate Xcode project on a macOS runner");
 assert.match(workflow, /npm run build:mobile/);
 assert.match(workflow, /npx cap add ios --packagemanager SPM/, "Use Capacitor 8 native SPM project");
@@ -31,4 +35,4 @@ assert.match(workflow, /actions\/upload-artifact@v4/);
 assert.match(ignore, /node_modules\//);
 assert.match(guide, /provisional/i, "Do not imply Bundle ID is approved for production");
 assert.match(guide, /TestFlight/, "Native device testing must remain an explicit gate");
-console.log("iOS wrapper configuration passed: local assets, pinned tooling, manual macOS simulator compile, and release safeguards.");
+console.log("iOS wrapper configuration passed: local assets, pinned tooling, automatic main-branch macOS simulator compile, and release safeguards.");
