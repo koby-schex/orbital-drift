@@ -27,7 +27,6 @@ function setPlist(key, type, value) {
 setPlist("CFBundleDisplayName", "string", "Orbital Drift");
 setPlist("CFBundleShortVersionString", "string", version);
 setPlist("CFBundleVersion", "string", build);
-setPlist("UILaunchScreenMinimumOSVersion", "string", "15.0");
 // The source file is the official game icon, not Capacitor's template art.
 const imagePath = path.join(catalog, "OrbitalDrift-AppIcon-1024.png");
 execFileSync("swift", [path.join(root, "scripts/render-ios-app-icon.swift"), source, imagePath], { stdio: "inherit" });
