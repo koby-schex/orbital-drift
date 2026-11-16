@@ -66,3 +66,21 @@ npx cap open ios
 ```
 
 Ads are not linked or requested by the wrapper; the game must remain playable offline.
+
+## Unsigned iOS Simulator compilation gate
+
+The manual **Verify iOS Simulator Build** GitHub Actions workflow now generates
+the Capacitor 8 Swift Package Manager project on a macOS runner and **attempts
+a real Xcode iOS Simulator compilation** with code signing disabled.
+Successful completion of that specific workflow (not just PR validation)
+is required before calling the native wrapper compile-verified.
+
+The workflow uploads an unsigned Xcode source project after compilation passes.
+It does **not** generate a signed IPA, run the game on a simulator, install it on
+an iPhone, link StoreKit or advertisements, or submit anything to TestFlight.
+Apple Developer signing, final Bundle ID, device QA, native monetization and
+store disclosures remain separate release blockers.
+
+After merging this change, go to **GitHub > Actions > Verify iOS Simulator Build >
+Run workflow** using the main branch. Inspect that workflow's result. Do not
+interpret passing normal pull-request checks as evidence of native compilation.
