@@ -53,3 +53,6 @@ for (const img of contents.images) {
 }
 await writeFile(contentsPath, JSON.stringify(contents, null, 2) + "\n");
 console.log(`iOS branding applied: Orbital Drift ${version} (${build}), real game AppIcon`);
+
+// StoreKit classes are compiled into the generated native App target.
+execFileSync(process.execPath, [path.join(root, "scripts/install-ios-storekit.mjs")], { stdio: "inherit" });

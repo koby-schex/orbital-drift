@@ -8,6 +8,8 @@ on:
       - scripts/smoke-ios-simulator.sh
       - scripts/prepare-ios-release.mjs
       - scripts/render-ios-app-icon.swift
+      - scripts/install-ios-storekit.mjs
+      - native/ios/**
       - tests/ios-wrapper.mjs
       - capacitor.config.json
       - package.json
@@ -31,6 +33,8 @@ on:
       - scripts/smoke-ios-simulator.sh
       - scripts/prepare-ios-release.mjs
       - scripts/render-ios-app-icon.swift
+      - scripts/install-ios-storekit.mjs
+      - native/ios/**
 
 permissions:
   contents: read
