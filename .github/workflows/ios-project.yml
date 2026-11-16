@@ -74,6 +74,9 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :UISupportedInterfaceOrientations:0" "$PLIST" | grep -Fx UIInterfaceOrientationPortrait
       - name: Apply Orbital Drift native branding and version metadata
         run: node scripts/prepare-ios-release.mjs
+      - name: Resolve pinned Google advertising packages
+        run: |
+          xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App
       - name: Compile unsigned iOS Simulator app
         run: |
           xcodebuild \
