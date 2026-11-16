@@ -61,8 +61,8 @@ const appId = process.env.IOS_ADMOB_APP_ID || "";
 const rewardedUnitId = process.env.IOS_ADMOB_REWARDED_UNIT_ID || "";
 if (Boolean(appId) !== Boolean(rewardedUnitId))
   throw new Error("Configure both IOS_ADMOB_APP_ID and IOS_ADMOB_REWARDED_UNIT_ID or neither.");
-if (appId && (!/^ca-app-pub-\\d{16}~\\d{10}$/.test(appId) ||
-              !/^ca-app-pub-\\d{16}\\/\\d{10}$/.test(rewardedUnitId)))
+if (appId && (!/^ca-app-pub-[0-9]{16}~[0-9]{10}$/.test(appId) ||
+              !/^ca-app-pub-[0-9]{16}\/[0-9]{10}$/.test(rewardedUnitId)))
   throw new Error("Invalid AdMob application or rewarded-ad unit identifier.");
 // Default builds are test-only or entirely ad-free. Never ship test units as
 // live ads in the signed release workflow.
