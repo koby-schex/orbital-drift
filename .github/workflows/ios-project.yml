@@ -2,6 +2,18 @@ name: Verify iOS Simulator Build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ios-project.yml
+      - capacitor.config.json
+      - package.json
+      - index.html
+      - assets/**
+      - manifest.webmanifest
+      - sw.js
+      - scripts/build-mobile.mjs
 
 permissions:
   contents: read
