@@ -25565,9 +25565,7 @@
           nativeStore ? "Confirm Purchase" : "Claim Web Edition Design?",
           nativeStore
             ? product.label +
-                " " +
-                (product.price ? "(" + product.price + ")" : "") +
-                " will be added to your collection. Continue?"
+                " will open Apple's purchase confirmation sheet. The App Store will show the current local price before you pay. Continue?"
             : product.label +
                 " is complimentary in Web Edition. Add it to your collection?",
           () => {
