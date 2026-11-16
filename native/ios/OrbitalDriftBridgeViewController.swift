@@ -5,5 +5,6 @@ import Capacitor
 class OrbitalDriftBridgeViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(OrbitalDriftStoreKitPlugin())
+        bridge?.registerPluginInstance(OrbitalDriftAdMobPlugin())
     }
 }
