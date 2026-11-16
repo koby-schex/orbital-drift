@@ -13695,12 +13695,19 @@
         if (state.offers.length && !force) return state.offers;
         const retired = new Set(state.retiredFamilies),
           history = state.history,
-          candidates = expeditionThemes.filter((theme) => {
+          firstTime = expeditionThemes.filter((theme) => {
             if (retired.has(theme.family)) return false;
             const sample = makeExpeditionOffer(theme, state.offerSeed);
             return !history.some((record) => expeditionSimilarity(sample, record) >= 0.72);
-          }),
-          ranked = candidates
+          });
+        // Expedition stories have a first-time completion order, but the game's
+        // long-term expedition board must never become permanently empty.
+        // Once all new families are exhausted, replay older adventures while
+        // keeping the most recently completed/archived families off the board.
+        const recentFamilies = new Set(history.slice(0, 3).map((record) => record.family));
+        const replayable = expeditionThemes.filter((theme) => !recentFamilies.has(theme.family));
+        const candidates = firstTime.length ? firstTime : replayable;
+        const ranked = candidates
             .map((theme, index) => ({
               theme,
               score: rand(mixSeed(universeSeed, state.offerSeed, index, vaultStringSeed(theme.key))),
