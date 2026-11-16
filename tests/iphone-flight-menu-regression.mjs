@@ -28,13 +28,12 @@ game.ship.y=0;
 let saveCount=0,dockCount=0;
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const angleDiff=(a,b)=>{let d=((a-b+Math.PI)%(2*Math.PI))-Math.PI;return d< -Math.PI?d+2*Math.PI:d;};
+const state={value:rescue};
 const rescueUpdate=new Function("game","clamp","angleDiff","toast","frigateHomePosition",
  "placeShipAtFrigate","saveGame","state",
  "let pioneerRescue=state.value;\n"+extract("updatePioneerRescue","solarCrash")+
  "\nreturn dt=>{updatePioneerRescue(dt);state.value=pioneerRescue;};")(
- game,clamp,angleDiff,()=>{},()=>({x:0,y:0}),()=>dockCount++,()=>saveCount++,
- {get value(){return rescueState;},set value(v){rescueState=v;}});
-let rescueState=rescue;
+ game,clamp,angleDiff,()=>{},()=>({x:0,y:0}),()=>dockCount++,()=>saveCount++,state);
 rescueUpdate(20);
 assert.ok(rescue.x>0&&rescue.x<882);
 assert.equal(game.ship.x,1000);
@@ -49,7 +48,7 @@ assert.equal(rescue.heading,heading,"Stationary Pioneer must retain heading");
 rescueUpdate(62);
 assert.equal(rescue.phase,"returning");
 rescueUpdate(145);
-assert.equal(rescueState,null);
+assert.equal(state.value,null);
 assert.equal(saveCount,1);
 assert.equal(dockCount,1);
 assert.match(extract("updateShip","scanPlanet"),/if \(!updateOrbit\(dt\) && !pioneerRescue\)/);
