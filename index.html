@@ -10999,9 +10999,21 @@
         const cost = fleetShipCost(type);
         if (!canAfford(cost))
           return toast(d.name + " requires " + fmt(cost) + ".");
+        // Preserve unique fleet identities even when multiple construction
+        // actions happen within the same millisecond (or random values repeat).
+        // Ship IDs are referenced by active missions and stored save records.
+        const shipIdBase = "fs-" + Date.now();
+        let shipIdSuffix = game.fleet.ships.length + 1;
+        const usedShipIds = new Set([
+          ...game.fleet.ships.map((ship) => ship.id),
+          ...game.fleet.missions.map((mission) => mission.shipId),
+          ...game.fleet.completed.map((mission) => mission.shipId),
+        ]);
+        while (usedShipIds.has(shipIdBase + "-" + shipIdSuffix))
+          shipIdSuffix++;
         spend(cost);
         const ship = {
-          id: "fs-" + Date.now() + "-" + Math.floor(Math.random() * 999),
+          id: shipIdBase + "-" + shipIdSuffix,
           type,
           level: 1,
           name: d.name + " " + (game.fleet.ships.length + 1),
