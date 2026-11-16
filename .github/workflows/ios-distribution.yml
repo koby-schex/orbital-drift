@@ -56,6 +56,8 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations array" "$PLIST"
           /usr/libexec/PlistBuddy -c "Add :UISupportedInterfaceOrientations:0 string UIInterfaceOrientationPortrait" "$PLIST"
           node scripts/prepare-ios-release.mjs
+      - name: Resolve pinned native Swift packages
+        run: xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App
       - name: Import scoped signing materials
         run: bash scripts/ios-distribution.sh import
       - name: Archive and export distribution-signed IPA
