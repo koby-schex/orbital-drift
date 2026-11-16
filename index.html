@@ -25483,7 +25483,9 @@
       function monetizationStatusText() {
         const m = restoreMonetization(game.monetization);
         if (!m.storeKitReady && !m.adMobReady)
-          return "Ads are inactive in this build. All progression remains available without them.";
+          return window.Capacitor?.isNativePlatform?.() === true
+            ? "Ads are inactive in this build. All progression remains available without them."
+            : "Web Edition has no advertisements or payments. All progression remains available.";
         return (
           (isRemoveAdsOwned()
             ? "Automatic ads removed permanently. "
