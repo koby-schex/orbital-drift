@@ -11113,10 +11113,18 @@
           );
         const now = Date.now(),
           match = fleetShipTypes[s.type]?.mission === m.type,
-          dur = missionDuration(m, s),
-          run = {
+          dur = missionDuration(m, s);
+        // A timestamp alone collides when two ships launch in the same millisecond.
+        // Keep existing save IDs intact and guarantee each new run has a unique ID.
+        const runBaseId = "run-" + now + "-" + s.id;
+        let runId = runBaseId, suffix = 1;
+        while (
+          game.fleet.missions.some((entry) => entry.id === runId) ||
+          game.fleet.completed.some((entry) => entry.id === runId)
+        ) runId = runBaseId + "-" + suffix++;
+        const run = {
             ...m,
-            id: "run-" + Date.now(),
+            id: runId,
             templateId: m.id,
             shipId: s.id,
             shipType: s.type,
