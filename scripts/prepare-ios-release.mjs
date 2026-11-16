@@ -30,6 +30,12 @@ setPlist("CFBundleVersion", "string", build);
 // The source file is the official game icon, not Capacitor's template art.
 const imagePath = path.join(catalog, "OrbitalDrift-AppIcon-1024.png");
 execFileSync("swift", [path.join(root, "scripts/render-ios-app-icon.swift"), source, imagePath], { stdio: "inherit" });
+// Render on an opaque navy canvas, then strip the PNG alpha channel through
+// a temporary JPEG. App Store icons must not contain an alpha channel.
+const opaqueJpeg = path.join(catalog, "OrbitalDrift-opaque-temporary.jpg");
+execFileSync("sips", ["-s", "format", "jpeg", imagePath, "--out", opaqueJpeg], { stdio: "pipe" });
+execFileSync("sips", ["-s", "format", "png", opaqueJpeg, "--out", imagePath], { stdio: "pipe" });
+await import("node:fs/promises").then(({ unlink }) => unlink(opaqueJpeg));
 const contents = JSON.parse(await readFile(contentsPath, "utf8"));
 if (!Array.isArray(contents.images) || !contents.images.length)
   throw new Error("Capacitor generated an unexpected AppIcon catalog");
