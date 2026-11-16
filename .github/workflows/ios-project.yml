@@ -1,4 +1,4 @@
-name: Generate iOS Xcode Project
+name: Verify iOS Simulator Build
 
 on:
   workflow_dispatch:
@@ -21,14 +21,30 @@ jobs:
         run: npm test
       - name: Build bundled game
         run: npm run build:mobile
-      - name: Generate native iOS project
+      - name: Verify available Xcode version
         run: |
-          npx cap add ios
+          xcodebuild -version
+          xcodebuild -showsdks
+      - name: Generate native iOS project with Swift Package Manager
+        run: |
+          npx cap add ios --packagemanager SPM
           npx cap sync ios
+      - name: Compile unsigned iOS Simulator app
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/orbital-drift-derived-data" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+          test -d "$RUNNER_TEMP/orbital-drift-derived-data/Build/Products/Debug-iphonesimulator/App.app"
       - name: Upload unsigned iOS source project
         uses: actions/upload-artifact@v4
         with:
-          name: orbital-drift-ios-xcode-project
+          name: orbital-drift-ios-source-after-simulator-build
           path: ios/
           if-no-files-found: error
           retention-days: 7
