@@ -4,7 +4,7 @@
   "private": true,
   "description": "Portrait mobile gravity-exploration game",
   "scripts": {
-    "test": "node tests/static-smoke.mjs && node tests/release-readiness.mjs && node tests/offline-recovery.mjs && node tests/native-monetization.mjs && node tests/customization-entitlements.mjs && node tests/fleet-mission-identity.mjs && node tests/expedition-offer-lifecycle.mjs && node tests/expedition-finale-matching.mjs && node tests/economy-reward-scaling.mjs && node tests/production-claim.mjs",
+    "test": "node tests/static-smoke.mjs && node tests/release-readiness.mjs && node tests/offline-recovery.mjs && node tests/native-monetization.mjs && node tests/customization-entitlements.mjs && node tests/fleet-mission-identity.mjs && node tests/expedition-offer-lifecycle.mjs && node tests/expedition-finale-matching.mjs && node tests/economy-reward-scaling.mjs && node tests/production-claim.mjs && node tests/cosmetic-save-hydration.mjs",
     "test:static": "node tests/static-smoke.mjs",
     "test:release": "node tests/release-readiness.mjs",
     "build:mobile": "node scripts/build-mobile.mjs",
