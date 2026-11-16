@@ -40,7 +40,10 @@ assert.match(controller,/registerPluginInstance\(OrbitalDriftAdMobPlugin\(\)\)/)
 assert.match(ci,/scripts\/link-ios-ads-sdk\.mjs/);
 assert.match(dist,/vars\.IOS_ADMOB_APP_ID/);
 assert.match(dist,/vars\.IOS_ADMOB_REWARDED_UNIT_ID/);
-const privacy = between("openPrivacyOptions","setMenuTab");
+const privacyStart = html.indexOf("      function openPrivacyOptions(");
+const privacyEnd = html.indexOf("      Object.assign(window,", privacyStart);
+assert.ok(privacyStart >= 0 && privacyEnd > privacyStart);
+const privacy = html.slice(privacyStart, privacyEnd);
 assert.match(privacy,/plugin\.privacyOptions\(\)/);
 assert.match(privacy,/Privacy options are not available/);
 assert.match(html,/Sponsored rewards are unavailable in this build/);
