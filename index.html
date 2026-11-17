@@ -12963,6 +12963,7 @@
         saveGame(false);
       }
       function openChoice(b) {
+        cleanControlButtons();
         paused = true;
         modalFreeze = true;
         ui.choiceOverlay.classList.remove("closing");
@@ -14866,8 +14867,7 @@
         const unresolved = !game.sectorEvent?.complete;
         hideOverlayWithTransition(ui.encounterOverlay);
         document.body.classList.remove("encounter-open");
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
+        settleOverlayPause();
         if (unresolved)
           toast("Signal left open. Return whenever you are ready to respond.");
       }
@@ -20662,6 +20662,7 @@
       }
       function showUpgradePanel(title, summary, rows = []) {
         if (!ui.upgradeOverlay) return;
+        cleanControlButtons();
         paused = true;
         modalFreeze = true;
         ui.upgradeTitle.textContent = title;
@@ -20685,6 +20686,7 @@
       function showMissionPanel(title, summary, rows = []) {
         if (!ui.missionOverlay) return;
         // Never interrupt a major reward or active flight with an advertisement.
+        cleanControlButtons();
         paused = true;
         modalFreeze = true;
         playSound("confirm");
