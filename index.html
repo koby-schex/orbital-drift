@@ -21026,7 +21026,6 @@
           start: t,
           duration: game.settings?.motion === "Reduced" ? 210 : 390,
         };
-        toast(activeVisualPhenomenon.name + " detected — " + activeVisualPhenomenon.desc);
         addActivity("discovery", activeVisualPhenomenon.name, activeVisualPhenomenon.desc);
       }
       function systemVisualThemeIndex(sys) {
@@ -21130,6 +21129,50 @@
         image.src = CINEMATIC_ART[kind];
         return null;
       }
+      // Composition is presentation-only; never change saved bodies or routes.
+      function environmentComposition(sys) {
+        const index=systemVisualThemeIndex(sys), seed=visualSeed(sys?.seed||"Sol"),
+          layouts=[
+            {shape:"cloudbank",density:1.25,rocks:.65,galaxies:2,angle:-.48},
+            {shape:"dustlane",density:.72,rocks:1.8,galaxies:0,angle:.42},
+            {shape:"aurora",density:1.1,rocks:.55,galaxies:1,angle:-.18},
+            {shape:"filaments",density:.92,rocks:1.15,galaxies:1,angle:.76},
+            {shape:"galaxy",density:1.55,rocks:.38,galaxies:3,angle:-.32},
+            {shape:"void",density:.34,rocks:.24,galaxies:0,angle:.1}
+          ];
+        const special=sys?.specialType;
+        return {...(special==="parallel"?{shape:"rift",density:.8,rocks:.3,galaxies:0,angle:.85}:
+          special==="cosmicSpirit"?{shape:"halo",density:1.4,rocks:.2,galaxies:1,angle:-.4}:layouts[index]),
+          offset:((seed%997)/997-.5)*.24,seed};
+      }
+      function paintEnvironmentComposition(c,w,h,layout,theme) {
+        const scale=Math.max(w,h), angle=layout.angle, cx=w*(.5+layout.offset), cy=h*(.48-layout.offset);
+        c.save(); c.translate(cx,cy); c.rotate(angle);
+        const glow=(x,y,rx,ry,color,alpha)=>{
+          c.save();c.translate(x,y);c.scale(rx,ry);
+          const g=c.createRadialGradient(0,0,0,0,0,1);
+          g.addColorStop(0,rgba(color,alpha));g.addColorStop(.4,rgba(color,alpha*.5));g.addColorStop(1,"rgba(0,0,0,0)");
+          c.fillStyle=g;c.fillRect(-1,-1,2,2);c.restore();
+        };
+        if(layout.shape==="void"){
+          glow(-scale*.36,scale*.22,scale*.38,scale*.09,theme.accent2,.16);
+          c.fillStyle="rgba(0,4,10,.53)";c.fillRect(-scale,-scale,scale*2,scale*2);
+        } else if(layout.shape==="dustlane"){
+          glow(0,-scale*.16,scale*.85,scale*.14,theme.accent,.32);
+          glow(0,scale*.14,scale*.82,scale*.1,theme.accent2,.24);
+          glow(0,0,scale*.95,scale*.09,theme.deep,.86);
+        } else if(layout.shape==="cloudbank"){
+          for(let n=0;n<5;n++)glow((n-2)*scale*.16,Math.sin(n*1.9)*scale*.12,scale*.32,scale*.23,theme.nebulas[n%theme.nebulas.length],.25);
+        } else if(layout.shape==="aurora"||layout.shape==="filaments"||layout.shape==="rift"){
+          for(let n=0;n<4;n++)glow((n-1.5)*scale*.1,Math.sin(n*1.3)*scale*.15,scale*.7,scale*(layout.shape==="filaments"?.035:.075),n%2?theme.accent:theme.accent2,.24);
+        } else {
+          glow(0,0,scale*.63,scale*.26,theme.accent,.31);
+          glow(0,0,scale*.18,scale*.12,theme.accent2,.28);
+          c.strokeStyle=rgba(theme.accent2,.14);c.lineWidth=scale*.008;
+          for(let n=1;n<4;n++){c.beginPath();c.ellipse(0,0,scale*.13*n,scale*.055*n,0,0,TAU);c.stroke();}
+        }
+        c.restore();
+      }
       function cinematicSky() {
         const kind = cinematicArtKind(), image = environmentImage(kind);
         if (!image) return null; // The procedural sky is always a usable fallback.
@@ -21176,6 +21219,7 @@
           lightField.addColorStop(1, "rgba(0,0,0,0)");
           c.fillStyle = lightField; c.fillRect(0, 0, width, height);
         }
+        if (!tutorial) paintEnvironmentComposition(c,width,height,environmentComposition(game.system),sectorVisualTheme());
         const vignette = c.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
         vignette.addColorStop(0, "rgba(0,3,9,0)"); vignette.addColorStop(1, "rgba(0,3,9,.4)");
         c.fillStyle = vignette; c.fillRect(0, 0, width, height);
@@ -21372,7 +21416,8 @@
         renderAssets.builds++;
         const base = hex(b.name === "Mars" ? "#be7250" : b.color),
           gas = ["bands", "rings", "storm"].includes(b.pattern),
-          ocean = b.pattern === "continents", lava = b.pattern === "lava";
+          ocean = b.pattern === "continents", lava = b.pattern === "lava",
+          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%7-3)*.11;
         const image = rasterAsset(size, size, data => {
           for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
@@ -21383,9 +21428,9 @@
               continue;
             }
             const nz = Math.sqrt(1 - rr),
-              terrain = visualFbm(nx * 3 + 9, ny * 3 + 7, nz * 3 + 5, seed, 5),
+              terrain = visualFbm(nx * (3+variation) + 9, ny * (3-variation) + 7, nz * 3 + 5, seed, 5),
               fine = visualNoise(nx * 70 + 80, ny * 70 + 80, nz * 70, seed + 97),
-              bands = 0.5 + 0.26 * Math.sin(ny * 31 + (terrain - 0.5) * 7) +
+              bands = 0.5 + 0.26 * Math.sin(ny * (31+variation*34) + (terrain - 0.5) * 7) +
                 0.14 * Math.sin(ny * 67 + terrain * 13),
               relief = gas ? b.pattern === "storm" ? 0.58 + terrain * 0.5 :
                 0.65 + bands * (b.name === "Uranus" ? 0.13 : 0.28) + terrain * 0.15 :
@@ -21401,6 +21446,10 @@
               const glint = Math.pow(Math.max(0, nz * 0.88 - nx * 0.34 - ny * 0.3), 48) * (1 - land) * 72;
               rgb = coast.map((v, c) => v * (1 - land) + ground[c] * land + glint);
               if (Math.abs(ny) > 0.87 + (terrain - 0.5) * 0.2) rgb = [213, 228, 232];
+            }
+            if (!gas && !ocean && !lava && b.pattern !== "crystal" && variation !== 0) {
+              const ridge=Math.pow(Math.max(0,1-Math.abs(terrain-.53)*9),2)*.12;
+              rgb=rgb.map(v=>v*(.94+ridge+variation*(fine-.5)));
             }
             if (b.pattern === "craters") {
               const longitude = Math.atan2(nx, nz), latitude = Math.asin(ny),
@@ -21463,6 +21512,7 @@
         shootingStars = [];
         const theme = sectorVisualTheme(),
           quality = game.settings?.graphics || "High",
+          layout = game.system?.isTutorial ? {density:1,rocks:1,galaxies:3} : environmentComposition(game.system),
           starDiv =
             quality === "Low" ? 5400 : quality === "Medium" ? 3900 : 3100,
           nebulaBase = quality === "Low" ? 4 : quality === "Medium" ? 7 : 9,
@@ -21475,7 +21525,7 @@
           return backdropRandomState / 4294967296;
         };
         buildDeepSky();
-        for (let i = 0, c = Math.floor((W * H) / starDiv); i < c; i++) {
+        for (let i = 0, c = Math.min(1000,Math.floor((W * H) / starDiv*layout.density)); i < c; i++) {
           stars.push({
             x: random() * W,
             y: random() * H,
@@ -21523,7 +21573,7 @@
             ring: false,
           });
         }
-        for (let i = 0, c = Math.floor((W * H) / asteroidDiv); i < c; i++) {
+        for (let i = 0, c = Math.min(32,Math.floor((W * H) / asteroidDiv*layout.rocks)); i < c; i++) {
           asteroids.push({
             x: random() * W,
             y: random() * H,
@@ -21564,7 +21614,7 @@
               length: between(currentSystemIndex * 191 + i * 71, 72, 155),
               color: i % 2 ? theme.accent2 : theme.accent,
             });
-          const galaxyCount = quality === "High" ? 3 : 2;
+          const galaxyCount = Math.min(layout.galaxies,quality === "High" ? 3 : 2);
           for (let i = 0; i < galaxyCount; i++)
             distantGalaxies.push({
               x: between(i * 83 + currentSystemIndex * 5, W * 0.08, W * 0.92),
@@ -23652,7 +23702,7 @@
         if (!event) return;
         const q = clamp((t - event.start) / event.duration, 0, 1),
           fade = Math.sin(q * Math.PI),
-          reduced = game.settings?.motion === "Reduced";
+          reduced = game.settings?.motion === "Reduced", phase = reduced ? .5 : q;
         ctx.save();
         ctx.globalAlpha = fade;
         ctx.globalCompositeOperation = "screen";
@@ -23660,7 +23710,7 @@
           const count = reduced ? 5 : 12;
           ctx.lineCap = "round";
           for (let i = 0; i < count; i++) {
-            const x = ((q * (W + 520) * 1.5 + i * 149) % (W + 320)) - 220,
+            const x = ((phase * (W + 520) * 1.5 + i * 149) % (W + 320)) - 220,
               y = H * (0.12 + ((i * 19) % 73) / 100);
             const trail = ctx.createLinearGradient(x - 150, y + 70, x, y);
             trail.addColorStop(0, "rgba(0,0,0,0)");
@@ -23675,12 +23725,12 @@
         } else if (event.type === "ionLightning" || event.type === "realityFracture") {
           const cracks = reduced ? 2 : 5;
           for (let i = 0; i < cracks; i++) {
-            ctx.strokeStyle = rgba(i % 2 ? event.color : event.color2, 0.28 + 0.22 * Math.sin(q * 42 + i));
+            ctx.strokeStyle = rgba(i % 2 ? event.color : event.color2, 0.28 + 0.22 * Math.sin(phase * 42 + i));
             ctx.lineWidth = event.type === "realityFracture" ? 2.2 : 1.2;
             ctx.beginPath();
             for (let j = 0; j < 8; j++) {
               const x = W * (0.08 + j * 0.125),
-                y = H * (0.2 + i * 0.13) + Math.sin(j * 3.7 + i + q * 18) * 42;
+                y = H * (0.2 + i * 0.13) + Math.sin(j * 3.7 + i + phase * 18) * 42;
               if (!j) ctx.moveTo(x, y);
               else ctx.lineTo(x, y);
             }
