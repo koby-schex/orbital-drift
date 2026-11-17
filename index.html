@@ -20722,6 +20722,7 @@
           game.settings?.graphics === "High" ? "high" : "medium";
         resizeTitleCanvas();
         buildBackdrop();
+        applyControlPositions();
         if(ui.menu?.classList.contains("open")) renderSkinPreviews();
       }
       function resizeTitleCanvas() {
@@ -26484,9 +26485,11 @@
         saveGame(false);
         toast("Control layout saved.");
       }
+      const flightPointers = {joystick:null,thrust:null,brake:null};
       function cleanControlButtons() {
         keys.clear();
         touch.active = false;
+        Object.keys(flightPointers).forEach(k=>flightPointers[k]=null);
         if (ui.knob) {
           ui.knob.style.left = "var(--stickKnobHome)";
           ui.knob.style.top = "var(--stickKnobHome)";
@@ -26535,6 +26538,7 @@
       }
       addEventListener("pointermove", moveControlDrag);
       addEventListener("pointerup", endControlDrag);
+      addEventListener("pointercancel",e=>{if(layoutDrag){layoutDrag.el.style.transition="";layoutDrag=null;applyControlPositions();} });
       function touchMove(e) {
         const r = ui.stick.getBoundingClientRect(),
           cx = r.left + r.width / 2,
@@ -26544,71 +26548,66 @@
           sens = game.settings?.touchSensitivity || 1,
           knob = ui.knob.getBoundingClientRect(),
           home = (r.width - knob.width) / 2,
-          limit = Math.max(34, r.width / 2 - knob.width / 2 - 6),
+          limit = Math.max(1, r.width / 2 - knob.width / 2 - 6),
           mag = Math.min(limit, Math.hypot(dx, dy)),
           a = Math.atan2(dy, dx);
-        touch = { active: true, x: Math.cos(a) * sens, y: Math.sin(a) * sens };
+        touch = { active: mag > 5, x: Math.cos(a) * sens, y: Math.sin(a) * sens };
         ui.knob.style.left = home + Math.cos(a) * mag + "px";
         ui.knob.style.top = home + Math.sin(a) * mag + "px";
       }
-      ui.stick.onpointerdown = (e) => {
-        if (isLayoutEdit()) return startControlDrag(e, "joystick", ui.stick);
-        e.preventDefault();
-        ui.stick.setPointerCapture(e.pointerId);
-        touchMove(e);
+      function flightInputAllowed() {
+        return canResumePlay()&&!paused&&!modalFreeze&&!gameplayModalOpen()&&!pioneerRescue;
+      }
+      function claimFlightPointer(e,key,element) {
+        if(!flightInputAllowed()||flightPointers[key]!==null)return false;
+        e.preventDefault(); flightPointers[key]=e.pointerId;
+        element.setPointerCapture?.(e.pointerId);
+        resumeAudio();
+        return true;
+      }
+      function releaseFlightPointer(e,key) {
+        if(flightPointers[key]!==e.pointerId)return false;
+        flightPointers[key]=null;
+        return true;
+      }
+      ui.stick.onpointerdown = e=>{
+        if(isLayoutEdit())return startControlDrag(e,"joystick",ui.stick);
+        if(claimFlightPointer(e,"joystick",ui.stick))touchMove(e);
       };
-      ui.stick.onpointermove = (e) => {
-        if (touch.active) touchMove(e);
+      ui.stick.onpointermove=e=>{
+        if(flightPointers.joystick===e.pointerId)touchMove(e);
       };
       function endTouch() {
-        touch.active = false;
-        ui.knob.style.left = "var(--stickKnobHome)";
-        ui.knob.style.top = "var(--stickKnobHome)";
+        touch.active=false;
+        flightPointers.joystick=null;
+        if(ui.knob){ui.knob.style.left="var(--stickKnobHome)";ui.knob.style.top="var(--stickKnobHome)";}
       }
-      ui.stick.onpointerup = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        endTouch();
-      };
-      ui.stick.onpointercancel = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        endTouch();
-      };
-      ui.touchThrust.onpointerdown = (e) => {
-        if (isLayoutEdit())
-          return startControlDrag(e, "thrust", ui.touchThrust);
-        e.preventDefault();
-        resumeAudio();
-        keys.add("touch");
-      };
-      ui.touchThrust.onpointerup = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("touch");
-      };
-      ui.touchThrust.onpointercancel = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("touch");
-      };
-      ui.touchBrake.onpointerdown = (e) => {
-        if (isLayoutEdit()) return startControlDrag(e, "brake", ui.touchBrake);
-        e.preventDefault();
-        resumeAudio();
-        keys.add("brake");
-      };
-      ui.touchBrake.onpointerup = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("brake");
-      };
-      ui.touchBrake.onpointercancel = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("brake");
-      };
+      function releaseJoystick(e){
+        if(layoutDrag)return endControlDrag(e);
+        if(releaseFlightPointer(e,"joystick"))endTouch();
+      }
+      ui.stick.onpointerup=releaseJoystick;
+      ui.stick.onpointercancel=releaseJoystick;
+      ui.stick.onlostpointercapture=e=>{if(releaseFlightPointer(e,"joystick"))endTouch();};
+      function bindHeldFlightControl(element,key,heldKey) {
+        element.onpointerdown=e=>{
+          if(isLayoutEdit())return startControlDrag(e,key,element);
+          if(claimFlightPointer(e,key,element))keys.add(heldKey);
+        };
+        const release=e=>{
+          if(layoutDrag)return endControlDrag(e);
+          if(releaseFlightPointer(e,key)){e.preventDefault();keys.delete(heldKey);}
+        };
+        element.onpointerup=release;
+        element.onpointercancel=release;
+        element.onlostpointercapture=e=>{if(releaseFlightPointer(e,key))keys.delete(heldKey);};
+      }
+      bindHeldFlightControl(ui.touchThrust,"thrust","touch");
+      bindHeldFlightControl(ui.touchBrake,"brake","brake");
       ui.orbitRelease.onpointerdown = (e) => {
         if (isLayoutEdit())
           return startControlDrag(e, "release", ui.orbitRelease);
+        if(!flightInputAllowed())return;
         e.preventDefault();
         resumeAudio();
         toggleOrbit();
