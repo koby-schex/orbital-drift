@@ -5714,6 +5714,7 @@
         distantGalaxies = [],
         upgradeFX = [],
         captureFX = [],
+        jumpArrivalFX = null,
         audioNoticeShown = false,
         touch = { active: false, x: 0, y: 0 },
         layoutDrag = null,
@@ -9740,6 +9741,7 @@
         echoRecorder = null;
         upgradeFX.length = 0;
         captureFX.length = 0;
+        jumpArrivalFX = null;
         cleanControlButtons();
       }
       function initGame(showTips = false, playable = true) {
@@ -10062,6 +10064,7 @@
             game.sectorEvent = createSectorEvent(currentSystemIndex);
             resetSystemVisualPhenomena();
             buildBackdrop();
+            startJumpArrival();
             playSound("event");
             feedbackPulse("slingshot");
             addActivity(
@@ -10226,6 +10229,7 @@
         game.sectorEvent = createSectorEvent(currentSystemIndex);
         resetSystemVisualPhenomena();
         buildBackdrop();
+        startJumpArrival();
         if (game.system.modifier?.key !== "calm")
           game.captainLog.sectorsWithModifiers++;
         if (game.system.specialType === "cosmicSpirit")
@@ -21125,12 +21129,14 @@
         const ringed = b.name === "Saturn" || b.pattern === "rings";
         const rings = front => {
           if (!ringed) return;
-          c.save(); c.rotate(-0.32);
-          for (let i = 0; i < 24; i++) {
-            if (i === 12 || i === 13) continue;
+          const profile=planetRingProfile(b), count=visualDetailBudget(game.settings).rings;
+          c.save(); c.rotate(profile.tilt);
+          for (let i = 0; i < count; i++) {
+            const q=i/count;
+            if(q>profile.gap&&q<profile.gap+.075)continue;
             c.strokeStyle = rgba(light(b.color, 0.5), 0.18 + rand(i + 63) * 0.24);
             c.lineWidth = r * 0.028;
-            c.beginPath(); c.ellipse(0, 0, r * (1.3 + i * 0.035), r * (0.34 + i * 0.011), 0, front ? 0 : Math.PI, front ? Math.PI : TAU); c.stroke();
+            c.beginPath(); c.ellipse(0, 0, r * (1.3 + q * .85), r * (0.34 + q * .25)*profile.flatten, 0, front ? 0 : Math.PI, front ? Math.PI : TAU); c.stroke();
           }
           c.restore();
         };
@@ -21156,7 +21162,7 @@
       function renderDiscoveryPortrait() {
         const b = activeDiscoveryBody, canvas = document.getElementById("discoveryPortrait");
         if (!b || !canvas) return;
-        const key = [b.name, b.featureSeed, b.color, !!earthAlbedo.pixels].join(":");
+        const key = [b.name, b.featureSeed, b.color, !!earthAlbedo.pixels, game.settings?.graphics].join(":");
         if (canvas.dataset.planet === key) return;
         canvas.width = 800; canvas.height = 420;
         const c = canvas.getContext("2d"); if (!c) return;
@@ -22779,7 +22785,7 @@
       function drawCraftEngine(c, engine, skin, thrust) {
         const {x,y,size}=engine, power=clamp(Number(thrust)||0,0,1), length=size*(2.2+power*8), color=skin.glow||skin.accent||"#7dd3fc";
         c.save(); c.globalCompositeOperation="screen";
-        const glow=c.createRadialGradient(x,y,0,x,y,size*4);
+        const glow=c.createRadialGradient(x,y,0,x,y,size*(3.1+power*.9));
         glow.addColorStop(0,rgba(color,0.18+power*0.30));glow.addColorStop(1,"rgba(0,0,0,0)");
         c.fillStyle=glow;c.fillRect(x-size*4,y-size*4,size*8,size*8);
         const plume=c.createLinearGradient(x-length,y,x,y);
@@ -22791,7 +22797,12 @@
           c.fillStyle=rgba("#e9faff",0.65);
           c.beginPath();c.moveTo(x,y-size*.24);c.lineTo(x-length*.62,y);c.lineTo(x,y+size*.24);c.closePath();c.fill();
         }
-        c.fillStyle="#def7ff";c.fillRect(x-0.6,y-size*0.6,1.2,size*1.2);c.restore();
+        c.fillStyle="#def7ff";c.fillRect(x-0.6,y-size*0.6,1.2,size*1.2);
+        if(power>.4 && game.settings?.graphics==="High" && game.settings?.performanceMode!=="Battery Saver"){
+          c.fillStyle=rgba(color,.25);c.fillRect(x-length*.23,y-size*.36,1.2,size*.72);
+          c.fillRect(x-length*.42,y-size*.22,.9,size*.44);
+        }
+        c.restore();
       }
       const spacecraftSprites = { entries:new Map(), bytes:0, budget:12*1024*1024 };
       function craftBounds(model) {
@@ -22832,7 +22843,7 @@
           }
           c.fillStyle=finish;c.fill();
           // Fine plating, clipped to each actual hull section (cached, not per-frame).
-          if (material === "hull" || material === "trim") {
+          if (["hull","trim","metal","paint"].includes(material)) {
             c.save(); c.clip();
             const xs = points.map(p => p[0]), left = Math.min(...xs), right = Math.max(...xs);
             c.strokeStyle = "rgba(1,6,12,.3)"; c.lineWidth = 0.28;
@@ -22842,6 +22853,10 @@
                 c.beginPath(); c.moveTo(col, row); c.lineTo(col, Math.min(bottom, row + 5)); c.stroke();
                 c.fillStyle = "rgba(232,243,241,.24)"; c.fillRect(col + .8, row + .8, .4, .4);
               }
+            }
+            if(right-left>12 && bottom-top>6){
+              c.fillStyle="rgba(4,12,19,.38)";c.fillRect(left+3,top+2,Math.min(9,(right-left)*.3),1.6);
+              c.fillStyle="rgba(219,235,241,.48)";c.fillRect(left+3,top+2,.65,1.6);
             }
             c.restore();
           }
@@ -23700,6 +23715,7 @@
         drawUpgradeEffects();
         drawObjective();
         drawScreenFX();
+        drawJumpArrival();
         drawTitleShowcase();
       }
       function drawMiniMap() {
@@ -24052,6 +24068,38 @@
         g.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+      }
+      function jumpArrivalFrame(elapsed,settings={}) {
+        const duration=settings.motion==="Reduced"?260:850;
+        const q=clamp(elapsed/duration,0,1);
+        return {active:q<1,fade:Math.pow(1-q,2),rays:visualDetailBudget(settings).jumpRays,progress:q};
+      }
+      function startJumpArrival() {
+        // Jump is already committed; camera and visual state are transient only.
+        cam.x=game.ship.x;cam.y=game.ship.y;
+        jumpArrivalFX={started:performance.now()};
+      }
+      function drawJumpArrival() {
+        if(!jumpArrivalFX)return;
+        const frame=jumpArrivalFrame(performance.now()-jumpArrivalFX.started,game.settings);
+        if(!frame.active){jumpArrivalFX=null;return;}
+        const theme=activeVisualTheme||sectorVisualTheme(), cx=W*.5,cy=H*.5,span=Math.hypot(W,H);
+        ctx.save();
+        if(frame.rays){
+          ctx.globalCompositeOperation="screen";
+          for(let i=0;i<frame.rays;i++){
+            const a=i*TAU/frame.rays+.31,
+              near=span*(.08+frame.progress*.15),far=near+span*.28;
+            const x=Math.cos(a),y=Math.sin(a);
+            const g=ctx.createLinearGradient(cx+x*near,cy+y*near,cx+x*far,cy+y*far);
+            g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,rgba(theme.accent,.25*frame.fade));
+            ctx.strokeStyle=g;ctx.lineWidth=1.1;
+            ctx.beginPath();ctx.moveTo(cx+x*near,cy+y*near);ctx.lineTo(cx+x*far,cy+y*far);ctx.stroke();
+          }
+        }
+        ctx.globalCompositeOperation="source-over";
+        ctx.fillStyle=rgba(theme.deep,.52*frame.fade);ctx.fillRect(0,0,W,H);
         ctx.restore();
       }
       function drawScreenFX() {
