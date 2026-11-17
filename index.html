@@ -26135,10 +26135,13 @@
           audio.ctx.suspend().catch?.(() => {});
       }
       function foregroundJourney() {
-        // Never auto-unpause flight or restart sound after an interruption.
+        // Do not auto-unpause flight or restore held input. Resume only the
+        // user's previously enabled audio setting, as in the existing game.
         loop.last = 0;
         keys.clear();
         endTouch();
+        if (audio && (game.settings?.music === "On" || game.settings?.sound === "On"))
+          audio.ctx.resume().then?.(syncAudioSettings).catch?.(() => {});
       }
       function registerNativeLifecycle() {
         const lifecycle = window.Capacitor?.Plugins?.OrbitalDriftLifecycle;
