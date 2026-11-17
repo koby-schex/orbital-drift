@@ -12504,6 +12504,20 @@
         b.memory[type] = (b.memory[type] || 0) + n;
         updateIdentity(b);
       }
+      // Context actions must agree with the actual locked or explicitly targeted world.
+      function nearbyPlanet(predicate,limit) {
+        if(!game.ship||!game.system)return {body:null,d:Infinity};
+        const candidates=game.system.bodies.filter(b=>b.type!=="star"&&predicate(b)).map(b=>({body:b,d:dist(game.ship,b)-visualRadius(b)}))
+          .filter(n=>n.d<=limit(n.body));
+        const preferred=game.ship.orbitLocked?game.ship.lockBody:manualTargetName;
+        return candidates.find(n=>n.body.name===preferred)||candidates.reduce((best,n)=>n.d<best.d?n:best,{body:null,d:Infinity});
+      }
+      function nearestSurveyTarget() {
+        return nearbyPlanet(b=>!b.discoveryRewardClaimed,()=>230);
+      }
+      function nearestRefuelTarget() {
+        return nearbyPlanet(b=>game.captured.has(b.name),b=>visualRadius(b)+120);
+      }
       function nearestLockTarget() {
         if (!game.ship || !game.system) return { body: null, d: Infinity };
         // The closest stellar body might be a star or outside lock range.
@@ -12512,7 +12526,10 @@
           ...game.system.bodies.filter((b) => b.type !== "star"),
           frigatePosition(),
         ].filter((b) => b && canOrbitLock(b));
-        const selected = candidates.find((b) => b.name === selectedPlanetName);
+        const preferred = tutorialRequiresObjective() ? currentTarget() : null;
+        const selected = candidates.find(b=>preferred && (b.name===preferred.name || (b.type==="frigate"&&preferred.type==="frigate"))) ||
+          candidates.find(b=>manualTargetName==="__FRIGATE__"?b.type==="frigate":b.name===manualTargetName) ||
+          candidates.find((b) => b.name === selectedPlanetName);
         const target = selected || candidates.reduce((best, b) => {
           const edge = Math.hypot(game.ship.x - b.x, game.ship.y - b.y) -
             (b.type === "frigate" ? b.radius || 42 : visualRadius(b));
@@ -12786,7 +12803,7 @@
       }
 
       function scanPlanet(target = null) {
-        const n = nearestBody(),
+        const n = nearestSurveyTarget(),
           b = typeof target === "string" ? body(target) : n.body;
         if (!b || b.type === "star") return toast("No planetary world is in scanner range.");
         const range = dist(game.ship, b) - visualRadius(b);
@@ -12816,7 +12833,9 @@
               (b.capturable ? " • Suitable for capture" : " • Survey-only world"),
           );
         }
+        if(firstSurvey) saveGame(false);
         showDiscovery(b, reward);
+        if(ui.menu?.classList.contains("open"))renderMenu();
       }
       function capture() {
         const s = game.ship;
@@ -12833,6 +12852,8 @@
         finishCapture(b);
       }
       function finishCapture(b, replace = null) {
+        if(!b || !b.capturable || game.captured.has(b.name))return false;
+        if(replace && (replace==="Earth" || !game.captured.has(replace)))return false;
         feedbackPulse("capture");
         if (replace) {
           const old = body(replace);
@@ -12990,12 +13011,8 @@
           if (ui.menu?.classList.contains("open")) renderMenu();
           return;
         }
-        const n = nearestBody();
-        if (
-          n.body &&
-          game.captured.has(n.body.name) &&
-          n.d < visualRadius(n.body) + 120
-        ) {
+        const n = nearestRefuelTarget();
+        if (n.body) {
           game.ship.fuel = game.ship.maxFuel;
           recordPlanet(n.body, "refuels", 1);
           toast("Refueled at " + n.body.name + ".");
@@ -20315,7 +20332,7 @@
         }
       }
       function smartAction() {
-        const n = nearestBody(),
+        const n = nearestSurveyTarget(), fuelTarget=nearestRefuelTarget(),
           h = nearestEcho(),
           ev = nearestSectorEvent(),
           bh = nearestBlackHole();
@@ -20336,33 +20353,20 @@
             show: true,
             tone: "travel",
           };
+        if (game.ship.orbitLocked && game.ship.lockBody) {
+          const b=body(game.ship.lockBody);
+          if(b&&b.type!=="star"){
+            if(!b.discoveryRewardClaimed&&!game.captured.has(b.name)&&dist(game.ship,b)-visualRadius(b)<=230)return {label:"Scan "+b.name,run:()=>scanPlanet(b.name),show:true};
+            if(b.capturable&&!game.captured.has(b.name))return {label:"Capture "+b.name,run:capture,show:true};
+            if(game.captured.has(b.name)&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
+          }
+        }
         if (h && h.d < 70 && !h.echo.harvested)
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
-        if (
-          n.body &&
-          n.body.type !== "star" &&
-          n.d < 230 &&
-          !n.body.discoveryRewardClaimed
-        )
-          return {
-            label: "Scan " + n.body.name,
-            run: () => scanPlanet(n.body.name),
-            show: true,
-          };
-        if (game.ship.orbitLocked && game.ship.lockBody) {
-          const b = body(game.ship.lockBody);
-          if (b && b.capturable && !game.captured.has(b.name))
-            return { label: "Capture " + b.name, run: capture, show: true };
-        }
-        if (
-          n.body &&
-          game.captured.has(n.body.name) &&
-          n.d < visualRadius(n.body) + 120 &&
-          game.ship.fuel < game.ship.maxFuel * 0.94
-        )
-          return { label: "Refuel", run: refuel, show: true };
+        if(n.body)return {label:"Scan "+n.body.name,run:()=>scanPlanet(n.body.name),show:true};
+        if(fuelTarget.body&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
         if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
           return {
             label: "Scan Mystery",
@@ -26340,6 +26344,7 @@
         .querySelectorAll(".dock button")
         .forEach((b) => (b.onclick = () => openMenu(b.dataset.menu)));
       ui.smartBtn.onclick = () => {
+        if(!canResumePlay()||paused||modalFreeze)return;
         const a = smartAction();
         if (a.show) a.run();
       };
