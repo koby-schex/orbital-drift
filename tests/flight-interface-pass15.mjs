@@ -11,6 +11,7 @@ timers[1]();assert.equal(children.length,1,"Old timer must not remove new messag
 timers[3]();assert.equal(children.length,0);
 assert.doesNotMatch(html,/toast\("Autosaved\."\)/);
 assert.match(html,/autosaveIndicator: "Off"/);
+assert.doesNotMatch(html,/id="flightSaveStatus"|id="autosaveSelect"/);
 assert.match(html,/id="titleJourney" hidden/);
 assert.match(html,/\.title-screen \.title-actions\.has-save #loadBtn/);
 assert.match(html,/body\.hud-collapsed \.mini-map/);

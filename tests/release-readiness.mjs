@@ -835,8 +835,14 @@ assert.ok(readiness.length >= 16, "Release checklist should cover all critical g
 assert.ok(readiness.every((check) => check.pass), `Runtime release checks failed: ${readiness.filter((check) => !check.pass).map((check) => check.label).join(", ")}`);
 
 assert.match(html, /bottom:\s*calc\(var\(--miniMapSize\) \+ 30px/, "Desktop action must clear Nav Map");
-assert.match(html, /@media \(max-width: 900px\)[\s\S]*?\.smart\s*\{[\s\S]*?bottom:\s*calc\(370px/, "Mobile action must clear controls and Nav Map");
-assert.match(html, /--thrustSize:\s*76px/, "Primary touch control must remain large");
+const compactFlightCss = html.slice(html.indexOf("/* Pass 23: compact flight controls"));
+assert.match(compactFlightCss, /\.smart\s*\{\s*bottom:\s*calc\(354px/, "Mobile action must clear controls and Nav Map");
+assert.ok(354 >= 254 + 92 + 8, "Context action must clear even the large orbit button");
+assert.ok(112 >= 14 + 92 + 6, "Brake must clear the large thrust button");
+const thrustSizes = [...html.matchAll(/--thrustSize:\s*(\d+)px/g)].map(match => Number(match[1]));
+assert.equal(thrustSizes[0], 68, "Default thrust control must match the approved compact layout");
+assert.ok(thrustSizes.every(size => size >= 44), "Every thrust size must retain a comfortable touch target");
+assert.ok(thrustSizes.includes(92), "Large thrust accessibility option must remain available");
 assert.match(html, /prefers-reduced-motion:\s*reduce/, "Reduced motion support must remain present");
 assert.match(html, /Web Edition designs are complimentary and never require payment/, "Web commerce copy must be accurate and player-facing");
 assert.match(html, /audio\.ctx\.suspend/, "Backgrounding should suspend audio");

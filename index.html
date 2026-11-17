@@ -45,13 +45,13 @@
           inset 0 1px 0 rgba(255, 255, 255, 0.08);
         --safeBottom: env(safe-area-inset-bottom, 0px);
         --safeTop: env(safe-area-inset-top, 0px);
-        --stickSize: 118px;
-        --stickKnob: 40px;
-        --stickKnobHome: 39px;
-        --thrustSize: 76px;
-        --releaseSize: 76px;
-        --brakeSize: 68px;
-        --miniMapSize: 136px;
+        --stickSize: 106px;
+        --stickKnob: 36px;
+        --stickKnobHome: 35px;
+        --thrustSize: 68px;
+        --releaseSize: 68px;
+        --brakeSize: 60px;
+        --miniMapSize: 124px;
       }
       * {
         box-sizing: border-box;
@@ -5129,6 +5129,27 @@
       .milestone-meter {height:5px;background:#243644;border-radius:5px;overflow:hidden;margin:8px 0}
       .milestone-meter div {height:100%;background:#83c6bc;border-radius:5px}
       .milestone-row {text-align:left;padding:12px}
+      /* Pass 23: compact flight controls, not menu buttons. Keep optional Large sizes. */
+      .flight-save-status { display: none !important; }
+      .smart { min-width: 116px; min-height: 44px; padding: 7px 10px; font-size: 12px; max-width: min(220px, calc(100vw - 28px)); overflow-wrap: anywhere; }
+      .smart:disabled { opacity: .85; transform: none; }
+      .objective-pill { padding: 6px 10px; min-height: 44px; }
+      .objective-pill > span:first-child { min-width: 0; overflow: hidden; }
+      .objective-pill #objectivePillSub { overflow: hidden; text-overflow: ellipsis; }
+      body.hud-collapsed .hud-toggle { min-width: 60px; }
+      .pause-btn { min-width: 44px; min-height: 44px; }
+      .menu-launcher { min-width: 72px; min-height: 44px; padding: 6px 10px; }
+      @media (max-width: 900px) {
+        .touch, .brake { bottom: calc(156px + var(--safeBottom)); }
+        .orbit-release { bottom: calc(254px + var(--safeBottom)); }
+        .brake { right: 112px; }
+        body:not(.thrust-large) .brake { right: 88px; }
+        .stick { bottom: calc(140px + var(--safeBottom)); }
+        .smart { bottom: calc(354px + var(--safeBottom)); }
+        .menu-launcher, .pause-btn { top: calc(10px + var(--safeTop)); }
+        .menu-launcher { right: 64px; }
+        .mini-map { width: 104px; height: 104px; padding: 6px; }
+      }
     </style>
   </head>
   <body>
@@ -5169,7 +5190,6 @@
       </div>
       <div class="mission" id="missionBox" aria-live="polite"></div>
       <div class="tracker" id="missionTracker" aria-live="polite"></div>
-      <p class="flight-save-status" id="flightSaveStatus" hidden></p>
     </div>
     <div class="dock">
       <button type="button" data-menu="resources">
@@ -5701,6 +5721,7 @@
         hasActiveJourney = false,
         saveDeletedUntilExplicitSave = false,
         lastSaveMessage = "No save yet.",
+        saveFailureNotified = false,
         lastSaveMeta = null,
         lastFrameMs = 16.67,
         fps = 60,
@@ -10444,6 +10465,7 @@
           localStorage.setItem(SAVE_KEY, JSON.stringify(snapshot));
           saveDeletedUntilExplicitSave = false;
           lastSaveMeta = snapshot.meta;
+          saveFailureNotified = false;
           lastAutosave = Date.now();
           lastSaveMessage =
             (manual ? "Manual save" : "Autosave") +
@@ -10465,12 +10487,14 @@
           lastAutosave = Date.now();
           lastSaveMessage = "Save failed. Export a backup when storage is available.";
           updateSaveStatus();
-          if (!quiet) toast("Save failed.");
-          addActivity(
+          // A genuine failure warrants one warning, not repeated interruptions.
+          if (manual || (!quiet && !saveFailureNotified)) toast("Save failed.");
+          if (!saveFailureNotified) addActivity(
             "warning",
             "Save failed",
             "Local storage may be unavailable.",
           );
+          if (!quiet || manual) saveFailureNotified = true;
           return false;
         }
       }
@@ -16639,7 +16663,6 @@
         set("graphicsSelect", game.settings.graphics);
         set("motionSelect", game.settings.motion);
         set("tipsSelect", game.settings.tutorialTips);
-        set("autosaveSelect", game.settings.autosaveIndicator);
         set("debugSelect", game.settings.debug);
         set("touchSelect", game.settings.touchSensitivity);
         set("perfSelect", game.settings.performanceMode);
@@ -18749,7 +18772,7 @@
           card(
             "Settings",
               "Tune visuals, audio, motion, guidance, and on-screen controls.",
-            '<div class="list"><div class="setting-row"><span>Graphics Quality</span><select id="graphicsSelect"><option>Low</option><option>Medium</option><option>High</option></select></div><div class="setting-row"><span>Motion Effects</span><select id="motionSelect"><option>On</option><option>Reduced</option></select></div><div class="setting-row"><span>Tutorial Tips</span><select id="tipsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Save status in flight details</span><select id="autosaveSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Touch Sensitivity</span><select id="touchSelect"><option value="0.75">Low</option><option value="1">Normal</option><option value="1.25">High</option></select></div><div class="setting-row"><span>Performance Mode</span><select id="perfSelect"><option>Auto</option><option>High</option><option>Battery Saver</option></select></div><div class="setting-row"><span>Sound</span><select id="soundSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Music</span><select id="musicSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Vibration FX</span><select id="vibrationSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Music Volume</span><select id="musicVolumeSelect"><option value="0.25">Low</option><option value="0.55">Normal</option><option value="0.85">High</option></select></div><div class="setting-row"><span>SFX Volume</span><select id="sfxVolumeSelect"><option value="0.35">Low</option><option value="0.75">Normal</option><option value="1">High</option></select></div><div class="setting-row"><span>Touch Controls</span><select id="controlsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Control Hints</span><select id="hintsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Joystick Size</span><select id="joystickSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Thrust Button Size</span><select id="thrustSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Release Button Size</span><select id="releaseSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Brake Button Size</span><select id="brakeSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Control Layout</span><select id="controlLayoutSelect"><option>Fixed</option><option>Move Controls</option></select></div><div class="actions"><button type="button" data-action="resetControlLayout" data-arg="">Reset Control Layout</button></div><div class="sound-meter"></div></div><div class="actions"><button type="button" data-action="applySettingsFromMenu" data-arg="">Apply Settings</button><button type="button" class="danger" data-action="resetSaveAndRun" data-arg="">Reset Save + Run</button></div>',
+            '<div class="list"><div class="setting-row"><span>Graphics Quality</span><select id="graphicsSelect"><option>Low</option><option>Medium</option><option>High</option></select></div><div class="setting-row"><span>Motion Effects</span><select id="motionSelect"><option>On</option><option>Reduced</option></select></div><div class="setting-row"><span>Tutorial Tips</span><select id="tipsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Touch Sensitivity</span><select id="touchSelect"><option value="0.75">Low</option><option value="1">Normal</option><option value="1.25">High</option></select></div><div class="setting-row"><span>Performance Mode</span><select id="perfSelect"><option>Auto</option><option>High</option><option>Battery Saver</option></select></div><div class="setting-row"><span>Sound</span><select id="soundSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Music</span><select id="musicSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Vibration FX</span><select id="vibrationSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Music Volume</span><select id="musicVolumeSelect"><option value="0.25">Low</option><option value="0.55">Normal</option><option value="0.85">High</option></select></div><div class="setting-row"><span>SFX Volume</span><select id="sfxVolumeSelect"><option value="0.35">Low</option><option value="0.75">Normal</option><option value="1">High</option></select></div><div class="setting-row"><span>Touch Controls</span><select id="controlsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Control Hints</span><select id="hintsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Joystick Size</span><select id="joystickSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Thrust Button Size</span><select id="thrustSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Release Button Size</span><select id="releaseSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Brake Button Size</span><select id="brakeSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Control Layout</span><select id="controlLayoutSelect"><option>Fixed</option><option>Move Controls</option></select></div><div class="actions"><button type="button" data-action="resetControlLayout" data-arg="">Reset Control Layout</button></div><div class="sound-meter"></div></div><div class="actions"><button type="button" data-action="applySettingsFromMenu" data-arg="">Apply Settings</button><button type="button" class="danger" data-action="resetSaveAndRun" data-arg="">Reset Save + Run</button></div>',
           )
         );
         return panel.replace("Reset Save + Run", "Start New Journey");
@@ -19864,7 +19887,6 @@
           g = $("graphicsSelect"),
           m = $("motionSelect"),
           tips = $("tipsSelect"),
-          auto = $("autosaveSelect"),
           dbg = $("debugSelect"),
           touch = $("touchSelect"),
           perf = $("perfSelect"),
@@ -19885,7 +19907,6 @@
         if (tips) game.settings.tutorialTips = tips.value;
         autoPerfDowngraded = false;
         lowFpsSeconds = 0;
-        if (auto) game.settings.autosaveIndicator = auto.value;
         if (dbg) game.settings.debug = dbg.value;
         if (touch) game.settings.touchSensitivity = Number(touch.value) || 1;
         if (perf) game.settings.performanceMode = perf.value;
@@ -19934,6 +19955,7 @@
       }
       function applySettings(show = false) {
         game.settings = { ...defaultSettings(), ...(game.settings || {}) };
+        game.settings.autosaveIndicator = "Off"; // Normalize older saves.
         document.body.classList.toggle(
           "reduced-motion",
           game.settings.motion === "Reduced",
@@ -20326,6 +20348,7 @@
           ready > 99 ? "99+" : String(ready || "!");
         const action = smartAction();
         ui.smartBtn.textContent = action.label;
+        ui.smartBtn.disabled = !!action.disabled;
         ui.smartBtn.classList.toggle("travel", action.tone === "travel");
         ui.smartBtn.classList.toggle(
           "show",
@@ -20344,7 +20367,7 @@
           ev = nearestSectorEvent(),
           bh = nearestBlackHole();
         if (pioneerRescue)
-          return { label: "Pioneer Rescue Active", run: noop, show: true };
+          return { label: "Pioneer Rescue Active", run: noop, show: true, disabled: true };
         if (game.ship.fuel <= 0.5)
           return {
             label: game.frigate?.built ? "Call Pioneer" : "Recover Ship",
@@ -20559,12 +20582,8 @@
         );
       }
       function updateSaveStatus() {
+        // Keep save health available in Pause and Save menus, never over flight.
         if (ui.saveStatus) ui.saveStatus.textContent = lastSaveMessage;
-        const status = $("flightSaveStatus");
-        if (status) {
-          status.hidden = game.settings?.autosaveIndicator !== "On";
-          status.textContent = lastSaveMessage;
-        }
       }
       function confirmAction(title, text, onOk) {
         paused = true;
@@ -26461,11 +26480,19 @@
       document
         .querySelectorAll(".dock button")
         .forEach((b) => (b.onclick = () => openMenu(b.dataset.menu)));
-      ui.smartBtn.onclick = () => {
-        if(!canResumePlay()||paused||modalFreeze)return;
+      function activateFlightAction() {
+        if(!canResumePlay()||paused||modalFreeze)return false;
         const a = smartAction();
-        if (a.show) a.run();
-      };
+        // During motion a different planet/action may become eligible between HUD ticks.
+        // Never execute a different action than the one the player saw.
+        if (!a.show || a.disabled || ui.smartBtn.textContent !== a.label) {
+          updateUI();
+          return false;
+        }
+        a.run();
+        return true;
+      }
+      ui.smartBtn.onclick = activateFlightAction;
       ui.nextTip.onclick = nextTip;
       ui.skipTip.onclick = dismissTips;
       ui.nextOnboard.onclick = nextOnboarding;
@@ -26540,19 +26567,22 @@
       }
       function defaultControlPositions() {
         return {
-          joystick: { left: 18, bottom: 150 },
-          thrust: { right: 14, bottom: 166 },
-          release: { right: 14, bottom: 276 },
-          brake: { right: 98, bottom: 166 },
+          joystick: { left: 18, bottom: 140 },
+          thrust: { right: 14, bottom: 156 },
+          release: { right: 14, bottom: 254 },
+          brake: { right: 88, bottom: 156 },
         };
       }
       function applyControlPositions() {
         const pos = game.settings?.controlPositions;
-        if (!pos) return;
         const map = controlMap();
-        Object.entries(pos).forEach(([k, p]) => {
-          const el = map[k];
-          if (!el || !p) return;
+        Object.entries(map).forEach(([k, el]) => {
+          if (!el) return;
+          const p = pos?.[k];
+          if (!p || !Number.isFinite(p.left) || !Number.isFinite(p.top)) {
+            el.style.left = el.style.right = el.style.top = el.style.bottom = "";
+            return;
+          }
           const w = el.offsetWidth || 80,
             h = el.offsetHeight || 80,
             left = clamp(Number(p.left ?? 0), 6, Math.max(6, W - w - 6)),
