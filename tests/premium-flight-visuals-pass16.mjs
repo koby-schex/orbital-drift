@@ -16,7 +16,24 @@ draw();assert.equal(arcs,4);assert.equal(targetCalls,1);
 ship.orbitLocked=true;ship.lockBody="Mars";ship.lockRadius=50;
 draw();assert.equal(arcs,9);assert.equal(targetCalls,1);
 assert.match(html,/ui\.hud\?\.classList\.contains\("collapsed"\) \|\|\s*titleOpen/);
-assert.match(html,/const projected = points\.map/);
+const trailSource=extract("drawStarshipTrail","drawShip");
+const previewSource=extract("drawTrailPreview","setFrigateTarget");
+let strokes=0;
+const gradient={addColorStop(){}};
+const canvas=new Proxy({createLinearGradient:()=>gradient,stroke:()=>strokes++},{get:(o,k)=>o[k]??(()=>{}),set:(o,k,v)=>(o[k]=v,true)});
+const settings={graphics:"High",motion:"Full"};
+const skin={primary:"#fff",accent:"#fff",glow:"#fff",visualTier:4,motif:"echo"};
+const trail=new Function("game","flightVisualBudget","screen","rgba","TAU",trailSource+";return drawStarshipTrail")({settings},budget,(x,y)=>({x,y}),()=>"#fff",Math.PI*2);
+const preview=new Function("game","flightVisualBudget","rgba","TAU","drawShipVisual","activeShipSkin",previewSource+";return drawTrailPreview")({settings},budget,()=>"#fff",Math.PI*2,()=>{},()=>skin);
+const points=Array.from({length:12},(_,i)=>({x:i,y:i*2,drift:i>5}));
+for(const graphics of ["High","Medium","Low"]){
+  settings.graphics=graphics;strokes=0;
+  assert.doesNotThrow(()=>trail(canvas,{trail:[]},skin,skin));
+  assert.doesNotThrow(()=>trail(canvas,{trail:points},skin,skin));
+  assert.equal(strokes,budget(settings).strands+1,"Flight trail must honor quality strand cap plus drift line");
+  assert.doesNotThrow(()=>preview(canvas,320,160,skin),"Trail preview must render independently of world coordinates");
+}
+assert.match(extract("loop","performanceGuard"),/requestAnimationFrame\(loop\);[\s\S]*?if \(document.hidden/);
 assert.match(html,/drawFlightContact\(\);/);
 assert.doesNotMatch(html,/drawCaptureHint\(\);/);
 console.log("Premium flight visual budget and approach/locked cues passed.");

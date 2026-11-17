@@ -18479,13 +18479,13 @@
           });
       }
       function drawTrailPreview(c, width, height, skin) {
+        const budget = flightVisualBudget(game.settings);
         const colors = [skin.primary, skin.accent, skin.glow],
           tier = skin.visualTier || 1,
           strands = Math.min(budget.strands, 1 + tier),
           startX = width * 0.08,
           endX = width * 0.77,
           centerY = height * 0.53;
-        const projected = points.map(point => screen(point.x, point.y));
         c.save();
         c.globalCompositeOperation = "screen";
         for (let strand = 0; strand < strands; strand++) {
@@ -23006,12 +23006,13 @@
         if (points.length < 3) return;
         const tier = trailSkin.visualTier || 1,
           motif = trailSkin.motif || "ion",
-          strands = Math.min(5, 1 + tier),
+          strands = Math.min(budget.strands, 1 + tier),
           colors = [
             trailSkin.primary || hullSkin.glow,
             trailSkin.accent || hullSkin.accent,
             trailSkin.glow || hullSkin.glow,
           ];
+        const projected = points.map(point => screen(point.x, point.y));
         c.save();
         c.globalCompositeOperation = "screen";
         for (let strand = 0; strand < strands; strand++) {
@@ -24850,7 +24851,9 @@
           slowFrames:stats.slow, worstFrameMs:Number(stats.worst.toFixed(2))} : {frames:0};
       }
       function loop(now) {
-        if (document.hidden || loop.nativeInactive) { loop.last = now; loop.wasFlying = false; requestAnimationFrame(loop); return; }
+        // Queue before drawing so a transient rendering exception cannot permanently kill flight.
+        requestAnimationFrame(loop);
+        if (document.hidden || loop.nativeInactive) { loop.last = now; loop.wasFlying = false; return; }
         const flying = !paused && !titleOpen && !modalFreeze;
         const sample = flightFrameSample(loop.last, now, flying && loop.wasFlying);
         loop.wasFlying = flying;
@@ -24889,7 +24892,6 @@
         if (!loop.mapAt || now - loop.mapAt >= (batterySaver ? 125 : 66)) {
           drawMiniMap(); loop.mapAt = now;
         }
-        requestAnimationFrame(loop);
       }
       function performanceGuard(ms) {
         if (
@@ -26132,6 +26134,7 @@
         // Do not auto-unpause flight or restore held input. Resume only the
         // user's previously enabled audio setting, as in the existing game.
         loop.last = 0;
+        loop.nativeInactive = false;
         loop.wasFlying = false;
         keys.clear();
         endTouch();
