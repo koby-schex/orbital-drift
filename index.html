@@ -10236,11 +10236,7 @@
             ],
           );
         toast(
-          (outward ? "Uncharted jump complete: entered " : "Atlas travel complete: entered ") +
-            game.system.name +
-            " • " +
-            sectorModifierName() +
-            ".",
+          "Arrived: " + game.system.name + " • " + sectorModifierName(),
         );
         addActivity(
           "travel",
@@ -17778,7 +17774,7 @@
           needed+'" aria-valuenow="'+Math.min(needed,member.xp)+'"><div style="width:'+
           (maxed?100:clamp(member.xp/Math.max(1,needed)*100,0,100))+'%"></div></div>'+
           '<div class="crew-train"><span>'+esc(reason)+'</span>'+
-          btnWhy(maxed?"Mastered":"Train", "upgradeCrew",member.id,ready,reason)+'</div>'+
+          btn(maxed?"Mastered":"Train", "upgradeCrew",member.id,ready)+'</div>'+
           secondaryDetails("Manage "+member.name,
             '<p>'+esc(template?.bio||"Pioneer specialist.")+'</p><p>Change duty to direct this specialist’s contribution. Training uses field experience and materials.</p>'+
             '<div class="crew-duties">'+duties.map(d=>btn(crewDutyLabel(d)+(member.duty===d?" ✓":""),"setCrewDuty",member.id+"|"+d,member.duty!==d)).join("")+
@@ -17788,7 +17784,7 @@
       function crewHtml() {
         const crew=crewState().members, candidates=crewTemplates.filter(template=>!crewMember(template.id)), docked=orbitingFrigate();
         const ready=crew.filter(m=>m.level<6&&m.xp>=crewXpNeeded(m)&&canAfford(crewUpgradeCost(m.id))).length;
-        return card("Crew","Your specialists earn experience during exploration. Train them at the Pioneer to improve their abilities.",
+        return card("Pioneer Crew","Your specialists earn experience during exploration. Train them at the Pioneer to improve their abilities.",
           '<div class="crew-summary"><span><b>'+crew.length+' / '+crewTemplates.length+'</b> aboard</span><span><b>'+ready+
           '</b> eligible to train</span></div><p class="crew-dock-note">'+(docked?"Connected to Pioneer":"Lock orbit with Pioneer to recruit or train.")+'</p>')+
           '<h3 class="crew-section-title">Active crew</h3><div class="crew-grid">'+crew.map(crewCardHtml).join("")+'</div>'+
