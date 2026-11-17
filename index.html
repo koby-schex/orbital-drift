@@ -5065,6 +5065,51 @@
         .discovery-stage { height: min(260px, 31vh); }
       }
 
+      /* Release pass 15 — flight-first presentation. */
+      #titleOverlay { background: radial-gradient(ellipse at 50% 25%, #102334 0%, #050b13 75%); }
+      #titleOverlay .title-screen {
+        width: min(580px, 100%); padding: clamp(14px, 3vw, 26px);
+        background: linear-gradient(180deg, #101e2a, #060e17);
+        border: 1px solid rgba(180, 211, 218, .25); border-radius: 22px;
+        box-shadow: 0 24px 80px #020609; text-align: center;
+      }
+      .title-screen .title-logo { font-size: clamp(32px, 7vw, 52px); line-height: 1.04; margin: 5px 0; }
+      .title-screen .title-sub { margin: 6px auto 12px; }
+      .title-screen .title-hero { grid-template-columns: 1fr; gap: 10px; }
+      .title-screen .title-showcase { min-height: 0; height: clamp(130px, 30vh, 270px); border-radius: 14px; }
+      .title-screen .title-feature[hidden], .title-journey[hidden], #missionContinue[hidden], .flight-save-status[hidden] { display: none !important; }
+      .title-journey { color: #b4c9d0; font-size: 12px; padding: 8px; overflow-wrap: anywhere; }
+      .title-screen .title-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin: 0; }
+      .title-screen .title-actions button { min-width: 0; min-height: 46px; width: 100%; text-align: center; font-size: 14px; }
+      .title-screen .title-actions.has-save #loadBtn,
+      .title-screen .title-actions:not(.has-save) #newGameBtn {
+        grid-column: 1/-1; min-height: 54px; color: #07121c;
+        background: linear-gradient(120deg,#d0e7e3,#91becb); border-color: #bbd8d6;
+      }
+      .title-screen .title-actions.has-save #newGameBtn { grid-column: 1/-1; }
+      .menu-head { display: grid; grid-template-columns: minmax(64px,1fr) minmax(0,2.5fr) minmax(64px,1fr); align-items: center; }
+      .menu-head h3 { text-align: center; margin: 0; overflow-wrap: anywhere; }
+      .menu-head button, .section-tabs button, .menu .actions button { text-align: center; justify-content: center; align-items: center; }
+      .menu[data-section="upgrades"] .upgrade-card { text-align: center; }
+      .menu[data-section="upgrades"] .upgrade-card .actions,
+      .menu[data-section="upgrades"] .upgrade-card .costs,
+      .menu[data-section="upgrades"] .upgrade-status { justify-content: center; }
+      .menu[data-section="upgrades"] .upgrade-card .chip,
+      .menu[data-section="upgrades"] .upgrade-result { text-align: center; overflow-wrap: anywhere; }
+      .menu[data-section="upgrades"] .upgrade-card .actions button { width: 100%; min-height: 44px; }
+      .menu[data-section="upgrades"] .section-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      body.hud-collapsed .mini-map, body.hud-collapsed .flight-save-status { display: none; }
+      body.hud-collapsed .hud .logo { display: none; }
+      body.hud-collapsed .hud { min-width: 0; padding: 4px; background: rgba(5,13,21,.7); box-shadow: none; }
+      body.hud-collapsed .hud-toggle { min-height: 44px; min-width: 66px; font-size: 12px; }
+      body.hud-collapsed .objective-pill #objectivePillSub { display: none; }
+      .flight-save-status { font-size: 11px; color: var(--muted); margin: 6px 0 0; }
+      .toast-wrap { width: min(320px, calc(100vw - 32px)); left: 50%; right: auto; transform: translateX(-50%); max-height: 70px; bottom: auto; top: calc(112px + var(--safeTop)); }
+      .toast-wrap:empty { display: none; }
+      .toast { text-align: center; background: rgba(7,17,26,.93); border-radius: 8px; box-shadow: none; padding: 7px 10px; }
+      #discoveryOverlay .tap-dismiss-note { display: block; text-align: center; margin-top: 10px; }
+      @media (max-height: 650px) { .title-screen .title-showcase { height: 20vh; min-height: 90px; } }
+
     </style>
   </head>
   <body>
@@ -5105,6 +5150,7 @@
       </div>
       <div class="mission" id="missionBox" aria-live="polite"></div>
       <div class="tracker" id="missionTracker" aria-live="polite"></div>
+      <p class="flight-save-status" id="flightSaveStatus" hidden></p>
     </div>
     <div class="dock">
       <button type="button" data-menu="resources">
@@ -5193,10 +5239,9 @@
       <div class="dialog title-screen">
         <div class="title-eyebrow">ODF Deep-Space Initiative</div>
         <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Deep-Space Exploration • v0.26.0</div>
+        <div class="title-version">Deep-Space Exploration</div>
         <p class="title-sub">
-          Command a deep-space drift vessel, ride gravity wells, claim frontier
-          worlds, and carve lasting Echo routes across uncharted systems.
+          Chart your own course across the frontier.
         </p>
         <div class="title-hero">
           <div
@@ -5208,20 +5253,21 @@
             <div class="title-hangar-vignette"></div>
           </div>
           <div class="title-panel">
-            <div class="title-feature">
+            <div class="title-feature" hidden>
               <b>Gravity-Based Exploration</b
               ><span
                 >Ride orbital momentum, decode deep-space mysteries, and uncover
                 anomaly-class worlds.</span
               >
             </div>
-            <div class="title-feature">
+            <div class="title-feature" hidden>
               <b>Build Your Pioneer</b
               ><span
                 >Bring the ODF Pioneer online, shape its crew, command a living
                 fleet, and choose independent adventures.</span
               >
             </div>
+            <div class="title-journey" id="titleJourney" hidden></div>
             <div class="title-actions primary-first" id="titleActions">
               <button id="loadBtn" type="button">Continue</button
               ><button id="newGameBtn" type="button">New Game</button
@@ -5493,8 +5539,9 @@
         <div class="grid" id="discoveryStats"></div>
         <div class="actions">
           <button id="discoveryCapture" type="button" hidden>Capture World</button
-          ><button id="closeDiscovery" type="button">Tap Anywhere to Return</button>
+          >
         </div>
+        <span class="tap-dismiss-note">Tap anywhere outside a control to return</span>
       </div>
     </div>
     <div class="overlay" id="choiceOverlay">
@@ -5595,7 +5642,7 @@
       hidden
     />
     <div class="feedback-flash" id="feedbackFlash"></div>
-    <div class="toast-wrap" id="toasts"></div>
+    <div class="toast-wrap" id="toasts" role="status" aria-live="polite" aria-atomic="true"></div>
     <script>
       "use strict";
       const $ = (id) => document.getElementById(id),
@@ -5715,7 +5762,6 @@
         discoveryClassification: $("discoveryClassification"),
         discoveryStats: $("discoveryStats"),
         discoveryCapture: $("discoveryCapture"),
-        closeDiscovery: $("closeDiscovery"),
         choiceOverlay: $("choiceOverlay"),
         choiceText: $("choiceText"),
         choiceList: $("choiceList"),
@@ -7902,7 +7948,7 @@
         graphics: "High",
         motion: "On",
         tutorialTips: "On",
-        autosaveIndicator: "On",
+        autosaveIndicator: "Off",
         debug: "Off",
         touchSensitivity: 1,
         performanceMode: "Auto",
@@ -8682,17 +8728,18 @@
         );
       }
       function toast(m) {
+        if (ui.toasts.firstChild?.textContent === m) return;
+        while (ui.toasts.firstChild) ui.toasts.removeChild(ui.toasts.firstChild);
         const e = document.createElement("div");
         e.className = "toast";
         e.textContent = m;
         ui.toasts.prepend(e);
-        while (ui.toasts.children.length > 3)
-          ui.toasts.removeChild(ui.toasts.lastChild);
+        
         setTimeout(() => {
           e.style.opacity = "0";
           e.style.transform = "translateY(8px)";
-        }, 1000);
-        setTimeout(() => e.remove(), 1250);
+        }, 2200);
+        setTimeout(() => e.remove(), 2500);
       }
       function errorToast(m) {
         feedbackPulse("error");
@@ -10390,8 +10437,7 @@
               "Manual save completed",
               game.system?.name || "Current sector",
             );
-          } else if (!quiet && game.settings?.autosaveIndicator === "On")
-            toast("Autosaved.");
+          }
           updateSaveStatus();
           refreshTitleButtons();
           return true;
@@ -10640,7 +10686,7 @@
           lastSaveMessage =
             "Loaded save from " +
             (d.savedAt ? new Date(d.savedAt).toLocaleString() : "unknown time");
-          if (manual) toast("Saved game loaded.");
+          if (manual && !titleOpen) toast("Saved game loaded.");
           if (recoveredBackup) {
             localStorage.setItem(SAVE_KEY, raw);
             toast("Primary save was damaged. Restored the automatic backup.");
@@ -16487,7 +16533,8 @@
         setTimeout(() => {
           if (ui.menu.classList.contains("open")) return;
           ui.menu.classList.remove("closing");
-          ui.menuNav.innerHTML = "";
+          ui.menu.dataset.section = activeMenu;
+        ui.menuNav.innerHTML = "";
           ui.menuContent.innerHTML = "";
         }, 320);
       }
@@ -18916,7 +18963,7 @@
           card(
             "Settings",
               "Tune visuals, audio, motion, guidance, and on-screen controls.",
-            '<div class="list"><div class="setting-row"><span>Graphics Quality</span><select id="graphicsSelect"><option>Low</option><option>Medium</option><option>High</option></select></div><div class="setting-row"><span>Motion Effects</span><select id="motionSelect"><option>On</option><option>Reduced</option></select></div><div class="setting-row"><span>Tutorial Tips</span><select id="tipsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Autosave Indicator</span><select id="autosaveSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Touch Sensitivity</span><select id="touchSelect"><option value="0.75">Low</option><option value="1">Normal</option><option value="1.25">High</option></select></div><div class="setting-row"><span>Performance Mode</span><select id="perfSelect"><option>Auto</option><option>High</option><option>Battery Saver</option></select></div><div class="setting-row"><span>Sound</span><select id="soundSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Music</span><select id="musicSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Vibration FX</span><select id="vibrationSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Music Volume</span><select id="musicVolumeSelect"><option value="0.25">Low</option><option value="0.55">Normal</option><option value="0.85">High</option></select></div><div class="setting-row"><span>SFX Volume</span><select id="sfxVolumeSelect"><option value="0.35">Low</option><option value="0.75">Normal</option><option value="1">High</option></select></div><div class="setting-row"><span>Touch Controls</span><select id="controlsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Control Hints</span><select id="hintsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Joystick Size</span><select id="joystickSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Thrust Button Size</span><select id="thrustSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Release Button Size</span><select id="releaseSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Brake Button Size</span><select id="brakeSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Control Layout</span><select id="controlLayoutSelect"><option>Fixed</option><option>Move Controls</option></select></div><div class="actions"><button type="button" data-action="resetControlLayout" data-arg="">Reset Control Layout</button></div><div class="sound-meter"></div></div><div class="actions"><button type="button" data-action="applySettingsFromMenu" data-arg="">Apply Settings</button><button type="button" class="danger" data-action="resetSaveAndRun" data-arg="">Reset Save + Run</button></div>',
+            '<div class="list"><div class="setting-row"><span>Graphics Quality</span><select id="graphicsSelect"><option>Low</option><option>Medium</option><option>High</option></select></div><div class="setting-row"><span>Motion Effects</span><select id="motionSelect"><option>On</option><option>Reduced</option></select></div><div class="setting-row"><span>Tutorial Tips</span><select id="tipsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Save status in flight details</span><select id="autosaveSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Touch Sensitivity</span><select id="touchSelect"><option value="0.75">Low</option><option value="1">Normal</option><option value="1.25">High</option></select></div><div class="setting-row"><span>Performance Mode</span><select id="perfSelect"><option>Auto</option><option>High</option><option>Battery Saver</option></select></div><div class="setting-row"><span>Sound</span><select id="soundSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Music</span><select id="musicSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Vibration FX</span><select id="vibrationSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Music Volume</span><select id="musicVolumeSelect"><option value="0.25">Low</option><option value="0.55">Normal</option><option value="0.85">High</option></select></div><div class="setting-row"><span>SFX Volume</span><select id="sfxVolumeSelect"><option value="0.35">Low</option><option value="0.75">Normal</option><option value="1">High</option></select></div><div class="setting-row"><span>Touch Controls</span><select id="controlsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Control Hints</span><select id="hintsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Joystick Size</span><select id="joystickSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Thrust Button Size</span><select id="thrustSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Release Button Size</span><select id="releaseSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Brake Button Size</span><select id="brakeSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Control Layout</span><select id="controlLayoutSelect"><option>Fixed</option><option>Move Controls</option></select></div><div class="actions"><button type="button" data-action="resetControlLayout" data-arg="">Reset Control Layout</button></div><div class="sound-meter"></div></div><div class="actions"><button type="button" data-action="applySettingsFromMenu" data-arg="">Apply Settings</button><button type="button" class="danger" data-action="resetSaveAndRun" data-arg="">Reset Save + Run</button></div>',
           )
         );
         return panel.replace("Reset Save + Run", "Start New Journey");
@@ -20743,6 +20790,11 @@
       }
       function updateSaveStatus() {
         if (ui.saveStatus) ui.saveStatus.textContent = lastSaveMessage;
+        const status = $("flightSaveStatus");
+        if (status) {
+          status.hidden = game.settings?.autosaveIndicator !== "On";
+          status.textContent = lastSaveMessage;
+        }
       }
       function confirmAction(title, text, onOk) {
         paused = true;
@@ -20868,6 +20920,7 @@
         modalFreeze = true;
         playSound("confirm");
         vibrate("confirm");
+        ui.missionContinue.hidden = /captured|survey complete/i.test(title);
         ui.missionTitle.textContent = title;
         ui.missionSummary.textContent = summary;
         ui.missionStats.innerHTML = rows
@@ -26318,6 +26371,7 @@
           paused = false;
           modalFreeze = false;
           ui.titleOverlay.classList.remove("show");
+          setHudCollapsed(true);
           if (!onboardingDismissed) showOnboarding(0);
           // Save immediately rather than relying on a later timed autosave.
           saveGame(false);
@@ -26375,6 +26429,11 @@
             : "No save found";
         }
         $("titleActions")?.classList.toggle("has-save", has);
+        const journey = $("titleJourney");
+        if (journey) {
+          journey.hidden = !has;
+          journey.textContent = has ? meta.shipName + " • " + meta.sector : "";
+        }
       }
       function replayTips() {
         if (!hasActiveJourney) return startNew();
@@ -26462,7 +26521,6 @@
       ui.skipOnboard.onclick = () => dismissOnboarding(false);
       ui.confirmCancel.onclick = closeConfirm;
       ui.confirmOk.onclick = acceptConfirm;
-      ui.closeDiscovery.onclick = closeDiscoveryPanel;
       if (ui.discoveryCapture) ui.discoveryCapture.onclick = captureDiscoveryWorld;
       ui.discoveryOverlay.addEventListener("pointerdown", (event) => {
         if (event.target.closest("button")) return;
