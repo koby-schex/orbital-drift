@@ -21146,7 +21146,7 @@
         c.fillStyle = glow; c.fillRect(-r * 1.3, -r * 1.3, r * 2.6, r * 2.6);
         c.save(); c.beginPath(); c.arc(0, 0, r, 0, TAU); c.clip();
         c.fillStyle = b.color; c.fillRect(-r, -r, r * 2, r * 2);
-        const texture = surfaceTexture(b, b.name === "Earth" && r > 180 ? 512 : 256);
+        const texture = surfaceTexture(b, game.settings?.graphics==="Low"?128:b.name === "Earth" && r > 180 ? 512 : 256);
         if (texture) c.drawImage(texture, -r, -r, r * 2, r * 2);
         const shade = c.createLinearGradient(-r, -r * 0.65, r, r * 0.65);
         shade.addColorStop(0, "rgba(245,244,225,.17)"); shade.addColorStop(0.36, "rgba(0,0,0,0)");
@@ -21162,7 +21162,7 @@
       function renderDiscoveryPortrait() {
         const b = activeDiscoveryBody, canvas = document.getElementById("discoveryPortrait");
         if (!b || !canvas) return;
-        const key = [b.name, b.featureSeed, b.color, !!earthAlbedo.pixels, game.settings?.graphics].join(":");
+        const key = [b.name, b.featureSeed, b.color, !!earthAlbedo.pixels, game.settings?.graphics,game.settings?.performanceMode].join(":");
         if (canvas.dataset.planet === key) return;
         canvas.width = 800; canvas.height = 420;
         const c = canvas.getContext("2d"); if (!c) return;
@@ -21660,10 +21660,16 @@
         }
         ctx.restore();
       }
+      function orbitIntersectsViewport(p,r,w,h) {
+        const near=Math.hypot(Math.max(0,-p.x,p.x-w),Math.max(0,-p.y,p.y-h)),
+          far=Math.hypot(Math.max(Math.abs(p.x),Math.abs(p.x-w)),Math.max(Math.abs(p.y),Math.abs(p.y-h)));
+        return r>=near-2&&r<=far+2;
+      }
       function drawOrbit(b) {
         if (!b.parent) return;
         const p = screen(b.parent.x, b.parent.y), rad = b.orbitRadius * zoom,
           focused = game.ship.lockBody === b.name || manualTargetName === b.name;
+        if(!orbitIntersectsViewport(p,rad,W,H))return;
         ctx.save(); ctx.strokeStyle = focused ? "rgba(183,218,221,.14)" : "rgba(183,218,221,.035)";
         ctx.lineWidth = 0.7; ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, TAU); ctx.stroke(); ctx.restore();
       }
@@ -23117,6 +23123,7 @@
             base = (b ? visualRadius(b) : 34) * zoom,
             rad = base + (game.settings?.motion==="Reduced"?.35:1-Math.pow(1-q,2)) * 68 * zoom,
             alpha = 1 - q;
+          if(p.x+rad+12<0||p.x-rad-12>W||p.y+rad+12<0||p.y-rad-12>H)continue;
           ctx.strokeStyle = rgba(e.color, 0.62 * alpha);
           ctx.lineWidth = 3 * (1 - q) + 1;
           ctx.beginPath();
