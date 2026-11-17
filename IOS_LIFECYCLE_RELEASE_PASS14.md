@@ -4,7 +4,7 @@
 - Native Capacitor iOS lifecycle bridge forwards `willResignActive`, `didEnterBackground` and `didBecomeActive` to the existing game. Web pagehide and visibilitychange remain fallback signals.
 - Backgrounding stops held flight controls, pauses playable journeys, suspends audio, resets the frame-time accumulator, and synchronously saves progress **without an intrusive toast**.
 - Multiple native and browser events arriving during one transition coalesce into a single save (1200ms guard), avoiding unnecessary serialization and overwriting the useful backup several times.
-- Returning to the app does **not** automatically resume thrust, gameplay, or audio.
+- Returning to the app does **not** automatically resume thrust or gameplay. Audio follows the player’s existing enabled sound/music settings.
 - Explicitly deleted saves and inactive title-screen sessions are never silently rewritten by a background event.
 - Failed save imports now attempt to roll back **both** the primary save and its backup if either was changed, rather than leaving an imported primary in storage after reporting failure.
 
