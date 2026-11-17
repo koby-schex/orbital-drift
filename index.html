@@ -5126,6 +5126,9 @@
       .cosmetic-card p { font-size:12px;line-height:1.5;margin:9px 0; }
       .cosmetic-card .tag { margin-top:0; }
       .cosmetic-card .menu-secondary-details { margin:8px 0; }
+      .milestone-meter {height:5px;background:#243644;border-radius:5px;overflow:hidden;margin:8px 0}
+      .milestone-meter div {height:100%;background:#83c6bc;border-radius:5px}
+      .milestone-row {text-align:left;padding:12px}
     </style>
   </head>
   <body>
@@ -12344,6 +12347,12 @@
         saveGame(false);
         renderMenu();
       }
+      function frontierSurveyBonus(b,system) {
+        if (!b||b.type==="star"||!system||system.isTutorial) return {};
+        const bonus=({Rare:{DataCores:2,Crystal:2},Exotic:{DataCores:5,Crystal:4},
+          Mythic:{DataCores:8,Crystal:6,DarkMatter:1}})[b.rarity]||{};
+        return {...bonus};
+      }
       function discoveryReward(b) {
         const reward = blankResources(),
           bonus =
@@ -12365,6 +12374,8 @@
           reward.DarkMatter += 2;
           reward.Crystal += 14;
         }
+        const frontierBonus=frontierSurveyBonus(b,game.system);
+        Object.entries(frontierBonus).forEach(([k,v])=>reward[k]=(reward[k]||0)+v);
         return reward;
       }
       function markIceWorldEncountered(b) {
@@ -13538,20 +13549,16 @@
       function checkMilestones() {
         if (!game.milestonesClaimed) game.milestonesClaimed = new Set();
         let changed = false;
+        const completed=[];
         for (const m of milestones) {
           if (game.milestonesClaimed.has(m.key) || !m.done()) continue;
           game.milestonesClaimed.add(m.key);
+          completed.push(m.title);
           game.captainLog.milestonesCompleted++;
           Object.entries(m.reward || {}).forEach(
             ([k, v]) => (game.resources[k] = (game.resources[k] || 0) + v),
           );
-          toast(
-            "Milestone reached: " +
-              m.title +
-              ". Reward: " +
-              fmt(m.reward) +
-              ".",
-          );
+
           addActivity(
             "system",
             "Pilot milestone reached",
@@ -13560,6 +13567,7 @@
           changed = true;
         }
         if (changed) {
+          toast(completed.length===1?completed[0]+" reached — reward collected.":completed.length+" milestones reached — rewards collected.");
           playSound("daily");
           saveGame(false);
         }
@@ -17484,9 +17492,6 @@
           ),
           ok = canAfford(cost);
         return (
-          "<p><b>What improves:</b> " +
-          esc(benefit) +
-          "</p>" +
           costHtml(cost) +
           (ok
             ? '<div class="hint" style="color:#bbf7d0;border-color:rgba(187,247,208,.22);background:rgba(187,247,208,.06)">Ready to upgrade now.</div>'
@@ -17500,8 +17505,7 @@
                     .join(" • ")
                 : "None") +
               "</div>") +
-          missingHints(cost) +
-          '<div class="hint" style="color:#dbeafe;border-color:rgba(125,211,252,.18);background:rgba(125,211,252,.055)">Get resources by capturing planets, collecting production, harvesting Echoes, completing contracts, or raiding when capture capacity is full.</div>'
+          (ok?"":secondaryDetails("Where to find materials",missingHints(cost)+'<p>Capture planets, collect production, harvest Echoes, complete contracts, or raid when capture capacity is full.</p>'))
         );
       }
       function upgradeCardHtml(
@@ -18905,33 +18909,32 @@
             "</div>",
         );
       }
+      function milestoneProgress(m) {
+        const log=game.captainLog||{};
+        const values={
+          pilot1:[pilotScore(),3],pilot2:[log.captures||0,5],pilot3:[game.upgradeLevel||0,1],
+          pilot4:[game.sectorJumps||0,3],pilot5:[game.echoStats?.harvested||0,10],
+          pilot6:[collectionStats().exoticPlus,1],pilot7:[log.eventsCompleted||0,5],
+          pilot8:[log.mythicDiscoveries||0,1]
+        };
+        const [current,goal]=values[m.key]||[m.done()?1:0,1];
+        return {current:Math.min(goal,Math.max(0,current)),goal};
+      }
       function milestoneHtml() {
         checkMilestones();
-        return card(
-          "Pilot Rank",
-          "Current Rank " +
-            pilotRank() +
-            ". Milestones reward long-term mastery, collection, travel, and rare discoveries.",
-          '<div class="list">' +
-            milestones
-              .map((m) => {
-                const done = game.milestonesClaimed?.has(m.key) || m.done();
-                return (
-                  '<div class="quest ' +
-                  (done ? "done" : "") +
-                  '"><b>' +
-                  (done ? "✓ " : "") +
-                  esc(m.title) +
-                  "</b><span>" +
-                  esc(m.desc) +
-                  "</span><span>Reward: " +
-                  esc(fmt(m.reward)) +
-                  "</span></div>"
-                );
-              })
-              .join("") +
-            "</div>",
-        );
+        const completed=milestones.filter(m=>game.milestonesClaimed?.has(m.key)||m.done()),
+          remaining=milestones.filter(m=>!completed.includes(m));
+        const row=(m,done)=>{
+          const {current,goal}=milestoneProgress(m);
+          return '<div class="quest milestone-row '+(done?"done":"")+'"><b>'+esc(m.title)+'</b><span>'+
+            esc(m.desc)+'</span><div class="milestone-meter"><div style="width:'+(done?100:current/goal*100)+'%"></div></div>'+
+            '<span>'+ (done?"Completed • Reward collected":current+" / "+goal+" • Reward: "+esc(fmt(m.reward)))+'</span></div>';
+        };
+        return card("Pilot Rank","Rank "+pilotRank()+" • "+completed.length+" / "+milestones.length+" milestones completed",
+          '<div class="list">'+remaining.slice(0,3).map(m=>row(m,false)).join("")+
+          (remaining.length?"":'<p>Every pilot milestone is complete.</p>')+'</div>'+
+          (remaining.length>3?secondaryDetails("More milestones",remaining.slice(3).map(m=>row(m,false)).join("")):"")+
+          (completed.length?secondaryDetails("Completed milestones ("+completed.length+")",completed.map(m=>row(m,true)).join("")):""));
       }
       function collectionHtml() {
         const c = collectionStats();
