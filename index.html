@@ -20009,6 +20009,7 @@
           s = game.ship || {},
           data = {
             fps: Math.round(fps),
+            flightPerformance: flightPerformanceSummary(),
             state: paused ? "paused" : titleOpen ? "title" : "playing",
             system: game.system?.name,
             target: target?.name,
@@ -20737,7 +20738,7 @@
           r = host
             ? host.getBoundingClientRect()
             : ui.titleCanvas.getBoundingClientRect(),
-          d = Math.max(1, Math.min(2, devicePixelRatio || 1)),
+          d = Math.max(1, Math.min(game.settings?.graphics === "Low" ? 1 : game.settings?.graphics === "Medium" ? 1.5 : 2, devicePixelRatio || 1)),
           fallbackW = Math.min(720, Math.max(320, W - 32)),
           fallbackH = Math.min(560, Math.max(390, H * 0.58)),
           rw = r.width || fallbackW,
@@ -24830,12 +24831,35 @@
         cam.x += (game.ship.x - cam.x) * ease;
         cam.y += (game.ship.y - cam.y) * ease;
       }
+      function flightFrameSample(previous, now, active) {
+        const elapsed = now - previous;
+        // Ignore the first frame, clock resets and interruption-sized gaps.
+        return active && previous > 0 && elapsed > 0 && elapsed <= 250 ? elapsed : 0;
+      }
+      function recordFlightPerformance(ms) {
+        if (!ms) return;
+        const stats = loop.flightStats || (loop.flightStats = {frames:0, elapsed:0, slow:0, worst:0});
+        stats.frames++;
+        stats.elapsed += ms;
+        if (ms > 28) stats.slow++;
+        stats.worst = Math.max(stats.worst, ms);
+      }
+      function flightPerformanceSummary() {
+        const stats = loop.flightStats;
+        return stats ? {frames:stats.frames, meanFrameMs:Number((stats.elapsed/stats.frames).toFixed(2)),
+          slowFrames:stats.slow, worstFrameMs:Number(stats.worst.toFixed(2))} : {frames:0};
+      }
       function loop(now) {
-        if (document.hidden) { loop.last = now; requestAnimationFrame(loop); return; }
-        lastFrameMs = now - (loop.last || now);
-        if (lastFrameMs > 80) lastFrameMs = 80;
-        fps = fps * 0.92 + (lastFrameMs ? 1000 / lastFrameMs : 60) * 0.08;
-        performanceGuard(lastFrameMs);
+        if (document.hidden || loop.nativeInactive) { loop.last = now; loop.wasFlying = false; requestAnimationFrame(loop); return; }
+        const flying = !paused && !titleOpen && !modalFreeze;
+        const sample = flightFrameSample(loop.last, now, flying && loop.wasFlying);
+        loop.wasFlying = flying;
+        lastFrameMs = Math.max(0, Math.min(80, now - (loop.last || now)));
+        if (sample) {
+          fps = fps * 0.92 + (1000 / sample) * 0.08;
+          recordFlightPerformance(sample);
+        }
+        performanceGuard(sample);
         const frameUnits = Math.max(0.05, lastFrameMs / 16.67);
         updateCinematicTimeScale(frameUnits);
         const dt =
@@ -24850,7 +24874,8 @@
           followShipCamera(frameUnits);
           autosave();
         }
-        if (!loop.hudAt || now - loop.hudAt >= 80) {
+        const batterySaver = game.settings?.performanceMode === "Battery Saver";
+        if (!loop.hudAt || now - loop.hudAt >= (batterySaver ? 125 : 80)) {
           updateUI(); updateDebugOverlay(); loop.hudAt = now;
         }
         if (
@@ -24861,7 +24886,7 @@
         )
           scheduleMusic();
         if (shouldRenderFrame(now)) draw();
-        if (!loop.mapAt || now - loop.mapAt >= 66) {
+        if (!loop.mapAt || now - loop.mapAt >= (batterySaver ? 125 : 66)) {
           drawMiniMap(); loop.mapAt = now;
         }
         requestAnimationFrame(loop);
@@ -24874,19 +24899,24 @@
           autoPerfDowngraded = true;
           game.settings.graphics = "Low";
           game.settings.motion = "Reduced";
+          document.body.classList.toggle("reduced-motion", true);
           resize();
           return;
         }
         if (game.settings?.performanceMode !== "Auto" || autoPerfDowngraded)
           return;
-        if (titleOpen || paused) return;
-        if (fps < 45 || ms > 28) lowFpsSeconds += ms / 1000;
+        if (titleOpen || paused || modalFreeze || !ms) {
+          lowFpsSeconds = 0;
+          return;
+        }
+        if (ms > 28) lowFpsSeconds += ms / 1000;
         else lowFpsSeconds = Math.max(0, lowFpsSeconds - ms / 1100);
         if (lowFpsSeconds > 3.5) {
           autoPerfDowngraded = true;
           game.settings.graphics =
             game.settings.graphics === "High" ? "Medium" : "Low";
           game.settings.motion = "Reduced";
+          document.body.classList.toggle("reduced-motion", true);
           resize();
           toast("Visual detail adjusted for smoother flight.");
           saveGame(false);
@@ -26102,6 +26132,7 @@
         // Do not auto-unpause flight or restore held input. Resume only the
         // user's previously enabled audio setting, as in the existing game.
         loop.last = 0;
+        loop.wasFlying = false;
         keys.clear();
         endTouch();
         if (audio && (game.settings?.music === "On" || game.settings?.sound === "On"))
@@ -26111,8 +26142,13 @@
         const lifecycle = window.Capacitor?.Plugins?.OrbitalDriftLifecycle;
         if (typeof lifecycle?.addListener !== "function") return;
         Promise.resolve(lifecycle.addListener("stateChanged", (event) => {
-          if (event?.active === false) suspendJourneyForBackground();
-          else if (event?.active === true) foregroundJourney();
+          if (event?.active === false) {
+            loop.nativeInactive = true;
+            suspendJourneyForBackground();
+          } else if (event?.active === true) {
+            loop.nativeInactive = false;
+            foregroundJourney();
+          }
         })).catch(() => {});
       }
       addEventListener("beforeunload", suspendJourneyForBackground);
