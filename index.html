@@ -12997,8 +12997,7 @@
       function closeChoice() {
         hideOverlayWithTransition(ui.choiceOverlay);
         ui.choiceList.innerHTML = "";
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
+        settleOverlayPause();
       }
       function refuel() {
         if (orbitingFrigate()) {
@@ -16499,6 +16498,7 @@
       }
       function closeMenu() {
         const shouldResume = !menuWasPaused && !titleMenuMode && !titleOpen;
+        if(!ui.menu.classList.contains("open"))return;
         activeMenu = null;
         layoutDrag = null;
         ui.menu.classList.add("closing");
@@ -16522,8 +16522,8 @@
         setTimeout(() => {
           if (ui.menu.classList.contains("open")) return;
           ui.menu.classList.remove("closing");
-          ui.menu.dataset.section = activeMenu;
-        ui.menuNav.innerHTML = "";
+          delete ui.menu.dataset.section;
+          ui.menuNav.innerHTML = "";
           ui.menuContent.innerHTML = "";
         }, 320);
       }
@@ -16533,6 +16533,7 @@
       function renderMenu() {
         if (!activeMenu || !ui.menu.classList.contains("open")) return;
         activeMenu = normalizeMenuName(activeMenu);
+        ui.menu.dataset.section = activeMenu;
         ui.menuTitle.textContent =
           {
             hub: game.frigate?.built ? "Pioneer Command" : "Command Menu",
@@ -16669,7 +16670,7 @@
               (t) =>
                 '<button type="button" class="' +
                 (current === t.key ? "active" : "") +
-                '" data-action="setMenuTab" data-arg="' +
+                '" role="tab" aria-selected="' + String(current === t.key) + '" data-action="setMenuTab" data-arg="' +
                 esc(menu + "|" + t.key) +
                 '">' +
                 esc(t.label) +
@@ -16686,7 +16687,8 @@
         const parts = String(v || "").split("|"),
           menu = parts[0],
           tab = parts[1];
-        if (!menu || !tab) return;
+        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","vault","upgrades","cosmetics"],system:["status","ops","travel","records","settings"]};
+        if (!allowed[menu]?.includes(tab)) return;
         menuTabs[menu] = tab;
         renderMenu();
         requestAnimationFrame(() => {
@@ -20512,13 +20514,7 @@
       function closeDiscoveryPanel() {
         hideOverlayWithTransition(ui.discoveryOverlay);
         activeDiscoveryBody = null;
-        cinematicPausePending = false;
-        cinematicTargetScale = 1;
-        modalFreeze = false;
-        if (canResumePlay()) {
-          paused = false;
-          cinematicTimeScale = Math.max(0.08, cinematicTimeScale);
-        }
+        settleOverlayPause();
       }
       function captureDiscoveryWorld() {
         const b = activeDiscoveryBody;
@@ -20529,7 +20525,10 @@
           return;
         }
         manualTargetName = b.name;
+        selectedPlanetName = b.name;
         closeDiscoveryPanel();
+        if(ui.menu.classList.contains("open"))closeMenu();
+        saveGame(false);
         toast("Capture target set: " + b.name + ". Lock orbit when you arrive.");
       }
       function discoveryBg(b) {
@@ -20565,6 +20564,7 @@
       function confirmAction(title, text, onOk) {
         paused = true;
         modalFreeze = true;
+        cleanControlButtons();
         pendingConfirm = onOk;
         ui.confirmTitle.textContent = title;
         ui.confirmText.textContent = text;
@@ -20574,8 +20574,7 @@
       function closeConfirm() {
         pendingConfirm = null;
         hideOverlayWithTransition(ui.confirmOverlay);
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
+        settleOverlayPause();
       }
       function acceptConfirm() {
         playSound("confirm");
@@ -20620,6 +20619,7 @@
       }
       function beginCinematicPause(overlay) {
         const canEase = !paused && !titleOpen && !modalFreeze;
+        cleanControlButtons();
         overlay?.classList.remove("closing");
         overlay?.classList.add("show");
         if (!canEase) {
@@ -20637,6 +20637,9 @@
       }
       function settleOverlayPause() {
         modalFreeze = gameplayModalOpen();
+        cinematicPausePending = false;
+        cinematicTargetScale = modalFreeze ? 0 : 1;
+        if (!modalFreeze) cinematicTimeScale = Math.max(.08, cinematicTimeScale);
         if (
           modalFreeze ||
           titleOpen ||
