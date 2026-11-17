@@ -21346,12 +21346,14 @@
               }
             }
             if (b.pattern === "crystal") {
-              const ice = Math.max(0, terrain - 0.45) * 1.4;
-              rgb = rgb.map((v, c) => v * (1 - ice) + [180, 225, 245][c] * ice);
+              const ice = Math.max(0, terrain - 0.45) * 1.4,
+                facets=Math.pow(Math.max(0,1-Math.abs(terrain-.52)*28),3)*.24;
+              rgb = rgb.map((v, c) => v * (1 - ice) + [180, 225, 245][c] * ice + facets*[110,185,205][c]);
             }
             if (lava) {
-              const crack = Math.pow(Math.max(0, 1 - Math.abs(terrain - 0.51) * 65), 2);
-              rgb = rgb.map((v, c) => v * 0.43 + [245, 80, 8][c] * crack);
+              const crack = Math.pow(Math.max(0, 1 - Math.abs(terrain - 0.51) * 65), 2),
+                heat=Math.pow(Math.max(0,1-Math.abs(terrain-.51)*15),2)*.25;
+              rgb = rgb.map((v, c) => v * (0.36+fine*.12) + [245, 80, 8][c] * crack + heat*[160,45,5][c]);
             }
             for (let c = 0; c < 3; c++) data[i + c] = (rgb[c] * (1 - Math.min(0.8, cloud)) + 235 * Math.min(0.8, cloud)) * limb;
             data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
@@ -21761,7 +21763,7 @@
         ctx.stroke();
         if (game.settings?.graphics !== "Low") {
           ctx.save(); ctx.globalCompositeOperation = "screen";
-          for (let i = 0; i < 5; i++) {
+          for (let i = 0; i < visualDetailBudget(game.settings).corona; i++) {
             const a = i * 1.31 + (b.featureSeed || 1),
               pulse = game.settings?.motion === "Reduced" ? 1 : 1 + Math.sin(t * 0.012 + i) * 0.08;
             ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(a);
@@ -21813,6 +21815,18 @@
         ctx.fill();
         ctx.restore();
       }
+      function visualDetailBudget(settings={}) {
+        const low=settings.graphics==="Low"||settings.performanceMode==="Battery Saver";
+        return {atmosphere:low?2:settings.graphics==="Medium"?3:4,rings:low?10:settings.graphics==="Medium"?18:30,
+          corona:low?0:settings.graphics==="Medium"?3:5,particles:low||settings.motion==="Reduced"?0:settings.graphics==="Medium"?4:8,
+          jumpRays:low||settings.motion==="Reduced"?0:settings.graphics==="Medium"?8:14};
+      }
+      function planetRingProfile(b) {
+        const seed=visualSeed(b.name+":"+b.featureSeed);
+        return {tilt:b.name==="Saturn"?-.32:-.62+(seed%101)/100*.9,
+          flatten:b.name==="Saturn"?1:.78+(seed%37)/100,
+          gap:.42+(seed%13)/100};
+      }
       function drawPlanetLighting(b, p, r) {
         if (r < 4) return;
         const star = game.system.bodies.find(body => body.type === "star"),
@@ -21824,29 +21838,31 @@
         shade.addColorStop(0.38, "rgba(0,2,9,.74)");
         shade.addColorStop(0.53, "rgba(0,2,9,.28)");
         shade.addColorStop(0.72, "rgba(0,0,0,0)");
-        shade.addColorStop(1, "rgba(255,244,220,.13)");
+        shade.addColorStop(1, rgba(star?.color||"#fff4dc",.19));
         ctx.fillStyle = shade; ctx.fillRect(-r, -r, r * 2, r * 2);
         ctx.restore();
         if (!b.atmosphere) return;
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(direction);
         ctx.globalCompositeOperation = "screen";
-        for (let i = 3; i >= 0; i--) {
-          ctx.strokeStyle = rgba(light(b.color, 0.62), 0.08 + (3 - i) * 0.08);
+        const layers=visualDetailBudget(game.settings).atmosphere;
+        for (let i = layers-1; i >= 0; i--) {
+          ctx.strokeStyle = rgba(light(b.color, 0.62), 0.07 + (layers-1-i) * 0.09);
           ctx.lineWidth = Math.max(0.75, r * (0.02 + i * 0.018));
           ctx.beginPath(); ctx.arc(0, 0, r * 1.008, -1.55, 1.55); ctx.stroke();
         }
         ctx.restore();
       }
       function drawPlanetRings(p, r, b, front = true) {
-        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(-0.32);
-        const count = game.settings?.graphics === "Low" ? 12 : 30;
+        const profile=planetRingProfile(b);
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(profile.tilt);
+        const count = visualDetailBudget(game.settings).rings;
         for (let i = 0; i < count; i++) {
           const q = i / count;
-          if (q > 0.51 && q < 0.59) continue; // Cassini-like division.
-          ctx.strokeStyle = rgba(light(b.color, 0.45), 0.16 + rand(i + (b.featureSeed || 1)) * 0.3);
+          if (q > profile.gap && q < profile.gap+.075) continue; // Seeded ring division.
+          ctx.strokeStyle = rgba(light(b.color, 0.45+Math.sin(q*17)*.12), (front?.21:.13) + rand(i + (b.featureSeed || 1)) * .26);
           ctx.lineWidth = Math.max(0.6, r * 0.8 / count);
           ctx.beginPath();
-          ctx.ellipse(0, 0, r * (1.3 + q * 0.85), r * (0.34 + q * 0.25), 0,
+          ctx.ellipse(0, 0, r * (1.3 + q * 0.85), r * (0.34 + q * 0.25)*profile.flatten, 0,
             front ? 0 : Math.PI, front ? Math.PI : TAU);
           ctx.stroke();
         }
@@ -22459,6 +22475,8 @@
         const p = screen(f.x, f.y),
           r = Math.max(0.34, zoom * 0.48),
           skin = activeFrigateSkin();
+        const margin=550*zoom+80;
+        if(p.x+margin<0||p.x-margin>W||p.y+margin<0||p.y-margin>H)return;
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(f.heading || f.angle || 0);
@@ -22513,7 +22531,7 @@
           drawFleetShipVisual(c, scale, ship, skin, cruisingThrust);
           if (ship.status === "ready") {
             c.globalCompositeOperation = "screen";
-            c.strokeStyle = rgba("#86efac", 0.34 + Math.sin(t * 0.05) * 0.08);
+            c.strokeStyle = rgba("#86efac", 0.3 + (game.settings?.motion==="Reduced"?0:Math.sin(t * 0.05) * 0.06));
             c.lineWidth = Math.max(0.8, zoom);
             c.setLineDash([3 * zoom, 5 * zoom]);
             c.beginPath();
@@ -23082,7 +23100,7 @@
             p = screen(b ? b.x : e.x, b ? b.y : e.y),
             q = clamp(e.t / e.dur, 0, 1),
             base = (b ? visualRadius(b) : 34) * zoom,
-            rad = base + (1-Math.pow(1-q,2)) * 68 * zoom,
+            rad = base + (game.settings?.motion==="Reduced"?.35:1-Math.pow(1-q,2)) * 68 * zoom,
             alpha = 1 - q;
           ctx.strokeStyle = rgba(e.color, 0.62 * alpha);
           ctx.lineWidth = 3 * (1 - q) + 1;
@@ -23096,9 +23114,9 @@
           ctx.arc(p.x, p.y, rad * 0.72, phase, phase + TAU * 0.84);
           ctx.stroke();
           ctx.setLineDash([]);
-          const particles = flightVisualBudget(game.settings).particles ? 6 : 0;
+          const particles = visualDetailBudget(game.settings).particles;
           for (let i = 0; i < particles; i++) {
-            const a = (i * TAU) / 6 + t * 0.04,
+            const a = (i * TAU) / particles + t * 0.025,
               rrr = rad * 0.86;
             ctx.fillStyle = rgba(i % 2 ? "#86efac" : "#e0f2fe", 0.48 * alpha);
             ctx.beginPath();
