@@ -5714,6 +5714,7 @@
         distantGalaxies = [],
         upgradeFX = [],
         captureFX = [],
+        jumpArrivalFX = null,
         audioNoticeShown = false,
         touch = { active: false, x: 0, y: 0 },
         layoutDrag = null,
@@ -9740,6 +9741,7 @@
         echoRecorder = null;
         upgradeFX.length = 0;
         captureFX.length = 0;
+        jumpArrivalFX = null;
         cleanControlButtons();
       }
       function initGame(showTips = false, playable = true) {
@@ -10062,6 +10064,7 @@
             game.sectorEvent = createSectorEvent(currentSystemIndex);
             resetSystemVisualPhenomena();
             buildBackdrop();
+            startJumpArrival();
             playSound("event");
             feedbackPulse("slingshot");
             addActivity(
@@ -10226,6 +10229,7 @@
         game.sectorEvent = createSectorEvent(currentSystemIndex);
         resetSystemVisualPhenomena();
         buildBackdrop();
+        startJumpArrival();
         if (game.system.modifier?.key !== "calm")
           game.captainLog.sectorsWithModifiers++;
         if (game.system.specialType === "cosmicSpirit")
@@ -21125,12 +21129,14 @@
         const ringed = b.name === "Saturn" || b.pattern === "rings";
         const rings = front => {
           if (!ringed) return;
-          c.save(); c.rotate(-0.32);
-          for (let i = 0; i < 24; i++) {
-            if (i === 12 || i === 13) continue;
+          const profile=planetRingProfile(b), count=visualDetailBudget(game.settings).rings;
+          c.save(); c.rotate(profile.tilt);
+          for (let i = 0; i < count; i++) {
+            const q=i/count;
+            if(q>profile.gap&&q<profile.gap+.075)continue;
             c.strokeStyle = rgba(light(b.color, 0.5), 0.18 + rand(i + 63) * 0.24);
             c.lineWidth = r * 0.028;
-            c.beginPath(); c.ellipse(0, 0, r * (1.3 + i * 0.035), r * (0.34 + i * 0.011), 0, front ? 0 : Math.PI, front ? Math.PI : TAU); c.stroke();
+            c.beginPath(); c.ellipse(0, 0, r * (1.3 + q * .85), r * (0.34 + q * .25)*profile.flatten, 0, front ? 0 : Math.PI, front ? Math.PI : TAU); c.stroke();
           }
           c.restore();
         };
@@ -21140,7 +21146,7 @@
         c.fillStyle = glow; c.fillRect(-r * 1.3, -r * 1.3, r * 2.6, r * 2.6);
         c.save(); c.beginPath(); c.arc(0, 0, r, 0, TAU); c.clip();
         c.fillStyle = b.color; c.fillRect(-r, -r, r * 2, r * 2);
-        const texture = surfaceTexture(b, b.name === "Earth" && r > 180 ? 512 : 256);
+        const texture = surfaceTexture(b, game.settings?.graphics==="Low"?128:b.name === "Earth" && r > 180 ? 512 : 256);
         if (texture) c.drawImage(texture, -r, -r, r * 2, r * 2);
         const shade = c.createLinearGradient(-r, -r * 0.65, r, r * 0.65);
         shade.addColorStop(0, "rgba(245,244,225,.17)"); shade.addColorStop(0.36, "rgba(0,0,0,0)");
@@ -21156,7 +21162,7 @@
       function renderDiscoveryPortrait() {
         const b = activeDiscoveryBody, canvas = document.getElementById("discoveryPortrait");
         if (!b || !canvas) return;
-        const key = [b.name, b.featureSeed, b.color, !!earthAlbedo.pixels].join(":");
+        const key = [b.name, b.featureSeed, b.color, !!earthAlbedo.pixels, game.settings?.graphics,game.settings?.performanceMode].join(":");
         if (canvas.dataset.planet === key) return;
         canvas.width = 800; canvas.height = 420;
         const c = canvas.getContext("2d"); if (!c) return;
@@ -21346,12 +21352,14 @@
               }
             }
             if (b.pattern === "crystal") {
-              const ice = Math.max(0, terrain - 0.45) * 1.4;
-              rgb = rgb.map((v, c) => v * (1 - ice) + [180, 225, 245][c] * ice);
+              const ice = Math.max(0, terrain - 0.45) * 1.4,
+                facets=Math.pow(Math.max(0,1-Math.abs(terrain-.52)*28),3)*.24;
+              rgb = rgb.map((v, c) => v * (1 - ice) + [180, 225, 245][c] * ice + facets*[110,185,205][c]);
             }
             if (lava) {
-              const crack = Math.pow(Math.max(0, 1 - Math.abs(terrain - 0.51) * 65), 2);
-              rgb = rgb.map((v, c) => v * 0.43 + [245, 80, 8][c] * crack);
+              const crack = Math.pow(Math.max(0, 1 - Math.abs(terrain - 0.51) * 65), 2),
+                heat=Math.pow(Math.max(0,1-Math.abs(terrain-.51)*15),2)*.25;
+              rgb = rgb.map((v, c) => v * (0.36+fine*.12) + [245, 80, 8][c] * crack + heat*[160,45,5][c]);
             }
             for (let c = 0; c < 3; c++) data[i + c] = (rgb[c] * (1 - Math.min(0.8, cloud)) + 235 * Math.min(0.8, cloud)) * limb;
             data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
@@ -21652,10 +21660,16 @@
         }
         ctx.restore();
       }
+      function orbitIntersectsViewport(p,r,w,h) {
+        const near=Math.hypot(Math.max(0,-p.x,p.x-w),Math.max(0,-p.y,p.y-h)),
+          far=Math.hypot(Math.max(Math.abs(p.x),Math.abs(p.x-w)),Math.max(Math.abs(p.y),Math.abs(p.y-h)));
+        return r>=near-2&&r<=far+2;
+      }
       function drawOrbit(b) {
         if (!b.parent) return;
         const p = screen(b.parent.x, b.parent.y), rad = b.orbitRadius * zoom,
           focused = game.ship.lockBody === b.name || manualTargetName === b.name;
+        if(!orbitIntersectsViewport(p,rad,W,H))return;
         ctx.save(); ctx.strokeStyle = focused ? "rgba(183,218,221,.14)" : "rgba(183,218,221,.035)";
         ctx.lineWidth = 0.7; ctx.beginPath(); ctx.arc(p.x, p.y, rad, 0, TAU); ctx.stroke(); ctx.restore();
       }
@@ -21761,7 +21775,7 @@
         ctx.stroke();
         if (game.settings?.graphics !== "Low") {
           ctx.save(); ctx.globalCompositeOperation = "screen";
-          for (let i = 0; i < 5; i++) {
+          for (let i = 0; i < visualDetailBudget(game.settings).corona; i++) {
             const a = i * 1.31 + (b.featureSeed || 1),
               pulse = game.settings?.motion === "Reduced" ? 1 : 1 + Math.sin(t * 0.012 + i) * 0.08;
             ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(a);
@@ -21813,6 +21827,18 @@
         ctx.fill();
         ctx.restore();
       }
+      function visualDetailBudget(settings={}) {
+        const low=settings.graphics==="Low"||settings.performanceMode==="Battery Saver";
+        return {atmosphere:low?2:settings.graphics==="Medium"?3:4,rings:low?10:settings.graphics==="Medium"?18:30,
+          corona:low?0:settings.graphics==="Medium"?3:5,particles:low||settings.motion==="Reduced"?0:settings.graphics==="Medium"?4:8,
+          jumpRays:low||settings.motion==="Reduced"?0:settings.graphics==="Medium"?8:14};
+      }
+      function planetRingProfile(b) {
+        const seed=visualSeed(b.name+":"+b.featureSeed);
+        return {tilt:b.name==="Saturn"?-.32:-.62+(seed%101)/100*.9,
+          flatten:b.name==="Saturn"?1:.78+(seed%37)/100,
+          gap:.42+(seed%13)/100};
+      }
       function drawPlanetLighting(b, p, r) {
         if (r < 4) return;
         const star = game.system.bodies.find(body => body.type === "star"),
@@ -21824,29 +21850,31 @@
         shade.addColorStop(0.38, "rgba(0,2,9,.74)");
         shade.addColorStop(0.53, "rgba(0,2,9,.28)");
         shade.addColorStop(0.72, "rgba(0,0,0,0)");
-        shade.addColorStop(1, "rgba(255,244,220,.13)");
+        shade.addColorStop(1, rgba(star?.color||"#fff4dc",.19));
         ctx.fillStyle = shade; ctx.fillRect(-r, -r, r * 2, r * 2);
         ctx.restore();
         if (!b.atmosphere) return;
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(direction);
         ctx.globalCompositeOperation = "screen";
-        for (let i = 3; i >= 0; i--) {
-          ctx.strokeStyle = rgba(light(b.color, 0.62), 0.08 + (3 - i) * 0.08);
+        const layers=visualDetailBudget(game.settings).atmosphere;
+        for (let i = layers-1; i >= 0; i--) {
+          ctx.strokeStyle = rgba(light(b.color, 0.62), 0.07 + (layers-1-i) * 0.09);
           ctx.lineWidth = Math.max(0.75, r * (0.02 + i * 0.018));
           ctx.beginPath(); ctx.arc(0, 0, r * 1.008, -1.55, 1.55); ctx.stroke();
         }
         ctx.restore();
       }
       function drawPlanetRings(p, r, b, front = true) {
-        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(-0.32);
-        const count = game.settings?.graphics === "Low" ? 12 : 30;
+        const profile=planetRingProfile(b);
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(profile.tilt);
+        const count = visualDetailBudget(game.settings).rings;
         for (let i = 0; i < count; i++) {
           const q = i / count;
-          if (q > 0.51 && q < 0.59) continue; // Cassini-like division.
-          ctx.strokeStyle = rgba(light(b.color, 0.45), 0.16 + rand(i + (b.featureSeed || 1)) * 0.3);
+          if (q > profile.gap && q < profile.gap+.075) continue; // Seeded ring division.
+          ctx.strokeStyle = rgba(light(b.color, 0.45+Math.sin(q*17)*.12), (front?.21:.13) + rand(i + (b.featureSeed || 1)) * .26);
           ctx.lineWidth = Math.max(0.6, r * 0.8 / count);
           ctx.beginPath();
-          ctx.ellipse(0, 0, r * (1.3 + q * 0.85), r * (0.34 + q * 0.25), 0,
+          ctx.ellipse(0, 0, r * (1.3 + q * 0.85), r * (0.34 + q * 0.25)*profile.flatten, 0,
             front ? 0 : Math.PI, front ? Math.PI : TAU);
           ctx.stroke();
         }
@@ -22459,6 +22487,8 @@
         const p = screen(f.x, f.y),
           r = Math.max(0.34, zoom * 0.48),
           skin = activeFrigateSkin();
+        const margin=550*zoom+80;
+        if(p.x+margin<0||p.x-margin>W||p.y+margin<0||p.y-margin>H)return;
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(f.heading || f.angle || 0);
@@ -22513,7 +22543,7 @@
           drawFleetShipVisual(c, scale, ship, skin, cruisingThrust);
           if (ship.status === "ready") {
             c.globalCompositeOperation = "screen";
-            c.strokeStyle = rgba("#86efac", 0.34 + Math.sin(t * 0.05) * 0.08);
+            c.strokeStyle = rgba("#86efac", 0.3 + (game.settings?.motion==="Reduced"?0:Math.sin(t * 0.05) * 0.06));
             c.lineWidth = Math.max(0.8, zoom);
             c.setLineDash([3 * zoom, 5 * zoom]);
             c.beginPath();
@@ -22761,7 +22791,7 @@
       function drawCraftEngine(c, engine, skin, thrust) {
         const {x,y,size}=engine, power=clamp(Number(thrust)||0,0,1), length=size*(2.2+power*8), color=skin.glow||skin.accent||"#7dd3fc";
         c.save(); c.globalCompositeOperation="screen";
-        const glow=c.createRadialGradient(x,y,0,x,y,size*4);
+        const glow=c.createRadialGradient(x,y,0,x,y,size*(3.1+power*.9));
         glow.addColorStop(0,rgba(color,0.18+power*0.30));glow.addColorStop(1,"rgba(0,0,0,0)");
         c.fillStyle=glow;c.fillRect(x-size*4,y-size*4,size*8,size*8);
         const plume=c.createLinearGradient(x-length,y,x,y);
@@ -22773,7 +22803,12 @@
           c.fillStyle=rgba("#e9faff",0.65);
           c.beginPath();c.moveTo(x,y-size*.24);c.lineTo(x-length*.62,y);c.lineTo(x,y+size*.24);c.closePath();c.fill();
         }
-        c.fillStyle="#def7ff";c.fillRect(x-0.6,y-size*0.6,1.2,size*1.2);c.restore();
+        c.fillStyle="#def7ff";c.fillRect(x-0.6,y-size*0.6,1.2,size*1.2);
+        if(power>.4 && game.settings?.graphics==="High" && game.settings?.performanceMode!=="Battery Saver"){
+          c.fillStyle=rgba(color,.25);c.fillRect(x-length*.23,y-size*.36,1.2,size*.72);
+          c.fillRect(x-length*.42,y-size*.22,.9,size*.44);
+        }
+        c.restore();
       }
       const spacecraftSprites = { entries:new Map(), bytes:0, budget:12*1024*1024 };
       function craftBounds(model) {
@@ -22814,7 +22849,7 @@
           }
           c.fillStyle=finish;c.fill();
           // Fine plating, clipped to each actual hull section (cached, not per-frame).
-          if (material === "hull" || material === "trim") {
+          if (["hull","trim","metal","paint"].includes(material)) {
             c.save(); c.clip();
             const xs = points.map(p => p[0]), left = Math.min(...xs), right = Math.max(...xs);
             c.strokeStyle = "rgba(1,6,12,.3)"; c.lineWidth = 0.28;
@@ -22824,6 +22859,10 @@
                 c.beginPath(); c.moveTo(col, row); c.lineTo(col, Math.min(bottom, row + 5)); c.stroke();
                 c.fillStyle = "rgba(232,243,241,.24)"; c.fillRect(col + .8, row + .8, .4, .4);
               }
+            }
+            if(right-left>12 && bottom-top>6){
+              c.fillStyle="rgba(4,12,19,.38)";c.fillRect(left+3,top+2,Math.min(9,(right-left)*.3),1.6);
+              c.fillStyle="rgba(219,235,241,.48)";c.fillRect(left+3,top+2,.65,1.6);
             }
             c.restore();
           }
@@ -23082,8 +23121,9 @@
             p = screen(b ? b.x : e.x, b ? b.y : e.y),
             q = clamp(e.t / e.dur, 0, 1),
             base = (b ? visualRadius(b) : 34) * zoom,
-            rad = base + (1-Math.pow(1-q,2)) * 68 * zoom,
+            rad = base + (game.settings?.motion==="Reduced"?.35:1-Math.pow(1-q,2)) * 68 * zoom,
             alpha = 1 - q;
+          if(p.x+rad+12<0||p.x-rad-12>W||p.y+rad+12<0||p.y-rad-12>H)continue;
           ctx.strokeStyle = rgba(e.color, 0.62 * alpha);
           ctx.lineWidth = 3 * (1 - q) + 1;
           ctx.beginPath();
@@ -23096,9 +23136,9 @@
           ctx.arc(p.x, p.y, rad * 0.72, phase, phase + TAU * 0.84);
           ctx.stroke();
           ctx.setLineDash([]);
-          const particles = flightVisualBudget(game.settings).particles ? 6 : 0;
+          const particles = visualDetailBudget(game.settings).particles;
           for (let i = 0; i < particles; i++) {
-            const a = (i * TAU) / 6 + t * 0.04,
+            const a = (i * TAU) / particles + t * 0.025,
               rrr = rad * 0.86;
             ctx.fillStyle = rgba(i % 2 ? "#86efac" : "#e0f2fe", 0.48 * alpha);
             ctx.beginPath();
@@ -23682,6 +23722,7 @@
         drawUpgradeEffects();
         drawObjective();
         drawScreenFX();
+        drawJumpArrival();
         drawTitleShowcase();
       }
       function drawMiniMap() {
@@ -24034,6 +24075,38 @@
         g.addColorStop(1, "rgba(0,0,0,0)");
         ctx.fillStyle = g;
         ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+      }
+      function jumpArrivalFrame(elapsed,settings={}) {
+        const duration=settings.motion==="Reduced"?260:850;
+        const q=clamp(elapsed/duration,0,1);
+        return {active:q<1,fade:Math.pow(1-q,2),rays:visualDetailBudget(settings).jumpRays,progress:q};
+      }
+      function startJumpArrival() {
+        // Jump is already committed; camera and visual state are transient only.
+        cam.x=game.ship.x;cam.y=game.ship.y;
+        jumpArrivalFX={started:performance.now()};
+      }
+      function drawJumpArrival() {
+        if(!jumpArrivalFX)return;
+        const frame=jumpArrivalFrame(performance.now()-jumpArrivalFX.started,game.settings);
+        if(!frame.active){jumpArrivalFX=null;return;}
+        const theme=activeVisualTheme||sectorVisualTheme(), cx=W*.5,cy=H*.5,span=Math.hypot(W,H);
+        ctx.save();
+        if(frame.rays){
+          ctx.globalCompositeOperation="screen";
+          for(let i=0;i<frame.rays;i++){
+            const a=i*TAU/frame.rays+.31,
+              near=span*(.08+frame.progress*.15),far=near+span*.28;
+            const x=Math.cos(a),y=Math.sin(a);
+            const g=ctx.createLinearGradient(cx+x*near,cy+y*near,cx+x*far,cy+y*far);
+            g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(1,rgba(theme.accent,.25*frame.fade));
+            ctx.strokeStyle=g;ctx.lineWidth=1.1;
+            ctx.beginPath();ctx.moveTo(cx+x*near,cy+y*near);ctx.lineTo(cx+x*far,cy+y*far);ctx.stroke();
+          }
+        }
+        ctx.globalCompositeOperation="source-over";
+        ctx.fillStyle=rgba(theme.deep,.52*frame.fade);ctx.fillRect(0,0,W,H);
         ctx.restore();
       }
       function drawScreenFX() {
