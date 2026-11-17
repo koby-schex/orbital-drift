@@ -10358,7 +10358,7 @@
         sanitizeFlags();
         forceTutorialCommon();
       }
-      function saveGame(manual = false) {
+      function saveGame(manual = false, quiet = false) {
         // A deleted save must not silently return via autosave or app background.
         if (saveDeletedUntilExplicitSave && !manual) return false;
         if (!hasActiveJourney) {
@@ -10390,7 +10390,7 @@
               "Manual save completed",
               game.system?.name || "Current sector",
             );
-          } else if (game.settings?.autosaveIndicator === "On")
+          } else if (!quiet && game.settings?.autosaveIndicator === "On")
             toast("Autosaved.");
           updateSaveStatus();
           refreshTitleButtons();
@@ -10400,7 +10400,7 @@
           lastAutosave = Date.now();
           lastSaveMessage = "Save failed. Export a backup when storage is available.";
           updateSaveStatus();
-          toast("Save failed.");
+          if (!quiet) toast("Save failed.");
           addActivity(
             "warning",
             "Save failed",
@@ -10800,7 +10800,7 @@
               const previousState = hasActiveJourney ? saveState() : null;
               const previousReady = hasActiveJourney;
               const previousDeletedState = saveDeletedUntilExplicitSave;
-              let current, backup, wroteBackup = false;
+              let current, backup, wrotePrimary = false, wroteBackup = false;
               try {
                 current = localStorage.getItem(SAVE_KEY);
                 backup = localStorage.getItem(SAVE_BACKUP_KEY);
@@ -10816,6 +10816,7 @@
                   }
                 }
                 localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+                wrotePrimary = true;
                 saveDeletedUntilExplicitSave = false;
                 lastSaveMeta = data.meta || saveMeta(data);
                 refreshTitleButtons();
@@ -10824,13 +10825,19 @@
                 else initGame(false, false);
                 hasActiveJourney = previousReady;
                 saveDeletedUntilExplicitSave = previousDeletedState;
-                if (wroteBackup) {
-                  try {
+                // Roll back BOTH storage slots if any step after writing the
+                // imported primary save fails. The prior journey must survive.
+                try {
+                  if (wrotePrimary) {
+                    if (current === null) localStorage.removeItem(SAVE_KEY);
+                    else localStorage.setItem(SAVE_KEY, current);
+                  }
+                  if (wroteBackup) {
                     if (backup === null) localStorage.removeItem(SAVE_BACKUP_KEY);
                     else localStorage.setItem(SAVE_BACKUP_KEY, backup);
-                  } catch (restoreError) { console.warn(restoreError); }
-                }
-                errorToast("Import failed. Your current journey has been kept.");
+                  }
+                } catch (restoreError) { console.warn("Save rollback unavailable", restoreError); }
+                errorToast("Import failed. Your previous journey was restored where storage permits.");
                 return;
               }
               titleOpen = false;
@@ -26110,23 +26117,49 @@
         if (event.key === SAVE_KEY || event.key === SAVE_BACKUP_KEY || event.key === null)
           refreshTitleButtons();
       });
-      addEventListener("beforeunload", () => saveGame(false));
-      addEventListener("pagehide", () => saveGame(false));
+      let lastLifecycleSaveAt = 0;
+      function suspendJourneyForBackground() {
+        // Native lifecycle, pagehide and visibilitychange may arrive together.
+        // Save once, synchronously, and never resume movement in background.
+        loop.last = 0;
+        keys.clear();
+        endTouch();
+        cleanControlButtons();
+        if (hasActiveJourney && canResumePlay()) openPause();
+        if (hasActiveJourney && !saveDeletedUntilExplicitSave &&
+            Date.now() - lastLifecycleSaveAt > 1200) {
+          lastLifecycleSaveAt = Date.now();
+          saveGame(false, true);
+        }
+        if (audio?.ctx?.state === "running")
+          audio.ctx.suspend().catch?.(() => {});
+      }
+      function foregroundJourney() {
+        // Do not auto-unpause flight or restore held input. Resume only the
+        // user's previously enabled audio setting, as in the existing game.
+        loop.last = 0;
+        keys.clear();
+        endTouch();
+        if (audio && (game.settings?.music === "On" || game.settings?.sound === "On"))
+          audio.ctx.resume().then?.(syncAudioSettings).catch?.(() => {});
+      }
+      function registerNativeLifecycle() {
+        const lifecycle = window.Capacitor?.Plugins?.OrbitalDriftLifecycle;
+        if (typeof lifecycle?.addListener !== "function") return;
+        Promise.resolve(lifecycle.addListener("stateChanged", (event) => {
+          if (event?.active === false) suspendJourneyForBackground();
+          else if (event?.active === true) foregroundJourney();
+        })).catch(() => {});
+      }
+      addEventListener("beforeunload", suspendJourneyForBackground);
+      addEventListener("pagehide", suspendJourneyForBackground);
       addEventListener("blur", () => {
         cleanControlButtons();
         if (hasActiveJourney && canResumePlay()) openPause();
       });
       document.addEventListener("visibilitychange", () => {
-        loop.last = 0;
-        keys.clear();
-        endTouch();
-        if (document.hidden) {
-          if (hasActiveJourney && canResumePlay()) openPause();
-          saveGame(false);
-          if (audio?.ctx?.state === "running") audio.ctx.suspend().catch?.(() => {});
-        } else if (audio && (game.settings?.music === "On" || game.settings?.sound === "On")) {
-          audio.ctx.resume().then?.(syncAudioSettings).catch?.(() => {});
-        }
+        if (document.hidden) suspendJourneyForBackground();
+        else foregroundJourney();
       });
       ui.saveImportInput?.addEventListener("change", (event) =>
         importSaveFile(event.target.files?.[0]),
@@ -26722,6 +26755,7 @@
       paused = true;
       if (DEV_BUILD) runTests();
       registerOfflineSupport();
+      registerNativeLifecycle();
       registerNativePurchaseUpdates();
       requestAnimationFrame(loop);
     </script>
