@@ -23,14 +23,14 @@ function harness({deleted=false,active=true}={}) {
     addListener:(name,cb)=>{callbacks.native=cb;return Promise.resolve({remove(){}});}
   }}}};
   const document={hidden:false,addEventListener:(name,cb)=>{callbacks[name]=cb;}};
-  const audio={ctx:{state:"running",suspend:()=>{data.suspends++;return Promise.resolve();}}};
+  const audio={ctx:{state:"running",suspend:()=>{data.suspends++;return Promise.resolve();},resume:()=>Promise.resolve()}};
   const get=new Function("window","document","addEventListener","loop","keys",
     "endTouch","cleanControlButtons","hasActiveJourney","canResumePlay",
-    "openPause","saveDeletedUntilExplicitSave","saveGame","audio",
+    "openPause","saveDeletedUntilExplicitSave","saveGame","audio","game","syncAudioSettings",
     segment+"\nreturn {suspendJourneyForBackground,foregroundJourney,registerNativeLifecycle};");
   const obj=get(window,document,(name,cb)=>{callbacks[name]=cb;},
     {last:32},keys,()=>data.ends++,()=>data.clean++,active,()=>active,
-    ()=>data.pauses++,deleted,(...args)=>data.saves.push(args),audio);
+    ()=>data.pauses++,deleted,(...args)=>data.saves.push(args),audio,{settings:{music:"On"}},()=>{});
   return {callbacks,data,keys,...obj};
 }
 const h=harness();
