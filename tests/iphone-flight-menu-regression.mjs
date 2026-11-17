@@ -12,10 +12,10 @@ const game={ship:{x:200,y:0,vx:2,vy:0,maxFuel:100,maxBoost:100,fuel:0,boost:0},
  {name:"Mars",type:"planet",x:220,y:0,radius:35},
  {name:"Jupiter",type:"planet",x:550,y:0,radius:45}]},
  frigate:{built:true},captainLog:{rescueCount:0}};
-const lock=new Function("game","frigatePosition","canOrbitLock","selectedPlanetName","visualRadius",
+const lock=new Function("game","frigatePosition","canOrbitLock","selectedPlanetName","visualRadius","tutorialRequiresObjective","currentTarget","manualTargetName",
  extract("nearestLockTarget","toggleOrbit")+"\nreturn nearestLockTarget;")(
  game,()=>null,b=>b.type!=="star"&&Math.hypot(game.ship.x-b.x,game.ship.y-b.y)-b.radius<175,
- "Mars",b=>b.radius);
+ "Mars",b=>b.radius,()=>false,()=>null,null);
 assert.equal(lock().body.name,"Mars","A closer star must never block planet lock");
 game.ship.x=550;
 assert.equal(lock().body.name,"Jupiter","Out-of-range selected planet must not block reachable target");
