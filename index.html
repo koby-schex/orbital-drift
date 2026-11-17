@@ -12504,6 +12504,20 @@
         b.memory[type] = (b.memory[type] || 0) + n;
         updateIdentity(b);
       }
+      // Context actions must agree with the actual locked or explicitly targeted world.
+      function nearbyPlanet(predicate,limit) {
+        if(!game.ship||!game.system)return {body:null,d:Infinity};
+        const candidates=game.system.bodies.filter(b=>b.type!=="star"&&predicate(b)).map(b=>({body:b,d:dist(game.ship,b)-visualRadius(b)}))
+          .filter(n=>n.d<=limit(n.body));
+        const preferred=game.ship.orbitLocked?game.ship.lockBody:manualTargetName;
+        return candidates.find(n=>n.body.name===preferred)||candidates.reduce((best,n)=>n.d<best.d?n:best,{body:null,d:Infinity});
+      }
+      function nearestSurveyTarget() {
+        return nearbyPlanet(b=>!b.discoveryRewardClaimed,()=>230);
+      }
+      function nearestRefuelTarget() {
+        return nearbyPlanet(b=>game.captured.has(b.name),b=>visualRadius(b)+120);
+      }
       function nearestLockTarget() {
         if (!game.ship || !game.system) return { body: null, d: Infinity };
         // The closest stellar body might be a star or outside lock range.
@@ -12512,7 +12526,10 @@
           ...game.system.bodies.filter((b) => b.type !== "star"),
           frigatePosition(),
         ].filter((b) => b && canOrbitLock(b));
-        const selected = candidates.find((b) => b.name === selectedPlanetName);
+        const preferred = tutorialRequiresObjective() ? currentTarget() : null;
+        const selected = candidates.find(b=>preferred && (b.name===preferred.name || (b.type==="frigate"&&preferred.type==="frigate"))) ||
+          candidates.find(b=>manualTargetName==="__FRIGATE__"?b.type==="frigate":b.name===manualTargetName) ||
+          candidates.find((b) => b.name === selectedPlanetName);
         const target = selected || candidates.reduce((best, b) => {
           const edge = Math.hypot(game.ship.x - b.x, game.ship.y - b.y) -
             (b.type === "frigate" ? b.radius || 42 : visualRadius(b));
@@ -12786,7 +12803,7 @@
       }
 
       function scanPlanet(target = null) {
-        const n = nearestBody(),
+        const n = nearestSurveyTarget(),
           b = typeof target === "string" ? body(target) : n.body;
         if (!b || b.type === "star") return toast("No planetary world is in scanner range.");
         const range = dist(game.ship, b) - visualRadius(b);
@@ -12816,7 +12833,9 @@
               (b.capturable ? " • Suitable for capture" : " • Survey-only world"),
           );
         }
+        if(firstSurvey) saveGame(false);
         showDiscovery(b, reward);
+        if(ui.menu?.classList.contains("open"))renderMenu();
       }
       function capture() {
         const s = game.ship;
@@ -12833,6 +12852,8 @@
         finishCapture(b);
       }
       function finishCapture(b, replace = null) {
+        if(!b || !b.capturable || game.captured.has(b.name))return false;
+        if(replace && (replace==="Earth" || !game.captured.has(replace)))return false;
         feedbackPulse("capture");
         if (replace) {
           const old = body(replace);
@@ -12942,6 +12963,7 @@
         saveGame(false);
       }
       function openChoice(b) {
+        cleanControlButtons();
         paused = true;
         modalFreeze = true;
         ui.choiceOverlay.classList.remove("closing");
@@ -12976,8 +12998,7 @@
       function closeChoice() {
         hideOverlayWithTransition(ui.choiceOverlay);
         ui.choiceList.innerHTML = "";
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
+        settleOverlayPause();
       }
       function refuel() {
         if (orbitingFrigate()) {
@@ -12990,12 +13011,8 @@
           if (ui.menu?.classList.contains("open")) renderMenu();
           return;
         }
-        const n = nearestBody();
-        if (
-          n.body &&
-          game.captured.has(n.body.name) &&
-          n.d < visualRadius(n.body) + 120
-        ) {
+        const n = nearestRefuelTarget();
+        if (n.body) {
           game.ship.fuel = game.ship.maxFuel;
           recordPlanet(n.body, "refuels", 1);
           toast("Refueled at " + n.body.name + ".");
@@ -14850,8 +14867,7 @@
         const unresolved = !game.sectorEvent?.complete;
         hideOverlayWithTransition(ui.encounterOverlay);
         document.body.classList.remove("encounter-open");
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
+        settleOverlayPause();
         if (unresolved)
           toast("Signal left open. Return whenever you are ready to respond.");
       }
@@ -16482,6 +16498,7 @@
       }
       function closeMenu() {
         const shouldResume = !menuWasPaused && !titleMenuMode && !titleOpen;
+        if(!ui.menu.classList.contains("open"))return;
         activeMenu = null;
         layoutDrag = null;
         ui.menu.classList.add("closing");
@@ -16505,8 +16522,8 @@
         setTimeout(() => {
           if (ui.menu.classList.contains("open")) return;
           ui.menu.classList.remove("closing");
-          ui.menu.dataset.section = activeMenu;
-        ui.menuNav.innerHTML = "";
+          delete ui.menu.dataset.section;
+          ui.menuNav.innerHTML = "";
           ui.menuContent.innerHTML = "";
         }, 320);
       }
@@ -16516,6 +16533,7 @@
       function renderMenu() {
         if (!activeMenu || !ui.menu.classList.contains("open")) return;
         activeMenu = normalizeMenuName(activeMenu);
+        ui.menu.dataset.section = activeMenu;
         ui.menuTitle.textContent =
           {
             hub: game.frigate?.built ? "Pioneer Command" : "Command Menu",
@@ -16652,7 +16670,7 @@
               (t) =>
                 '<button type="button" class="' +
                 (current === t.key ? "active" : "") +
-                '" data-action="setMenuTab" data-arg="' +
+                '" role="tab" aria-selected="' + String(current === t.key) + '" data-action="setMenuTab" data-arg="' +
                 esc(menu + "|" + t.key) +
                 '">' +
                 esc(t.label) +
@@ -16669,7 +16687,8 @@
         const parts = String(v || "").split("|"),
           menu = parts[0],
           tab = parts[1];
-        if (!menu || !tab) return;
+        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","vault","upgrades","cosmetics"],system:["status","ops","travel","records","settings"]};
+        if (!allowed[menu]?.includes(tab)) return;
         menuTabs[menu] = tab;
         renderMenu();
         requestAnimationFrame(() => {
@@ -20315,7 +20334,7 @@
         }
       }
       function smartAction() {
-        const n = nearestBody(),
+        const n = nearestSurveyTarget(), fuelTarget=nearestRefuelTarget(),
           h = nearestEcho(),
           ev = nearestSectorEvent(),
           bh = nearestBlackHole();
@@ -20336,33 +20355,20 @@
             show: true,
             tone: "travel",
           };
+        if (game.ship.orbitLocked && game.ship.lockBody) {
+          const b=body(game.ship.lockBody);
+          if(b&&b.type!=="star"){
+            if(!b.discoveryRewardClaimed&&!game.captured.has(b.name)&&dist(game.ship,b)-visualRadius(b)<=230)return {label:"Scan "+b.name,run:()=>scanPlanet(b.name),show:true};
+            if(b.capturable&&!game.captured.has(b.name))return {label:"Capture "+b.name,run:capture,show:true};
+            if(game.captured.has(b.name)&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
+          }
+        }
         if (h && h.d < 70 && !h.echo.harvested)
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
-        if (
-          n.body &&
-          n.body.type !== "star" &&
-          n.d < 230 &&
-          !n.body.discoveryRewardClaimed
-        )
-          return {
-            label: "Scan " + n.body.name,
-            run: () => scanPlanet(n.body.name),
-            show: true,
-          };
-        if (game.ship.orbitLocked && game.ship.lockBody) {
-          const b = body(game.ship.lockBody);
-          if (b && b.capturable && !game.captured.has(b.name))
-            return { label: "Capture " + b.name, run: capture, show: true };
-        }
-        if (
-          n.body &&
-          game.captured.has(n.body.name) &&
-          n.d < visualRadius(n.body) + 120 &&
-          game.ship.fuel < game.ship.maxFuel * 0.94
-        )
-          return { label: "Refuel", run: refuel, show: true };
+        if(n.body)return {label:"Scan "+n.body.name,run:()=>scanPlanet(n.body.name),show:true};
+        if(fuelTarget.body&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
         if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
           return {
             label: "Scan Mystery",
@@ -20508,13 +20514,7 @@
       function closeDiscoveryPanel() {
         hideOverlayWithTransition(ui.discoveryOverlay);
         activeDiscoveryBody = null;
-        cinematicPausePending = false;
-        cinematicTargetScale = 1;
-        modalFreeze = false;
-        if (canResumePlay()) {
-          paused = false;
-          cinematicTimeScale = Math.max(0.08, cinematicTimeScale);
-        }
+        settleOverlayPause();
       }
       function captureDiscoveryWorld() {
         const b = activeDiscoveryBody;
@@ -20525,7 +20525,10 @@
           return;
         }
         manualTargetName = b.name;
+        selectedPlanetName = b.name;
         closeDiscoveryPanel();
+        if(ui.menu.classList.contains("open"))closeMenu();
+        saveGame(false);
         toast("Capture target set: " + b.name + ". Lock orbit when you arrive.");
       }
       function discoveryBg(b) {
@@ -20561,6 +20564,7 @@
       function confirmAction(title, text, onOk) {
         paused = true;
         modalFreeze = true;
+        cleanControlButtons();
         pendingConfirm = onOk;
         ui.confirmTitle.textContent = title;
         ui.confirmText.textContent = text;
@@ -20570,8 +20574,7 @@
       function closeConfirm() {
         pendingConfirm = null;
         hideOverlayWithTransition(ui.confirmOverlay);
-        modalFreeze = false;
-        if (canResumePlay()) paused = false;
+        settleOverlayPause();
       }
       function acceptConfirm() {
         playSound("confirm");
@@ -20616,6 +20619,7 @@
       }
       function beginCinematicPause(overlay) {
         const canEase = !paused && !titleOpen && !modalFreeze;
+        cleanControlButtons();
         overlay?.classList.remove("closing");
         overlay?.classList.add("show");
         if (!canEase) {
@@ -20633,6 +20637,9 @@
       }
       function settleOverlayPause() {
         modalFreeze = gameplayModalOpen();
+        cinematicPausePending = false;
+        cinematicTargetScale = modalFreeze ? 0 : 1;
+        if (!modalFreeze) cinematicTimeScale = Math.max(.08, cinematicTimeScale);
         if (
           modalFreeze ||
           titleOpen ||
@@ -20655,6 +20662,7 @@
       }
       function showUpgradePanel(title, summary, rows = []) {
         if (!ui.upgradeOverlay) return;
+        cleanControlButtons();
         paused = true;
         modalFreeze = true;
         ui.upgradeTitle.textContent = title;
@@ -20678,6 +20686,7 @@
       function showMissionPanel(title, summary, rows = []) {
         if (!ui.missionOverlay) return;
         // Never interrupt a major reward or active flight with an advertisement.
+        cleanControlButtons();
         paused = true;
         modalFreeze = true;
         playSound("confirm");
@@ -20715,6 +20724,7 @@
           game.settings?.graphics === "High" ? "high" : "medium";
         resizeTitleCanvas();
         buildBackdrop();
+        applyControlPositions();
         if(ui.menu?.classList.contains("open")) renderSkinPreviews();
       }
       function resizeTitleCanvas() {
@@ -26340,6 +26350,7 @@
         .querySelectorAll(".dock button")
         .forEach((b) => (b.onclick = () => openMenu(b.dataset.menu)));
       ui.smartBtn.onclick = () => {
+        if(!canResumePlay()||paused||modalFreeze)return;
         const a = smartAction();
         if (a.show) a.run();
       };
@@ -26476,9 +26487,11 @@
         saveGame(false);
         toast("Control layout saved.");
       }
+      const flightPointers = {joystick:null,thrust:null,brake:null};
       function cleanControlButtons() {
         keys.clear();
         touch.active = false;
+        Object.keys(flightPointers).forEach(k=>flightPointers[k]=null);
         if (ui.knob) {
           ui.knob.style.left = "var(--stickKnobHome)";
           ui.knob.style.top = "var(--stickKnobHome)";
@@ -26527,6 +26540,7 @@
       }
       addEventListener("pointermove", moveControlDrag);
       addEventListener("pointerup", endControlDrag);
+      addEventListener("pointercancel",e=>{if(layoutDrag){layoutDrag.el.style.transition="";layoutDrag=null;applyControlPositions();} });
       function touchMove(e) {
         const r = ui.stick.getBoundingClientRect(),
           cx = r.left + r.width / 2,
@@ -26536,71 +26550,66 @@
           sens = game.settings?.touchSensitivity || 1,
           knob = ui.knob.getBoundingClientRect(),
           home = (r.width - knob.width) / 2,
-          limit = Math.max(34, r.width / 2 - knob.width / 2 - 6),
+          limit = Math.max(1, r.width / 2 - knob.width / 2 - 6),
           mag = Math.min(limit, Math.hypot(dx, dy)),
           a = Math.atan2(dy, dx);
-        touch = { active: true, x: Math.cos(a) * sens, y: Math.sin(a) * sens };
+        touch = { active: mag > 5, x: Math.cos(a) * sens, y: Math.sin(a) * sens };
         ui.knob.style.left = home + Math.cos(a) * mag + "px";
         ui.knob.style.top = home + Math.sin(a) * mag + "px";
       }
-      ui.stick.onpointerdown = (e) => {
-        if (isLayoutEdit()) return startControlDrag(e, "joystick", ui.stick);
-        e.preventDefault();
-        ui.stick.setPointerCapture(e.pointerId);
-        touchMove(e);
+      function flightInputAllowed() {
+        return canResumePlay()&&!paused&&!modalFreeze&&!gameplayModalOpen()&&!pioneerRescue;
+      }
+      function claimFlightPointer(e,key,element) {
+        if(!flightInputAllowed()||flightPointers[key]!==null)return false;
+        e.preventDefault(); flightPointers[key]=e.pointerId;
+        element.setPointerCapture?.(e.pointerId);
+        resumeAudio();
+        return true;
+      }
+      function releaseFlightPointer(e,key) {
+        if(flightPointers[key]!==e.pointerId)return false;
+        flightPointers[key]=null;
+        return true;
+      }
+      ui.stick.onpointerdown = e=>{
+        if(isLayoutEdit())return startControlDrag(e,"joystick",ui.stick);
+        if(claimFlightPointer(e,"joystick",ui.stick))touchMove(e);
       };
-      ui.stick.onpointermove = (e) => {
-        if (touch.active) touchMove(e);
+      ui.stick.onpointermove=e=>{
+        if(flightPointers.joystick===e.pointerId)touchMove(e);
       };
       function endTouch() {
-        touch.active = false;
-        ui.knob.style.left = "var(--stickKnobHome)";
-        ui.knob.style.top = "var(--stickKnobHome)";
+        touch.active=false;
+        flightPointers.joystick=null;
+        if(ui.knob){ui.knob.style.left="var(--stickKnobHome)";ui.knob.style.top="var(--stickKnobHome)";}
       }
-      ui.stick.onpointerup = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        endTouch();
-      };
-      ui.stick.onpointercancel = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        endTouch();
-      };
-      ui.touchThrust.onpointerdown = (e) => {
-        if (isLayoutEdit())
-          return startControlDrag(e, "thrust", ui.touchThrust);
-        e.preventDefault();
-        resumeAudio();
-        keys.add("touch");
-      };
-      ui.touchThrust.onpointerup = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("touch");
-      };
-      ui.touchThrust.onpointercancel = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("touch");
-      };
-      ui.touchBrake.onpointerdown = (e) => {
-        if (isLayoutEdit()) return startControlDrag(e, "brake", ui.touchBrake);
-        e.preventDefault();
-        resumeAudio();
-        keys.add("brake");
-      };
-      ui.touchBrake.onpointerup = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("brake");
-      };
-      ui.touchBrake.onpointercancel = (e) => {
-        if (layoutDrag) return endControlDrag(e);
-        e.preventDefault();
-        keys.delete("brake");
-      };
+      function releaseJoystick(e){
+        if(layoutDrag)return endControlDrag(e);
+        if(releaseFlightPointer(e,"joystick"))endTouch();
+      }
+      ui.stick.onpointerup=releaseJoystick;
+      ui.stick.onpointercancel=releaseJoystick;
+      ui.stick.onlostpointercapture=e=>{if(releaseFlightPointer(e,"joystick"))endTouch();};
+      function bindHeldFlightControl(element,key,heldKey) {
+        element.onpointerdown=e=>{
+          if(isLayoutEdit())return startControlDrag(e,key,element);
+          if(claimFlightPointer(e,key,element))keys.add(heldKey);
+        };
+        const release=e=>{
+          if(layoutDrag)return endControlDrag(e);
+          if(releaseFlightPointer(e,key)){e.preventDefault();keys.delete(heldKey);}
+        };
+        element.onpointerup=release;
+        element.onpointercancel=release;
+        element.onlostpointercapture=e=>{if(releaseFlightPointer(e,key))keys.delete(heldKey);};
+      }
+      bindHeldFlightControl(ui.touchThrust,"thrust","touch");
+      bindHeldFlightControl(ui.touchBrake,"brake","brake");
       ui.orbitRelease.onpointerdown = (e) => {
         if (isLayoutEdit())
           return startControlDrag(e, "release", ui.orbitRelease);
+        if(!flightInputAllowed())return;
         e.preventDefault();
         resumeAudio();
         toggleOrbit();
