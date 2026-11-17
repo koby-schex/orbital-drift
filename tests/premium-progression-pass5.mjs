@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const section = (a,b) => html.slice(html.indexOf(a), html.indexOf(b,html.indexOf(a)));
-const saving=section("function saveGame(manual = false)","function loadGame(");
+const saving=section("function saveGame(manual = false, quiet = false)","function loadGame(");
 const deletion=section("function deleteSave()","function autosave()");
 const fleet=section("function ensureFleet()","function serializeFleet()");
 const offers=section("function generateExpeditionOffers(","function acceptExpedition(");
