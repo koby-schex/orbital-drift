@@ -13,6 +13,7 @@ const original=await readFile(appDelegate,"utf8");
 const plugin=await readFile(path.join(root,"native/ios/OrbitalDriftStoreKitPlugin.swift"),"utf8");
 const controller=await readFile(path.join(root,"native/ios/OrbitalDriftBridgeViewController.swift"),"utf8");
 const adsPlugin=await readFile(path.join(root,"native/ios/OrbitalDriftAdMobPlugin.swift"),"utf8");
+const lifecyclePlugin=await readFile(path.join(root,"native/ios/OrbitalDriftLifecyclePlugin.swift"),"utf8");
 if (!original.includes("class AppDelegate") || !original.includes("import UIKit"))
   throw new Error("Unknown generated Capacitor AppDelegate source");
 if (original.includes("class OrbitalDriftStoreKitPlugin") ||
@@ -21,6 +22,6 @@ if (original.includes("class OrbitalDriftStoreKitPlugin") ||
 const scene=await readFile(storyboard,"utf8");
 const pattern=/customClass="CAPBridgeViewController"\s+customModule="Capacitor"/;
 if (!pattern.test(scene)) throw new Error("Generated Capacitor storyboard changed; cannot safely register StoreKit plugin");
-await writeFile(appDelegate,original.trimEnd()+"\n\n"+plugin.trim()+"\n\n"+adsPlugin.trim()+"\n\n"+controller.trim()+"\n");
+await writeFile(appDelegate,original.trimEnd()+"\n\n"+plugin.trim()+"\n\n"+adsPlugin.trim()+"\n\n"+lifecyclePlugin.trim()+"\n\n"+controller.trim()+"\n");
 await writeFile(storyboard,scene.replace(pattern,'customClass="OrbitalDriftBridgeViewController" customModule="App"'));
 console.log("Registered verified StoreKit 2 Capacitor plugin in generated iOS application");
