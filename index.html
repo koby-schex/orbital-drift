@@ -5088,6 +5088,9 @@
       }
       .title-screen .title-actions.has-save #newGameBtn { grid-column: 1/-1; }
       .menu-head { display: grid; grid-template-columns: minmax(64px,1fr) minmax(0,2.5fr) minmax(64px,1fr); align-items: center; }
+      .menu-head #menuBack { grid-column: 1; grid-row: 1; }
+      .menu-head #menuTitle { grid-column: 2; grid-row: 1; }
+      .menu-head #menuClose { grid-column: 3; grid-row: 1; }
       .menu-head h3 { text-align: center; margin: 0; overflow-wrap: anywhere; }
       .menu-head button, .section-tabs button, .menu .actions button { text-align: center; justify-content: center; align-items: center; }
       .menu[data-section="upgrades"] .upgrade-card { text-align: center; }
@@ -8729,7 +8732,7 @@
       }
       function toast(m) {
         if (ui.toasts.firstChild?.textContent === m) return;
-        while (ui.toasts.firstChild) ui.toasts.removeChild(ui.toasts.firstChild);
+        while (ui.toasts.children.length) ui.toasts.removeChild(ui.toasts.lastChild);
         const e = document.createElement("div");
         e.className = "toast";
         e.textContent = m;
