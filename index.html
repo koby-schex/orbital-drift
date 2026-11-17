@@ -23632,13 +23632,13 @@
               ? target.radius || 42
               : visualRadius(target),
           d = Math.round(Math.max(0, dist(game.ship, target) - targetRad)),
-          pulse = Math.sin(t * 0.12) * 3,
+          pulse = game.settings?.motion === "Reduced" ? 0 : Math.sin(t * 0.12) * 3,
           color = objectiveColor(target);
         ctx.save();
         ctx.font = "900 12px Inter, system-ui";
         ctx.textAlign = "center";
         if (on) {
-          ctx.strokeStyle = rgba(color, 0.55);
+          ctx.strokeStyle = rgba(color, 0.36);
           ctx.setLineDash([]);
           ctx.beginPath();
           for (let i=0;i<4;i++) { const a=i*Math.PI*.5+.15;ctx.moveTo(ts.x+Math.cos(a)*(targetRad*zoom+14),ts.y+Math.sin(a)*(targetRad*zoom+14));ctx.arc(ts.x,ts.y,targetRad*zoom+14,a,a+.22); }
@@ -23676,7 +23676,7 @@
           ctx.rotate(a);
           ctx.fillStyle = rgba(color, 0.95);
           ctx.shadowColor = rgba(color, 0.6);
-          ctx.shadowBlur = 14;
+          ctx.shadowBlur = flightVisualBudget(game.settings).glow ? 5 : 0;
           ctx.beginPath();
           ctx.moveTo(12, 0);
           ctx.lineTo(-7, -7);
@@ -23721,7 +23721,7 @@
         x = clamp(x, w / 2 + 8, W - w / 2 - 8);
         y = clamp(y, h / 2 + 8, H - h / 2 - 8);
         ctx.translate(x - w / 2, y - h / 2);
-        ctx.fillStyle = "rgba(6,10,23,.82)";
+        ctx.fillStyle = "rgba(6,10,23,.64)";
         ctx.strokeStyle = rgba(color, 0.32);
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -23729,7 +23729,7 @@
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = "#e0f2fe";
-        ctx.font = "900 10px Inter, system-ui";
+        ctx.font = "600 10px Inter, system-ui";
         ctx.textAlign = "center";
         ctx.fillText(text, w / 2, 15.5);
         ctx.restore();
