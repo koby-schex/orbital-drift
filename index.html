@@ -2619,43 +2619,6 @@
         grid-template-columns: 70px minmax(0, 1fr);
         gap: 11px;
       }
-      .crew-avatar {
-        --crewColor: #67e8f9;
-        --crewUniform: #1e3a5f;
-        position: relative;
-        width: 70px;
-        height: 92px;
-        overflow: hidden;
-        border-radius: 18px 18px 23px 23px;
-        background:
-          radial-gradient(circle at 50% 31%, color-mix(in srgb, var(--crewColor) 76%, white) 0 16%, transparent 17%),
-          radial-gradient(circle at 50% 35%, #111827 0 25%, transparent 26%),
-          linear-gradient(155deg, var(--crewUniform), #020617 72%);
-        border: 1px solid color-mix(in srgb, var(--crewColor) 45%, transparent);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 22px color-mix(in srgb, var(--crewColor) 16%, transparent);
-      }
-      .crew-avatar:before {
-        content: "";
-        position: absolute;
-        left: 15px;
-        right: 15px;
-        bottom: -5px;
-        height: 48px;
-        border-radius: 30px 30px 8px 8px;
-        background: linear-gradient(145deg, color-mix(in srgb, var(--crewUniform) 72%, white), var(--crewUniform));
-        border: 1px solid rgba(255, 255, 255, 0.18);
-      }
-      .crew-avatar:after {
-        content: attr(data-initials);
-        position: absolute;
-        inset: auto 0 8px;
-        z-index: 2;
-        text-align: center;
-        color: var(--crewColor);
-        font-size: 10px;
-        font-weight: 950;
-        letter-spacing: 1px;
-      }
       .crew-copy { min-width: 0; }
       .crew-copy > b { color: #f8fbff; }
       .crew-xp {
@@ -5135,6 +5098,23 @@
       .menu .card, .menu .branch { overflow-wrap: anywhere; }
       .menu .actions button { min-height: 44px; }
       .menu .chip { line-height: 1.35; }
+      /* Portrait-free crew roster; one readable decision per row. */
+      .menu .crew-grid { grid-template-columns: 1fr; gap: 9px; }
+      .menu .crew-card { display: block; padding: 14px; border-radius: 12px; background: rgba(14,27,38,.86); box-shadow: none; }
+      .crew-row-head,.crew-row-status,.crew-train,.crew-summary { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+      .crew-row-head b { display:block; font-size:16px; color:#e8f1f3; }
+      .crew-row-head span,.crew-row-status,.crew-train span { font-size:12px; color:var(--muted); }
+      .crew-row-head .crew-level { color:#d3e8e6; flex-shrink:0; }
+      .crew-row-status { margin-top:12px; }
+      .crew-train { margin-top:10px; }
+      .crew-train button { min-width:88px; flex-shrink:0; }
+      .crew-card .menu-secondary-details { margin:10px 0 0; }
+      .crew-card .crew-duties { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+      .crew-card .crew-duties button { min-height:44px; }
+      .crew-summary { justify-content:flex-start; flex-wrap:wrap; gap:18px; }
+      .crew-summary b { color:#d8ebea; }
+      .crew-dock-note { margin:9px 0 0; }
+      .crew-section-title { margin:18px 0 8px; }
     </style>
   </head>
   <body>
@@ -10256,11 +10236,7 @@
             ],
           );
         toast(
-          (outward ? "Uncharted jump complete: entered " : "Atlas travel complete: entered ") +
-            game.system.name +
-            " • " +
-            sectorModifierName() +
-            ".",
+          "Arrived: " + game.system.name + " • " + sectorModifierName(),
         );
         addActivity(
           "travel",
@@ -17780,162 +17756,46 @@
           "</div></div>"
         );
       }
-      function crewAvatarHtml(member) {
-        const initials = String(member.name || "Crew")
-          .split(/\s+/)
-          .slice(0, 2)
-          .map((part) => part[0] || "")
-          .join("")
-          .toUpperCase();
-        return (
-          '<div class="crew-avatar" style="--crewColor:' +
-          esc(member.color || "#67e8f9") +
-          ";--uniform:" +
-          esc(member.uniform || crewUniforms[0]) +
-          '" role="img" aria-label="Portrait of ' +
-          esc(member.name) +
-          '"><span>' +
-          esc(initials) +
-          "</span></div>"
-        );
+      function crewDutyLabel(duty) {
+        return ({bridge:"Bridge",vault:"Vault",fleet:"Fleet",systems:"Systems"})[duty] || "Bridge";
       }
       function crewCardHtml(member) {
-        const template = crewTemplate(member.id),
-          needed = crewXpNeeded(member),
-          cost = crewUpgradeCost(member.id),
-          canTrain = member.level < 6 && member.xp >= needed && canAfford(cost),
-          duties = [
-            ["bridge", "Bridge"],
-            ["vault", "Vault"],
-            ["fleet", "Fleet"],
-            ["systems", "Systems"],
-          ];
-        return (
-          '<div class="crew-card" style="--crewColor:' +
-          esc(member.color || "#67e8f9") +
-          '">' +
-          crewAvatarHtml(member) +
-          '<div class="crew-copy"><b>' +
-          esc(member.name) +
-          '</b><span class="crew-role">' +
-          esc(member.role + " • " + member.specialty) +
-          "</span><p>" +
-          esc(template?.bio || "Pioneer specialist.") +
-          '</p><div class="vault-tags"><span class="tag">Level ' +
-          member.level +
-          '</span><span class="tag">' +
-          esc(member.expeditions || 0) +
-          ' expeditions</span><span class="tag">Duty: ' +
-          esc(duties.find(([key]) => key === member.duty)?.[1] || "Bridge") +
-          "</span></div>" +
-          '<div class="crew-xp"><div style="width:' +
-          clamp((member.xp / Math.max(1, needed)) * 100, 0, 100) +
-          '%"></div></div><span>' +
-          (member.level >= 6 ? "Master specialist" : member.xp + " / " + needed + " field experience") +
-          '</span><div class="crew-perks">' +
-          (template?.perks || [])
-            .map(
-              (perk, index) =>
-                '<span class="' +
-                (member.level >= index * 2 + 2 ? "unlocked" : "") +
-                '">' +
-                esc(perk) +
-                (member.level >= index * 2 + 2 ? " • active" : " • unlocks Lv. " + (index * 2 + 2)) +
-                "</span>",
-            )
-            .join("") +
-          '</div><div class="crew-duties">' +
-          duties
-            .map(([key, labelText]) =>
-              btn(
-                member.duty === key ? labelText + " Assigned" : "Assign " + labelText,
-                "setCrewDuty",
-                member.id + "|" + key,
-                member.duty !== key,
-              ),
-            )
-            .join("") +
-          '</div><div class="actions"><input id="crewName-' +
-          esc(member.id) +
-          '" maxlength="20" value="' +
-          esc(member.name) +
-          '"><button type="button" data-action="renameCrew" data-arg="' +
-          esc(member.id) +
-          '">Rename</button>' +
-          btn("Change Uniform", "cycleCrewUniform", member.id) +
-          btnWhy(
-            member.level >= 6 ? "Mastered" : "Train to Level " + (member.level + 1),
-            "upgradeCrew",
-            member.id,
-            canTrain,
-            member.level >= 6
-              ? "This specialist has reached mastery."
-              : member.xp < needed
-                ? "Complete field work to earn " + (needed - member.xp) + " more experience."
-                : !canAfford(cost)
-                  ? "Training requires " + fmt(cost) + "."
-                  : "",
-          ) +
-          "</div></div></div>"
-        );
+        const template=crewTemplate(member.id), needed=crewXpNeeded(member),
+          cost=crewUpgradeCost(member.id), maxed=member.level>=6,
+          docked=orbitingFrigate(), ready=!maxed&&member.xp>=needed&&canAfford(cost)&&docked,
+          reason=maxed?"Master specialist":!docked?"Lock orbit with Pioneer to train.":member.xp<needed?
+            (needed-member.xp)+" more XP needed.":!canAfford(cost)?"Requires "+fmt(cost):"Ready to train";
+        const duties=["bridge","vault","fleet","systems"];
+        return '<article class="crew-card"><div class="crew-row-head"><div><b>'+esc(member.name)+
+          '</b><span>'+esc(member.role)+'</span></div><span class="crew-level">Lv. '+member.level+
+          '</span></div><div class="crew-row-status"><span>Assigned: <b>'+crewDutyLabel(member.duty)+
+          '</b></span><span>'+(maxed?"Mastered":member.xp+" / "+needed+" XP")+
+          '</span></div><div class="crew-xp" role="progressbar" aria-label="Training experience" aria-valuemin="0" aria-valuemax="'+
+          needed+'" aria-valuenow="'+Math.min(needed,member.xp)+'"><div style="width:'+
+          (maxed?100:clamp(member.xp/Math.max(1,needed)*100,0,100))+'%"></div></div>'+
+          '<div class="crew-train"><span>'+esc(reason)+'</span>'+
+          btn(maxed?"Mastered":"Train", "upgradeCrew",member.id,ready)+'</div>'+
+          secondaryDetails("Manage "+member.name,
+            '<p>'+esc(template?.bio||"Pioneer specialist.")+'</p><p>Change duty to direct this specialist’s contribution. Training uses field experience and materials.</p>'+
+            '<div class="crew-duties">'+duties.map(d=>btn(crewDutyLabel(d)+(member.duty===d?" ✓":""),"setCrewDuty",member.id+"|"+d,member.duty!==d)).join("")+
+            '</div><p class="small">Training cost: '+esc(fmt(cost))+'</p><label for="crewName-'+esc(member.id)+'">Name</label><div class="actions"><input id="crewName-'+esc(member.id)+'" maxlength="20" value="'+esc(member.name)+'">'+
+            btn("Rename","renameCrew",member.id)+'</div><p class="small">'+esc(member.expeditions||0)+' expeditions completed</p>')+'</article>';
       }
       function crewHtml() {
-        const crew = crewState().members,
-          candidates = crewTemplates.filter((template) => !crewMember(template.id));
-        return (
-          card(
-            "Pioneer Crew",
-            "Your specialists live and grow aboard the Pioneer. Field work earns experience; duties shape the bonuses they provide between expeditions.",
-            '<div class="grid"><div class="chip"><b>Crew Aboard</b><br>' +
-              crew.length +
-              ' / ' +
-              crewTemplates.length +
-              '</div><div class="chip"><b>Bridge Strength</b><br>' +
-              crewDutyPower("bridge") +
-              '</div><div class="chip"><b>Fleet Logistics</b><br>' +
-              crewDutyPower("fleet") +
-              '</div><div class="chip"><b>Systems Expertise</b><br>' +
-              crewDutyPower("systems") +
-              "</div></div>",
-          ) +
-          '<div class="crew-grid">' +
-          crew.map(crewCardHtml).join("") +
-          "</div>" +
-          card(
-            "Recruitment Channel",
-            candidates.length
-              ? "New specialists become permanent, customizable members of the Pioneer crew."
-              : "Every available specialist now has a berth aboard the Pioneer.",
-            candidates.length
-              ? '<div class="crew-grid">' +
-                  candidates
-                    .map(
-                      (template) =>
-                        '<div class="crew-card" style="--crewColor:' +
-                        esc(template.color) +
-                        '"><div class="crew-copy"><b>' +
-                        esc(template.name) +
-                        '</b><span class="crew-role">' +
-                        esc(template.role + " • " + template.specialty) +
-                        "</span><p>" +
-                        esc(template.bio) +
-                        "</p><span>Recruitment: " +
-                        esc(fmt(template.cost)) +
-                        '</span><div class="actions">' +
-                        btnWhy(
-                          "Recruit " + template.name,
-                          "recruitCrew",
-                          template.id,
-                          canAfford(template.cost),
-                          canAfford(template.cost) ? "" : "Requires " + fmt(template.cost) + ".",
-                        ) +
-                        "</div></div></div>",
-                    )
-                    .join("") +
-                  "</div>"
-              : "",
-          )
-        );
+        const crew=crewState().members, candidates=crewTemplates.filter(template=>!crewMember(template.id)), docked=orbitingFrigate();
+        const ready=crew.filter(m=>m.level<6&&m.xp>=crewXpNeeded(m)&&canAfford(crewUpgradeCost(m.id))).length;
+        return card("Pioneer Crew","Your specialists earn experience during exploration. Train them at the Pioneer to improve their abilities.",
+          '<div class="crew-summary"><span><b>'+crew.length+' / '+crewTemplates.length+'</b> aboard</span><span><b>'+ready+
+          '</b> eligible to train</span></div><p class="crew-dock-note">'+(docked?"Connected to Pioneer":"Lock orbit with Pioneer to recruit or train.")+'</p>')+
+          '<h3 class="crew-section-title">Active crew</h3><div class="crew-grid">'+crew.map(crewCardHtml).join("")+'</div>'+
+          '<h3 class="crew-section-title">Recruitment</h3>'+
+          (candidates.length?'<div class="crew-grid">'+candidates.map(template=>
+            '<article class="crew-card"><div class="crew-row-head"><div><b>'+esc(template.name)+'</b><span>'+esc(template.role)+
+            '</span></div></div><p>'+esc(template.specialty)+'</p><p class="small">'+esc(fmt(template.cost))+'</p>'+
+            btnWhy("Recruit","recruitCrew",template.id,docked&&canAfford(template.cost),!docked?"Lock orbit with Pioneer.":!canAfford(template.cost)?"Requires "+fmt(template.cost):"")+'</article>').join("")+'</div>':'<p class="small">All specialists recruited.</p>')+
+          secondaryDetails("Duty assignments & crew benefits",
+            '<p>Vault assignments improve survey rewards and containment capacity. Fleet assignments support expeditions and threat rewards. Systems assignments improve threat preparation. Bridge is the default assignment.</p>'+
+            '<div class="grid">'+["bridge","vault","fleet","systems"].map(d=>'<div class="chip">'+crewDutyLabel(d)+': '+crewDutyPower(d)+'</div>').join("")+'</div>');
       }
       function expeditionStagesHtml(expedition) {
         return (
@@ -21162,7 +21022,6 @@
           start: t,
           duration: game.settings?.motion === "Reduced" ? 210 : 390,
         };
-        toast(activeVisualPhenomenon.name + " detected — " + activeVisualPhenomenon.desc);
         addActivity("discovery", activeVisualPhenomenon.name, activeVisualPhenomenon.desc);
       }
       function systemVisualThemeIndex(sys) {
@@ -21266,6 +21125,50 @@
         image.src = CINEMATIC_ART[kind];
         return null;
       }
+      // Composition is presentation-only; never change saved bodies or routes.
+      function environmentComposition(sys) {
+        const index=systemVisualThemeIndex(sys), seed=visualSeed(sys?.seed||"Sol"),
+          layouts=[
+            {shape:"cloudbank",density:1.25,rocks:.65,galaxies:2,angle:-.48},
+            {shape:"dustlane",density:.72,rocks:1.8,galaxies:0,angle:.42},
+            {shape:"aurora",density:1.1,rocks:.55,galaxies:1,angle:-.18},
+            {shape:"filaments",density:.92,rocks:1.15,galaxies:1,angle:.76},
+            {shape:"galaxy",density:1.55,rocks:.38,galaxies:3,angle:-.32},
+            {shape:"void",density:.34,rocks:.24,galaxies:0,angle:.1}
+          ];
+        const special=sys?.specialType;
+        return {...(special==="parallel"?{shape:"rift",density:.8,rocks:.3,galaxies:0,angle:.85}:
+          special==="cosmicSpirit"?{shape:"halo",density:1.4,rocks:.2,galaxies:1,angle:-.4}:layouts[index]),
+          offset:((seed%997)/997-.5)*.24,seed};
+      }
+      function paintEnvironmentComposition(c,w,h,layout,theme) {
+        const scale=Math.max(w,h), angle=layout.angle, cx=w*(.5+layout.offset), cy=h*(.48-layout.offset);
+        c.save(); c.translate(cx,cy); c.rotate(angle);
+        const glow=(x,y,rx,ry,color,alpha)=>{
+          c.save();c.translate(x,y);c.scale(rx,ry);
+          const g=c.createRadialGradient(0,0,0,0,0,1);
+          g.addColorStop(0,rgba(color,alpha));g.addColorStop(.4,rgba(color,alpha*.5));g.addColorStop(1,"rgba(0,0,0,0)");
+          c.fillStyle=g;c.fillRect(-1,-1,2,2);c.restore();
+        };
+        if(layout.shape==="void"){
+          glow(-scale*.36,scale*.22,scale*.38,scale*.09,theme.accent2,.16);
+          c.fillStyle="rgba(0,4,10,.53)";c.fillRect(-scale,-scale,scale*2,scale*2);
+        } else if(layout.shape==="dustlane"){
+          glow(0,-scale*.16,scale*.85,scale*.14,theme.accent,.32);
+          glow(0,scale*.14,scale*.82,scale*.1,theme.accent2,.24);
+          glow(0,0,scale*.95,scale*.09,theme.deep,.86);
+        } else if(layout.shape==="cloudbank"){
+          for(let n=0;n<5;n++)glow((n-2)*scale*.16,Math.sin(n*1.9)*scale*.12,scale*.32,scale*.23,theme.nebulas[n%theme.nebulas.length],.25);
+        } else if(layout.shape==="aurora"||layout.shape==="filaments"||layout.shape==="rift"){
+          for(let n=0;n<4;n++)glow((n-1.5)*scale*.1,Math.sin(n*1.3)*scale*.15,scale*.7,scale*(layout.shape==="filaments"?.035:.075),n%2?theme.accent:theme.accent2,.24);
+        } else {
+          glow(0,0,scale*.63,scale*.26,theme.accent,.31);
+          glow(0,0,scale*.18,scale*.12,theme.accent2,.28);
+          c.strokeStyle=rgba(theme.accent2,.14);c.lineWidth=scale*.008;
+          for(let n=1;n<4;n++){c.beginPath();c.ellipse(0,0,scale*.13*n,scale*.055*n,0,0,TAU);c.stroke();}
+        }
+        c.restore();
+      }
       function cinematicSky() {
         const kind = cinematicArtKind(), image = environmentImage(kind);
         if (!image) return null; // The procedural sky is always a usable fallback.
@@ -21312,6 +21215,7 @@
           lightField.addColorStop(1, "rgba(0,0,0,0)");
           c.fillStyle = lightField; c.fillRect(0, 0, width, height);
         }
+        if (!tutorial) paintEnvironmentComposition(c,width,height,environmentComposition(game.system),sectorVisualTheme());
         const vignette = c.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
         vignette.addColorStop(0, "rgba(0,3,9,0)"); vignette.addColorStop(1, "rgba(0,3,9,.4)");
         c.fillStyle = vignette; c.fillRect(0, 0, width, height);
@@ -21508,7 +21412,8 @@
         renderAssets.builds++;
         const base = hex(b.name === "Mars" ? "#be7250" : b.color),
           gas = ["bands", "rings", "storm"].includes(b.pattern),
-          ocean = b.pattern === "continents", lava = b.pattern === "lava";
+          ocean = b.pattern === "continents", lava = b.pattern === "lava",
+          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%7-3)*.11;
         const image = rasterAsset(size, size, data => {
           for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
@@ -21519,9 +21424,9 @@
               continue;
             }
             const nz = Math.sqrt(1 - rr),
-              terrain = visualFbm(nx * 3 + 9, ny * 3 + 7, nz * 3 + 5, seed, 5),
+              terrain = visualFbm(nx * (3+variation) + 9, ny * (3-variation) + 7, nz * 3 + 5, seed, 5),
               fine = visualNoise(nx * 70 + 80, ny * 70 + 80, nz * 70, seed + 97),
-              bands = 0.5 + 0.26 * Math.sin(ny * 31 + (terrain - 0.5) * 7) +
+              bands = 0.5 + 0.26 * Math.sin(ny * (31+variation*34) + (terrain - 0.5) * 7) +
                 0.14 * Math.sin(ny * 67 + terrain * 13),
               relief = gas ? b.pattern === "storm" ? 0.58 + terrain * 0.5 :
                 0.65 + bands * (b.name === "Uranus" ? 0.13 : 0.28) + terrain * 0.15 :
@@ -21537,6 +21442,10 @@
               const glint = Math.pow(Math.max(0, nz * 0.88 - nx * 0.34 - ny * 0.3), 48) * (1 - land) * 72;
               rgb = coast.map((v, c) => v * (1 - land) + ground[c] * land + glint);
               if (Math.abs(ny) > 0.87 + (terrain - 0.5) * 0.2) rgb = [213, 228, 232];
+            }
+            if (!gas && !ocean && !lava && b.pattern !== "crystal" && variation !== 0) {
+              const ridge=Math.pow(Math.max(0,1-Math.abs(terrain-.53)*9),2)*.12;
+              rgb=rgb.map(v=>v*(.94+ridge+variation*(fine-.5)));
             }
             if (b.pattern === "craters") {
               const longitude = Math.atan2(nx, nz), latitude = Math.asin(ny),
@@ -21599,6 +21508,7 @@
         shootingStars = [];
         const theme = sectorVisualTheme(),
           quality = game.settings?.graphics || "High",
+          layout = game.system?.isTutorial ? {density:1,rocks:1,galaxies:3} : environmentComposition(game.system),
           starDiv =
             quality === "Low" ? 5400 : quality === "Medium" ? 3900 : 3100,
           nebulaBase = quality === "Low" ? 4 : quality === "Medium" ? 7 : 9,
@@ -21611,7 +21521,7 @@
           return backdropRandomState / 4294967296;
         };
         buildDeepSky();
-        for (let i = 0, c = Math.floor((W * H) / starDiv); i < c; i++) {
+        for (let i = 0, c = Math.min(1000,Math.floor((W * H) / starDiv*layout.density)); i < c; i++) {
           stars.push({
             x: random() * W,
             y: random() * H,
@@ -21659,7 +21569,7 @@
             ring: false,
           });
         }
-        for (let i = 0, c = Math.floor((W * H) / asteroidDiv); i < c; i++) {
+        for (let i = 0, c = Math.min(32,Math.floor((W * H) / asteroidDiv*layout.rocks)); i < c; i++) {
           asteroids.push({
             x: random() * W,
             y: random() * H,
@@ -21700,7 +21610,7 @@
               length: between(currentSystemIndex * 191 + i * 71, 72, 155),
               color: i % 2 ? theme.accent2 : theme.accent,
             });
-          const galaxyCount = quality === "High" ? 3 : 2;
+          const galaxyCount = Math.min(layout.galaxies,quality === "High" ? 3 : 2);
           for (let i = 0; i < galaxyCount; i++)
             distantGalaxies.push({
               x: between(i * 83 + currentSystemIndex * 5, W * 0.08, W * 0.92),
@@ -23788,7 +23698,7 @@
         if (!event) return;
         const q = clamp((t - event.start) / event.duration, 0, 1),
           fade = Math.sin(q * Math.PI),
-          reduced = game.settings?.motion === "Reduced";
+          reduced = game.settings?.motion === "Reduced", phase = reduced ? .5 : q;
         ctx.save();
         ctx.globalAlpha = fade;
         ctx.globalCompositeOperation = "screen";
@@ -23796,7 +23706,7 @@
           const count = reduced ? 5 : 12;
           ctx.lineCap = "round";
           for (let i = 0; i < count; i++) {
-            const x = ((q * (W + 520) * 1.5 + i * 149) % (W + 320)) - 220,
+            const x = ((phase * (W + 520) * 1.5 + i * 149) % (W + 320)) - 220,
               y = H * (0.12 + ((i * 19) % 73) / 100);
             const trail = ctx.createLinearGradient(x - 150, y + 70, x, y);
             trail.addColorStop(0, "rgba(0,0,0,0)");
@@ -23811,12 +23721,12 @@
         } else if (event.type === "ionLightning" || event.type === "realityFracture") {
           const cracks = reduced ? 2 : 5;
           for (let i = 0; i < cracks; i++) {
-            ctx.strokeStyle = rgba(i % 2 ? event.color : event.color2, 0.28 + 0.22 * Math.sin(q * 42 + i));
+            ctx.strokeStyle = rgba(i % 2 ? event.color : event.color2, 0.28 + 0.22 * Math.sin(phase * 42 + i));
             ctx.lineWidth = event.type === "realityFracture" ? 2.2 : 1.2;
             ctx.beginPath();
             for (let j = 0; j < 8; j++) {
               const x = W * (0.08 + j * 0.125),
-                y = H * (0.2 + i * 0.13) + Math.sin(j * 3.7 + i + q * 18) * 42;
+                y = H * (0.2 + i * 0.13) + Math.sin(j * 3.7 + i + phase * 18) * 42;
               if (!j) ctx.moveTo(x, y);
               else ctx.lineTo(x, y);
             }
