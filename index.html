@@ -18227,7 +18227,6 @@
         return btn(mode==="apple"?"View Apple price":mode==="web"?"Claim free design":"Store unavailable",action,arg,mode!=="unavailable");
       }
       function cosmeticUnlockText(s) {
-        const log=game.captainLog||{};
         return ({
           "Parallel Chaos":"Enter a Parallel system",
           "Parallel Swarm":"Enter a Parallel system",
@@ -18367,14 +18366,14 @@
         }
       }
       document.addEventListener("toggle",event=>{
-        if(event.target?.tagName==="DETAILS"&&event.target.open&&ui.menu?.contains(event.target))requestAnimationFrame(renderSkinPreviews);
+        if(event.target?.tagName==="DETAILS"&&event.target.open&&ui.menu?.contains?.(event.target))requestAnimationFrame(renderSkinPreviews);
       },true);
       function renderSkinPreviews() {
         if (!ui.menu?.classList.contains("open")) return;
         ui.menuContent
           .querySelectorAll("canvas[data-skin-kind][data-skin-key]")
           .forEach((canvas) => {
-            if(canvas.closest("details:not([open])"))return;
+            if(canvas.closest?.("details:not([open])"))return;
             const kind = canvas.dataset.skinKind,
               key = canvas.dataset.skinKey,
               skin =
@@ -18430,14 +18429,14 @@
               c.rotate(-0.08);
               drawShipVisual(
                 c,
-                Math.min(width / 170, height / 90),
+                Math.min(width / 195, height / 94),
                 skin,
                 false,
               );
             } else if (kind === "frigate") {
               drawFrigateVisual(
                 c,
-                Math.min(width / 450, height / 225),
+                Math.min(width / 470, height / 235),
                 skin,
               );
             } else if (kind === "fleet-unit") {
