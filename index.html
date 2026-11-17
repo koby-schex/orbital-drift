@@ -2619,43 +2619,6 @@
         grid-template-columns: 70px minmax(0, 1fr);
         gap: 11px;
       }
-      .crew-avatar {
-        --crewColor: #67e8f9;
-        --crewUniform: #1e3a5f;
-        position: relative;
-        width: 70px;
-        height: 92px;
-        overflow: hidden;
-        border-radius: 18px 18px 23px 23px;
-        background:
-          radial-gradient(circle at 50% 31%, color-mix(in srgb, var(--crewColor) 76%, white) 0 16%, transparent 17%),
-          radial-gradient(circle at 50% 35%, #111827 0 25%, transparent 26%),
-          linear-gradient(155deg, var(--crewUniform), #020617 72%);
-        border: 1px solid color-mix(in srgb, var(--crewColor) 45%, transparent);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 22px color-mix(in srgb, var(--crewColor) 16%, transparent);
-      }
-      .crew-avatar:before {
-        content: "";
-        position: absolute;
-        left: 15px;
-        right: 15px;
-        bottom: -5px;
-        height: 48px;
-        border-radius: 30px 30px 8px 8px;
-        background: linear-gradient(145deg, color-mix(in srgb, var(--crewUniform) 72%, white), var(--crewUniform));
-        border: 1px solid rgba(255, 255, 255, 0.18);
-      }
-      .crew-avatar:after {
-        content: attr(data-initials);
-        position: absolute;
-        inset: auto 0 8px;
-        z-index: 2;
-        text-align: center;
-        color: var(--crewColor);
-        font-size: 10px;
-        font-weight: 950;
-        letter-spacing: 1px;
-      }
       .crew-copy { min-width: 0; }
       .crew-copy > b { color: #f8fbff; }
       .crew-xp {
@@ -5135,6 +5098,23 @@
       .menu .card, .menu .branch { overflow-wrap: anywhere; }
       .menu .actions button { min-height: 44px; }
       .menu .chip { line-height: 1.35; }
+      /* Portrait-free crew roster; one readable decision per row. */
+      .menu .crew-grid { grid-template-columns: 1fr; gap: 9px; }
+      .menu .crew-card { display: block; padding: 14px; border-radius: 12px; background: rgba(14,27,38,.86); box-shadow: none; }
+      .crew-row-head,.crew-row-status,.crew-train,.crew-summary { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+      .crew-row-head b { display:block; font-size:16px; color:#e8f1f3; }
+      .crew-row-head span,.crew-row-status,.crew-train span { font-size:12px; color:var(--muted); }
+      .crew-row-head .crew-level { color:#d3e8e6; flex-shrink:0; }
+      .crew-row-status { margin-top:12px; }
+      .crew-train { margin-top:10px; }
+      .crew-train button { min-width:88px; flex-shrink:0; }
+      .crew-card .menu-secondary-details { margin:10px 0 0; }
+      .crew-card .crew-duties { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+      .crew-card .crew-duties button { min-height:44px; }
+      .crew-summary { justify-content:flex-start; flex-wrap:wrap; gap:18px; }
+      .crew-summary b { color:#d8ebea; }
+      .crew-dock-note { margin:9px 0 0; }
+      .crew-section-title { margin:18px 0 8px; }
     </style>
   </head>
   <body>
@@ -17780,162 +17760,46 @@
           "</div></div>"
         );
       }
-      function crewAvatarHtml(member) {
-        const initials = String(member.name || "Crew")
-          .split(/\s+/)
-          .slice(0, 2)
-          .map((part) => part[0] || "")
-          .join("")
-          .toUpperCase();
-        return (
-          '<div class="crew-avatar" style="--crewColor:' +
-          esc(member.color || "#67e8f9") +
-          ";--uniform:" +
-          esc(member.uniform || crewUniforms[0]) +
-          '" role="img" aria-label="Portrait of ' +
-          esc(member.name) +
-          '"><span>' +
-          esc(initials) +
-          "</span></div>"
-        );
+      function crewDutyLabel(duty) {
+        return ({bridge:"Bridge",vault:"Vault",fleet:"Fleet",systems:"Systems"})[duty] || "Bridge";
       }
       function crewCardHtml(member) {
-        const template = crewTemplate(member.id),
-          needed = crewXpNeeded(member),
-          cost = crewUpgradeCost(member.id),
-          canTrain = member.level < 6 && member.xp >= needed && canAfford(cost),
-          duties = [
-            ["bridge", "Bridge"],
-            ["vault", "Vault"],
-            ["fleet", "Fleet"],
-            ["systems", "Systems"],
-          ];
-        return (
-          '<div class="crew-card" style="--crewColor:' +
-          esc(member.color || "#67e8f9") +
-          '">' +
-          crewAvatarHtml(member) +
-          '<div class="crew-copy"><b>' +
-          esc(member.name) +
-          '</b><span class="crew-role">' +
-          esc(member.role + " • " + member.specialty) +
-          "</span><p>" +
-          esc(template?.bio || "Pioneer specialist.") +
-          '</p><div class="vault-tags"><span class="tag">Level ' +
-          member.level +
-          '</span><span class="tag">' +
-          esc(member.expeditions || 0) +
-          ' expeditions</span><span class="tag">Duty: ' +
-          esc(duties.find(([key]) => key === member.duty)?.[1] || "Bridge") +
-          "</span></div>" +
-          '<div class="crew-xp"><div style="width:' +
-          clamp((member.xp / Math.max(1, needed)) * 100, 0, 100) +
-          '%"></div></div><span>' +
-          (member.level >= 6 ? "Master specialist" : member.xp + " / " + needed + " field experience") +
-          '</span><div class="crew-perks">' +
-          (template?.perks || [])
-            .map(
-              (perk, index) =>
-                '<span class="' +
-                (member.level >= index * 2 + 2 ? "unlocked" : "") +
-                '">' +
-                esc(perk) +
-                (member.level >= index * 2 + 2 ? " • active" : " • unlocks Lv. " + (index * 2 + 2)) +
-                "</span>",
-            )
-            .join("") +
-          '</div><div class="crew-duties">' +
-          duties
-            .map(([key, labelText]) =>
-              btn(
-                member.duty === key ? labelText + " Assigned" : "Assign " + labelText,
-                "setCrewDuty",
-                member.id + "|" + key,
-                member.duty !== key,
-              ),
-            )
-            .join("") +
-          '</div><div class="actions"><input id="crewName-' +
-          esc(member.id) +
-          '" maxlength="20" value="' +
-          esc(member.name) +
-          '"><button type="button" data-action="renameCrew" data-arg="' +
-          esc(member.id) +
-          '">Rename</button>' +
-          btn("Change Uniform", "cycleCrewUniform", member.id) +
-          btnWhy(
-            member.level >= 6 ? "Mastered" : "Train to Level " + (member.level + 1),
-            "upgradeCrew",
-            member.id,
-            canTrain,
-            member.level >= 6
-              ? "This specialist has reached mastery."
-              : member.xp < needed
-                ? "Complete field work to earn " + (needed - member.xp) + " more experience."
-                : !canAfford(cost)
-                  ? "Training requires " + fmt(cost) + "."
-                  : "",
-          ) +
-          "</div></div></div>"
-        );
+        const template=crewTemplate(member.id), needed=crewXpNeeded(member),
+          cost=crewUpgradeCost(member.id), maxed=member.level>=6,
+          docked=orbitingFrigate(), ready=!maxed&&member.xp>=needed&&canAfford(cost)&&docked,
+          reason=maxed?"Master specialist":!docked?"Lock orbit with Pioneer to train.":member.xp<needed?
+            (needed-member.xp)+" more XP needed.":!canAfford(cost)?"Requires "+fmt(cost):"Ready to train";
+        const duties=["bridge","vault","fleet","systems"];
+        return '<article class="crew-card"><div class="crew-row-head"><div><b>'+esc(member.name)+
+          '</b><span>'+esc(member.role)+'</span></div><span class="crew-level">Lv. '+member.level+
+          '</span></div><div class="crew-row-status"><span>Assigned: <b>'+crewDutyLabel(member.duty)+
+          '</b></span><span>'+(maxed?"Mastered":member.xp+" / "+needed+" XP")+
+          '</span></div><div class="crew-xp" role="progressbar" aria-label="Training experience" aria-valuemin="0" aria-valuemax="'+
+          needed+'" aria-valuenow="'+Math.min(needed,member.xp)+'"><div style="width:'+
+          (maxed?100:clamp(member.xp/Math.max(1,needed)*100,0,100))+'%"></div></div>'+
+          '<div class="crew-train"><span>'+esc(reason)+'</span>'+
+          btnWhy(maxed?"Mastered":"Train", "upgradeCrew",member.id,ready,reason)+'</div>'+
+          secondaryDetails("Manage "+member.name,
+            '<p>'+esc(template?.bio||"Pioneer specialist.")+'</p><p>Change duty to direct this specialist’s contribution. Training uses field experience and materials.</p>'+
+            '<div class="crew-duties">'+duties.map(d=>btn(crewDutyLabel(d)+(member.duty===d?" ✓":""),"setCrewDuty",member.id+"|"+d,member.duty!==d)).join("")+
+            '</div><p class="small">Training cost: '+esc(fmt(cost))+'</p><label for="crewName-'+esc(member.id)+'">Name</label><div class="actions"><input id="crewName-'+esc(member.id)+'" maxlength="20" value="'+esc(member.name)+'">'+
+            btn("Rename","renameCrew",member.id)+'</div><p class="small">'+esc(member.expeditions||0)+' expeditions completed</p>')+'</article>';
       }
       function crewHtml() {
-        const crew = crewState().members,
-          candidates = crewTemplates.filter((template) => !crewMember(template.id));
-        return (
-          card(
-            "Pioneer Crew",
-            "Your specialists live and grow aboard the Pioneer. Field work earns experience; duties shape the bonuses they provide between expeditions.",
-            '<div class="grid"><div class="chip"><b>Crew Aboard</b><br>' +
-              crew.length +
-              ' / ' +
-              crewTemplates.length +
-              '</div><div class="chip"><b>Bridge Strength</b><br>' +
-              crewDutyPower("bridge") +
-              '</div><div class="chip"><b>Fleet Logistics</b><br>' +
-              crewDutyPower("fleet") +
-              '</div><div class="chip"><b>Systems Expertise</b><br>' +
-              crewDutyPower("systems") +
-              "</div></div>",
-          ) +
-          '<div class="crew-grid">' +
-          crew.map(crewCardHtml).join("") +
-          "</div>" +
-          card(
-            "Recruitment Channel",
-            candidates.length
-              ? "New specialists become permanent, customizable members of the Pioneer crew."
-              : "Every available specialist now has a berth aboard the Pioneer.",
-            candidates.length
-              ? '<div class="crew-grid">' +
-                  candidates
-                    .map(
-                      (template) =>
-                        '<div class="crew-card" style="--crewColor:' +
-                        esc(template.color) +
-                        '"><div class="crew-copy"><b>' +
-                        esc(template.name) +
-                        '</b><span class="crew-role">' +
-                        esc(template.role + " • " + template.specialty) +
-                        "</span><p>" +
-                        esc(template.bio) +
-                        "</p><span>Recruitment: " +
-                        esc(fmt(template.cost)) +
-                        '</span><div class="actions">' +
-                        btnWhy(
-                          "Recruit " + template.name,
-                          "recruitCrew",
-                          template.id,
-                          canAfford(template.cost),
-                          canAfford(template.cost) ? "" : "Requires " + fmt(template.cost) + ".",
-                        ) +
-                        "</div></div></div>",
-                    )
-                    .join("") +
-                  "</div>"
-              : "",
-          )
-        );
+        const crew=crewState().members, candidates=crewTemplates.filter(template=>!crewMember(template.id)), docked=orbitingFrigate();
+        const ready=crew.filter(m=>m.level<6&&m.xp>=crewXpNeeded(m)&&canAfford(crewUpgradeCost(m.id))).length;
+        return card("Crew","Your specialists earn experience during exploration. Train them at the Pioneer to improve their abilities.",
+          '<div class="crew-summary"><span><b>'+crew.length+' / '+crewTemplates.length+'</b> aboard</span><span><b>'+ready+
+          '</b> eligible to train</span></div><p class="crew-dock-note">'+(docked?"Connected to Pioneer":"Lock orbit with Pioneer to recruit or train.")+'</p>')+
+          '<h3 class="crew-section-title">Active crew</h3><div class="crew-grid">'+crew.map(crewCardHtml).join("")+'</div>'+
+          '<h3 class="crew-section-title">Recruitment</h3>'+
+          (candidates.length?'<div class="crew-grid">'+candidates.map(template=>
+            '<article class="crew-card"><div class="crew-row-head"><div><b>'+esc(template.name)+'</b><span>'+esc(template.role)+
+            '</span></div></div><p>'+esc(template.specialty)+'</p><p class="small">'+esc(fmt(template.cost))+'</p>'+
+            btnWhy("Recruit","recruitCrew",template.id,docked&&canAfford(template.cost),!docked?"Lock orbit with Pioneer.":!canAfford(template.cost)?"Requires "+fmt(template.cost):"")+'</article>').join("")+'</div>':'<p class="small">All specialists recruited.</p>')+
+          secondaryDetails("Duty assignments & crew benefits",
+            '<p>Vault assignments improve survey rewards and containment capacity. Fleet assignments support expeditions and threat rewards. Systems assignments improve threat preparation. Bridge is the default assignment.</p>'+
+            '<div class="grid">'+["bridge","vault","fleet","systems"].map(d=>'<div class="chip">'+crewDutyLabel(d)+': '+crewDutyPower(d)+'</div>').join("")+'</div>');
       }
       function expeditionStagesHtml(expedition) {
         return (
