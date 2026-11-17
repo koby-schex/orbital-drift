@@ -43,7 +43,8 @@ permissions:
 
 jobs:
   ios-project:
-    runs-on: macos-latest
+    # Explicit alternate runner image after repeated pre-start cancellations on macos-latest.
+    runs-on: macos-15
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -58,6 +59,7 @@ jobs:
         run: npm run build:mobile
       - name: Verify available Xcode version
         run: |
+          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
           xcodebuild -version
           xcodebuild -showsdks
       - name: Generate native iOS project with Swift Package Manager

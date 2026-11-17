@@ -24,7 +24,7 @@ assert.match(workflow, /push:\s*\n\s*branches:\s*\n\s*- main/, "Compile iOS afte
 assert.match(workflow, /\.github\/workflows\/ios-project\.yml/, "Workflow edits must trigger a native compile");
 assert.match(workflow, /- index\.html/, "Gameplay changes must trigger a native compile");
 assert.match(workflow, /- capacitor\.config\.json/, "Native shell changes must trigger a native compile");
-assert.match(workflow, /macos-latest/, "Generate Xcode project on a macOS runner");
+assert.match(workflow, /runs-on:\s*macos-(?:latest|15|26)\b/, "Generate Xcode project on a supported macOS runner");
 assert.match(workflow, /npm run build:mobile/);
 assert.match(workflow, /npx cap add ios --packagemanager SPM/, "Use Capacitor 8 native SPM project");
 assert.match(workflow, /npx cap sync ios/);
