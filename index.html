@@ -5115,6 +5115,17 @@
       .crew-summary b { color:#d8ebea; }
       .crew-dock-note { margin:9px 0 0; }
       .crew-section-title { margin:18px 0 8px; }
+      /* Pass 18: gallery cards and clear purchase states. */
+      .cosmetic-catalog { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px; }
+      .cosmetic-row-head { display:flex;justify-content:space-between;align-items:center;gap:8px; }
+      .cosmetic-row-head b { font-size:15px;color:#eef4f6; }
+      .cosmetic-row-head span { font-size:11px;color:#b8d5d8;text-align:right; }
+      .cosmetic-card { border-radius:12px; background:rgba(12,25,35,.94); }
+      .cosmetic-card .cosmetic-preview-live { height:172px;border-radius:9px;box-shadow:none; }
+      .cosmetic-card .actions button { width:100%;min-height:44px; }
+      .cosmetic-card p { font-size:12px;line-height:1.5;margin:9px 0; }
+      .cosmetic-card .tag { margin-top:0; }
+      .cosmetic-card .menu-secondary-details { margin:8px 0; }
     </style>
   </head>
   <body>
@@ -11849,60 +11860,12 @@
       }
       function fleetSkinsHtml() {
         ensureFleet();
-        return (
-          '<div class="card" id="fleetSkins"><h4>Fleet Designs</h4><p>Choose a unified visual identity for every escort stationed around the Pioneer. Earned designs can be equipped here at any time.</p><div class="grid">' +
-          fleetSkins
-            .map((s) => {
-              const own = ownsFleetSkin(s.key),
-                active = game.fleet.skin === s.key;
-              let action = own
-                ? btn(
-                    active ? "Equipped" : "Equip",
-                    "setFleetSkin",
-                    s.key,
-                    !active,
-                  )
-                : s.type === "achievement"
-                  ? btn("Earn", "noop", null, false)
-                  : btn(
-                      game.monetization?.storeKitReady
-                        ? "Unlock $" + s.price
-                        : "Claim Web Edition Design",
-                      "buyFleetSkin",
-                      s.key,
-                    );
-              return (
-                '<div class="cosmetic-card' +
-                (active ? " equipped" : own ? " owned" : " locked") +
-                (s.type === "paid" ? " premium" : "") +
-                '"><b>' +
-                esc(s.key) +
-                "</b>" +
-                cosmeticPreviewHtml(
-                  "fleet",
-                  s.key,
-                  active ? "Active escort formation" : own ? "Owned" : "Preview",
-                ) +
-                "<span>" +
-                esc(s.desc) +
-                '</span><span class="tag ' +
-                cosmeticRarityClass(s.rarity) +
-                '">' +
-                esc(s.rarity) +
-                '</span><span class="tag">' +
-                (own
-                  ? "Owned"
-                  : s.type === "achievement"
-                    ? "Achievement"
-                    : "$" + s.price) +
-                '</span><div class="actions">' +
-                action +
-                "</div></div>"
-              );
-            })
-            .join("") +
-          "</div></div>"
-        );
+        return '<div class="card" id="fleetSkins"><h4>Fleet Designs</h4><p>Apply one appearance to all escorts.</p><div class="cosmetic-catalog">'+
+          rankCosmetics(fleetSkins,ownsFleetSkin,game.fleet.skin).map(s=>{
+            const own=ownsFleetSkin(s.key),active=own&&game.fleet.skin===s.key;
+            return cosmeticDesignCard(s,"fleet",own,active,own?btn(active?"Equipped":"Equip","setFleetSkin",s.key,!active):
+              s.type==="achievement"?btn("Earn in game","noop",null,false):cosmeticPurchaseButton(s,"buyFleetSkin",s.key));
+          }).join("")+'</div></div>';
       }
       function fleetHistoryHtml() {
         ensureFleet();
@@ -18250,6 +18213,40 @@
           "</span></div>"
         );
       }
+      function cosmeticStoreMode() {
+        const native = window.Capacitor?.isNativePlatform?.() === true ||
+          ["ios","android"].includes(window.Capacitor?.getPlatform?.());
+        return game.monetization?.storeKitReady ? "apple" : native ? "unavailable" : "web";
+      }
+      function cosmeticPurchaseButton(s,action,arg) {
+        const mode=cosmeticStoreMode();
+        return btn(mode==="apple"?"View Apple price":mode==="web"?"Claim free design":"Store unavailable",action,arg,mode!=="unavailable");
+      }
+      function cosmeticUnlockText(s) {
+        const log=game.captainLog||{};
+        return ({
+          "Parallel Chaos":"Enter a Parallel system",
+          "Parallel Swarm":"Enter a Parallel system",
+          "Parallel Fracture":"Enter a Parallel system",
+          "Spirit Voyager":"Reach a Cosmic Spirit system",
+          "Spirit Wing":"Reach a Cosmic Spirit system",
+          "Spirit Aurora":"Reach a Cosmic Spirit system",
+          "Cosmic Warp":"Record a 76+ quality Echo and open an anomaly",
+          "Cosmic Warp Combo":"Record a 76+ quality Echo and open an anomaly",
+          "Mythic Mile":"Survey a Mythic world",
+          "Deep Freeze":"Discover an ice world",
+          "Astral Archaeologist":Math.min(VAULT_SKIN_GOAL,vaultSecuredEntries().length)+" / "+VAULT_SKIN_GOAL+" Vault discoveries secured",
+          "Echo Lattice":Math.min(25,game.echoStats?.created||0)+" / 25 Echoes recorded"
+        })[s.key]||"Earn through exploration";
+      }
+      function cosmeticStateText(s,own,active=false) {
+        return active?"Equipped":own?"Owned":s.type==="achievement"?"Earn in game":
+          cosmeticStoreMode()==="apple"?"Apple purchase":cosmeticStoreMode()==="web"?"Free Web Edition":"Store unavailable";
+      }
+      function rankCosmetics(items,owned,equipped) {
+        return [...items].sort((a,b)=>Number(b.key===equipped)-Number(a.key===equipped)||
+          Number(owned(b.key))-Number(owned(a.key))||Number(b.type==="achievement")-Number(a.type==="achievement"));
+      }
       function renderCosmetics() {
         refreshSkins(false);
         const ship = activeShipSkin(),
@@ -18263,7 +18260,7 @@
         ui.menuContent.innerHTML =
           card(
             "Equipped Designs",
-            "Preview your current look. New designs are available below.",
+            owned + " / " + total + " hull and trail designs owned. Browse collections below. Cosmetic designs never change ship stats.",
           ) +
           '<div class="cosmetic-loadout"><div class="cosmetic-slot"><b>' +
           esc(game.shipName) +
@@ -18286,176 +18283,49 @@
           secondaryDetails("Browse Fleet Formations", fleetSkinsHtml());
       }
       function storeHtml() {
-        const nativeStore = !!game.monetization?.storeKitReady,
-          purchaseLabel = (price) =>
-            nativeStore
-              ? "Unlock $" + price
-              : "Claim Web Edition Design";
-        return (
-          '<div class="card"><h4>Complete Hull Sets</h4><p>' +
-          (nativeStore
-            ? "Unlock matching designs for both command ships."
-            : "Web Edition designs are complimentary and never require payment.") +
-          '</p><div class="grid">' +
-          skinCombos
-            .map((c) => {
-              const owned = owns("ship", c.ship) && owns("frigate", c.frigate);
-              return (
-                '<div class="shop"><b>' +
-                esc(c.key) +
-                "</b><span>" +
-                esc(c.ship) +
-                " + " +
-                esc(c.frigate) +
-                '</span><div class="actions">' +
-                btn(
-                  owned
-                    ? "Owned Set"
-                    : c.type === "achievement"
-                      ? "Earn in Exploration"
-                      : purchaseLabel(c.price),
-                  owned ? "noop" : "buyCombo",
-                  owned ? null : c.key,
-                  !owned && c.type !== "achievement",
-                ) +
-                "</div></div>"
-              );
-            })
-            .join("") +
-          '</div></div><div class="card"><h4>Starship Skins</h4><p>Designs for the Starling command ship.</p><div class="grid">' +
-          shipSkins.map((s) => skinHtml(s, "ship")).join("") +
-          '</div></div><div class="card"><h4>Starship Trail Designs</h4><p>Equip a separate light trail behind the Starling. Trails are cosmetic and never alter handling.</p><div class="grid">' +
-          trailSkins.map(trailSkinHtml).join("") +
-          '</div></div><div class="card"><h4>Frigate Skins</h4><p>Capital hulls for the ODF Pioneer.</p><div class="grid">' +
-          frigateSkins.map((s) => skinHtml(s, "frigate")).join("") +
-          "</div></div>"
-        );
+        const mode=cosmeticStoreMode();
+        const category=(title,items,kind,owned,equipped,render)=>secondaryDetails(title+" ("+
+          items.filter(v=>owned(v.key)).length+"/"+items.length+" owned)",
+          '<div class="cosmetic-catalog">'+rankCosmetics(items,owned,equipped).map(render).join("")+'</div>');
+        return card("Design collection","Visual customization only. Designs never affect power, flight or progression.",
+          '<p>'+esc(mode==="apple"?"Apple confirms the current local price before payment.":mode==="web"?"Web Edition designs are complimentary and never require payment.":"Purchases are unavailable in this native build. Earned and owned designs remain usable.")+'</p>')+
+          category("Starship Skins",shipSkins,"ship",k=>owns("ship",k),game.frigate.shipSkin,v=>skinHtml(v,"ship"))+
+          category("Starship Trail Designs",trailSkins,"trail",ownsTrailSkin,game.frigate.trailSkin,trailSkinHtml)+
+          category("Frigate Skins",frigateSkins,"frigate",k=>owns("frigate",k),game.frigate.skin,v=>skinHtml(v,"frigate"))+
+          secondaryDetails("Complete Hull Sets",'<div class="cosmetic-catalog">'+skinCombos.map(c=>{
+            const own=owns("ship",c.ship)&&owns("frigate",c.frigate);
+            return '<article class="cosmetic-card"><b>'+esc(c.key)+'</b><span>'+esc(c.ship+" + "+c.frigate)+'</span><p>'+
+              esc(own?"Owned set":c.type==="achievement"?cosmeticUnlockText(c):cosmeticStateText(c,false))+'</p>'+
+              (own?btn("Owned","noop",null,false):c.type==="achievement"?btn("Earn in game","noop",null,false):
+              cosmeticPurchaseButton(c,"buyCombo",c.key))+'</article>';
+          }).join("")+'</div>')+
+          (mode==="apple"||mode==="unavailable"?'<div class="actions">'+btn("Restore Apple Purchases","restorePurchases")+'</div>':"");
       }
-      function skinHtml(s, kind) {
-        const own = owns(kind, s.key),
-          active =
-            kind === "ship"
-              ? game.frigate.shipSkin === s.key
-              : game.frigate.skin === s.key,
-          stateClass =
-            (active ? " equipped" : own ? " owned" : " locked") +
-            (["paid", "paidCombo"].includes(s.type) ? " premium" : "");
-        let action = own
-          ? btn(
-              active ? "Equipped" : "Equip",
-              kind === "ship" ? "setShipSkin" : "setFrigateSkin",
-              s.key,
-              !active,
-            )
-          : s.type === "achievement"
-            ? btn(
-                s.key === "Deep Freeze"
-                  ? "Find an Ice World"
-                  : s.key === "Astral Archaeologist"
-                    ? Math.min(VAULT_SKIN_GOAL, vaultSecuredEntries().length) +
-                      " / " +
-                      VAULT_SKIN_GOAL +
-                      " Secured"
-                    : "Earn",
-                "noop",
-                null,
-                false,
-              )
-            : s.type === "paidCombo"
-              ? btn(
-                  game.monetization?.storeKitReady
-                    ? "Buy Combo"
-                    : "Claim Web Edition Set",
-                  "buyCombo",
-                  "Ancient Hunter Combo",
-                )
-              : btn(
-                  game.monetization?.storeKitReady
-                    ? "Unlock $" + s.price
-                    : "Claim Web Edition Design",
-                  "buySkinKind",
-                  kind + "|" + s.key,
-                );
-        return (
-          '<div class="cosmetic-card' +
-          stateClass +
-          '"><b>' +
-          esc(s.key) +
-          "</b>" +
-          cosmeticPreviewHtml(kind, s.key, active ? "Equipped" : own ? "Owned" : "Preview") +
-          "<span>" +
-          esc(s.desc) +
-          '</span><span class="tag ' +
-          cosmeticRarityClass(s.rarity) +
-          '">' +
-          esc(s.rarity || "Unusual") +
-          '</span><span class="tag">' +
-          (own
-            ? "Owned"
-            : s.type === "achievement"
-              ? "Achievement"
-              : !game.monetization?.storeKitReady
-                ? "Web Edition"
-                : s.type === "paidCombo"
-                  ? "$2 Combo"
-                  : "$" + s.price) +
-          '</span><div class="actions">' +
-          action +
-          "</div></div>"
-        );
+      function skinHtml(s,kind) {
+        const own=owns(kind,s.key),active=own&&(kind==="ship"?game.frigate.shipSkin:game.frigate.skin)===s.key;
+        const action=own?btn(active?"Equipped":"Equip",kind==="ship"?"setShipSkin":"setFrigateSkin",s.key,!active):
+          s.type==="achievement"?btn("Earn in game","noop",null,false):
+          s.type==="paidCombo"?cosmeticPurchaseButton(s,"buyCombo","Ancient Hunter Combo"):
+          cosmeticPurchaseButton(s,"buySkinKind",kind+"|"+s.key);
+        return cosmeticDesignCard(s,kind,own,active,action);
+      }
+      function cosmeticDesignCard(s,kind,own,active,action) {
+        return '<article class="cosmetic-card'+(active?" equipped":own?" owned":" locked")+
+          (["paid","paidCombo"].includes(s.type)?" premium":"")+'"><div class="cosmetic-row-head"><b>'+esc(s.key)+
+          '</b><span>'+esc(cosmeticStateText(s,own,active))+'</span></div>'+
+          cosmeticPreviewHtml(kind,s.key,active?"Equipped":own?"Owned":"Preview")+
+          '<span class="tag '+cosmeticRarityClass(s.rarity)+'">'+esc(s.rarity||"Unusual")+'</span>'+
+          '<p>'+esc(!own&&s.type==="achievement"?cosmeticUnlockText(s):s.desc)+'</p>'+
+          (own||s.type!=="achievement"?"":secondaryDetails("About this design",'<p>'+esc(s.desc)+'</p>'))+
+          '<div class="actions">'+action+'</div></article>';
       }
       function cosmeticRarityClass(rarity = "Unusual") {
         return "rarity-" + String(rarity).toLowerCase().replace(/[^a-z]/g, "");
       }
       function trailSkinHtml(s) {
-        const own = ownsTrailSkin(s.key),
-          active = game.frigate.trailSkin === s.key,
-          premium = s.type === "paid" ? " premium" : "",
-          progress =
-            s.key === "Echo Lattice"
-              ? Math.min(25, game.echoStats?.created || 0) + " / 25 Echoes"
-              : s.key === "Spirit Aurora"
-                ? "Reach a Cosmic Spirit system"
-                : s.key === "Parallel Fracture"
-                  ? "Enter a Parallel system"
-                  : "Exploration achievement";
-        const action = own
-          ? btn(active ? "Equipped" : "Equip Trail", "setTrailSkin", s.key, !active)
-          : s.type === "achievement"
-            ? btn(progress, "noop", null, false)
-            : btn(
-                game.monetization?.storeKitReady
-                  ? "Unlock $" + s.price
-                  : "Claim Web Edition Design",
-                "buyTrailSkin",
-                s.key,
-              );
-        return (
-          '<div class="cosmetic-card' +
-          (active ? " equipped" : own ? " owned" : " locked") +
-          premium +
-          '"><b>' +
-          esc(s.key) +
-          "</b>" +
-          cosmeticPreviewHtml("trail", s.key, active ? "Equipped" : own ? "Owned" : "Preview") +
-          "<span>" +
-          esc(s.desc) +
-          '</span><span class="tag ' +
-          cosmeticRarityClass(s.rarity) +
-          '">' +
-          esc(s.rarity) +
-          '</span><span class="tag">' +
-          (own
-            ? "Owned"
-            : s.type === "achievement"
-              ? "Achievement"
-              : game.monetization?.storeKitReady
-                ? "$" + s.price
-                : "Web Edition") +
-          '</span><div class="actions">' +
-          action +
-          "</div></div>"
-        );
+        const own=ownsTrailSkin(s.key),active=own&&game.frigate.trailSkin===s.key;
+        return cosmeticDesignCard(s,"trail",own,active,own?btn(active?"Equipped":"Equip Trail","setTrailSkin",s.key,!active):
+          s.type==="achievement"?btn("Earn in game","noop",null,false):cosmeticPurchaseButton(s,"buyTrailSkin",s.key));
       }
       function fleetUnitPreviewHtml(type,level=1) {
         const label=fleetShipTypes[type]?.name||"Fleet craft";
@@ -18492,11 +18362,15 @@
           c.fillText(fleetShipTypes[slot.type].name,0,27*slot.scale, width*0.29);c.restore();
         }
       }
+      document.addEventListener("toggle",event=>{
+        if(event.target?.tagName==="DETAILS"&&event.target.open&&ui.menu?.contains(event.target))requestAnimationFrame(renderSkinPreviews);
+      },true);
       function renderSkinPreviews() {
         if (!ui.menu?.classList.contains("open")) return;
         ui.menuContent
           .querySelectorAll("canvas[data-skin-kind][data-skin-key]")
           .forEach((canvas) => {
+            if(canvas.closest("details:not([open])"))return;
             const kind = canvas.dataset.skinKind,
               key = canvas.dataset.skinKey,
               skin =
@@ -18552,14 +18426,14 @@
               c.rotate(-0.08);
               drawShipVisual(
                 c,
-                Math.min(width / 195, height / 94),
+                Math.min(width / 170, height / 90),
                 skin,
                 false,
               );
             } else if (kind === "frigate") {
               drawFrigateVisual(
                 c,
-                Math.min(width / 470, height / 235),
+                Math.min(width / 450, height / 225),
                 skin,
               );
             } else if (kind === "fleet-unit") {
