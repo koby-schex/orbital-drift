@@ -11158,24 +11158,19 @@
         if (!out.skin) out.skin = "Command Match";
         return out;
       }
+      function fleetMissionSelection(templates,seed,recent=[]){
+        const groups=[...new Set(templates.map(t=>t.type))];
+        return groups.map((type,i)=>{
+          const candidates=templates.filter(t=>t.type===type);
+          const fresh=candidates.filter(t=>!recent.includes(t.title));
+          const pool=fresh.length?fresh:candidates;
+          return pool[Math.floor(rand(seed+i*73)*pool.length)];
+        });
+      }
       function generateFleetMissions(seed = Date.now() % 999999) {
-        const count = 5,
-          used = new Set(),
-          arr = [];
-        for (let i = 0; i < count; i++) {
-          let t =
-              fleetMissionTemplates[
-                Math.floor(rand(seed + i * 73) * fleetMissionTemplates.length)
-              ],
-            guard = 0;
-          while (used.has(t.title) && guard++ < 12)
-            t =
-              fleetMissionTemplates[
-                Math.floor(
-                  rand(seed + i * 107 + guard) * fleetMissionTemplates.length,
-                )
-              ];
-          used.add(t.title);
+        const recent=(game.fleet?.completed||[]).slice(0,5).map(m=>m.title);
+        const arr = [];
+        for (const [i,t] of fleetMissionSelection(fleetMissionTemplates,seed,recent).entries()) {
           arr.push({
             ...t,
             id: "fm-" + seed + "-" + i,
@@ -11395,11 +11390,12 @@
             ship && ship.type && fleetShipTypes[ship.type]?.mission === m.type,
           bonus = match ? fleetMatchBonus(ship).speed : 0,
           reactor = (game.frigate.reactorLevel || 0) * 3,
-          cmd = (game.frigate.commandLevel || 0) * 2;
+          cmd = (game.frigate.commandLevel || 0) * 2,
+          crew = Math.min(12,crewDutyPower("fleet")*1.2);
         return Math.max(
           35,
           Math.round(
-            (m.baseDuration || 180) * (1 - (bonus + reactor + cmd) / 100),
+            (m.baseDuration || 180) * (1 - Math.min(65,bonus + reactor + cmd + crew) / 100),
           ),
         );
       }
@@ -11408,7 +11404,8 @@
           bonus =
             (match ? fleetMatchBonus(ship).reward : 0) +
             (ship?.level || 1) * 2 +
-            (game.frigate.scannerLevel || 0) * 3;
+            (game.frigate.scannerLevel || 0) * 3 +
+            Math.min(18,crewDutyPower("fleet")*1.5);
         return scaleReward(m.reward || {}, 1 + bonus / 100);
       }
       function startFleetMission(mid, sid) {
@@ -11496,6 +11493,7 @@
         if (!game.retention.firstFleetAt) game.retention.firstFleetAt = Date.now();
         game.captainLog.fleetMissionsCompleted =
           (game.captainLog.fleetMissionsCompleted || 0) + 1;
+        grantCrewXp(6);
         trackExpeditionProgress("fleet", 1);
         markMeaningfulMoment("fleet-return");
         trackDaily(
@@ -12133,7 +12131,7 @@
         const lvl = game.shipSystems?.[key] || 0,
           next = lvl + 1;
         if (next > def.max) return null;
-        const scale = Math.pow(1.38, lvl),
+        const scale = Math.pow(1.30, lvl),
           cost = { Alloy: Math.round((12 + next * 8) * scale) };
         if (["fuel", "brake", "handling"].includes(key))
           cost.Titanium = Math.round((5 + next * 4) * scale);
@@ -12221,7 +12219,7 @@
           out = {};
         Object.entries(base).forEach(
           ([r, v]) =>
-            (out[r] = Math.round(v * (1 + lvl * 0.75) + (lvl + 1) * 6)),
+            (out[r] = Math.round(v * (1 + lvl * 0.60) + (lvl + 1) * 6)),
         );
         return out;
       }
@@ -12333,7 +12331,7 @@
       }
       function grantReward(reward = {}, title = "Reward") {
         const clean = Object.fromEntries(
-          Object.entries(reward || {}).filter(([, v]) => v > 0),
+          Object.entries(reward || {}).filter(([, v]) => Number.isFinite(v) && v > 0),
         );
         Object.entries(clean).forEach(
           ([k, v]) => (game.resources[k] = (game.resources[k] || 0) + v),
@@ -12364,7 +12362,7 @@
             b.resource === "DataCores" || b.resource === "Crystal"
               ? 0.35
               : 0.12;
-        return m;
+        return m*(1+Math.min(.12,crewDutyPower("systems")*.01));
       }
       function productionRate(b) {
         if (
@@ -12374,23 +12372,21 @@
           !b.developed
         )
           return 0;
-        return Math.max(0.02, productionMult(b) * 0.022);
+        // Keep the established tutorial economy; modestly improve frontier output.
+        return Math.max(0.02, productionMult(b) * 0.022 * (game.system.isTutorial?1:1.12));
+      }
+      function productionPerMinute(rate){
+        // Simulation dt is measured in 60Hz frame units, not seconds.
+        return Math.max(0,rate)*60*60*TIME_SCALE;
+      }
+      function researchProductionRate(b){
+        return Math.max(0,Number(b?.branches?.research)||0)*.012*rarityBonus(b);
       }
       function productionPreview(b) {
-        if (!b || !game.captured.has(b.name)) return "Not producing yet";
-        const br = b.branches || defaultBranches(),
-          data =
-            br.research > 0
-              ? " + " + (br.research * 0.7).toFixed(1) + " Data/min"
-              : "";
-        return (
-          "+" +
-          (productionRate(b) * 60).toFixed(1) +
-          " " +
-          label(b.resource) +
-          "/min" +
-          data
-        );
+        if (!b || !game.captured.has(b.name)||!b.developed) return "Not producing yet";
+        const data=researchProductionRate(b);
+        return "+"+productionPerMinute(productionRate(b)).toFixed(1)+" "+label(b.resource)+"/min"+
+          (data>0?" + "+productionPerMinute(data).toFixed(1)+" Data/min":"");
       }
       function updateProduction(dt) {
         const now=Date.now();
@@ -12406,7 +12402,7 @@
           if (gain <= 0) continue;
           unclaimedProduction[b.resource] =
             (unclaimedProduction[b.resource] || 0) + gain;
-          const rg = (b.branches?.research || 0) * 0.012 * dt * rarityBonus(b);
+          const rg = researchProductionRate(b) * dt;
           if (rg > 0)
             unclaimedProduction.DataCores =
               (unclaimedProduction.DataCores || 0) + rg;
@@ -12438,8 +12434,8 @@
       }
       function frontierSurveyBonus(b,system) {
         if (!b||b.type==="star"||!system||system.isTutorial) return {};
-        const bonus=({Rare:{DataCores:2,Crystal:2},Exotic:{DataCores:5,Crystal:4},
-          Mythic:{DataCores:8,Crystal:6,DarkMatter:1}})[b.rarity]||{};
+        const bonus=({Unusual:{DataCores:1},Rare:{DataCores:3,Crystal:3},Exotic:{DataCores:7,Crystal:5},
+          Mythic:{DataCores:10,Crystal:8,DarkMatter:1}})[b.rarity]||{};
         return {...bonus};
       }
       function discoveryReward(b) {
@@ -12715,6 +12711,7 @@
         s.lockBody = null;
         s.lockCharge = 0;
         toast("Slingshot release!");
+        if(boost&&p>=5.4)completeContract("speed");
         finalizeEcho("slingshot", b.type === "frigate" ? "Frigate" : b.name);
       }
       function orbitAnchor() {
@@ -12772,6 +12769,9 @@
           s.vy += (dy / d) * f * dt;
         }
       }
+      function highSpeedSteering(speed,level,braking,dt){
+        return clamp((.012+level*.0018)*(1+clamp((speed-4)/8,0,1)*.9)*(braking?1.8:1)*dt,0,.25);
+      }
       function updateDrift(dt, cls) {
         const s = game.ship;
         if (!s || s.orbitLocked || pioneerRescue) {
@@ -12788,7 +12788,7 @@
         if (active) {
           const skill = clamp((speed - 0.7) / 3.2, 0.15, 1) * clamp(slip / 1.7, 0.12, 1),
             handlingLevel = game.shipSystems?.handling || 0,
-            carve = (0.012 + handlingLevel * 0.0018) * (braking ? 1.8 : 1) * dt,
+            carve = highSpeedSteering(speed,handlingLevel,braking,dt),
             curvedAngle = velocityAngle + angleDiff(s.angle, velocityAngle) * carve;
           // Preserve momentum while the nose carves across the travel vector.
           s.vx = Math.cos(curvedAngle) * speed;
@@ -12842,7 +12842,7 @@
           s.fuel > 0 &&
           !s.orbitLocked
         ) {
-          const brake = Math.max(0.84, 1 - cls.brake * dt);
+          const brake = Math.max(0.78, 1 - cls.brake * (1+clamp((Math.hypot(s.vx,s.vy)-4)/8,0,1)*.5) * dt);
           s.vx *= brake;
           s.vy *= brake;
           s.fuel = Math.max(0, s.fuel - 0.035 * dt);
@@ -12920,6 +12920,7 @@
         const firstSurvey = !b.discoveryRewardClaimed,
           reward = applyDiscoveryReward(b);
         if (firstSurvey) {
+          if(game.frigate?.built)grantCrewXp(3);
           completeContract("survey");
           recordPlanet(b, "surveys", 1);
           if (b.name === "Venus" && game.missionStage === 3) game.missionStage = 4;
@@ -12948,14 +12949,27 @@
         if (captureCapacityUsed() >= captureLimit()) return openChoice(b);
         finishCapture(b);
       }
+      function captureAlreadyRewarded(b){
+        return !!(b?.memory?.captureRewardClaimed||b?.captured||b?.developed||b?.level>0);
+      }
       function finishCapture(b, replace = null) {
         if(!b || !b.capturable || game.captured.has(b.name))return false;
         if(replace && (replace==="Earth" || !game.captured.has(replace)))return false;
+        if(!replace&&captureCapacityUsed()>=captureLimit())return false;
+        if(!game.ship.orbitLocked||game.ship.lockBody!==b.name||body(b.name)!==b)return false;
+        const firstCapture=!captureAlreadyRewarded(b);
+        if(!b.memory)b.memory=defaultMemory();
+        b.memory.captureRewardClaimed=true;
         feedbackPulse("capture");
         if (replace) {
           const old = body(replace);
-          if (old) Object.assign(old, { captured: false, developed: false });
+          if (old) {
+            if(!old.memory)old.memory=defaultMemory();
+            old.memory.captureRewardClaimed=true;
+            Object.assign(old, { captured: false, developed: false });
+          }
           game.captured.delete(replace);
+          if(old)recordCodex(old,"network released");
         }
         Object.assign(b, {
           captured: true,
@@ -12966,33 +12980,28 @@
         if (!b.branches) b.branches = defaultBranches();
         game.captured.add(b.name);
         selectedPlanetName = b.name;
-        const amount = Math.round(
+        const amount = firstCapture?Math.round(
           14 *
             b.richness *
             shipStats().cargo *
             rarityBonus(b) *
             (game.system?.modifier?.reward || 1) *
             (1 + (game.fleet?.boosts?.captureReward || 0)),
-        );
-        game.resources[b.resource] = (game.resources[b.resource] || 0) + amount;
-        game.ship.fuel = Math.min(game.ship.maxFuel, game.ship.fuel + 28);
-        game.captainLog.captures++;
-        trackDaily("capture", 1);
-        trackExpeditionProgress("capture", 1);
-        markMeaningfulMoment("capture");
-        recordPlanet(b, "extracted", amount);
+        ):0;
+        if(firstCapture){
+          game.resources[b.resource] = (game.resources[b.resource] || 0) + amount;
+          game.ship.fuel = Math.min(game.ship.maxFuel, game.ship.fuel + 28);
+          game.captainLog.captures++;
+          trackDaily("capture", 1);
+          trackExpeditionProgress("capture", 1);
+          markMeaningfulMoment("capture");
+          recordPlanet(b, "extracted", amount);
+          if(game.frigate?.built)grantCrewXp(4);
+        }
         recordCodex(b, "captured");
         playSound("capture");
         vibrate("capture");
-        toast(
-          "Captured " +
-            b.name +
-            ". Gained " +
-            amount +
-            " " +
-            label(b.resource) +
-            ".",
-        );
+        toast(firstCapture?"Captured "+b.name+". Gained "+amount+" "+label(b.resource)+".":b.name+" reconnected to the network.");
         addActivity(
           "capture",
           b.name + " captured",
@@ -13003,7 +13012,7 @@
             " and linked the planet to your network.",
         );
         triggerCaptureEffect(b);
-        completeContract("capture");
+        if(firstCapture)completeContract("capture");
         checkAchievements();
         if (b.name === "Mars" && game.missionStage < 1) {
           game.missionStage = 1;
@@ -13034,6 +13043,10 @@
         renderMenu();
       }
       function raid(b) {
+        if(!b||b.type==="star"||!b.capturable||game.captured.has(b.name)||!game.ship.orbitLocked||game.ship.lockBody!==b.name||body(b.name)!==b)return false;
+        if(b.memory?.raidRewardClaimed){toast("This world has already been raided.");return false;}
+        if(!b.memory)b.memory=defaultMemory();
+        b.memory.raidRewardClaimed=true;
         const amount = Math.round(
             18 *
               b.richness *
@@ -13074,7 +13087,8 @@
         ui.choiceList.innerHTML = "";
         const rb = document.createElement("button");
         rb.type = "button";
-        rb.textContent = "Raid " + b.name + " once for resources";
+        rb.textContent = b.memory?.raidRewardClaimed?"Raid already completed":"Raid " + b.name + " once for resources";
+        rb.disabled=!!b.memory?.raidRewardClaimed;
         rb.onclick = () => raid(b);
         ui.choiceList.appendChild(rb);
         [...game.captured]
@@ -13110,8 +13124,9 @@
         }
         const n = nearestRefuelTarget();
         if (n.body) {
+          const restored=game.ship.maxFuel-game.ship.fuel;
           game.ship.fuel = game.ship.maxFuel;
-          recordPlanet(n.body, "refuels", 1);
+          if(restored>=game.ship.maxFuel*.10)recordPlanet(n.body, "refuels", 1);
           playSound("refuel");
           toast("Refueled at " + n.body.name + ".");
           saveGame(false);
@@ -13228,7 +13243,7 @@
         if (reason) return toast(reason);
         const oldLevel = Number(b.level) || 0,
           oldFactory = !!b.factory,
-          oldRate = (productionRate(b) * 60).toFixed(1),
+          oldRate = (productionPerMinute(productionRate(b))).toFixed(1),
           cost = planetUpgradeCost(b);
         spend(cost);
         b.level = oldLevel + 1;
@@ -13242,7 +13257,7 @@
         recordPlanet(b, "extracted", gain);
         recordCodex(b, "upgraded");
         game.captainLog.planetUpgrades++;
-        const newRate = (productionRate(b) * 60).toFixed(1),
+        const newRate = (productionPerMinute(productionRate(b))).toFixed(1),
           factoryMsg = !oldFactory && b.factory ? " • Factory unlocked" : "";
         playSound("upgrade");
         vibrate("upgrade");
@@ -13325,7 +13340,7 @@
         const cost = branchCost(b, branch);
         if (!canAfford(cost))
           return toast("Branch upgrade requires " + fmt(cost) + ".");
-        const beforeRate = (productionRate(b) * 60).toFixed(1),
+        const beforeRate = (productionPerMinute(productionRate(b))).toFixed(1),
           wasFactory = !!b.factory;
         spend(cost);
         br[branch] = before + 1;
@@ -13347,7 +13362,7 @@
                 "Planet branch milestone reward",
               )
             : {};
-        const afterRate = (productionRate(b) * 60).toFixed(1),
+        const afterRate = (productionPerMinute(productionRate(b))).toFixed(1),
           rewardMsg = fmt(reward),
           factoryMsg = !wasFactory && b.factory ? " • Factory unlocked" : "";
         recordPlanet(b, "upgrades", 1);
@@ -16942,7 +16957,7 @@
         ui.menuContent.innerHTML =
           card(
             "Colony Output",
-            "Captured worlds supply your expedition over time.",
+            "Captured worlds in this system supply your expedition during active flight. Rates are estimated per real minute at normal game speed.",
             '<div class="list"><div class="prod"><b>Ready to Gather</b><span>' +
               esc(pending) +
               '</span><div class="actions"><button type="button" data-action="claimProduction" data-arg="">Gather All Output</button></div></div>' +
@@ -17514,9 +17529,9 @@
             body(selectedPlanetName) ||
             body(game.ship?.lockBody) ||
             body("Earth"),
-          rate = b ? productionRate(b) * 60 : 0,
+          rate = b ? productionPerMinute(productionRate(b)) : 0,
           nextRate = b
-            ? Math.max(0.02, (productionMult(b) + 0.42) * 0.022) * 60
+            ? productionPerMinute(productionRate({...b,level:(b.level||0)+1,extractorLevel:(b.extractorLevel||0)+1}))
             : 0;
         return (
           '<div class="chip">Level: ' +
@@ -17550,7 +17565,7 @@
       function planetUpgradeBenefits(b) {
         if (!b) return "Improves the selected planet.";
         const future = (b.level || 0) + 1,
-          rate = (productionRate(b) * 60).toFixed(1);
+          rate = (productionPerMinute(productionRate(b))).toFixed(1);
         return (
           "Raises " +
           b.name +
@@ -17692,7 +17707,7 @@
             '</span></div></div><p>'+esc(template.specialty)+'</p><p class="small">'+esc(fmt(template.cost))+'</p>'+
             btnWhy("Recruit","recruitCrew",template.id,docked&&canAfford(template.cost),!docked?"Lock orbit with Pioneer.":!canAfford(template.cost)?"Requires "+fmt(template.cost):"")+'</article>').join("")+'</div>':'<p class="small">All specialists recruited.</p>')+
           secondaryDetails("Duty assignments & crew benefits",
-            '<p>Vault assignments improve survey rewards and containment capacity. Fleet assignments support expeditions and threat rewards. Systems assignments improve threat preparation. Bridge is the default assignment.</p>'+
+            '<p>Vault assignments improve survey rewards and containment capacity. Fleet assignments improve mission speed and rewards, expeditions and threat rewards. Systems assignments improve colony production and threat preparation. Bridge is the default assignment. Crew also earn XP from surveys, captures and fleet missions.</p>'+
             '<div class="grid">'+["bridge","vault","fleet","systems"].map(d=>'<div class="chip">'+crewDutyLabel(d)+': '+crewDutyPower(d)+'</div>').join("")+'</div>');
       }
       function expeditionStagesHtml(expedition) {
@@ -20287,7 +20302,7 @@
           bh = nearestBlackHole();
         if (pioneerRescue)
           return { label: "Pioneer Rescue Active", run: noop, show: true, disabled: true };
-        if (game.ship.fuel <= 0.5)
+        if (game.ship.fuel <= 0.5 && !game.ship.orbitLocked && !fuelTarget.body)
           return {
             label: game.frigate?.built ? "Call Pioneer" : "Recover Ship",
             run: game.frigate?.built ? startPioneerRescue : recoverShip,
@@ -20310,6 +20325,7 @@
             if(game.captured.has(b.name)&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
           }
         }
+        if(fuelTarget.body&&game.ship.fuel<game.ship.maxFuel*.22)return {label:"Refuel",run:refuel,show:true};
         if (h && h.d < 70 && !h.echo.harvested)
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
@@ -21598,8 +21614,8 @@
         ctx.lineCap = "round";
         for (let i = 0; i < count; i++) {
           const s = stars[(i * 7 + Math.floor(t * 0.08)) % stars.length],
-            x = (((s.x - game.ship.x * 0.022 * s.d) % W) + W) % W,
-            y = (((s.y - game.ship.y * 0.022 * s.d) % H) + H) % H,
+            x = (((s.x - cam.x * 0.055 * s.d) % W) + W) % W,
+            y = (((s.y - cam.y * 0.055 * s.d) % H) + H) % H,
             len = (7 + s.d * 24) * intensity;
           ctx.strokeStyle = rgba(s.h, (0.035 + s.a * 0.08) * intensity);
           ctx.lineWidth = Math.max(0.45, s.r * 0.7);
