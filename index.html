@@ -5174,6 +5174,34 @@
       .menu .menu-secondary-body .card, .menu .card-body > .card, .menu .card .card { border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 10px 0; margin: 0; border-bottom: 1px solid rgba(165,199,209,.12); }
       .menu .menu-secondary-body .card::before, .menu .card .card::before { display: none; }
       .menu .menu-secondary-body .card:last-child, .menu .card .card:last-child { border-bottom: 0; }
+      /* Pass 25: unified spacing and touch-safe command surfaces. */
+      .menu .content, .menu .card-body, .menu .list, .menu .grid, .dialog { min-width:0; }
+      .menu .content { gap:10px; }
+      .menu .card { margin-bottom:0; }
+      .menu button, .dialog button, .pause-dialog button { text-align:center; justify-content:center; align-items:center; line-height:1.25; white-space:normal; overflow-wrap:anywhere; min-width:0; min-height:44px; }
+      .menu button:disabled, .dialog button:disabled { cursor:default; }
+      .menu .actions, .dialog .actions { gap:8px; align-items:stretch; }
+      .menu .actions > button, .dialog .actions > button { flex:1 1 122px; }
+      .menu .card-body > p, .dialog p { line-height:1.52; overflow-wrap:anywhere; }
+      .menu .grid > *, .menu .list > *, .section-tabs > *, .dialog .grid > * { min-width:0; }
+      .menu .section-tabs button { white-space:normal; }
+      .dialog { max-height:calc(100dvh - var(--safeTop) - var(--safeBottom) - 32px); overflow-y:auto; overscroll-behavior:contain; }
+      .dialog h2 { text-align:center; line-height:1.25; overflow-wrap:anywhere; }
+      .tap-dismiss-note { margin-top:16px; text-align:center; }
+      .orbit-release,.touch { white-space:pre-line; line-height:1.3; text-align:center; }
+      .orbit-release.release-mode:before { border-bottom:3px solid #d7b779; width:var(--orbit-charge,0%); max-width:calc(100% - 8px); border-radius:8px; }
+      body.hud-collapsed .objective-pill.training #objectivePillSub { display:block; white-space:normal; line-height:1.35; }
+      .objective-pill.training { min-height:55px; text-align:left; }
+      .objective-pill.training b { white-space:normal; }
+      .pioneer-command-landing.pioneer-hero { border-radius:16px; border-color:#57717a; background:linear-gradient(155deg,#0f2835a6,#040c15de),url('./assets/deep-field.webp') center/cover; padding:15px; }
+      .pioneer-command-landing .cosmetic-preview-live { height:clamp(140px,25vh,220px); background:radial-gradient(ellipse,#17384988,transparent 70%); border:0; }
+      .pioneer-flight-deck,.pioneer-deck-directory { padding:12px 6px; border-top:1px solid #38505a; }
+      .pioneer-flight-deck h4 { color:#e1f2f2; font-size:18px; margin:7px 0; }
+      .pioneer-flight-deck p { font-size:12px; color:var(--muted); margin:0 0 12px; }
+      .pioneer-primary-actions button { text-align:center; justify-content:center; }
+      .pioneer-primary-actions .pioneer-deck-link { display:flex; flex-direction:column; gap:5px; min-height:72px; background:#102430; }
+      .pioneer-deck-link small { color:#afc4cc; font-size:11px; font-weight:400; line-height:1.4; }
+      @media(max-width:560px) { .menu .content { gap:8px; } .menu .grid { gap:8px; } .pioneer-deck-directory .pioneer-primary-actions {grid-template-columns:repeat(2,minmax(0,1fr));} }
     </style>
   </head>
   <body>
@@ -5631,9 +5659,6 @@
         <h2 id="upgradeTitle">Upgrade Complete</h2>
         <p id="upgradeSummary"></p>
         <div class="grid" id="upgradeStats"></div>
-        <div class="actions">
-          <button id="upgradeContinue" type="button">Continue</button>
-        </div>
         <span class="tap-dismiss-note">Tap anywhere outside a control to return</span>
       </div>
     </div>
@@ -5642,9 +5667,6 @@
         <h2 id="missionTitle">Mission Complete</h2>
         <p id="missionSummary"></p>
         <div class="grid" id="missionStats"></div>
-        <div class="actions">
-          <button id="missionContinue" type="button">Continue</button>
-        </div>
         <span class="tap-dismiss-note">Tap anywhere outside a control to return</span>
       </div>
     </div>
@@ -5844,12 +5866,10 @@
         upgradeTitle: $("upgradeTitle"),
         upgradeSummary: $("upgradeSummary"),
         upgradeStats: $("upgradeStats"),
-        upgradeContinue: $("upgradeContinue"),
         missionOverlay: $("missionOverlay"),
         missionTitle: $("missionTitle"),
         missionSummary: $("missionSummary"),
         missionStats: $("missionStats"),
-        missionContinue: $("missionContinue"),
         encounterOverlay: $("encounterOverlay"),
         encounterVisual: $("encounterVisual"),
         encounterVisualLabel: $("encounterVisualLabel"),
@@ -7856,7 +7876,7 @@
         ],
         [
           "Orbit Lock",
-          "Approach a planet and use Orbit Lock. While locked, you can capture eligible planets or slingshot away.",
+          "Approach a planet and use LOCK. Hold THRUST while locked to build momentum without fuel. BRAKE reduces orbital speed; RELEASE launches you along your orbit.",
         ],
         [
           "Context Actions",
@@ -7874,11 +7894,11 @@
       const onboardingSteps = [
         [
           "Welcome, Pilot",
-          "Fly with the joystick and THRUST button. Your goal is to use gravity, not fight it.",
+          "Use the left joystick to aim and THRUST to fly. You start safely orbiting Earth. Hold THRUST while locked to build speed for free, then tap RELEASE to launch toward Mars.",
         ],
         [
           "Orbit, Then Act",
-          "Get close to a planet and tap LOCK. Once locked, the orbit button becomes RELEASE, and nearby actions like Capture appear on screen.",
+          "Follow the target marker. Use BRAKE near Mars, tap LOCK when available, then use Scan and Capture. A full RELEASE meter gives the strongest slingshot.",
         ],
         [
           "Build Your Network",
@@ -7897,35 +7917,35 @@
         {
           title: "First Orbit",
           action: "Capture Mars",
-          text: "Fly to Mars, enter orbit with LOCK, then use the Capture action above the Nav Map.",
+          text: "Hold THRUST at Earth to charge your slingshot. Tap RELEASE when aimed toward Mars, follow its marker, then BRAKE, LOCK, Scan and Capture.",
           menu: "planets",
           target: "Mars",
         },
         {
           title: "Flight Systems",
           action: "Upgrade the Starling",
-          text: "Return to Earth Factory and install one starship subsystem upgrade.",
+          text: "Follow the Earth marker and lock orbit. Open Menu → Upgrade Center → Ship Systems. Pick an affordable upgrade; Earth is your first factory.",
           menu: "upgrades",
           target: "Earth",
         },
         {
           title: "Working Outpost",
           action: "Develop Mars",
-          text: "Return to Mars and raise the captured outpost to Level 2.",
+          text: "Return to Mars, lock orbit, then open Upgrade Center → Planet Upgrades and raise Mars to Level 2. Collect cargo in Resources if needed.",
           menu: "upgrades",
           target: "Mars",
         },
         {
           title: "Deep Scan",
           action: "Survey Venus",
-          text: "Fly close enough to Venus for the scanner to identify it. Capture is optional.",
+          text: "Target Venus and approach until Scan Venus appears in the lower-right. Tap it. Capture is optional; your goal is the survey.",
           menu: "planets",
           target: "Venus",
         },
         {
           title: "Fleet Foundation",
           action: "Build the ODF Pioneer",
-          text: "Return to Earth Factory and construct your frigate.",
+          text: "Return to Earth and lock orbit, then open Menu → Pioneer Project → Build ODF Pioneer. Earth supplies the tutorial construction reserve.",
           menu: "frigate",
           target: "Earth",
         },
@@ -10728,10 +10748,15 @@
             const frigateLock = !!d.ship.orbitLocked && d.ship.lockBody === "__FRIGATE__" && game.frigate.built;
             const wasLocked = !!d.ship.orbitLocked && !!body(d.ship.lockBody);
             game.ship.orbitLocked = wasLocked;
-            if (wasLocked) lockShipToBody(body(d.ship.lockBody));
+            if (wasLocked) {
+              lockShipToBody(body(d.ship.lockBody));
+              game.ship.lockCharge = orbitMomentum(d.ship.lockCharge);
+              game.ship.lockDirection = d.ship.lockDirection === -1 ? -1 : 1;
+            }
             else if (frigateLock) {
               game.ship.orbitLocked = true;
               game.ship.lockBody = "__FRIGATE__";
+              game.ship.lockCharge = orbitMomentum(d.ship.lockCharge);
             } else {
               game.ship.lockBody = null;
               game.ship.lockCharge = 0;
@@ -12649,8 +12674,17 @@
           saveGame(false);
         }
       }
+      function orbitMomentum(charge,dt=0,thrust=false,brake=false){
+        const q=clamp(Number.isFinite(charge)?charge:0,0,100);
+        return clamp(q+Math.max(0,Number(dt)||0)*(brake?-.85:thrust?.58:0),0,100);
+      }
+      function orbitRelativeSpeed(charge){
+        return 1.6+3.2*orbitMomentum(charge)/100;
+      }
+      function orbitReleaseSpeed(charge,boost=true){
+        return boost?Math.min(6,orbitRelativeSpeed(charge)*1.2+.24):orbitRelativeSpeed(charge);
+      }
       function releaseOrbit(boost = true) {
-        feedbackPulse("slingshot");
         const s = game.ship,
           b = orbitAnchor();
         if (!s.orbitLocked || !b) {
@@ -12658,18 +12692,14 @@
           s.lockBody = null;
           return;
         }
+        feedbackPulse("slingshot");
         const ta = s.lockAngle + (Math.PI / 2) * s.lockDirection,
-          p = boost
-            ? 1.95 +
-              Math.min(1.9, s.lockCharge * 0.16) +
-              Math.hypot(s.vx, s.vy) * 0.28
-            : 0.85;
+          p = orbitReleaseSpeed(s.lockCharge,boost);
         s.vx = (b.vx || 0) + Math.cos(ta) * p;
         s.vy = (b.vy || 0) + Math.sin(ta) * p;
         s.orbitLocked = false;
         s.lockBody = null;
         s.lockCharge = 0;
-        s.fuel = Math.max(0, s.fuel - 2.5);
         toast("Slingshot release!");
         finalizeEcho("slingshot", b.type === "frigate" ? "Frigate" : b.name);
       }
@@ -12687,18 +12717,19 @@
           s.lockBody = null;
           return false;
         }
-        s.lockCharge += dt * 0.048;
-        s.lockAngle +=
-          s.lockDirection *
-          (0.014 + Math.min(0.014, s.lockCharge * 0.0021)) *
-          dt;
+        const training = !pioneerRescue,
+          thrust = training && (keys.has("w") || keys.has("touch") || keys.has("shift")),
+          brake = training && (keys.has("s") || keys.has("brake"));
+        s.lockCharge = orbitMomentum(s.lockCharge,dt,thrust,brake);
+        const os = orbitRelativeSpeed(s.lockCharge),
+          radius = Math.max(1,Number(s.lockRadius)||100);
+        s.lockAngle = (s.lockAngle + s.lockDirection * os / radius * dt) % TAU;
         const br = pioneerRescue && s.lockBody === "__FRIGATE__"
           ? 0
           : Math.sin(t * 0.08) * 2.5;
         s.x = b.x + Math.cos(s.lockAngle) * (s.lockRadius + br);
         s.y = b.y + Math.sin(s.lockAngle) * (s.lockRadius + br);
-        const ta = s.lockAngle + (Math.PI / 2) * s.lockDirection,
-          os = 0.62 + Math.min(0.48, s.lockCharge * 0.016);
+        const ta = s.lockAngle + (Math.PI / 2) * s.lockDirection;
         s.vx = (b.vx || 0) + Math.cos(ta) * os;
         s.vy = (b.vy || 0) + Math.sin(ta) * os;
         s.angle += angleDiff(ta, s.angle) * 0.08 * dt;
@@ -12774,7 +12805,7 @@
         }
         if (keys.has("a")) s.angle -= cls.turn * dt;
         if (keys.has("d")) s.angle += cls.turn * dt;
-        if ((keys.has("w") || keys.has("touch")) && s.fuel > 0) {
+        if (!s.orbitLocked && (keys.has("w") || keys.has("touch")) && s.fuel > 0) {
           s.vx += Math.cos(s.angle) * cls.thrust * dt;
           s.vy += Math.sin(s.angle) * cls.thrust * dt;
           s.fuel = Math.max(0, s.fuel - cls.fuelDrain * dt);
@@ -15995,15 +16026,13 @@
         ui.feedbackFlash.className = "feedback-flash show";
         setTimeout(() => ui.feedbackFlash.classList.remove("show"), 430);
       }
-      // Original 32-bar ambient score with recurring melodic phrases.
+      // Original slow-moving void soundscape: suspended harmonies, no rhythmic arpeggios.
       function scoreBar(index) {
-        const chords=[[50,57,60,64],[46,53,57,60],[53,60,64,67],[48,55,62,64],
-          [50,57,60,65],[46,53,60,65],[55,62,65,69],[48,55,60,64]];
-        const melody=[[69,null,72,74],[69,null,65,null],[67,69,null,72],[64,null,67,null],
-          [69,null,72,76],[74,null,72,null],[70,69,null,67],[64,null,65,null]];
+        const notes=[[38,57,64,72],[38,57,65,72],[38,55,65,74],[38,57,64,74],
+          [34,53,60,69],[34,55,60,69],[36,55,62,69],[36,55,64,71]];
         const bar=((index%32)+32)%32, phrase=Math.floor(bar/8), step=bar%8;
-        return {chord:chords[step],melody:phrase===0||phrase===2?melody[step]:melody[step].map((v,i)=>i%2===0?v:null),
-          bass:chords[step][0]-12,shimmer:phrase===2,duration:4};
+        return {chord:notes[step],melody:[null,null,phrase===2&&step%3===0?81:null,null],
+          bass:notes[step][0]-12,shimmer:phrase===2,duration:9,space:phrase};
       }
       function audioHz(note){return 440*Math.pow(2,(note-69)/12);}
       function ensureAudio() {
@@ -16012,12 +16041,22 @@
         if(!AC)return null;
         try {
           const ctx=new AC(),master=ctx.createGain(),musicGain=ctx.createGain(),sfxGain=ctx.createGain(),
-            limiter=ctx.createDynamicsCompressor(),ambience=ctx.createDelay(.8),echo=ctx.createGain();
+            limiter=ctx.createDynamicsCompressor(),ambience=ctx.createDelay(1.8),echo=ctx.createGain(),
+            room=ctx.createConvolver(),wet=ctx.createGain(),lowpass=ctx.createBiquadFilter();
+          const length=Math.min(Math.floor(ctx.sampleRate*3.4),180000),impulse=ctx.createBuffer(2,length,ctx.sampleRate);
+          let seed=18271;
+          for(let ch=0;ch<2;ch++){const data=impulse.getChannelData(ch);let smooth=0;
+            for(let i=0;i<length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;
+              smooth=smooth*.79+(seed/4294967296*2-1)*.21;
+              data[i]=smooth*Math.pow(1-i/length,2.7)*.35;}
+          }
+          room.buffer=impulse;wet.gain.value=.30;lowpass.type="lowpass";lowpass.frequency.value=1200;
           master.gain.value=.8;musicGain.gain.value=0;sfxGain.gain.value=0;
           limiter.threshold.value=-15;limiter.knee.value=12;limiter.ratio.value=4;
           limiter.attack.value=.008;limiter.release.value=.22;
-          ambience.delayTime.value=.37;echo.gain.value=.14;
-          musicGain.connect(master);musicGain.connect(ambience);ambience.connect(echo);echo.connect(master);
+          ambience.delayTime.value=.73;echo.gain.value=.11;
+          musicGain.connect(lowpass);lowpass.connect(master);musicGain.connect(ambience);ambience.connect(echo);echo.connect(room);
+          musicGain.connect(room);sfxGain.connect(room);room.connect(wet);wet.connect(master);
           sfxGain.connect(master);master.connect(limiter);limiter.connect(ctx.destination);
           audio={ctx,master,musicGain,sfxGain,started:false,nextNote:0,bar:0,voices:new Set(),lastClick:-10,engine:null};
           return audio;
@@ -16070,13 +16109,13 @@
         const now=a.ctx.currentTime;if(a.nextNote<now-.25)a.nextNote=now+.08;
         if(a.nextNote>now+1.5)return;
         const bar=scoreBar(a.bar++),when=Math.max(now+.02,a.nextNote),bus=a.musicGain;
-        audioVoice(a,bus,audioHz(bar.bass),when,4.6,.095,{attack:.9,group:"music"});
+        audioVoice(a,bus,audioHz(bar.bass+12),when,13,.075,{attack:3.8,group:"music"});
         bar.chord.forEach((note,i)=>{
-          audioVoice(a,bus,audioHz(note+12),when,5.1,.047,{type:i%2?"sine":"triangle",attack:1.25,pan:(i-1.5)*.32,group:"music"});
-          audioVoice(a,bus,audioHz(note+12)*1.003,when+.05,5,.019,{attack:1.5,pan:(1.5-i)*.29,group:"music"});
+          audioVoice(a,bus,audioHz(note),when+i*.2,13,.049,{type:"sine",attack:4.2,pan:(i-1.5)*.38,group:"music"});
+          audioVoice(a,bus,audioHz(note)*1.004,when+.25+i*.2,13,.022,{attack:5.2,pan:(1.5-i)*.32,group:"music"});
         });
-        bar.melody.forEach((note,i)=>{if(note!==null)audioVoice(a,bus,audioHz(note),when+i,2.4,.045,{attack:.09,pan:i%2?.28:-.28,group:"music"});});
-        if(bar.shimmer)audioVoice(a,bus,audioHz(bar.chord[3]+24),when+2,2.8,.025,{attack:.65,group:"music"});
+        bar.melody.forEach((note,i)=>{if(note!==null)audioVoice(a,bus,audioHz(note),when+i,8,.018,{attack:2.8,pan:.28,group:"music"});});
+        if(bar.shimmer)audioVoice(a,bus,audioHz(bar.chord[3]+12),when+2,10,.014,{attack:4,group:"music"});
         a.nextNote=when+bar.duration;
       }
       function stopEngineAudio(){
@@ -16086,7 +16125,7 @@
       }
       function updateEngineAudio(){
         const a=audio;if(!a)return;
-        const active=game.settings.sound==="On"&&Number(game.settings.sfxVolume??.75)>0&&!titleOpen&&!paused&&!modalFreeze&&!pioneerRescue&&game.ship?.fuel>0&&
+        const active=game.settings.sound==="On"&&Number(game.settings.sfxVolume??.75)>0&&!titleOpen&&!paused&&!modalFreeze&&!pioneerRescue&&(game.ship?.orbitLocked||game.ship?.fuel>0)&&
           (keys.has("w")||keys.has("touch")||keys.has("shift")||keys.has("brake")||keys.has("s"));
         if(!active){stopEngineAudio();return;}
         const braking=keys.has("brake")||keys.has("s"),boost=keys.has("shift"),now=a.ctx.currentTime;
@@ -16106,9 +16145,9 @@
         const now=a.ctx.currentTime;
         if(kind==="click"){if(now-a.lastClick<.075)return;a.lastClick=now;}
         const tones={
-          click:[[340,0,.075,.045,260],[680,0,.04,.017,510]],
-          confirm:[[392,0,.15,.07,392],[587.33,.06,.22,.045,587.33]],
-          action:[[293.66,0,.15,.06,349.23],[440,.035,.17,.032,440]],
+          click:[[210,0,.09,.028,170],[630,0,.065,.012,420]],
+          confirm:[[196,0,.24,.045,220],[440,.055,.35,.021,440]],
+          action:[[220,0,.23,.038,185],[554,.04,.26,.016,440]],
           lock:[[196,0,.2,.08,196],[392,.065,.22,.05,392]],
           refuel:[[293.66,0,.25,.065,293.66],[440,.09,.25,.05,440],[587.33,.18,.38,.04,587.33]],
           error:[[146.83,0,.22,.075,130.81],[196,.04,.19,.025,165]],
@@ -16120,7 +16159,7 @@
           jump:[[55,0,1.1,.13,110],[110,.04,.85,.08,440],[293.66,.27,.9,.05,587.33]]
         };
         for(const [freq,offset,duration,level,finish] of tones[kind]||tones.action)
-          audioVoice(a,a.sfxGain,freq,now+offset,duration,level,{end:finish,attack:kind==="jump"?.12:.012,type:"sine"});
+          audioVoice(a,a.sfxGain,freq,now+offset,duration,level,{end:finish,attack:kind==="jump"?.12:kind==="click"?.008:.035,type:"sine"});
       }
       function vibrate(kind = "action") {
         if (!navigator.vibrate || game.settings?.vibration === "Off") return;
@@ -17983,19 +18022,19 @@
           esc(game.frigate.name) +
           '</h4></div><span class="tag rarity-unusual">' +
           (orbitingFrigate() ? "Docked" : "Remote") +
-          '</span></div><p>Choose your next move. Everything else is waiting in the decks above.</p>' +
+          '</span></div><p>Mobile headquarters • '+esc(game.system?.name||"Uncharted")+'</p>' +
           cosmeticPreviewHtml("frigate", game.frigate.skin, "Pioneer") +
           '</div>' +
-          '<div class="card pioneer-command-actions"><h4>What would you like to do?</h4><div class="pioneer-primary-actions">' +
-          btn("Explore a new system", "jumpSystem") +
-          btn("Start an adventure", "setMenuTab", "frigate|expeditions") +
-          btn("Manage my fleet", "setMenuTab", "frigate|fleet") +
-          btn("Meet the crew", "setMenuTab", "frigate|crew") +
-          '</div><div class="actions">' +
-          (game.ship.fuel < game.ship.maxFuel * 0.94
-            ? btn("Refuel Starling", "refuel")
-            : "") +
-          (!orbitingFrigate() ? btn("Locate Pioneer", "setFrigateTarget") : "") +
+          '<div class="pioneer-flight-deck"><span class="command-kicker">FLIGHT DECK</span><h4>What would you like to do?</h4><p>'+
+          (orbitingFrigate()?"Docked and ready. Replenish supplies or begin an expedition.":"Remote link active. Locate and lock orbit for onboard services.")+
+          '</p><div class="pioneer-primary-actions">'+
+          (orbitingFrigate()?btn("Explore a new system","jumpSystem"):btn("Locate Pioneer","setFrigateTarget"))+
+          (orbitingFrigate()&&game.ship.fuel<game.ship.maxFuel*.94?btn("Refuel Starling","refuel"):"")+
+          btn("Start an adventure","setMenuTab","frigate|expeditions")+
+          '</div></div>'+
+          '<div class="pioneer-deck-directory"><span class="command-kicker">SHIP DIRECTORY</span><div class="pioneer-primary-actions">'+
+          [["Manage my fleet","fleet","Deploy escorts and collect mission rewards."],["Meet the crew","crew","Recruit, train and assign specialists."],["Discovery Vault","vault","Secure discoveries and unlock records."],["Base systems","upgrades","Improve your mobile headquarters."],["Appearance","cosmetics","Equip hull and fleet designs."]].map(([label,deck,desc])=>
+            '<button class="pioneer-deck-link" type="button" data-action="setMenuTab" data-arg="frigate|'+deck+'"><b>'+esc(label)+'</b><small>'+esc(desc)+'</small></button>').join("")+
           '</div></div>' +
           '<details class="pioneer-command-details"><summary>Base details and settings</summary>' +
           '<div class="pioneer-command-metrics"><span>Base Lv. ' +
@@ -18056,7 +18095,7 @@
           .join("");
         // Deck navigation stays visible without a second wall of badges and
         // counters. Context lives inside the deck that owns the information.
-        let html = tabs;
+        let html = tab==="overview" ? "" : tabs;
         if (tab === "expeditions") html += expeditionsHtml();
         else if (tab === "crew") html += crewHtml();
         else if (tab === "fleet")
@@ -20056,11 +20095,12 @@
           ui.fuelHud.classList.toggle("low", fuelPct < 25);
         }
         ui.boostText.textContent =
+          s.orbitLocked ? "ORBIT "+Math.round(orbitMomentum(s.lockCharge))+"%" :
           (s.driftCharge || 0) > 0.08
             ? "DRIFT " + Math.round((s.driftCharge || 0) * 100) + "%"
             : Math.round((s.boost / s.maxBoost) * 100) + "%";
         ui.boostBar.style.width =
-          clamp((s.boost / s.maxBoost) * 100, 0, 100) + "%";
+          (s.orbitLocked ? orbitMomentum(s.lockCharge) : clamp((s.boost / s.maxBoost) * 100, 0, 100)) + "%";
         ui.nearest.textContent = n.body
           ? n.body.name + " " + Math.max(0, Math.round(n.d)) + " km"
           : "None";
@@ -20090,14 +20130,16 @@
             "release-mode",
             canShowOrbit && !!game.ship?.orbitLocked,
           );
-          ui.orbitRelease.textContent = game.ship?.orbitLocked
-            ? "RELEASE"
-            : "LOCK";
+          const charge = Math.round(orbitMomentum(s.lockCharge));
+          ui.orbitRelease.textContent = s.orbitLocked ? "RELEASE\n"+charge+"%" : "LOCK";
+          ui.orbitRelease.style.setProperty("--orbit-charge",charge+"%");
+          ui.touchThrust.textContent = s.orbitLocked ? "THRUST\nFREE" : "THRUST";
+          ui.touchThrust.setAttribute("aria-label",s.orbitLocked?"Thrust in orbit without fuel":"Thrust starship");
           const lockName = nLock.body?.type === "frigate"
             ? (game.frigate.name || "ODF Pioneer")
             : nLock.body?.name;
           ui.orbitRelease.setAttribute("aria-label", game.ship?.orbitLocked
-            ? "Release orbit and slingshot"
+            ? "Release orbit and slingshot, "+charge+" percent momentum"
             : lockName ? "Lock orbit around " + lockName : "Lock orbit");
           ui.orbitRelease.title = game.ship?.orbitLocked
             ? "Release orbit"
@@ -20185,10 +20227,27 @@
         );
         const nba = nextBestAction();
         if (ui.objectivePill && ui.objectivePillTitle && ui.objectivePillSub) {
+          const tutor = !!game.system.isTutorial && game.missionStage < tutorialObjectives.length && game.settings.tutorialTips!=="Off";
+          ui.objectivePill.classList.toggle("training",tutor);
           ui.objectivePill.classList.toggle("hidden", titleOpen || paused);
           ui.objectivePillTitle.textContent = nba.title;
-          ui.objectivePillSub.textContent = nba.sub;
+          ui.objectivePillSub.textContent = tutor ? tutorialFlightHint(s,game.missionStage,nba.sub) : nba.sub;
         }
+      }
+      function tutorialFlightHint(ship,stage,fallback=""){
+        if(stage===0){
+          if(ship.orbitLocked&&ship.lockBody==="Earth")return orbitMomentum(ship.lockCharge)>=95?"RELEASE toward Mars":"Hold THRUST • free orbit boost";
+          if(ship.orbitLocked&&ship.lockBody==="Mars")return "Scan, then capture Mars";
+          if(ship.orbitLocked)return "Release to travel toward Mars";
+          return "Follow Mars • BRAKE, then LOCK";
+        }
+        if(stage===1)return ship.orbitLocked&&ship.lockBody==="Earth"?"Menu → Ship Systems":"Return to Earth • LOCK";
+        if(stage===2)return ship.orbitLocked&&ship.lockBody==="Mars"?"Menu → Planet Upgrades":"Return to Mars • LOCK";
+        if(stage===3)return "Approach Venus • tap Scan";
+        if(stage===4)return ship.orbitLocked&&ship.lockBody==="Earth"?"Menu → Pioneer Project":"Return to Earth Factory";
+        if(stage===5)return "Follow Pioneer • tap LOCK";
+        if(stage===6)return "Docked? Tap Jump Outward";
+        return fallback;
       }
       function smartAction() {
         const n = nearestSurveyTarget(), fuelTarget=nearestRefuelTarget(),
@@ -20544,7 +20603,6 @@
         modalFreeze = true;
         playSound("confirm");
         vibrate("confirm");
-        ui.missionContinue.hidden = /captured|survey complete/i.test(title);
         ui.missionTitle.textContent = title;
         ui.missionSummary.textContent = summary;
         ui.missionStats.innerHTML = rows
@@ -22725,8 +22783,8 @@
             finish.addColorStop(0,"#a5cfdb");finish.addColorStop(0.16,"#4d8a9f");
             finish.addColorStop(0.4,"#17435b");finish.addColorStop(1,"#071725");
           } else {
-            finish.addColorStop(0,light(color,0.34));finish.addColorStop(0.12,color);
-            finish.addColorStop(0.32,light(color,0.08));finish.addColorStop(0.52,dark(color,0.12));finish.addColorStop(1,material==="vent"?"#050b11":"#263341");
+            finish.addColorStop(0,light(color,0.44));finish.addColorStop(0.08,light(color,.16));
+            finish.addColorStop(0.24,color);finish.addColorStop(0.42,light(color,0.06));finish.addColorStop(0.64,dark(color,0.16));finish.addColorStop(1,material==="vent"?"#050b11":dark(color,.46));
           }
           c.fillStyle=finish;c.fill();
           // Fine plating, clipped to each actual hull section (cached, not per-frame).
@@ -22765,9 +22823,14 @@
             c.beginPath();c.moveTo(mid,a[1]-z+1.5);c.lineTo(mid+1,a[1]-z+4.5);c.stroke();
           }
         }
+        // Small accent-lit hardware and bevel highlights are painted into cached hull rasters.
         for(const lamp of model.lights) {
-          c.fillStyle=lamp.color==="red"?"#f58d88":lamp.color==="cyan"?"#7ee4cf":lamp.color==="white"?"#e3eff1":skin.accent||"#8dddf5";
-          c.fillRect(lamp.x,lamp.y-3,lamp.size*2,lamp.size);
+          const color=lamp.color==="red"?"#f58d88":lamp.color==="cyan"?"#7ee4cf":lamp.color==="white"?"#e3eff1":skin.accent||"#8dddf5";
+          const x=lamp.x,y=lamp.y-3;
+          c.fillStyle="#101b27";c.fillRect(x-.65,y-.55,lamp.size*2+1.3,lamp.size+1.1);
+          c.fillStyle=rgba(color,.27);c.fillRect(x-.35,y-.35,lamp.size*2+.7,lamp.size+.7);
+          c.fillStyle=color;c.fillRect(x,y,lamp.size*2,lamp.size);
+          c.fillStyle="rgba(255,255,255,.68)";c.fillRect(x,y,Math.max(.35,lamp.size*.55),lamp.size*.55);
         }
         c.restore();
       }
@@ -26366,8 +26429,6 @@
         if (event.target.closest("button")) return;
         closeDiscoveryPanel();
       });
-      ui.upgradeContinue.onclick = closeUpgradePanel;
-      ui.missionContinue.onclick = closeMissionPanel;
       ui.upgradeOverlay.addEventListener("pointerdown", (event) => {
         if (event.target.closest("button, input, select, a")) return;
         closeUpgradePanel();

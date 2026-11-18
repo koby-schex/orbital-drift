@@ -18,6 +18,6 @@ assert.match(html,/body\.hud-collapsed \.mini-map/);
 assert.match(html,/ui\.menu\.dataset\.section = activeMenu/);
 assert.doesNotMatch(html,/id="closeDiscovery"/);
 assert.match(html,/ui\.discoveryCapture\.hidden = !available/);
-assert.match(html,/ui\.missionContinue\.hidden = \/captured\|survey complete\/i\.test\(title\)/);
+assert.doesNotMatch(html,/id="missionContinue"|id="upgradeContinue"/);
 assert.match(html,/ui\.discoveryOverlay\.addEventListener\("pointerdown"/);
 console.log("Flight interface passed: single notification, quiet saves, title hierarchy, compact HUD and survey dismissal.");
