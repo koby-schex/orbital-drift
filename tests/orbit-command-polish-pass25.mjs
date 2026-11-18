@@ -29,7 +29,7 @@ keys.clear();keys.add("touch");ship.lockBody="__FRIGATE__";ship.lockDirection=-1
 for(let i=0;i<1000;i++)update(1);
 assert.equal(ship.lockCharge,100);assert.equal(ship.fuel,42);
 assert.ok(Math.abs(Math.hypot(ship.vx-anchor.vx,ship.vy-anchor.vy)-8)<1e-8);
-const release=new Function("game","orbitAnchor","feedbackPulse","orbitReleaseSpeed","toast","finalizeEcho",extract("releaseOrbit","orbitAnchor")+";return releaseOrbit")(game,()=>anchor,()=>{},orbit.orbitReleaseSpeed,()=>{},()=>{});
+const release=new Function("game","orbitAnchor","feedbackPulse","orbitReleaseSpeed","toast","finalizeEcho","completeContract",extract("releaseOrbit","orbitAnchor")+";return releaseOrbit")(game,()=>anchor,()=>{},orbit.orbitReleaseSpeed,()=>{},()=>{},()=>{});
 release(true);assert.equal(ship.orbitLocked,false);assert.equal(ship.fuel,42);assert.ok(Math.abs(Math.hypot(ship.vx-anchor.vx,ship.vy-anchor.vy)-12)<1e-8);
 assert.match(extract("updateShip","scanPlanet"),/if \(!s\.orbitLocked && \(keys\.has\("w"\)/);
 assert.doesNotMatch(extract("releaseOrbit","orbitAnchor"),/s\.fuel\s*=/);

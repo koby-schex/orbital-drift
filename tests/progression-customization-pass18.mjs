@@ -6,9 +6,9 @@ const bonus=new Function(extract("frontierSurveyBonus","discoveryReward")+";retu
 assert.deepEqual(bonus({rarity:"Mythic"},{isTutorial:true}),{});
 assert.deepEqual(bonus({type:"star",rarity:"Mythic"},{}),{});
 assert.deepEqual(bonus({rarity:"Common"},{}),{});
-assert.deepEqual(bonus({rarity:"Rare"},{}),{DataCores:2,Crystal:2});
-assert.deepEqual(bonus({rarity:"Exotic"},{}),{DataCores:5,Crystal:4});
-assert.deepEqual(bonus({rarity:"Mythic"},{}),{DataCores:8,Crystal:6,DarkMatter:1});
+assert.deepEqual(bonus({rarity:"Rare"},{}),{DataCores:3,Crystal:3});
+assert.deepEqual(bonus({rarity:"Exotic"},{}),{DataCores:7,Crystal:5});
+assert.deepEqual(bonus({rarity:"Mythic"},{}),{DataCores:10,Crystal:8,DarkMatter:1});
 const game={monetization:{}},window={};
 const mode=new Function("game","window",extract("cosmeticStoreMode","cosmeticPurchaseButton")+";return cosmeticStoreMode")(game,window);
 assert.equal(mode(),"web");

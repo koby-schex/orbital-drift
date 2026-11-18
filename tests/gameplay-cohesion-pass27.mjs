@@ -1,0 +1,21 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
+const extract=(a,b)=>html.slice(html.indexOf("      function "+a+"("),html.indexOf("      function "+b+"("));
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const select=new Function("rand",extract("fleetMissionSelection","generateFleetMissions")+";return fleetMissionSelection")(n=>((n*73%997)+997)%997/997);
+const templates=["exploration","resource","capture","support","anomaly"].flatMap(type=>[1,2].map(n=>({type,title:type+n})));
+for(let seed=1;seed<100;seed++){const picks=select(templates,seed,templates.filter(t=>t.title.endsWith("1")).map(t=>t.title));assert.equal(new Set(picks.map(t=>t.type)).size,5);assert.ok(picks.every(t=>t.title.endsWith("2")));}
+const rate=new Function("TIME_SCALE","rarityBonus",extract("productionPerMinute","productionPreview")+";return {productionPerMinute,researchProductionRate}")(.72,()=>2);
+assert.equal(rate.productionPerMinute(.022),.022*60*60*.72);
+assert.equal(rate.researchProductionRate({branches:{research:2}}),.048);
+const rewarded=new Function(extract("captureAlreadyRewarded","finishCapture")+";return captureAlreadyRewarded")();
+assert.equal(rewarded({level:0,memory:{}}),false);assert.equal(rewarded({level:1}),true);assert.equal(rewarded({memory:{captureRewardClaimed:true}}),true);
+const steer=new Function("clamp",extract("highSpeedSteering","updateDrift")+";return highSpeedSteering")(clamp);
+assert.ok(steer(12,2,false,1)>steer(3,2,false,1));assert.ok(steer(12,2,true,1)>steer(12,2,false,1));assert.ok(steer(100,100,true,10)<=.25);
+assert.match(extract("raid","openChoice"),/raidRewardClaimed=true/);
+assert.match(extract("finishCapture","raid"),/if\(firstCapture\)/);
+assert.match(html,/memory: b.memory \|\| defaultMemory\(\)/);
+assert.match(html,/crewDutyPower\("fleet"\)\*1.5/);
+assert.match(html,/crewDutyPower\("systems"\)\*\.01/);
+console.log("Gameplay cohesion: varied fleet roles, production rates, first-capture migration, bounded handling and crew synergies passed.");
