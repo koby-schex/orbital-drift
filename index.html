@@ -5201,6 +5201,16 @@
       .pioneer-primary-actions button { text-align:center; justify-content:center; }
       .pioneer-primary-actions .pioneer-deck-link { display:flex; flex-direction:column; gap:5px; min-height:72px; background:#102430; }
       .pioneer-deck-link small { color:#afc4cc; font-size:11px; font-weight:400; line-height:1.4; }
+      /* Pass 26: consistent touch feedback without hover animations lingering on iOS. */
+      .menu button,.dialog button,.hud-toggle,.pause-btn,.menu-launcher { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+      .menu .content,.dialog { overflow-anchor:none; }
+      @media (hover:none) {
+        .menu button:hover,.dialog button:hover { transform:none; }
+        .mini-map:hover { transform:none; }
+      }
+      @media (prefers-reduced-motion:reduce) {
+        .menu-content-enter,.feedback-flash,.fuel-hud.low { animation:none !important; }
+      }
       @media(max-width:560px) { .menu .content { gap:8px; } .menu .grid { gap:8px; } .pioneer-deck-directory .pioneer-primary-actions {grid-template-columns:repeat(2,minmax(0,1fr));} }
     </style>
   </head>
@@ -10523,7 +10533,7 @@
             );
           }
           updateSaveStatus();
-          refreshTitleButtons();
+          refreshTitleButtons(snapshot.meta);
           return true;
         } catch (e) {
           console.error(e);
@@ -12383,7 +12393,10 @@
         );
       }
       function updateProduction(dt) {
-        updateFleetMissions();
+        const now=Date.now();
+        if(updateProduction.fleetAt===undefined||now<updateProduction.fleetAt||now-updateProduction.fleetAt>=250){
+          updateProduction.fleetAt=now;updateFleetMissions();
+        }
         if (paused || titleOpen || dt <= 0) return;
         let total = 0;
         for (const name of game.captured) {
@@ -12676,13 +12689,14 @@
       }
       function orbitMomentum(charge,dt=0,thrust=false,brake=false){
         const q=clamp(Number.isFinite(charge)?charge:0,0,100);
-        return clamp(q+Math.max(0,Number(dt)||0)*(brake?-.85:thrust?.58:0),0,100);
+        return clamp(q+Math.max(0,Number(dt)||0)*(brake?-1.25:thrust?.85:0),0,100);
       }
       function orbitRelativeSpeed(charge){
-        return 1.6+3.2*orbitMomentum(charge)/100;
+        return 1.6+6.4*orbitMomentum(charge)/100;
       }
       function orbitReleaseSpeed(charge,boost=true){
-        return boost?Math.min(6,orbitRelativeSpeed(charge)*1.2+.24):orbitRelativeSpeed(charge);
+        const q=orbitMomentum(charge)/100;
+        return boost?Math.min(12,orbitRelativeSpeed(charge)+.56+3.44*q):orbitRelativeSpeed(charge);
       }
       function releaseOrbit(boost = true) {
         const s = game.ship,
@@ -16396,6 +16410,7 @@
         const shouldResume = !menuWasPaused && !titleMenuMode && !titleOpen;
         if(!ui.menu.classList.contains("open"))return;
         activeMenu = null;
+        renderMenu.lastSection=null;
         layoutDrag = null;
         ui.menu.classList.add("closing");
         ui.menu.classList.remove("open", "in-section");
@@ -16464,11 +16479,13 @@
         )();
         hydrateSettingsControls();
         wireMenuButtons();
-        ui.menuContent.classList.remove("menu-content-enter");
-        requestAnimationFrame(() => {
-          ui.menuContent.classList.add("menu-content-enter");
-          renderSkinPreviews();
-        });
+        const sectionKey=activeMenu+"|"+(menuTabs[activeMenu]||"");
+        if(renderMenu.lastSection!==sectionKey){
+          renderMenu.lastSection=sectionKey;
+          ui.menuContent.classList.remove("menu-content-enter");
+          requestAnimationFrame(()=>{if(ui.menu.classList.contains("open"))ui.menuContent.classList.add("menu-content-enter");});
+        }
+        queueSkinPreviews();
       }
       function menuNavigationHtml() {
         const sections = [
@@ -18280,8 +18297,13 @@
         }
       }
       document.addEventListener("toggle",event=>{
-        if(event.target?.tagName==="DETAILS"&&event.target.open&&ui.menu?.contains?.(event.target))requestAnimationFrame(renderSkinPreviews);
+        if(event.target?.tagName==="DETAILS"&&event.target.open&&ui.menu?.contains?.(event.target))queueSkinPreviews();
       },true);
+      function queueSkinPreviews(){
+        if(queueSkinPreviews.pending)return;
+        queueSkinPreviews.pending=true;
+        requestAnimationFrame(()=>{queueSkinPreviews.pending=false;renderSkinPreviews();});
+      }
       function renderSkinPreviews() {
         if (!ui.menu?.classList.contains("open")) return;
         ui.menuContent
@@ -18305,8 +18327,9 @@
               height = Math.max(1, Math.round(rect.height || 156)),
               dpr = Math.min(2, window.devicePixelRatio || 1),
               c = canvas.getContext("2d");
-            canvas.width = Math.round(width * dpr);
-            canvas.height = Math.round(height * dpr);
+            const pw=Math.round(width*dpr),ph=Math.round(height*dpr);
+            if(canvas.width!==pw)canvas.width=pw;
+            if(canvas.height!==ph)canvas.height=ph;
             c.setTransform(dpr, 0, 0, dpr, 0, 0);
             c.clearRect(0, 0, width, height);
             const backdrop = c.createRadialGradient(
@@ -19750,6 +19773,10 @@
             .join("") +
           "</div>";
       }
+      function audioSettingVolume(value,fallback){
+        const n=Number(value);
+        return value!==""&&Number.isFinite(n)?clamp(n,0,1):fallback;
+      }
       function applySettingsFromMenu() {
         const wasLayout = game.settings.controlLayout,
           g = $("graphicsSelect"),
@@ -19781,8 +19808,8 @@
         if (sound) game.settings.sound = sound.value;
         if (music) game.settings.music = music.value;
         if (vib) game.settings.vibration = vib.value;
-        if (mv) game.settings.musicVolume = Number(mv.value) || 0.55;
-        if (sv) game.settings.sfxVolume = Number(sv.value) || 0.75;
+        if (mv) game.settings.musicVolume = audioSettingVolume(mv.value,0.55);
+        if (sv) game.settings.sfxVolume = audioSettingVolume(sv.value,0.75);
         if (controls) game.settings.controls = controls.value;
         if (hints) game.settings.controlHints = hints.value;
         if (joy) game.settings.joystickSize = joy.value;
@@ -20071,7 +20098,11 @@
       function updateUI() {
         if (!game.ship || !game.system) return;
         if (!ui.productionBadge) return;
-        updateAdManager();
+        // Entitlement reconciliation reads persisted data; it does not belong in the HUD tick.
+        const adNow=Date.now();
+        if(updateUI.adAt===undefined||adNow<updateUI.adAt||adNow-updateUI.adAt>=1000){
+          updateUI.adAt=adNow;updateAdManager();
+        }
         document.body.classList.toggle(
           "hud-collapsed",
           ui.hud?.classList.contains("collapsed"),
@@ -20133,7 +20164,7 @@
           const charge = Math.round(orbitMomentum(s.lockCharge));
           ui.orbitRelease.textContent = s.orbitLocked ? "RELEASE\n"+charge+"%" : "LOCK";
           ui.orbitRelease.style.setProperty("--orbit-charge",charge+"%");
-          ui.touchThrust.textContent = s.orbitLocked ? "THRUST\nFREE" : "THRUST";
+          ui.touchThrust.textContent = "THRUST";
           ui.touchThrust.setAttribute("aria-label",s.orbitLocked?"Thrust in orbit without fuel":"Thrust starship");
           const lockName = nLock.body?.type === "frigate"
             ? (game.frigate.name || "ODF Pioneer")
@@ -20625,8 +20656,9 @@
         );
         W = innerWidth;
         H = innerHeight;
-        canvas.width = Math.floor(W * DPR);
-        canvas.height = Math.floor(H * DPR);
+        const pw=Math.floor(W*DPR),ph=Math.floor(H*DPR);
+        if(canvas.width!==pw)canvas.width=pw;
+        if(canvas.height!==ph)canvas.height=ph;
         canvas.style.width = W + "px";
         canvas.style.height = H + "px";
         ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -20636,7 +20668,7 @@
         resizeTitleCanvas();
         buildBackdrop();
         applyControlPositions();
-        if(ui.menu?.classList.contains("open")) renderSkinPreviews();
+        if(ui.menu?.classList.contains("open")) queueSkinPreviews();
       }
       function resizeTitleCanvas() {
         if (!ui.titleCanvas) return;
@@ -20649,8 +20681,10 @@
           fallbackH = Math.min(560, Math.max(390, H * 0.58)),
           rw = r.width || fallbackW,
           rh = r.height || fallbackH;
-        ui.titleCanvas.width = Math.max(2, Math.floor(rw * d));
-        ui.titleCanvas.height = Math.max(2, Math.floor(rh * d));
+        const pw=Math.max(2,Math.floor(rw*d)),ph=Math.max(2,Math.floor(rh*d));
+        if(ui.titleCanvas.width!==pw)ui.titleCanvas.width=pw;
+        if(ui.titleCanvas.height!==ph)ui.titleCanvas.height=ph;
+        resizeTitleCanvas.dpr=d;
         ui.titleCanvas.style.width = rw + "px";
         ui.titleCanvas.style.height = rh + "px";
       }
@@ -24687,7 +24721,7 @@
         if (ui.titleCanvas.width < 4 || ui.titleCanvas.height < 4)
           resizeTitleCanvas();
         const c = ui.titleCanvas.getContext("2d"),
-          d = Math.max(1, Math.min(2, devicePixelRatio || 1)),
+          d = resizeTitleCanvas.dpr || Math.max(1, Math.min(2, devicePixelRatio || 1)),
           w = ui.titleCanvas.width / d,
           h = ui.titleCanvas.height / d;
         if (w < 4 || h < 4) {
@@ -24714,13 +24748,16 @@
         c.setTransform(d, 0, 0, d, 0, 0);
         c.clearRect(0, 0, w, h);
         c.save();
-        drawTitleMobileBackdrop(c, w, h);
-        drawTitleMobilePlanet(c, w, h);
-        drawTitleMobileHeroShip(c, w, h, shipSkin);
-        drawTitleMobileForeground(c, w, h);
-        game.shipSystems = oldSystems || game.shipSystems;
-        game.upgradeLevel = oldUpgradeLevel;
-        c.restore();
+        try{
+          drawTitleMobileBackdrop(c, w, h);
+          drawTitleMobilePlanet(c, w, h);
+          drawTitleMobileHeroShip(c, w, h, shipSkin);
+          drawTitleMobileForeground(c, w, h);
+        }finally{
+          game.shipSystems = oldSystems;
+          game.upgradeLevel = oldUpgradeLevel;
+          c.restore();
+        }
       }
       // The same resolver drives both the lock button and its visual cue.
       function drawFlightContact() {
@@ -24762,13 +24799,19 @@
         }
         return cinematicTimeScale;
       }
+      function frameCadence(now,previous,next,limited){
+        if(!limited||previous===undefined||now<previous||!Number.isFinite(next)||next<now-1000)
+          return {draw:true,next:now+1000/30};
+        if(now+.1<next)return {draw:false,next};
+        const span=1000/30;
+        return {draw:true,next:next+Math.max(1,Math.floor((now+.1-next)/span)+1)*span};
+      }
       function shouldRenderFrame(now) {
         const limited = titleOpen || paused || modalFreeze || game.settings?.performanceMode === "Battery Saver";
-        if (!limited || loop.drawAt === undefined || now < loop.drawAt || now - loop.drawAt >= 1000 / 30 - 0.1) {
-          loop.drawAt = now;
-          return true;
-        }
-        return false;
+        const result=frameCadence(now,loop.drawAt,loop.nextDrawAt,limited);
+        loop.nextDrawAt=result.next;
+        if(result.draw)loop.drawAt=now;
+        return result.draw;
       }
       function followShipCamera(frameUnits = 1) {
         const ease = 1 - Math.pow(0.92, Math.max(0, frameUnits));
@@ -24793,6 +24836,11 @@
         return stats ? {frames:stats.frames, meanFrameMs:Number((stats.elapsed/stats.frames).toFixed(2)),
           slowFrames:stats.slow, worstFrameMs:Number(stats.worst.toFixed(2))} : {frames:0};
       }
+      function flightSubsteps(dt){
+        if(!Number.isFinite(dt)||dt<=0)return [];
+        const total=Math.min(2,dt),count=Math.ceil(total);
+        return Array(count).fill(total/count);
+      }
       function loop(now) {
         // Queue before drawing so a transient rendering exception cannot permanently kill flight.
         requestAnimationFrame(loop);
@@ -24800,24 +24848,29 @@
         const flying = !paused && !titleOpen && !modalFreeze;
         const sample = flightFrameSample(loop.last, now, flying && loop.wasFlying);
         loop.wasFlying = flying;
-        lastFrameMs = Math.max(0, Math.min(80, now - (loop.last || now)));
+        // A resumed or newly unpaused frame must not integrate the time spent away.
+        lastFrameMs = flying && !sample ? 0 : Math.max(0, Math.min(80, now - (loop.last || now)));
         if (sample) {
           fps = fps * 0.92 + (1000 / sample) * 0.08;
           recordFlightPerformance(sample);
         }
         performanceGuard(sample);
-        const frameUnits = Math.max(0.05, lastFrameMs / 16.67);
+        const frameUnits = Math.max(0, lastFrameMs / (1000/60));
         updateCinematicTimeScale(frameUnits);
         const dt =
           Math.min(2, frameUnits * TIME_SCALE) * cinematicTimeScale;
         loop.last = now;
         if (!paused && !titleOpen && !modalFreeze) {
-          t += dt;
-          updateBodies(game.system);
-          updateShip(dt);
-          updateProduction(dt);
+          // Short integration steps keep acceleration and orbit motion consistent during stalls.
+          for(const step of flightSubsteps(dt)){
+            if(paused||titleOpen||modalFreeze)break;
+            t += step;
+            updateBodies(game.system);
+            updateShip(step);
+            updateProduction(step);
+          }
           updateSystemVisualPhenomena();
-          followShipCamera(frameUnits);
+          followShipCamera(Math.min(2,frameUnits));
           autosave();
         }
         const batterySaver = game.settings?.performanceMode === "Battery Saver";
@@ -24831,7 +24884,9 @@
           audio.nextNote < audio.ctx.currentTime + 1.5
         )
           scheduleMusic();
-        updateEngineAudio();
+        if(!flying||loop.engineAt===undefined||now<loop.engineAt||now-loop.engineAt>=40){
+          updateEngineAudio();loop.engineAt=now;
+        }
         if (shouldRenderFrame(now)) draw();
         if (!loop.mapAt || now - loop.mapAt >= (batterySaver ? 125 : 66)) {
           drawMiniMap(); loop.mapAt = now;
@@ -26051,7 +26106,13 @@
         refreshFleetMissionsRewarded,
         noop,
       });
-      addEventListener("resize", resize);
+      // Mobile viewport changes can arrive in bursts while browser chrome settles.
+      function queueViewportResize(){
+        if(queueViewportResize.pending)return;
+        queueViewportResize.pending=true;
+        requestAnimationFrame(()=>{queueViewportResize.pending=false;resize();});
+      }
+      addEventListener("resize", queueViewportResize);
       addEventListener("storage", (event) => {
         if (event.key === SAVE_KEY || event.key === SAVE_BACKUP_KEY || event.key === null)
           refreshTitleButtons();
@@ -26080,6 +26141,7 @@
         loop.last = 0;
         loop.nativeInactive = false;
         loop.wasFlying = false;
+        loop.drawAt=loop.nextDrawAt=loop.engineAt=loop.hudAt=loop.mapAt=undefined;
         keys.clear();
         endTouch();
         if (audio && (game.settings?.music === "On" || game.settings?.sound === "On"))
@@ -26305,8 +26367,8 @@
         setHudCollapsed(true);
         if (!loaded && !onboardingDismissed) showOnboarding(0);
       }
-      function refreshTitleButtons() {
-        const meta = getStoredSaveMeta(),
+      function refreshTitleButtons(knownMeta = undefined) {
+        const meta = knownMeta === undefined ? getStoredSaveMeta() : knownMeta,
           has = !!meta,
           load = $("loadBtn");
         if (load) {
