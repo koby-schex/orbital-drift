@@ -1,0 +1,21 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
+const extract=(a,b)=>html.slice(html.indexOf("      function "+a+"("),html.indexOf("      function "+b+"("));
+const score=new Function(extract("scoreBar","ensureAudio")+";return {scoreBar,audioHz}")();
+assert.equal(score.audioHz(69),440);
+for(let i=0;i<32;i++){const bar=score.scoreBar(i);assert.deepEqual(bar,score.scoreBar(i+32));assert.equal(bar.chord.length,4);}
+assert.notDeepEqual(score.scoreBar(0),score.scoreBar(8));
+assert.doesNotMatch(extract("scheduleMusic","stopEngineAudio"),/Math.random|setTimeout/);
+const parallax=new Function("W","H",extract("backdropParallax","drawBackdrop")+";return backdropParallax")(390,844);
+assert.deepEqual(parallax(100,100,"Reduced"),{x:0,y:0});
+assert.ok(parallax(100,0).x<0);assert.ok(Math.abs(parallax(1e6,1e6).x)<14);
+const card=new Function("esc",extract("card","secondaryDetails")+";return card")(s=>s);
+assert.match(card("A","<div>Nested</div>"),/<div class="card-body"><div>Nested<\/div><\/div>/);
+assert.match(html,/\.menu \.section-tabs, \.menu \.menu-nav, \.menu \.menu-quick-actions \{ position: static/);
+assert.match(html,/\.touch, \.brake \{ bottom: calc\(10px/);
+assert.match(html,/\.orbit-release \{ bottom: calc\(108px/);
+assert.match(html,/\.smart \{ bottom: calc\(208px/);
+assert.doesNotMatch(html,/toast\("Audio enabled|toast\("Visual detail adjusted/);
+assert.doesNotMatch(extract("drawMiniMap","drawCinematicLight"),/!ui\.miniMapCanvas\s*\|\|\s*ui\.hud\?\.classList\.contains/);
+console.log("Audio score, scrolling content, radar, parallax and compact flight layout passed.");

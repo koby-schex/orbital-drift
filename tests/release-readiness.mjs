@@ -836,8 +836,8 @@ assert.ok(readiness.every((check) => check.pass), `Runtime release checks failed
 
 assert.match(html, /bottom:\s*calc\(var\(--miniMapSize\) \+ 30px/, "Desktop action must clear Nav Map");
 const compactFlightCss = html.slice(html.indexOf("/* Pass 23: compact flight controls"));
-assert.match(compactFlightCss, /\.smart\s*\{\s*bottom:\s*calc\(354px/, "Mobile action must clear controls and Nav Map");
-assert.ok(354 >= 254 + 92 + 8, "Context action must clear even the large orbit button");
+assert.match(compactFlightCss, /\.smart\s*\{\s*bottom:\s*calc\(208px/, "Mobile action must clear controls and Nav Map");
+assert.ok(208 >= 108 + 92 + 8, "Context action must clear even the large orbit button");
 assert.ok(112 >= 14 + 92 + 6, "Brake must clear the large thrust button");
 const thrustSizes = [...html.matchAll(/--thrustSize:\s*(\d+)px/g)].map(match => Number(match[1]));
 assert.equal(thrustSizes[0], 68, "Default thrust control must match the approved compact layout");

@@ -5064,7 +5064,7 @@
       .menu[data-section="upgrades"] .upgrade-result { text-align: center; overflow-wrap: anywhere; }
       .menu[data-section="upgrades"] .upgrade-card .actions button { width: 100%; min-height: 44px; }
       .menu[data-section="upgrades"] .section-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
-      body.hud-collapsed .mini-map, body.hud-collapsed .flight-save-status { display: none; }
+      body.hud-collapsed .flight-save-status { display: none; }
       body.hud-collapsed .hud .logo { display: none; }
       body.hud-collapsed .hud { min-width: 0; padding: 4px; background: rgba(5,13,21,.7); box-shadow: none; }
       body.hud-collapsed .hud-toggle { min-height: 44px; min-width: 66px; font-size: 12px; }
@@ -5140,16 +5140,40 @@
       .pause-btn { min-width: 44px; min-height: 44px; }
       .menu-launcher { min-width: 72px; min-height: 44px; padding: 6px 10px; }
       @media (max-width: 900px) {
-        .touch, .brake { bottom: calc(156px + var(--safeBottom)); }
-        .orbit-release { bottom: calc(254px + var(--safeBottom)); }
+        .touch, .brake { bottom: calc(10px + var(--safeBottom)); }
+        .orbit-release { bottom: calc(108px + var(--safeBottom)); }
         .brake { right: 112px; }
         body:not(.thrust-large) .brake { right: 88px; }
-        .stick { bottom: calc(140px + var(--safeBottom)); }
-        .smart { bottom: calc(354px + var(--safeBottom)); }
+        .stick { bottom: calc(60px + var(--safeBottom)); }
+        .smart { bottom: calc(208px + var(--safeBottom)); }
         .menu-launcher, .pause-btn { top: calc(10px + var(--safeTop)); }
         .menu-launcher { right: 64px; }
-        .mini-map { width: 104px; height: 104px; padding: 6px; }
+        .fuel-hud { width: min(140px, calc(100vw - 214px)); max-width: 140px; }
       }
+      /* Pass 24: independent radar, left-side detail panel, scrolling menu content. */
+      .mini-map, body.hud-collapsed .mini-map { display: block; left: 10px; right: auto; top: calc(10px + var(--safeTop)); bottom: auto; width: 94px; height: 94px; padding: 4px; border-radius: 12px; }
+      .mini-map-label { top: 5px; left: 8px; font-size: 8px; letter-spacing: .04em; }
+      body.menu-open .mini-map, body.pause-open .mini-map, body.layout-edit .mini-map { display: none !important; }
+      .hud, .hud.collapsed, body.hud-collapsed .hud, .hud:not(.collapsed) { left: 10px; top: calc(110px + var(--safeTop)); right: auto; width: min(190px, calc(100vw - 186px)); min-width: 0; max-width: none; transform: none; padding: 8px; }
+      .hud:not(.collapsed) { max-height: max(44px, calc(100dvh - var(--safeTop) - var(--safeBottom) - 374px)); overflow-y: auto; overscroll-behavior: contain; }
+      .hud.collapsed, body.hud-collapsed .hud { width: 94px; padding: 0; background: transparent; border: 0; }
+      .hud .top { display: flex; flex-direction: column; align-items: stretch; }
+      .hud .logo { display: none; }
+      .hud .badge { white-space: normal; overflow-wrap: anywhere; }
+      .hud .hud-toggle { order: -1; min-height: 44px; width: 100%; }
+      .hud .stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .hud .stat strong { white-space: normal; overflow-wrap: anywhere; }
+      .objective-pill { left: auto; right: 10px; top: calc(59px + var(--safeTop)); transform: none; width: min(180px, calc(100vw - 210px)); }
+      .objective-pill:active { transform: scale(.985); }
+      .menu .section-tabs, .menu .menu-nav, .menu .menu-quick-actions { position: static; top: auto; bottom: auto; z-index: auto; }
+      .menu .menu-quick-actions { margin: 12px 0 0; padding: 8px 0; background: transparent; box-shadow: none; }
+      .menu .card-body { color: var(--muted); font-size: 12px; line-height: 1.5; min-width: 0; }
+      .menu .card .menu-secondary-details, .menu .menu-secondary-body .menu-secondary-details { border: 0; background: transparent; box-shadow: none; border-radius: 0; margin: 8px 0; }
+      .menu .menu-secondary-details > summary { border-bottom: 1px solid rgba(165,199,209,.14); padding-inline: 4px; }
+      .menu .menu-secondary-body { padding: 8px 0 0; }
+      .menu .menu-secondary-body .card, .menu .card-body > .card, .menu .card .card { border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 10px 0; margin: 0; border-bottom: 1px solid rgba(165,199,209,.12); }
+      .menu .menu-secondary-body .card::before, .menu .card .card::before { display: none; }
+      .menu .menu-secondary-body .card:last-child, .menu .card .card:last-child { border-bottom: 0; }
     </style>
   </head>
   <body>
@@ -5736,7 +5760,6 @@
         upgradeFX = [],
         captureFX = [],
         jumpArrivalFX = null,
-        audioNoticeShown = false,
         touch = { active: false, x: 0, y: 0 },
         layoutDrag = null,
         keys = new Set(),
@@ -12600,6 +12623,7 @@
         });
         if (b.type !== "frigate") selectedPlanetName = b.name;
         startEcho("orbit", b.type === "frigate" ? "Frigate" : b.name);
+        playSound("lock");
         toast(
           "Orbit locked around " +
             (b.type === "frigate"
@@ -13043,6 +13067,7 @@
         if (n.body) {
           game.ship.fuel = game.ship.maxFuel;
           recordPlanet(n.body, "refuels", 1);
+          playSound("refuel");
           toast("Refueled at " + n.body.name + ".");
           saveGame(false);
         } else
@@ -15970,328 +15995,132 @@
         ui.feedbackFlash.className = "feedback-flash show";
         setTimeout(() => ui.feedbackFlash.classList.remove("show"), 430);
       }
-      function ensureAudio() {
-        if (audio) return audio;
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return null;
-        const ctxA = new AC(),
-          master = ctxA.createGain(),
-          musicGain = ctxA.createGain(),
-          sfxGain = ctxA.createGain(),
-          filter = ctxA.createBiquadFilter(),
-          delay = ctxA.createDelay(2.8),
-          delayGain = ctxA.createGain(),
-          verb = ctxA.createDelay(1.6),
-          verbGain = ctxA.createGain();
-        master.gain.value = 0.78;
-        musicGain.gain.value = 0;
-        sfxGain.gain.value = 0.65;
-        filter.type = "lowpass";
-        filter.frequency.value = 1450;
-        filter.Q.value = 0.55;
-        delay.delayTime.value = 0.54;
-        delayGain.gain.value = 0.22;
-        verb.delayTime.value = 1.18;
-        verbGain.gain.value = 0.16;
-        musicGain.connect(filter);
-        filter.connect(master);
-        filter.connect(delay);
-        delay.connect(delayGain);
-        delayGain.connect(filter);
-        filter.connect(verb);
-        verb.connect(verbGain);
-        verbGain.connect(master);
-        sfxGain.connect(master);
-        master.connect(ctxA.destination);
-        audio = {
-          ctx: ctxA,
-          master,
-          musicGain,
-          sfxGain,
-          filter,
-          delay,
-          delayGain,
-          verb,
-          verbGain,
-          started: false,
-          drones: [],
-          sequenceTimer: null,
-          noise: null,
-          nextNote: 0,
-          scale: [196, 220, 246.94, 293.66, 329.63, 392, 440, 493.88, 587.33],
-          lastChord: -1,
-        };
-        return audio;
+      // Original 32-bar ambient score with recurring melodic phrases.
+      function scoreBar(index) {
+        const chords=[[50,57,60,64],[46,53,57,60],[53,60,64,67],[48,55,62,64],
+          [50,57,60,65],[46,53,60,65],[55,62,65,69],[48,55,60,64]];
+        const melody=[[69,null,72,74],[69,null,65,null],[67,69,null,72],[64,null,67,null],
+          [69,null,72,76],[74,null,72,null],[70,69,null,67],[64,null,65,null]];
+        const bar=((index%32)+32)%32, phrase=Math.floor(bar/8), step=bar%8;
+        return {chord:chords[step],melody:phrase===0||phrase===2?melody[step]:melody[step].map((v,i)=>i%2===0?v:null),
+          bass:chords[step][0]-12,shimmer:phrase===2,duration:4};
       }
-      function resumeAudio(sync = true) {
-        const first = !audio;
-        const a = ensureAudio();
-        if (!a) return null;
-        if (a.ctx.state === "suspended") a.ctx.resume().catch?.(() => {});
-        if (sync && !audioSyncing) syncAudioSettings();
-        if (first && !audioNoticeShown) {
-          audioNoticeShown = true;
-          toast("Audio enabled. Music and sound can be changed in Settings.");
-          addActivity(
-            "audio",
-            "Audio enabled",
-            "Music and sound can be changed in Settings.",
-          );
-        }
+      function audioHz(note){return 440*Math.pow(2,(note-69)/12);}
+      function ensureAudio() {
+        if(audio)return audio;
+        const AC=window.AudioContext||window.webkitAudioContext;
+        if(!AC)return null;
+        try {
+          const ctx=new AC(),master=ctx.createGain(),musicGain=ctx.createGain(),sfxGain=ctx.createGain(),
+            limiter=ctx.createDynamicsCompressor(),ambience=ctx.createDelay(.8),echo=ctx.createGain();
+          master.gain.value=.8;musicGain.gain.value=0;sfxGain.gain.value=0;
+          limiter.threshold.value=-15;limiter.knee.value=12;limiter.ratio.value=4;
+          limiter.attack.value=.008;limiter.release.value=.22;
+          ambience.delayTime.value=.37;echo.gain.value=.14;
+          musicGain.connect(master);musicGain.connect(ambience);ambience.connect(echo);echo.connect(master);
+          sfxGain.connect(master);master.connect(limiter);limiter.connect(ctx.destination);
+          audio={ctx,master,musicGain,sfxGain,started:false,nextNote:0,bar:0,voices:new Set(),lastClick:-10,engine:null};
+          return audio;
+        }catch(error){console.warn("Audio unavailable",error);return null;}
+      }
+      function resumeAudio(sync=true){
+        const a=ensureAudio();if(!a)return null;
+        if(a.ctx.state==="suspended"||a.ctx.state==="interrupted")a.ctx.resume().catch(()=>{});
+        if(sync&&!audioSyncing)syncAudioSettings();
         return a;
       }
-      function syncAudioSettings() {
-        const a = audio;
-        if (!a || audioSyncing) return;
-        audioSyncing = true;
-        const now = a.ctx.currentTime,
-          mv =
-            game.settings.music === "On"
-              ? Number(game.settings.musicVolume ?? 0.55)
-              : 0,
-          sv =
-            game.settings.sound === "On"
-              ? Number(game.settings.sfxVolume ?? 0.75)
-              : 0;
-        a.musicGain.gain.cancelScheduledValues(now);
-        a.musicGain.gain.setTargetAtTime(mv * 0.34, now, 0.7);
-        a.sfxGain.gain.cancelScheduledValues(now);
-        a.sfxGain.gain.setTargetAtTime(sv * 0.75, now, 0.08);
-        if (game.settings.music === "On") startMusic();
-        else stopMusic(false);
-        audioSyncing = false;
+      function syncAudioSettings(){
+        const a=audio;if(!a||audioSyncing)return;
+        audioSyncing=true;
+        try{
+          const now=a.ctx.currentTime,mv=game.settings.music==="On"?Number(game.settings.musicVolume??.55):0,
+            sv=game.settings.sound==="On"?Number(game.settings.sfxVolume??.75):0;
+          a.musicGain.gain.setTargetAtTime(clamp(mv,0,1)*.55,now,.18);
+          a.sfxGain.gain.setTargetAtTime(clamp(sv,0,1)*.65,now,.05);
+          if(game.settings.music==="On"&&mv>0)startMusic();else stopMusic();
+          if(game.settings.sound!=="On"||sv<=0)stopEngineAudio();
+        }finally{audioSyncing=false;}
       }
-      function startMusic() {
-        const a = resumeAudio(false);
-        if (!a || a.started) return;
-        a.started = true;
-        const now = a.ctx.currentTime;
-        a.nextNote = Math.max(a.nextNote || 0, now);
-        const droneFreqs = [49, 73.5, 98, 146.83];
-        a.drones = droneFreqs.map((f, i) => {
-          const osc = a.ctx.createOscillator(),
-            gain = a.ctx.createGain(),
-            pan = a.ctx.createStereoPanner ? a.ctx.createStereoPanner() : null,
-            lfo = a.ctx.createOscillator(),
-            lfoGain = a.ctx.createGain();
-          osc.type = i % 2 ? "sine" : "triangle";
-          osc.frequency.value = f;
-          lfo.frequency.value = 0.025 + i * 0.011;
-          lfoGain.gain.value = 2.5 + i * 0.7;
-          lfo.connect(lfoGain);
-          lfoGain.connect(osc.frequency);
-          gain.gain.value = (0.018 / (i + 1)) * 2.2;
-          osc.connect(gain);
-          if (pan) {
-            pan.pan.value = (i - 1.5) * 0.28;
-            gain.connect(pan);
-            pan.connect(a.musicGain);
-          } else gain.connect(a.musicGain);
-          osc.start(now + i * 0.08);
-          lfo.start(now + i * 0.08);
-          return { osc, gain, lfo, lfoGain, pan };
+      function audioVoice(a,bus,f,when,duration,level,{type="sine",end=f,attack=.025,pan=0,group="sfx"}={}){
+        if(a.voices.size>=96)return;
+        const o=a.ctx.createOscillator(),g=a.ctx.createGain(),p=a.ctx.createStereoPanner?a.ctx.createStereoPanner():null;
+        const finish=when+duration;
+        o.type=type;o.frequency.setValueAtTime(Math.max(20,f),when);
+        o.frequency.exponentialRampToValueAtTime(Math.max(20,end),finish);
+        g.gain.setValueAtTime(.0001,when);g.gain.linearRampToValueAtTime(level,Math.min(finish-.01,when+attack));
+        g.gain.exponentialRampToValueAtTime(.0001,finish);
+        o.connect(g);if(p){p.pan.value=pan;g.connect(p);p.connect(bus);}else g.connect(bus);
+        const voice={o,g,p,group};a.voices.add(voice);
+        o.onended=()=>{a.voices.delete(voice);o.disconnect();g.disconnect();p?.disconnect();};
+        o.start(when);o.stop(finish+.02);
+      }
+      function startMusic(){
+        const a=audio;if(!a||a.started)return;
+        a.started=true;a.nextNote=a.ctx.currentTime+.08;scheduleMusic();
+      }
+      function stopMusic(){
+        const a=audio;if(!a||!a.started)return;
+        a.started=false;a.nextNote=0;
+        for(const voice of a.voices)if(voice.group==="music"){
+          try{voice.g.gain.cancelScheduledValues(a.ctx.currentTime);voice.g.gain.setTargetAtTime(.0001,a.ctx.currentTime,.025);voice.o.stop(a.ctx.currentTime+.1);}catch(e){}
+        }
+      }
+      function scheduleMusic(){
+        const a=audio;if(!a||!a.started||game.settings.music!=="On")return;
+        const now=a.ctx.currentTime;if(a.nextNote<now-.25)a.nextNote=now+.08;
+        if(a.nextNote>now+1.5)return;
+        const bar=scoreBar(a.bar++),when=Math.max(now+.02,a.nextNote),bus=a.musicGain;
+        audioVoice(a,bus,audioHz(bar.bass),when,4.6,.095,{attack:.9,group:"music"});
+        bar.chord.forEach((note,i)=>{
+          audioVoice(a,bus,audioHz(note+12),when,5.1,.047,{type:i%2?"sine":"triangle",attack:1.25,pan:(i-1.5)*.32,group:"music"});
+          audioVoice(a,bus,audioHz(note+12)*1.003,when+.05,5,.019,{attack:1.5,pan:(1.5-i)*.29,group:"music"});
         });
-        scheduleMusic();
+        bar.melody.forEach((note,i)=>{if(note!==null)audioVoice(a,bus,audioHz(note),when+i,2.4,.045,{attack:.09,pan:i%2?.28:-.28,group:"music"});});
+        if(bar.shimmer)audioVoice(a,bus,audioHz(bar.chord[3]+24),when+2,2.8,.025,{attack:.65,group:"music"});
+        a.nextNote=when+bar.duration;
       }
-      function stopMusic(hard = false) {
-        if (!audio) return;
-        const a = audio,
-          now = a.ctx.currentTime;
-        if (a.sequenceTimer) {
-          clearTimeout(a.sequenceTimer);
-          a.sequenceTimer = null;
+      function stopEngineAudio(){
+        const a=audio;if(!a?.engine)return;
+        const engine=a.engine;a.engine=null;
+        try{engine.gain.gain.setTargetAtTime(.0001,a.ctx.currentTime,.04);engine.osc.stop(a.ctx.currentTime+.2);}catch(e){}
+      }
+      function updateEngineAudio(){
+        const a=audio;if(!a)return;
+        const active=game.settings.sound==="On"&&Number(game.settings.sfxVolume??.75)>0&&!titleOpen&&!paused&&!modalFreeze&&!pioneerRescue&&game.ship?.fuel>0&&
+          (keys.has("w")||keys.has("touch")||keys.has("shift")||keys.has("brake")||keys.has("s"));
+        if(!active){stopEngineAudio();return;}
+        const braking=keys.has("brake")||keys.has("s"),boost=keys.has("shift"),now=a.ctx.currentTime;
+        if(!a.engine){
+          const osc=a.ctx.createOscillator(),gain=a.ctx.createGain(),filter=a.ctx.createBiquadFilter();
+          osc.type="triangle";osc.frequency.value=48;filter.type="lowpass";filter.frequency.value=200;
+          gain.gain.value=.0001;osc.connect(filter);filter.connect(gain);gain.connect(a.sfxGain);
+          osc.onended=()=>{osc.disconnect();filter.disconnect();gain.disconnect();};osc.start();a.engine={osc,gain,filter};
         }
-        if (hard) {
-          a.drones.forEach((d) => {
-            try {
-              d.osc.stop();
-              d.lfo.stop();
-            } catch (e) {}
-          });
-          a.drones = [];
-          a.started = false;
-        } else if (game.settings.music !== "On") {
-          a.musicGain.gain.setTargetAtTime(0, now, 0.8);
-          setTimeout(() => {
-            if (audio && game.settings.music !== "On") {
-              audio.drones.forEach((d) => {
-                try {
-                  d.osc.stop();
-                } catch (e) {}
-                try {
-                  d.lfo.stop();
-                } catch (e) {}
-              });
-              audio.drones = [];
-              audio.started = false;
-            }
-          }, 1100);
-        }
+        const e=a.engine;e.osc.frequency.setTargetAtTime(braking?42:boost?78:56,now,.12);
+        e.filter.frequency.setTargetAtTime(boost?320:180,now,.12);
+        e.gain.gain.setTargetAtTime(braking?.035:boost?.075:.052,now,.09);
       }
-      function scheduleMusic() {
-        const a = audio;
-        if (!a || game.settings.music !== "On") return;
-        const now = a.ctx.currentTime,
-          bar = 3.8;
-        while (a.nextNote < now + 8) {
-          const idx =
-              (Math.floor(a.nextNote / bar) +
-                currentSystemIndex +
-                game.missionStage) %
-              a.scale.length,
-            root = a.scale[idx],
-            chord = [root, root * 1.5, root * 2, root * 2.5],
-            when = a.nextNote;
-          playMusicChord(chord, when, bar * 1.25);
-          if (Math.random() > 0.35)
-            playMusicPing(
-              a.scale[(idx + 3) % a.scale.length] * 2,
-              when + bar * 0.5,
-              1.8,
-            );
-          a.nextNote = when + bar;
-        }
-        a.sequenceTimer = setTimeout(scheduleMusic, 900);
-      }
-      function playMusicChord(freqs, when, dur) {
-        const a = audio;
-        if (!a) return;
-        freqs.forEach((f, i) => {
-          const o = a.ctx.createOscillator(),
-            g = a.ctx.createGain(),
-            p = a.ctx.createStereoPanner ? a.ctx.createStereoPanner() : null;
-          o.type = i % 2 ? "sine" : "triangle";
-          o.frequency.setValueAtTime(f, when);
-          o.frequency.exponentialRampToValueAtTime(
-            f * (1.002 + i * 0.001),
-            when + dur,
-          );
-          g.gain.setValueAtTime(0, when);
-          g.gain.linearRampToValueAtTime(0.018 / (i + 1), when + 1.2);
-          g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
-          o.connect(g);
-          if (p) {
-            p.pan.value = (i - 1.5) * 0.18;
-            g.connect(p);
-            p.connect(a.musicGain);
-          } else g.connect(a.musicGain);
-          o.start(when);
-          o.stop(when + dur + 0.1);
-        });
-      }
-      function playMusicPing(f, when, dur) {
-        const a = audio;
-        if (!a) return;
-        const o = a.ctx.createOscillator(),
-          g = a.ctx.createGain();
-        o.type = "sine";
-        o.frequency.setValueAtTime(f, when);
-        o.frequency.exponentialRampToValueAtTime(f * 1.01, when + dur);
-        g.gain.setValueAtTime(0, when);
-        g.gain.linearRampToValueAtTime(0.024, when + 0.08);
-        g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
-        o.connect(g);
-        g.connect(a.musicGain);
-        o.start(when);
-        o.stop(when + dur + 0.05);
-      }
-      function playSound(kind = "action") {
-        if (game.settings?.sound !== "On") return;
-        const a = resumeAudio();
-        if (!a) return;
-        const now = a.ctx.currentTime,
-          sv = Number(game.settings.sfxVolume ?? 0.75),
-          g = a.ctx.createGain(),
-          o = a.ctx.createOscillator(),
-          p = a.ctx.createStereoPanner ? a.ctx.createStereoPanner() : null;
-        let f1 = 440,
-          f2 = 660,
-          d = 0.22,
-          type = "sine",
-          vol = 0.11;
-        if (kind === "daily") {
-          f1 = 740;
-          f2 = 1110;
-          d = 0.52;
-          type = "triangle";
-          vol = 0.15;
-        } else if (kind === "event") {
-          f1 = 300;
-          f2 = 900;
-          d = 0.58;
-          type = "sine";
-          vol = 0.16;
-        } else if (kind === "capture") {
-          f1 = 392;
-          f2 = 784;
-          d = 0.42;
-          type = "triangle";
-          vol = 0.16;
-        } else if (kind === "upgrade") {
-          f1 = 523.25;
-          f2 = 1046.5;
-          d = 0.62;
-          type = "sine";
-          vol = 0.18;
-        } else if (kind === "slingshot") {
-          f1 = 220;
-          f2 = 880;
-          d = 0.5;
-          type = "sawtooth";
-          vol = 0.09;
-        } else if (kind === "error") {
-          f1 = 160;
-          f2 = 120;
-          d = 0.24;
-          type = "square";
-          vol = 0.08;
-        } else if (kind === "confirm") {
-          f1 = 440;
-          f2 = 660;
-          d = 0.2;
-          type = "sine";
-          vol = 0.1;
-        } else if (kind === "click") {
-          f1 = 660;
-          f2 = 770;
-          d = 0.08;
-          type = "sine";
-          vol = 0.045;
-        }
-        o.type = type;
-        o.frequency.setValueAtTime(f1, now);
-        o.frequency.exponentialRampToValueAtTime(Math.max(20, f2), now + d);
-        g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(vol * sv, now + 0.018);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + d);
-        o.connect(g);
-        if (p) {
-          p.pan.value = (Math.random() - 0.5) * 0.24;
-          g.connect(p);
-          p.connect(a.sfxGain);
-        } else g.connect(a.sfxGain);
-        o.start(now);
-        o.stop(now + d + 0.03);
-        if (kind === "slingshot" || kind === "upgrade" || kind === "capture")
-          playSparkle(kind, now + 0.05);
-      }
-      function playSparkle(kind, when) {
-        const a = audio;
-        if (!a) return;
-        const base = kind === "upgrade" ? 880 : kind === "capture" ? 660 : 520;
-        for (let i = 0; i < 4; i++) {
-          const o = a.ctx.createOscillator(),
-            g = a.ctx.createGain();
-          o.type = "sine";
-          o.frequency.setValueAtTime(base * (1 + i * 0.25), when + i * 0.045);
-          g.gain.setValueAtTime(0.0001, when + i * 0.045);
-          g.gain.linearRampToValueAtTime(0.035, when + i * 0.045 + 0.02);
-          g.gain.exponentialRampToValueAtTime(0.0001, when + i * 0.18 + 0.22);
-          o.connect(g);
-          g.connect(a.sfxGain);
-          o.start(when + i * 0.045);
-          o.stop(when + i * 0.18 + 0.24);
-        }
+      function playSound(kind="action"){
+        if(game.settings?.sound!=="On"||Number(game.settings.sfxVolume??.75)<=0)return;
+        const a=resumeAudio();if(!a)return;
+        const now=a.ctx.currentTime;
+        if(kind==="click"){if(now-a.lastClick<.075)return;a.lastClick=now;}
+        const tones={
+          click:[[340,0,.075,.045,260],[680,0,.04,.017,510]],
+          confirm:[[392,0,.15,.07,392],[587.33,.06,.22,.045,587.33]],
+          action:[[293.66,0,.15,.06,349.23],[440,.035,.17,.032,440]],
+          lock:[[196,0,.2,.08,196],[392,.065,.22,.05,392]],
+          refuel:[[293.66,0,.25,.065,293.66],[440,.09,.25,.05,440],[587.33,.18,.38,.04,587.33]],
+          error:[[146.83,0,.22,.075,130.81],[196,.04,.19,.025,165]],
+          capture:[[293.66,0,.38,.09,293.66],[440,.08,.45,.065,440],[587.33,.16,.52,.05,587.33]],
+          upgrade:[[349.23,0,.4,.08,349.23],[523.25,.09,.5,.06,523.25],[698.46,.18,.55,.045,698.46]],
+          daily:[[293.66,0,.32,.075,293.66],[392,.08,.33,.05,392],[587.33,.16,.45,.04,587.33]],
+          event:[[110,0,.72,.1,165],[293.66,.09,.58,.05,440]],
+          slingshot:[[92,0,.6,.1,220],[220,.07,.45,.05,660]],
+          jump:[[55,0,1.1,.13,110],[110,.04,.85,.08,440],[293.66,.27,.9,.05,587.33]]
+        };
+        for(const [freq,offset,duration,level,finish] of tones[kind]||tones.action)
+          audioVoice(a,a.sfxGain,freq,now+offset,duration,level,{end:finish,attack:kind==="jump"?.12:.012,type:"sine"});
       }
       function vibrate(kind = "action") {
         if (!navigator.vibrate || game.settings?.vibration === "Off") return;
@@ -16317,9 +16146,9 @@
         return (
           '<div class="card"><h4>' +
           esc(title) +
-          "</h4><p>" +
+          '</h4><div class="card-body">' +
           body +
-          "</p>" +
+          "</div>" +
           (actions ? '<div class="actions">' + actions + "</div>" : "") +
           "</div>"
         );
@@ -18400,7 +18229,7 @@
       function fleetPreviewLayout(width,height) {
         const types=["scout","miner","tender","probe","warden"],
           slots=[[-0.31,-0.22],[0,-0.22],[0.31,-0.22],[-0.16,0.22],[0.16,0.22]],
-          scale=Math.min(width/250,height/140);
+          scale=Math.min(width/280,height/156);
         return types.map((type,i)=>({type,x:slots[i][0]*width,y:slots[i][1]*height,scale}));
       }
       function drawFleetPreview(c,width,height,skin) {
@@ -21540,6 +21369,10 @@
       function screen(x, y) {
         return { x: (x - cam.x) * zoom + W / 2, y: (y - cam.y) * zoom + H / 2 };
       }
+      function backdropParallax(x,y,motion="On"){
+        if(motion==="Reduced")return {x:0,y:0};
+        return {x:-Math.tanh((Number(x)||0)*.0007)*W*.035,y:-Math.tanh((Number(y)||0)*.0007)*H*.035};
+      }
       function drawBackdrop() {
         const quality = game.settings?.graphics || "High",
           motion = game.settings?.motion || "On",
@@ -21558,9 +21391,14 @@
         // Distant galaxies remain subtle, luminous ellipses behind the local stars.
         ctx.save();
         ctx.globalCompositeOperation = "screen";
+        // Slowly pan the distant art with bounded overscan; keep reduced-motion respected.
+        const parallax = backdropParallax(cam.x,cam.y,motion);
+        ctx.save();ctx.translate(parallax.x,parallax.y);
+        if(motion!=="Reduced"){ctx.translate(W*.5,H*.5);ctx.scale(1.10,1.10);ctx.translate(-W*.5,-H*.5);}
         drawCinematicEnvironment();
+        ctx.restore();
         for (const galaxy of distantGalaxies) {
-          ctx.save(); ctx.translate(galaxy.x, galaxy.y); ctx.rotate(galaxy.rot);
+          ctx.save(); ctx.translate(galaxy.x+parallax.x*.6, galaxy.y+parallax.y*.6); ctx.rotate(galaxy.rot);
           ctx.scale(1, galaxy.ry / galaxy.rx);
           const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, galaxy.rx);
           glow.addColorStop(0, "rgba(255,240,210,.22)");
@@ -21572,8 +21410,8 @@
         }
         ctx.restore();
         for (const s of stars) {
-          const sx = game.ship && motion !== "Reduced" ? -game.ship.x * 0.022 * s.d : 0,
-            sy = game.ship && motion !== "Reduced" ? -game.ship.y * 0.022 * s.d : 0,
+          const sx = game.ship && motion !== "Reduced" ? -cam.x * 0.055 * s.d : 0,
+            sy = game.ship && motion !== "Reduced" ? -cam.y * 0.055 * s.d : 0,
             x = (((s.x + sx) % W) + W) % W,
             y = (((s.y + sy) % H) + H) % H,
             tw = s.a * (motion === "Reduced" ? 0.9 : 0.78 + Math.sin(t * 0.015 + s.tw) * 0.22);
@@ -22785,6 +22623,29 @@
           part([[4,-35],[19,-35],[17,-39],[7,-39]],"paint",7,2);
           light(11,-36,"accent",1);
         }
+        // Distinct hull proportions and mission-specific hardware, independent of collision physics.
+        const shape={
+          circuit:[1.02,.92,.94],standard:[1,.94,1],frontier:[1.04,.90,.96],command:[.94,1.02,1.08],
+          flare:[.93,1.12,1.08],solar:[.94,1.02,1.05],warp:[1.08,.94,1.12],
+          parallel:[1.03,1.06,.94],mythic:[1.06,1.08,.94],spirit:[1.04,1.07,.9],
+          ancient:[.94,1.08,1.12],freeze:[.98,1.09,1.1],abyss:[1.08,.83,.78],archaeologist:[.94,1.06,1.1]
+        }[motif]||[1,1,1];
+        const [length,width,height]=kind==="fleet"?shape.map(v=>1+(v-1)*.35):shape, hardware=kind==="frigate"?28:kind==="fleet"?17:20;
+        if(["circuit","standard","frontier","command"].includes(motif)){
+          mirror([[-hardware,8],[-hardware+4,12],[hardware-8,10],[hardware,6]],"metal",8,2);
+          for(const side of [-1,1]){box(-hardware,side*8-1,8,2,"energy",9,0);light(hardware-6,side*9,"white",.65);}
+        }else if(["warp","parallel"].includes(motif)){
+          mirror([[-hardware-4,15],[-hardware+1,22],[hardware,17],[hardware+5,11],[hardware-3,14]],"metal",7,2);
+          mirror([[-hardware,18],[hardware-2,15],[hardware,16],[-hardware+1,19]],"energy",8,0);
+        }else if(["spirit","mythic","freeze"].includes(motif)){
+          mirror([[-hardware,9],[-hardware+6,18],[hardware,12],[hardware+8,4],[hardware-5,8]],"pearl",8,2);
+          mirror([[0,10],[7,14],[15,9],[7,11]],"energy",9,0);
+        }else{
+          for(const side of [-1,1]){box(-hardware,side*10-3,12,6,"dark",8,2);radiator(-hardware+2,side*10-2,8,4,motif==="abyss"?"dark":"metal");light(-hardware+8,side*10,"accent",.75);}
+        }
+        for(const piece of model.parts){piece.points=piece.points.map(([x,y])=>[x*length,y*width]);piece.z*=height;piece.depth*=height;}
+        for(const e of model.engines){e.x*=length;e.y*=width;e.size*=Math.min(width,1.08);}
+        for(const lamp of model.lights){lamp.x*=length;lamp.y*=width;}
         // Upgrades add bounded mechanical details and preserve the same collision footprint.
         for(let i=0;i<Math.min(3,stage);i++) {
           for(const side of [-1,1]) box(-17+i*10,side*12-1.5,7,3,"metal",8,1.5);
@@ -22801,9 +22662,9 @@
         const primary=skin.primary||"#93c5fd", secondary=skin.secondary||"#162333",
           stealth=skin.motif==="abyss";
         return {
-          hull:craftMix(primary,stealth?"#364454":"#9caab6",stealth?0.34:0.48),
-          metal:craftMix(primary,"#8d9da9",0.68), dark:craftMix(secondary,"#15202c",0.6),
-          paint:craftMix(primary,"#5a6672",0.25), cargo:craftMix(primary,"#be8c51",0.55),
+          hull:craftMix(primary,stealth?"#364454":"#9caab6",stealth?0.34:0.24),
+          metal:craftMix(primary,"#8d9da9",0.55), dark:craftMix(secondary,"#15202c",0.45),
+          paint:craftMix(primary,"#5a6672",0.12), cargo:craftMix(primary,"#be8c51",0.38),
           pearl:craftMix(primary,"#e5ebe4",0.7), solar:"#233d61", vent:"#0a121c",
           glass:"#234c62", energy:skin.accent||"#67e8f9",energy2:skin.glow||"#c084fc"
         };
@@ -23749,7 +23610,6 @@
       function drawMiniMap() {
         if (
           !ui.miniMapCanvas ||
-          ui.hud?.classList.contains("collapsed") ||
           titleOpen ||
           ui.menu.classList.contains("open") ||
           ui.pauseOverlay.classList.contains("show")
@@ -23872,11 +23732,11 @@
         if (tx) {
           c.save();
           c.globalCompositeOperation = "screen";
-          c.strokeStyle = "rgba(253,230,138,.45)";
+          c.strokeStyle = "rgba(253,230,138,.85)";
           c.lineWidth = 1.5;
           c.setLineDash([4, 5]);
           c.beginPath();
-          c.arc(tx.x, tx.y, 10 + Math.sin(t * 0.1) * 2, 0, TAU);
+          c.arc(tx.x, tx.y, 6, 0, TAU);
           c.stroke();
           c.setLineDash([]);
           c.strokeStyle = "rgba(253,230,138,.2)";
@@ -24107,6 +23967,7 @@
         // Jump is already committed; camera and visual state are transient only.
         cam.x=game.ship.x;cam.y=game.ship.y;
         jumpArrivalFX={started:performance.now()};
+        playSound("jump");
       }
       function drawJumpArrival() {
         if(!jumpArrivalFX)return;
@@ -24904,9 +24765,10 @@
           audio &&
           game.settings.music === "On" &&
           audio.started &&
-          audio.nextNote < audio.ctx.currentTime + 2
+          audio.nextNote < audio.ctx.currentTime + 1.5
         )
           scheduleMusic();
+        updateEngineAudio();
         if (shouldRenderFrame(now)) draw();
         if (!loop.mapAt || now - loop.mapAt >= (batterySaver ? 125 : 66)) {
           drawMiniMap(); loop.mapAt = now;
@@ -24939,7 +24801,6 @@
           game.settings.motion = "Reduced";
           document.body.classList.toggle("reduced-motion", true);
           resize();
-          toast("Visual detail adjusted for smoother flight.");
           saveGame(false);
         }
       }
@@ -26146,6 +26007,7 @@
           lastLifecycleSaveAt = Date.now();
           saveGame(false, true);
         }
+        if (audio?.engine) stopEngineAudio();
         if (audio?.ctx?.state === "running")
           audio.ctx.suspend().catch?.(() => {});
       }
@@ -26417,17 +26279,14 @@
       }
       $("newGameBtn").onclick = (e) => {
         resumeAudio();
-        playSound("click");
         startNew();
       };
       $("loadBtn").onclick = (e) => {
         resumeAudio();
-        playSound("click");
         continueGame();
       };
       $("howToBtn").onclick = () => {
         resumeAudio();
-        playSound("click");
         titleMenuMode = true;
         titleOpen = false;
         paused = true;
@@ -26436,7 +26295,6 @@
       };
       $("titleSettingsBtn").onclick = () => {
         resumeAudio();
-        playSound("click");
         openPause();
         togglePauseSettings();
       };
@@ -26460,6 +26318,11 @@
             closePause();
           },
         );
+      // Delegation includes static and dynamically generated controls.
+      document.addEventListener("click", event=>{
+        const control=event.target?.closest?.("button, summary");
+        if(control&&!control.disabled&&!control.matches?.("[aria-disabled='true']"))playSound("click");
+      },true);
       ui.pauseBtn.onclick = openPause;
       if (ui.menuScrim) ui.menuScrim.onclick = closeMenu;
       ui.hudToggle.onclick = () =>
@@ -26473,7 +26336,6 @@
           e.preventDefault();
           e.stopPropagation();
           resumeAudio();
-          playSound("click");
           runMenuAction(b);
         }
       });
@@ -26534,7 +26396,6 @@
         const button = e.target.closest("button[data-encounter-choice]");
         if (!button || button.disabled) return;
         resumeAudio();
-        playSound("click");
         resolveExplorationEncounter(button.dataset.encounterChoice);
       });
       ui.encounterContinue.onclick = closeExplorationEncounter;
@@ -26567,10 +26428,10 @@
       }
       function defaultControlPositions() {
         return {
-          joystick: { left: 18, bottom: 140 },
-          thrust: { right: 14, bottom: 156 },
-          release: { right: 14, bottom: 254 },
-          brake: { right: 88, bottom: 156 },
+          joystick: { left: 18, bottom: 60 },
+          thrust: { right: 14, bottom: 10 },
+          release: { right: 14, bottom: 108 },
+          brake: { right: 88, bottom: 10 },
         };
       }
       function applyControlPositions() {
@@ -26736,7 +26597,7 @@
       function bindHeldFlightControl(element,key,heldKey) {
         element.onpointerdown=e=>{
           if(isLayoutEdit())return startControlDrag(e,key,element);
-          if(claimFlightPointer(e,key,element))keys.add(heldKey);
+          if(claimFlightPointer(e,key,element)){keys.add(heldKey);playSound("click");}
         };
         const release=e=>{
           if(layoutDrag)return endControlDrag(e);
@@ -26754,6 +26615,7 @@
         if(!flightInputAllowed())return;
         e.preventDefault();
         resumeAudio();
+        playSound("click");
         toggleOrbit();
       };
       function registerOfflineSupport() {
