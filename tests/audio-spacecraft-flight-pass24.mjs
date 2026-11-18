@@ -17,5 +17,5 @@ assert.match(html,/\.touch, \.brake \{ bottom: calc\(10px/);
 assert.match(html,/\.orbit-release \{ bottom: calc\(108px/);
 assert.match(html,/\.smart \{ bottom: calc\(208px/);
 assert.doesNotMatch(html,/toast\("Audio enabled|toast\("Visual detail adjusted/);
-assert.doesNotMatch(extract("drawMiniMap","drawObjective"),/!ui\.miniMapCanvas\s*\|\|\s*ui\.hud\?\.classList\.contains/);
+assert.doesNotMatch(extract("drawMiniMap","drawCinematicLight"),/!ui\.miniMapCanvas\s*\|\|\s*ui\.hud\?\.classList\.contains/);
 console.log("Audio score, scrolling content, radar, parallax and compact flight layout passed.");

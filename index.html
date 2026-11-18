@@ -5064,7 +5064,7 @@
       .menu[data-section="upgrades"] .upgrade-result { text-align: center; overflow-wrap: anywhere; }
       .menu[data-section="upgrades"] .upgrade-card .actions button { width: 100%; min-height: 44px; }
       .menu[data-section="upgrades"] .section-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
-      body.hud-collapsed .mini-map, body.hud-collapsed .flight-save-status { display: none; }
+      body.hud-collapsed .flight-save-status { display: none; }
       body.hud-collapsed .hud .logo { display: none; }
       body.hud-collapsed .hud { min-width: 0; padding: 4px; background: rgba(5,13,21,.7); box-shadow: none; }
       body.hud-collapsed .hud-toggle { min-height: 44px; min-width: 66px; font-size: 12px; }
@@ -5155,7 +5155,7 @@
       .mini-map-label { top: 5px; left: 8px; font-size: 8px; letter-spacing: .04em; }
       body.menu-open .mini-map, body.pause-open .mini-map, body.layout-edit .mini-map { display: none !important; }
       .hud, .hud.collapsed, body.hud-collapsed .hud, .hud:not(.collapsed) { left: 10px; top: calc(110px + var(--safeTop)); right: auto; width: min(190px, calc(100vw - 186px)); min-width: 0; max-width: none; transform: none; padding: 8px; }
-      .hud:not(.collapsed) { max-height: max(44px, calc(100dvh - var(--safeTop) - var(--safeBottom) - 310px)); overflow-y: auto; overscroll-behavior: contain; }
+      .hud:not(.collapsed) { max-height: max(44px, calc(100dvh - var(--safeTop) - var(--safeBottom) - 374px)); overflow-y: auto; overscroll-behavior: contain; }
       .hud.collapsed, body.hud-collapsed .hud { width: 94px; padding: 0; background: transparent; border: 0; }
       .hud .top { display: flex; flex-direction: column; align-items: stretch; }
       .hud .logo { display: none; }
@@ -5760,7 +5760,6 @@
         upgradeFX = [],
         captureFX = [],
         jumpArrivalFX = null,
-        audioNoticeShown = false,
         touch = { active: false, x: 0, y: 0 },
         layoutDrag = null,
         keys = new Set(),
@@ -21395,7 +21394,7 @@
         // Slowly pan the distant art with bounded overscan; keep reduced-motion respected.
         const parallax = backdropParallax(cam.x,cam.y,motion);
         ctx.save();ctx.translate(parallax.x,parallax.y);
-        ctx.translate(W*.5,H*.5);ctx.scale(1.10,1.10);ctx.translate(-W*.5,-H*.5);
+        if(motion!=="Reduced"){ctx.translate(W*.5,H*.5);ctx.scale(1.10,1.10);ctx.translate(-W*.5,-H*.5);}
         drawCinematicEnvironment();
         ctx.restore();
         for (const galaxy of distantGalaxies) {
@@ -26008,6 +26007,7 @@
           lastLifecycleSaveAt = Date.now();
           saveGame(false, true);
         }
+        if (audio?.engine) stopEngineAudio();
         if (audio?.ctx?.state === "running")
           audio.ctx.suspend().catch?.(() => {});
       }
