@@ -12689,13 +12689,14 @@
       }
       function orbitMomentum(charge,dt=0,thrust=false,brake=false){
         const q=clamp(Number.isFinite(charge)?charge:0,0,100);
-        return clamp(q+Math.max(0,Number(dt)||0)*(brake?-.85:thrust?.58:0),0,100);
+        return clamp(q+Math.max(0,Number(dt)||0)*(brake?-1.25:thrust?.85:0),0,100);
       }
       function orbitRelativeSpeed(charge){
-        return 1.6+3.2*orbitMomentum(charge)/100;
+        return 1.6+6.4*orbitMomentum(charge)/100;
       }
       function orbitReleaseSpeed(charge,boost=true){
-        return boost?Math.min(6,orbitRelativeSpeed(charge)*1.2+.24):orbitRelativeSpeed(charge);
+        const q=orbitMomentum(charge)/100;
+        return boost?Math.min(12,orbitRelativeSpeed(charge)+.56+3.44*q):orbitRelativeSpeed(charge);
       }
       function releaseOrbit(boost = true) {
         const s = game.ship,
@@ -20163,7 +20164,7 @@
           const charge = Math.round(orbitMomentum(s.lockCharge));
           ui.orbitRelease.textContent = s.orbitLocked ? "RELEASE\n"+charge+"%" : "LOCK";
           ui.orbitRelease.style.setProperty("--orbit-charge",charge+"%");
-          ui.touchThrust.textContent = s.orbitLocked ? "THRUST\nFREE" : "THRUST";
+          ui.touchThrust.textContent = "THRUST";
           ui.touchThrust.setAttribute("aria-label",s.orbitLocked?"Thrust in orbit without fuel":"Thrust starship");
           const lockName = nLock.body?.type === "frigate"
             ? (game.frigate.name || "ODF Pioneer")
