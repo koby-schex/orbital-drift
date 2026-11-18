@@ -15,7 +15,7 @@ const draw=new Function("game","pioneerRescue","body","frigatePosition","nearest
 draw();assert.equal(arcs,4);assert.equal(targetCalls,1);
 ship.orbitLocked=true;ship.lockBody="Mars";ship.lockRadius=50;
 draw();assert.equal(arcs,9);assert.equal(targetCalls,1);
-assert.match(html,/ui\.hud\?\.classList\.contains\("collapsed"\) \|\|\s*titleOpen/);
+assert.doesNotMatch(html,/!ui\.miniMapCanvas\s*\|\|\s*ui\.hud\?\.classList\.contains\("collapsed"\)/);
 const trailSource=extract("drawStarshipTrail","drawShip");
 const previewSource=extract("drawTrailPreview","setFrigateTarget");
 let strokes=0;
