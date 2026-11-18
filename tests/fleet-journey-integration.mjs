@@ -74,13 +74,13 @@ const finishCode = gameFunction("completeFleetMission", "applyFleetBoosts");
 const finish = new Function(
   ...commonNames, "applyFleetBoosts", "trackExpeditionProgress", "markMeaningfulMoment",
   "trackDaily", "playSound", "feedbackPulse", "showMissionPanel", "fmt",
-  "fleetBoostSummary", "generateFleetMissions", "addActivity",
+  "fleetBoostSummary", "generateFleetMissions", "addActivity", "grantCrewXp",
   finishCode + "\nreturn completeFleetMission;"
 )(
   ...commonValues, () => {},
   (type, amount) => {if(type === "fleet") fleetProgress += amount;},
   () => {}, () => {completedDaily++;}, () => {}, () => {}, () => {},
-  value => JSON.stringify(value), () => "", () => {}, () => {}
+  value => JSON.stringify(value), () => "", () => {}, () => {}, () => {}
 );
 const firstRun = game.fleet.missions[0].id;
 finish(firstRun);

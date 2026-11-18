@@ -592,6 +592,7 @@ assert.ok(
 
 api.initGame(false);
 
+api.game.ship.orbitLocked = true; api.game.ship.lockBody = "Mars";
 api.finishCapture(api.body("Mars"));
 api.dismissPanels();
 api.upgradeShip("thrust");
@@ -606,6 +607,7 @@ assert.equal(api.paused, false, "Closing the final stacked panel must always res
 assert.equal(api.modalFreeze, false, "No stale modal freeze may remain after stacked panels close");
 
 api.initGame(false);
+api.game.ship.orbitLocked = true; api.game.ship.lockBody = "Mars";
 api.finishCapture(api.body("Mars"));
 api.dismissPanels();
 api.upgradeShip("fuel");
@@ -618,7 +620,8 @@ for (const subsystem of ["thrust", "fuel", "brake", "accel", "handling", "cargo"
   checkpoint(`tutorial path: ${subsystem}`);
   api.initGame(false);
   checkpoint(`${subsystem}: init complete`);
-  api.finishCapture(api.body("Mars"));
+  api.game.ship.orbitLocked = true; api.game.ship.lockBody = "Mars";
+api.finishCapture(api.body("Mars"));
   api.dismissPanels();
   checkpoint(`${subsystem}: capture complete`);
   assert.equal(api.game.missionStage, 1, `${subsystem}: Mars capture should advance training`);
@@ -699,6 +702,7 @@ assert.ok(api.game.ship.driftCharge > 0, "High-speed steering should engage orbi
 
 api.initGame(false);
 checkpoint("rendezvous path initialized");
+api.game.ship.orbitLocked = true; api.game.ship.lockBody = "Mars";
 api.finishCapture(api.body("Mars"));
 api.dismissPanels();
 api.upgradeShip("fuel");
