@@ -5201,6 +5201,21 @@
       .pioneer-primary-actions button { text-align:center; justify-content:center; }
       .pioneer-primary-actions .pioneer-deck-link { display:flex; flex-direction:column; gap:5px; min-height:72px; background:#102430; }
       .pioneer-deck-link small { color:#afc4cc; font-size:11px; font-weight:400; line-height:1.4; }
+      /* Frontier collection and simpler navigation */
+      .hub-btn {min-height:64px!important;padding:10px!important;text-align:left!important;}
+      .hub-btn small {display:none!important;}
+      .hub-btn .hub-symbol {font-size:16px!important;}
+      .vault-perk {color:#a7e8d7!important;font-weight:600;}
+      .vault-specimen {background:radial-gradient(ellipse at 50% 45%,color-mix(in srgb,var(--vaultColor) 22%,#07101b),#040911 74%);}
+      .vault-specimen-core {width:64px;height:64px;box-shadow:inset -10px -8px 20px #020617aa,0 0 18px color-mix(in srgb,var(--vaultColor) 46%,transparent);}
+      .vault-specimen.visual-lantern .vault-specimen-core {border-radius:18% 18% 30% 30%;clip-path:polygon(25% 0,75% 0,100% 30%,80% 100%,20% 100%,0 30%);}
+      .vault-specimen.visual-spindle .vault-specimen-core {clip-path:polygon(50% 0,77% 26%,62% 50%,77% 76%,50% 100%,23% 76%,38% 50%,23% 26%);}
+      .vault-specimen.visual-crown .vault-specimen-core {clip-path:polygon(0 0,26% 39%,50% 4%,74% 39%,100% 0,85% 88%,50% 100%,15% 88%);}
+      .vault-specimen.visual-cube .vault-specimen-core {border-radius:8%;transform:rotate(30deg) skew(-8deg);background:conic-gradient(from 35deg,var(--vaultAccent),#050a17,var(--vaultColor),#050a17,var(--vaultAccent));}
+      .vault-specimen.visual-tablet .vault-specimen-core {border-radius:9%;transform:rotate(-9deg);background:repeating-linear-gradient(0deg,transparent 0 8px,#02061788 8px 10px),linear-gradient(135deg,var(--vaultAccent),var(--vaultColor));}
+      .vault-specimen.visual-key .vault-specimen-core {clip-path:polygon(20% 0,80% 0,95% 40%,61% 48%,61% 70%,82% 70%,82% 84%,61% 84%,61% 100%,39% 100%,39% 48%,5% 40%);}
+      .vault-specimen.visual-fern .vault-specimen-core {clip-path:polygon(50% 0,64% 25%,98% 8%,75% 45%,100% 62%,62% 70%,50% 100%,38% 70%,0 62%,25% 45%,2% 8%,36% 25%);}
+      .vault-specimen.visual-jelly .vault-specimen-core {border-radius:50% 50% 20% 20%;clip-path:polygon(0 0,100% 0,100% 60%,85% 100%,70% 60%,50% 100%,30% 60%,15% 100%,0 60%);}
       /* Pass 28: consistent keyboard focus and compact, legible secondary controls. */
       .menu button:focus-visible,.dialog button:focus-visible,.menu summary:focus-visible { outline:2px solid #d4e9e8; outline-offset:2px; }
       .menu button,.dialog button { overflow-wrap:anywhere; }
@@ -7233,6 +7248,38 @@
           { key: "inverted-astrolabe", name: "Inverted Astrolabe", kind: "artifact", source: "planet", families: ["parallel"], threat: 5, rarity: "Exotic", colors: ["#f472b6", "#22d3ee"], visual: "disc", entry: "A navigation instrument that points to places the Pioneer chose not to visit. Its needles move whenever a decision becomes irreversible." },
           { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism sharing Starling's genetic telemetry without sharing its history. It reacts before the crew touches the controls." },
           { key: "causality-lace", name: "Causality Lace", kind: "phenomenon", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#c084fc", "#fef08a"], visual: "swarm", entry: "Threads of probability braided into a stable specimen. Every strand records a different outcome for the same discovery." },
+          {"key":"slag-lantern","name":"Slag Lantern","kind":"artifact","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"lantern","entry":"A ceramic lantern burning without oxygen.","perk":"production"},
+          {"key":"iron-orchid","name":"Iron Orchid","kind":"lifeform","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"bloom","entry":"Metal petals open only in a magnetic field.","perk":"survey"},
+          {"key":"solar-spindle","name":"Solar Spindle","kind":"artifact","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#fb923c","#fde68a"],"visual":"spindle","entry":"A filament of frozen stellar plasma.","perk":"fuel"},
+          {"key":"plasma-nest","name":"Plasma Nest","kind":"phenomenon","source":"space","families":["innerForge"],"threat":4,"rarity":"Exotic","colors":["#fb923c","#fde68a"],"visual":"swarm","entry":"A flock of magnetic vortices.","perk":"production"},
+          {"key":"aether-shell","name":"Aether Shell","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"shell","entry":"A shell containing a weather cycle.","perk":"survey"},
+          {"key":"cloud-larva","name":"Cloud Larva","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"serpent","entry":"A translucent larva feeding on electrical gradients.","perk":"production"},
+          {"key":"cyclone-needle","name":"Cyclone Needle","kind":"artifact","source":"space","families":["gasFrontier"],"threat":2,"rarity":"Rare","colors":["#60a5fa","#c4b5fd"],"visual":"spindle","entry":"A compass measuring direction in storms.","perk":"fuel"},
+          {"key":"storm-crown","name":"Storm Crown","kind":"phenomenon","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#60a5fa","#c4b5fd"],"visual":"crown","entry":"A ring of self-sustaining lightning.","perk":"fuel"},
+          {"key":"opal-eye","name":"Opal Eye","kind":"artifact","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"orb","entry":"A polished eye refracting distant stellar spectra.","perk":"survey"},
+          {"key":"glass-fern","name":"Glass Fern","kind":"lifeform","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"fern","entry":"Mineral leaves recording gravity changes.","perk":"production"},
+          {"key":"prismatic-keel","name":"Prismatic Keel","kind":"artifact","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#c084fc","#67e8f9"],"visual":"crystal","entry":"A lost vessel's coherent crystal lattice.","perk":"survey"},
+          {"key":"spectrum-anvil","name":"Spectrum Anvil","kind":"phenomenon","source":"space","families":["crystalReach"],"threat":4,"rarity":"Exotic","colors":["#c084fc","#67e8f9"],"visual":"crown","entry":"An intersection of seven polarized beams.","perk":"production"},
+          {"key":"seed-compass","name":"Seed Compass","kind":"artifact","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"disc","entry":"An organic instrument pointing toward habitats.","perk":"survey"},
+          {"key":"amber-colony","name":"Amber Colony","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"swarm","entry":"A microbial civilization inside resin.","perk":"production"},
+          {"key":"lantern-jelly","name":"Lantern Jelly","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#4ade80","#fef08a"],"visual":"jelly","entry":"A vacuum swimmer emitting synchronized pulses.","perk":"fuel"},
+          {"key":"living-keystone","name":"Living Keystone","kind":"artifact","source":"space","families":["bioCluster"],"threat":4,"rarity":"Exotic","colors":["#4ade80","#fef08a"],"visual":"reliquary","entry":"A living bridge component seeking its span.","perk":"production"},
+          {"key":"oath-tablet","name":"Oath Tablet","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"tablet","entry":"A record etched in an extinct alphabet.","perk":"survey"},
+          {"key":"archive-scarab","name":"Archive Scarab","kind":"lifeform","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"beetle","entry":"A mechanical organism repairing inscriptions.","perk":"survey"},
+          {"key":"silent-key","name":"Silent Key","kind":"artifact","source":"space","families":["ancientArchive"],"threat":2,"rarity":"Rare","colors":["#d6b36a","#e2e8f0"],"visual":"key","entry":"A key rotating to match unknown doors.","perk":"fuel"},
+          {"key":"epoch-dial","name":"Epoch Dial","kind":"artifact","source":"space","families":["ancientArchive"],"threat":4,"rarity":"Exotic","colors":["#d6b36a","#e2e8f0"],"visual":"disc","entry":"A device measuring the age of stars.","perk":"production"},
+          {"key":"null-pebble","name":"Null Pebble","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"crystal","entry":"A stone with no thermal signature.","perk":"fuel"},
+          {"key":"echo-compass","name":"Echo Compass","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"key","entry":"A compass following gravitational wakes.","perk":"fleet"},
+          {"key":"night-fin","name":"Night Fin","kind":"lifeform","source":"space","families":["voidRim"],"threat":2,"rarity":"Rare","colors":["#64748b","#67e8f9"],"visual":"wing","entry":"A swimmer outlined by displaced starlight.","perk":"survey"},
+          {"key":"impossible-room","name":"Impossible Room","kind":"phenomenon","source":"space","families":["voidRim"],"threat":6,"rarity":"Mythic","colors":["#64748b","#67e8f9"],"visual":"cube","entry":"A room larger within than without that stores excess reactor energy.","perk":"fuel"},
+          {"key":"mercy-lantern","name":"Mercy Lantern","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"lantern","entry":"A beacon lighting in response to distress.","perk":"fuel"},
+          {"key":"dawn-pearl","name":"Dawn Pearl","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A pearl storing a sunrise.","perk":"survey"},
+          {"key":"star-garden","name":"Star Garden","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":2,"rarity":"Rare","colors":["#bbf7d0","#fbcfe8"],"visual":"fern","entry":"Plants growing around a phantom sun.","perk":"production"},
+          {"key":"second-sun","name":"Second Sun","kind":"phenomenon","source":"space","families":["cosmicSpirit"],"threat":6,"rarity":"Mythic","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A miniature star whose output exceeds its size.","perk":"production"},
+          {"key":"mirror-flower","name":"Mirror Flower","kind":"lifeform","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"bloom","entry":"Each petal reflects an alternate sky.","perk":"survey"},
+          {"key":"fractured-seal","name":"Fractured Seal","kind":"artifact","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"tablet","entry":"A seal opening only in conflicting realities.","perk":"fuel"},
+          {"key":"counter-clock","name":"Counter Clock","kind":"artifact","source":"space","families":["parallel"],"threat":2,"rarity":"Rare","colors":["#e879f9","#67e8f9"],"visual":"disc","entry":"A clock synchronized to a future arrival.","perk":"fleet"},
+          {"key":"unwritten-star","name":"Unwritten Star","kind":"phenomenon","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#e879f9","#67e8f9"],"visual":"halo","entry":"A star existing only as a possible future, predicting fleet routes.","perk":"fleet"},
         ];
       const crewUniforms = ["#164e63", "#312e81", "#713f12", "#14532d", "#4c1d95"],
         crewTemplates = [
@@ -8286,7 +8333,8 @@
           entries: Array.isArray(raw.entries)
             ? raw.entries
                 .filter((entry) => entry && knownCatalog.has(entry.catalogKey))
-                .slice(-120)
+                .sort((a,b)=>Number(b.status==="secured")-Number(a.status==="secured"))
+                .filter((entry,index,all)=>all.findIndex(x=>x.catalogKey===entry.catalogKey)===index)
                 .map((entry) => ({
                   ...entry,
                   threat: clamp(Number(entry.threat || 1), 1, 6),
@@ -8294,7 +8342,7 @@
                 }))
             : [],
           discoveryKeys: Array.isArray(raw.discoveryKeys)
-            ? [...new Set(raw.discoveryKeys.map(String))].slice(-180)
+            ? [...new Set(raw.discoveryKeys.map(String))]
             : [],
         };
       }
@@ -9601,6 +9649,15 @@
           archetype: parallelArchetype(),
         };
       }
+      function ensureFrontierCapture(system) {
+        if(!system||system.isTutorial||system.specialType)return system;
+        const planets=system.bodies.filter(b=>b.type!=="star");
+        const count=planets.filter(b=>b.capturable).length;
+        const eligible=planets.filter(b=>!b.capturable&&!/gas giant|protected/i.test(b.hazard||""))
+          .sort((a,b)=>(a.captureDifficulty||1)-(b.captureDifficulty||1));
+        for(const b of eligible.slice(0,Math.max(0,Math.min(2,planets.length)-count))) {b.capturable=true;b.upgradeable=true;}
+        return system;
+      }
       function proc(seed) {
         if (isCosmicSpiritRoll(seed)) return cosmicSpiritSystem(seed);
         const mod = sectorModifier(seed, false),
@@ -9671,7 +9728,7 @@
               captureDifficulty:
                 between(seed + i * 20 + 10, 0.8, 2.6) *
                 (isOuterGiant ? 1.18 : 1),
-              capturable: isOuterGiant
+              capturable: isOuterGiant || isSurveyRelic
                 ? false
                 : rand(seed + i * 20 + 11) < arch.capturable,
               upgradeable:
@@ -9711,7 +9768,7 @@
         );
         if (hasBlackHoleRoll(seed) || rand(seed + 44445) < bhBoost * 0.02)
           sys.blackHole = createBlackHole(seed);
-        return sys;
+        return ensureFrontierCapture(sys);
       }
       function proceduralSeedForIndex(i) {
         if (!universeSeed) return 1000 + i * 137;
@@ -10272,7 +10329,7 @@
           );
         resetFlightEffects();
         currentSystemIndex = targetIndex;
-        game.system = systems[currentSystemIndex];
+        game.system = ensureFrontierCapture(systems[currentSystemIndex]);
         syncCurrentSystemSets();
         game.discovered.add(game.system.bodies[0].name);
         manualTargetName = null;
@@ -10294,7 +10351,7 @@
               cls.maxFuel *
                 (0.4 +
                   (game.fleet?.boosts?.fuelRecovery || 0) +
-                  Math.min(0.12, crewRolePower("Navigator") * 0.012)),
+                  Math.min(0.12, crewRolePower("Navigator") * 0.012) + vaultBonus("fuel")),
             cls.maxFuel,
           ),
           trail: [],
@@ -10321,19 +10378,7 @@
         if (leavingTutorial) game.missionStage = tutorialObjectives.length;
         trackDaily("sector", 1);
         generateContracts(game.system.seed);
-        if (game.sectorJumps === 1)
-          showMissionPanel(
-            "New Sector Reached!",
-            "The tutorial loop is complete. Discover rare worlds, build Echo routes, and expand the Codex.",
-            [
-              ["Sector", game.system.name],
-              ["Goal", "Discover rare planets"],
-              ["Codex", "Planet archive unlocked"],
-            ],
-          );
-        toast(
-          "Arrived: " + game.system.name + " • " + sectorModifierName(),
-        );
+        // Arrival is communicated by the persistent system HUD and captain log.
         addActivity(
           "travel",
           "Sector jump complete",
@@ -10633,6 +10678,7 @@
           });
           forceTutorialCommon();
           applyBodyStates(d.bodyStates || []);
+          systems.forEach(ensureFrontierCapture);
           forceTutorialCommon();
           currentSystemIndex = Math.max(
             0,
@@ -11425,7 +11471,7 @@
           bonus = match ? fleetMatchBonus(ship).speed : 0,
           reactor = (game.frigate.reactorLevel || 0) * 3,
           cmd = (game.frigate.commandLevel || 0) * 2,
-          crew = Math.min(12,crewDutyPower("fleet")*1.2);
+          crew = Math.min(12,crewDutyPower("fleet")*1.2)+vaultBonus("fleet")*100;
         return Math.max(
           35,
           Math.round(
@@ -12397,7 +12443,7 @@
             b.resource === "DataCores" || b.resource === "Crystal"
               ? 0.35
               : 0.12;
-        return m*(1+Math.min(.12,crewDutyPower("systems")*.01));
+        return m*(1+Math.min(.12,crewDutyPower("systems")*.01)+vaultBonus("production"));
       }
       function productionRate(b) {
         if (
@@ -12479,7 +12525,7 @@
             rarityBonus(b) *
             (1 +
               crewRolePower("Xenologist") * 0.025 +
-              crewDutyPower("vault") * 0.01);
+              crewDutyPower("vault") * 0.01 + vaultBonus("survey"));
         if (!b || b.type === "star") return reward;
         reward.DataCores = Math.max(
           1,
@@ -12967,7 +13013,7 @@
           );
         }
         if(firstSurvey) saveGame(false);
-        showDiscovery(b, reward);
+        if(game.system.isTutorial)showDiscovery(b, reward);
         if(ui.menu?.classList.contains("open"))renderMenu();
       }
       function capture() {
@@ -13805,16 +13851,23 @@
       }
       function vaultDiscoveryCandidates(source, system = game.system) {
         const family = vaultFamily(system),
-          matching = vaultCatalog.filter(
-            (item) => item.source === source && item.families.includes(family),
-          ),
-          pool = matching.length
-            ? matching
-            : vaultCatalog.filter((item) => item.source === source),
-          unseen = pool.filter(
-            (item) => !vaultState().entries.some((entry) => entry.catalogKey === item.key),
-          );
-        return unseen.length ? unseen : pool;
+          owned=new Set(vaultState().entries.map(e=>e.catalogKey)),
+          unseen=vaultCatalog.filter(item=>item.source===source&&!owned.has(item.key)),
+          matching=unseen.filter(item=>item.families.includes(family));
+        return matching.length?matching:unseen;
+      }
+      function vaultPerk(entry){
+        const item=vaultCatalog.find(x=>x.key===entry.catalogKey);
+        if(!item)return null;
+        const type=item.perk||({artifact:"survey",lifeform:"production",phenomenon:"fuel"})[item.kind];
+        const value=({Unusual:.02,Rare:.04,Exotic:.07,Mythic:.12})[item.rarity]||.01;
+        return {type,value,label:({survey:"survey rewards",production:"world output",fuel:"jump fuel recovery",fleet:"fleet mission speed"})[type]};
+      }
+      function vaultBonus(type){
+        if(!game.frigate?.built)return 0;
+        return Math.min(.22,vaultSecuredEntries().reduce((sum,e)=>{
+          const perk=vaultPerk(e);return sum+(perk?.type===type?perk.value:0);
+        },0));
       }
       function vaultCanSecureReason(entry) {
         if (!game.frigate?.built) return "Build the ODF Pioneer first.";
@@ -13867,13 +13920,17 @@
             vaultStringSeed(origin),
             source === "space" ? 7727 : 3253,
           ),
-          chance = source === "space" ? 0.78 : 0.48;
+          chance = source === "space" ? 1 : 0.92;
         if (!force && rand(seed + 31) > chance) return null;
-        const candidates = vaultDiscoveryCandidates(source),
-          template = catalogKey
+        let candidates = vaultDiscoveryCandidates(source);
+        const benign=candidates.filter(item=>item.threat<=vaultContainment());
+        if(vaultSecuredEntries().length<2&&benign.length)candidates=benign;
+        const template = catalogKey
             ? vaultCatalog.find((item) => item.key === catalogKey && item.source === source)
             : candidates[Math.floor(rand(seed + 97) * candidates.length)];
         if (!template) return null;
+        const existing=vault.entries.find(e=>e.catalogKey===template.key);
+        if(existing)return existing;
         const canSecure =
             template.threat <= vaultContainment() &&
             vaultSecuredEntries().length < vaultCapacity(),
@@ -16067,8 +16124,7 @@
         );
       }
       function planetCaptureReady() {
-        const n = nearestBody(),
-          b = n.body;
+        const b = game.ship?.orbitLocked ? body(game.ship.lockBody) : null;
         if (
           !b ||
           b.type === "star" ||
@@ -16847,6 +16903,7 @@
           ) +
           groupHtml("Flight & Development", core.slice(0, 3)) +
           groupHtml("Pioneer & Exploration", core.slice(3).concat(explore)) +
+          (game.frigate.built?card("Discoveries", "Secure finds and review your collection.",btn("Vault","openFrigateTab","vault")+btn("Adventures","openFrigateTab","expeditions")):"") +
           secondaryDetails("Records, Settings & Help", groupHtml("Records & Help", support));
       }
       function menuLabel(k) {
@@ -17050,6 +17107,7 @@
                 !!s && s.type !== "star" && !bodySurveyed(s) && scanRange <= 230,
               ) +
               btn("Clear Target", "clearTarget") +
+              (s?.capturable&&!game.captured.has(s.name)?btnWhy("Capture "+s.name,"capture",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first."):"") +
               btnWhy(
                 "Upgrade Selected Planet",
                 "upgradePlanet",
@@ -17197,7 +17255,7 @@
           "</div></div></div>" +
           restrict +
           prod +
-          branches
+          branches + (owned&&!game.system.isTutorial?card("Control status",esc(b.identity||"Frontier")+" • "+(b.branches?.station||0)+" relay / "+(b.branches?.extractor||0)+" industry / "+(b.branches?.research||0)+" research. Develop the world along the path that supports your exploration."):"")
         );
       }
       function branchHtml(b) {
@@ -17664,7 +17722,7 @@
       }
       function vaultEntryHtml(entry) {
         const pending = entry.status !== "secured",
-          reason = vaultCanSecureReason(entry),
+          reason = vaultCanSecureReason(entry), perk=vaultPerk(entry),
           colors = Array.isArray(entry.colors) ? entry.colors : ["#67e8f9", "#fbbf24"];
         return (
           '<div class="vault-entry ' +
@@ -17692,6 +17750,7 @@
           " • " +
           esc(vaultThreatLabel(entry.threat)) +
           "</span></div>" +
+          (perk?'<span class="vault-perk">' +(pending?"When secured: ":"Active: ")+"+"+Math.round(perk.value*100)+"% "+esc(perk.label)+"</span>":"") +
           (pending
             ? '<div class="actions">' +
               btnWhy(
@@ -17961,7 +18020,7 @@
           upgradeReady =
             level < 6 && hasFactoryAccess() && canAfford(frigateCost("vault"));
         return (
-          '<div class="vault-hero"><h4>Pioneer Relic Vault</h4><p>Every specimen is a persistent record of where it was found and what makes it remarkable. Surface surveys and decoded deep-space signals can reveal new entries.</p><div class="grid"><div class="chip"><b>Secure Storage</b><br>' +
+          '<div class="vault-hero"><h4>Pioneer Relic Vault</h4><p>Secure unique specimens to unlock passive bonuses. Surveys and drifting signals reveal new discoveries. Each bonus category is capped at 22%.</p><div class="grid"><div class="chip"><b>Secure Storage</b><br>' +
           secured.length +
           " / " +
           capacity +
@@ -21311,7 +21370,7 @@
         const base = hex(b.name === "Mars" ? "#be7250" : b.color),
           gas = ["bands", "rings", "storm"].includes(b.pattern),
           ocean = b.pattern === "continents", lava = b.pattern === "lava",
-          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%7-3)*.11;
+          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%17-8)*.12;
         const image = rasterAsset(size, size, data => {
           for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
@@ -21322,7 +21381,7 @@
               continue;
             }
             const nz = Math.sqrt(1 - rr),
-              terrain = visualFbm(nx * (3+variation) + 9, ny * (3-variation) + 7, nz * 3 + 5, seed, 5),
+              terrain = visualFbm(nx * (3+variation) + 9, ny * (3-variation) + 7, nz * (3+variation*.45) + 5, seed, 5),
               fine = visualNoise(nx * 70 + 80, ny * 70 + 80, nz * 70, seed + 97),
               bands = 0.5 + 0.26 * Math.sin(ny * (31+variation*34) + (terrain - 0.5) * 7) +
                 0.14 * Math.sin(ny * 67 + terrain * 13),
@@ -21367,6 +21426,7 @@
                 heat=Math.pow(Math.max(0,1-Math.abs(terrain-.51)*15),2)*.25;
               rgb = rgb.map((v, c) => v * (0.36+fine*.12) + [245, 80, 8][c] * crack + heat*[160,45,5][c]);
             }
+            if(variation!==0){const fault=Math.pow(Math.max(0,1-Math.abs(terrain-(.45+(seed%13)*.01))*20),3);rgb=rgb.map((v,c)=>v*(.90+fault*.22)+fault*[18,13,24][c]);}
             for (let c = 0; c < 3; c++) data[i + c] = (rgb[c] * (1 - Math.min(0.8, cloud)) + 235 * Math.min(0.8, cloud)) * limb;
             data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
           }
@@ -21469,16 +21529,17 @@
             ring: false,
           });
         }
-        for (let i = 0, c = Math.min(32,Math.floor((W * H) / asteroidDiv*layout.rocks)); i < c; i++) {
+        for (let i = 0, c = Math.min(64,Math.max(3,Math.floor((W * H) / asteroidDiv*layout.rocks*2.4))); i < c; i++) {
           asteroids.push({
             x: random() * W,
             y: random() * H,
-            r: random() * 2 + 0.7,
+            r: random() * 4.2 + 0.7,
             vx: between(i + 120, -0.02, 0.02),
             vy: between(i + 180, -0.015, 0.025),
             spin: random() * TAU,
             ss: between(i + 210, -0.006, 0.006),
-            pts: Math.floor(between(i + 250, 6, 9)),
+            pts: Math.floor(between(i + 250, 5, 10)),
+            motif:Math.floor(random()*4),
             d: between(i + 300, 0.1, 0.32),
           });
         }
@@ -21629,6 +21690,7 @@
           rock.addColorStop(0.36, "rgba(100,116,139,.48)");
           rock.addColorStop(1, "rgba(15,23,42,.5)");
           ctx.fillStyle = rock;
+          if(a.motif===1){ctx.fillStyle=rgba(theme.accent,.6);ctx.fillRect(-a.r,-a.r*.25,a.r*2,a.r*.5);}else if(a.motif===2){ctx.strokeStyle=rgba(theme.accent2,.5);ctx.strokeRect(-a.r,-a.r*.55,a.r*2,a.r*1.1);}
           ctx.beginPath();
           for (let i = 0; i < a.pts; i++) {
             const ang = (i / a.pts) * TAU,
@@ -22787,7 +22849,7 @@
           parallel:[1.03,1.06,.94],mythic:[1.06,1.08,.94],spirit:[1.04,1.07,.9],
           ancient:[.94,1.08,1.12],freeze:[.98,1.09,1.1],abyss:[1.08,.83,.78],archaeologist:[.94,1.06,1.1]
         }[motif]||[1,1,1];
-        const [length,width,height]=kind==="fleet"?shape.map(v=>1+(v-1)*.35):shape, hardware=kind==="frigate"?28:kind==="fleet"?17:20;
+        const [length,width,height]=kind==="fleet"?shape.map(v=>1+(v-1)*.65):shape.map((v,i)=>1+(v-1)*(i===2?1.15:2.2)), hardware=kind==="frigate"?28:kind==="fleet"?17:20;
         if(["circuit","standard","frontier","command"].includes(motif)){
           mirror([[-hardware,8],[-hardware+4,12],[hardware-8,10],[hardware,6]],"metal",8,2);
           for(const side of [-1,1]){box(-hardware,side*8-1,8,2,"energy",9,0);light(hardware-6,side*9,"white",.65);}
@@ -22800,6 +22862,9 @@
         }else{
           for(const side of [-1,1]){box(-hardware,side*10-3,12,6,"dark",8,2);radiator(-hardware+2,side*10-2,8,4,motif==="abyss"?"dark":"metal");light(-hardware+8,side*10,"accent",.75);}
         }
+        if(["warp","parallel"].includes(motif)){mirror([[-hardware-12,17],[-hardware-3,29],[hardware+4,22],[hardware+10,12]],"metal",3,3);for(const side of [-1,1])engine(-hardware-10,side*23,3);}
+        else if(["spirit","mythic","freeze"].includes(motif)){mirror([[-hardware-8,14],[-hardware+6,28],[hardware+13,12],[hardware+5,8]],"pearl",4,2);}
+        else if(["flare","solar"].includes(motif)){mirror([[-hardware-9,11],[-hardware-14,26],[-hardware+8,22],[hardware+6,10]],"paint",4,4);for(const side of [-1,1])engine(-hardware-12,side*20,4);}
         for(const piece of model.parts){piece.points=piece.points.map(([x,y])=>[x*length,y*width]);piece.z*=height;piece.depth*=height;}
         for(const e of model.engines){e.x*=length;e.y*=width;e.size*=Math.min(width,1.08);}
         for(const lamp of model.lights){lamp.x*=length;lamp.y*=width;}
@@ -22827,7 +22892,7 @@
         };
       }
       function drawCraftEngine(c, engine, skin, thrust) {
-        const {x,y,size}=engine, power=clamp(Number(thrust)||0,0,1), length=size*(2.2+power*8), color=skin.glow||skin.accent||"#7dd3fc";
+        const {x,y,size}=engine, power=clamp(Number(thrust)||0,0,1), length=size*(2.2+power*8)*(["warp","parallel","abyss"].includes(skin.motif)?1.5:["spirit","mythic","freeze"].includes(skin.motif)?.78:1), color=skin.glow||skin.accent||"#7dd3fc";
         c.save(); c.globalCompositeOperation="screen";
         const glow=c.createRadialGradient(x,y,0,x,y,size*(3.1+power*.9));
         glow.addColorStop(0,rgba(color,0.18+power*0.30));glow.addColorStop(1,"rgba(0,0,0,0)");
