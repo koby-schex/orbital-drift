@@ -12459,7 +12459,7 @@
             b.resource === "DataCores" || b.resource === "Crystal"
               ? 0.35
               : 0.12;
-        return m*(1+Math.min(.12,crewDutyPower("systems")*.01)+vaultBonus("production")+(!game.system.isTutorial&&b.memory?.controlMode==="industry"?.12:0));
+        return m*(1+Math.min(.12,crewDutyPower("systems")*.01)+vaultBonus("production")+(!game.system.isTutorial?(b.memory?.controlMode==="industry"?.12:0)+Math.max(0,worldControlStability(b)-60)*.002:0));
       }
       function productionRate(b) {
         if (
@@ -17132,7 +17132,7 @@
                 !!s && s.type !== "star" && !bodySurveyed(s) && scanRange <= 230,
               ) +
               btn("Clear Target", "clearTarget") +
-              (s?.capturable&&!game.captured.has(s.name)?btnWhy("Capture "+s.name,"capture",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first."):"") +
+              (s?.capturable&&!game.captured.has(s.name)?btnWhy("Capture "+s.name,"capture",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first.")+(!game.system.isTutorial&&!s.memory?.raidRewardClaimed?btnWhy("Raid for salvage","raidSelectedWorld",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first."):""):"") +
               btnWhy(
                 "Upgrade Selected Planet",
                 "upgradePlanet",
@@ -17280,10 +17280,12 @@
           "</div></div></div>" +
           restrict +
           prod +
-          branches + (owned&&!game.system.isTutorial?card("World control","Active: "+esc(worldControlMode(b))+". Choose a specialization; switch freely. Industry increases output, Research adds data, Relay improves refueling.",["outpost","industry","research","relay"].map(mode=>btn(mode[0].toUpperCase()+mode.slice(1),"setWorldControlMode",mode,worldControlMode(b)!==mode)).join("")):"")
+          branches + (owned&&!game.system.isTutorial?card("World control","Active: "+esc(worldControlMode(b))+" • "+worldControlStability(b)+"% stability. Industry increases output, Research adds data, Relay extends refuel range by 100u and improves stability. Station upgrades consolidate control.",["outpost","industry","research","relay"].map(mode=>btn(mode[0].toUpperCase()+mode.slice(1),"setWorldControlMode",mode,worldControlMode(b)!==mode)).join("")):"")
         );
       }
+      function raidSelectedWorld(){const b=body(selectedPlanetName);if(!b||game.system.isTutorial)return false;return raid(b);}
       function worldControlMode(b){return b?.memory?.controlMode||"outpost";}
+      function worldControlStability(b){return Math.round(clamp(84-(Number(b?.captureDifficulty)||1)*10+(b?.branches?.station||0)*8+(worldControlMode(b)==="relay"?12:0),50,100));}
       function setWorldControlMode(mode){
         const b=body(selectedPlanetName);
         if(!b||game.system.isTutorial||!game.captured.has(b.name)||!["outpost","industry","research","relay"].includes(mode))return false;
@@ -18096,7 +18098,7 @@
           '</div><div class="chip"><b>Quarantine</b><br>' +
           pending.length +
           '</div><div class="chip"><b>Total Discoveries</b><br>' +
-          vault.entries.length +
+          vault.entries.length + " / "+vaultCatalog.length+
           '</div></div><div class="actions">' +
           btnWhy(
             level >= 6 ? "Vault Fully Upgraded" : "Upgrade Pioneer Vault",
@@ -18107,7 +18109,8 @@
           ) +
           btn("Open Collections", "openSection", "codex") +
           "</div></div>" +
-          card(
+          card("Active specimen bonuses",["survey","production","fuel","fleet"].map(type=>'<div class="chip">'+esc(({survey:"Survey rewards",production:"World output",fuel:"Jump fuel recovery",fleet:"Fleet mission speed"})[type])+" +"+Math.round(vaultBonus(type)*100)+"%</div>").join("")) +
+          secondaryDetails("Astral Archaeologist hull project",card(
             "Rare Hull Project: Astral Archaeologist",
             skinOwned
               ? "Field-research refit unlocked. Its specimen canisters, expedition plating, survey lights, and star-chart markings are rendered on the live Pioneer hull."
@@ -18134,7 +18137,7 @@
                   ) +
                   "</div>"
                 : ""),
-          ) +
+          )) +
           card(
             "Vault Collection",
             sorted.length
@@ -26359,6 +26362,7 @@
         upgradeFrigate,
         secureVaultEntry,
         setWorldControlMode,
+        raidSelectedWorld,
         recoverFrontierContact,
         trackFrontierContact,
         upgradePlanet,
