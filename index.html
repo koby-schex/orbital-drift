@@ -5243,6 +5243,85 @@
         .menu-content-enter,.feedback-flash,.fuel-hud.low { animation:none !important; }
       }
       @media(max-width:560px) { .menu .content { gap:8px; } .menu .grid { gap:8px; } .pioneer-deck-directory .pioneer-primary-actions {grid-template-columns:repeat(2,minmax(0,1fr));} }
+
+      /* Unified command interface: calm, high-contrast, native-looking navigation. */
+      .menu, .dialog {
+        --ui-bg:#091117; --ui-surface:#101c25; --ui-line:#263943;
+        --ui-text:#eaf2f5; --ui-secondary:#a2b6bf; --ui-accent:#9df2e4;
+        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        color:var(--ui-text);
+        background:var(--ui-bg);
+        letter-spacing:0; text-shadow:none;
+      }
+      .menu { background:#091117!important; border:1px solid #263943!important; box-shadow:0 26px 80px #0009!important; border-radius:22px; }
+      .menu-head { background:#091117!important; box-shadow:none!important; border-bottom:1px solid #263943!important; padding-block:14px!important; }
+      .menu-head:before, .menu-head:after {display:none!important;}
+      .menu-head h3 {font-size:19px!important;letter-spacing:-.035em!important;font-weight:650!important;}
+      .menu-head button {background:transparent!important;border:0!important;box-shadow:none!important;text-transform:none!important;font-size:14px!important;color:#9df2e4!important;min-height:44px!important;}
+      .menu-head #menuBack {display:inline-flex!important;gap:5px;justify-content:flex-start!important;}
+      .menu-head #menuBack:before {content:"‹";font-size:25px;line-height:1;}
+      .menu-head #menuBack:disabled {visibility:hidden;}
+      .menu-head #menuClose {justify-content:flex-end!important;display:inline-flex!important;}
+      .menu .content {gap:14px!important;padding-top:8px!important;max-width:680px;margin-inline:auto;}
+      .menu .menu-nav { margin:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;border:0!important;overflow:visible!important; }
+      .nav-context {display:flex;align-items:center;gap:10px;color:#a2b6bf;font-size:12px;min-height:38px;padding-inline:3px;min-width:0;}
+      .nav-context .nav-home {border:0!important;background:transparent!important;color:#9df2e4!important;box-shadow:none!important;padding:4px 6px!important;min-height:44px!important;font-size:13px!important;}
+      .nav-path {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+      .menu .route-list {display:flex;flex-direction:column;gap:0;border:1px solid #263943;border-radius:16px;background:#101c25;overflow:hidden;}
+      .menu .route-row {display:grid!important;grid-template-columns:40px minmax(0,1fr) 17px;align-items:center;text-align:left!important;gap:12px;min-height:70px!important;width:100%;border:0!important;border-radius:0!important;border-bottom:1px solid #263943!important;padding:12px 14px!important;box-shadow:none!important;background:transparent!important;transform:none!important;text-transform:none!important;letter-spacing:0!important;}
+      .menu .route-row:last-child{border-bottom:0!important;}
+      .menu .route-row:active {background:#1b3038!important;}
+      .menu .route-row:focus-visible {outline:2px solid #9df2e4;outline-offset:-3px;}
+      .route-icon {display:grid;place-items:center;width:38px;height:38px;color:#9df2e4;background:#172d33;border-radius:11px;}
+      .route-icon svg {width:22px;height:22px;display:block;}
+      .route-copy {min-width:0;display:flex;flex-direction:column;gap:4px;}
+      .route-copy b {font-size:15px;line-height:1.25;font-weight:650;color:#edf5f7;}
+      .route-copy small {font-size:12px;line-height:1.35;font-weight:400;color:#a2b6bf;white-space:normal;}
+      .route-chevron {width:16px;height:16px;color:#7796a2;}
+      .planet-orb {width:31px;height:31px;border-radius:50%;background:radial-gradient(circle at 30% 27%,#f2f8ff88,transparent 58%),var(--orb,#7f95ac);box-shadow:inset -7px -5px 12px #0009;justify-self:center;}
+      .screen-intro {font-size:14px!important;color:#a2b6bf!important;line-height:1.5;margin:4px 0 10px;}
+      .screen-eyebrow {font-size:10px;letter-spacing:.13em;font-weight:650;color:#a2b6bf;}
+      .command-status {padding:18px 18px 16px;border:1px solid #304650;border-radius:18px;background:linear-gradient(115deg,#10242d,#101c25 75%);}
+      .command-status h2 {font-size:clamp(24px,6vw,34px);letter-spacing:-.045em;font-weight:650;margin:8px 0;color:#f1f7f8;}
+      .command-status p {font-size:13px;color:#a2b6bf;margin:0 0 10px;}
+      .command-status .command-meter {height:4px;border-radius:9px;background:#263943;}
+      .command-status .command-meter span {background:#9df2e4;}
+      .next-action {display:grid;gap:8px;}
+      .next-action .route-row {background:#142a2c!important;border:1px solid #32534f!important;border-radius:15px!important;min-height:60px!important;}
+      .directory-heading {margin:8px 0 0!important;color:#b9cbd2!important;font-size:13px!important;font-weight:650!important;letter-spacing:.015em!important;}
+      .menu .card,.menu .branch,.menu .quest,.menu .log,.menu .prod,.menu .sector,.menu .crew-card,.menu .cosmetic-card,.menu .vault-hero,.menu .vault-entry,.menu .fleet-ship-card,.menu .expedition-card,.menu .shop{
+        background:#101c25!important;border:1px solid #263943!important;border-radius:16px!important;box-shadow:none!important;animation:none!important;
+      }
+      .menu .card::before,.menu .card::after,.menu .quest::before,.menu .branch::before {display:none!important;}
+      .menu .card h4,.menu h4,.menu .crew-row-head b {font-size:16px;letter-spacing:-.015em;line-height:1.35;font-weight:650;color:#edf5f7;}
+      .menu .card-body,.menu .card p,.menu .log span,.menu .prod span,.menu .branch span,.menu .quest span,.menu .setting-row span {color:#a2b6bf;line-height:1.5;font-size:13px;}
+      .menu .chip,.menu .res,.menu .stat {background:#0c171f!important;border:1px solid #263943!important;box-shadow:none!important;border-radius:10px!important;}
+      .menu button.game-action,.menu .actions button:not(.nav-link),.dialog button:not(.pause-close) {background:#9df2e4!important;color:#0b2426!important;border:1px solid #9df2e4!important;border-radius:11px!important;font-size:13px!important;font-weight:650!important;text-transform:none!important;letter-spacing:0!important;box-shadow:none!important;}
+      .menu button.nav-link {display:inline-flex;gap:7px;align-items:center;background:#152832!important;border:1px solid #34505a!important;color:#d5f0ee!important;border-radius:11px!important;font-size:13px!important;font-weight:600!important;box-shadow:none!important;text-transform:none!important;letter-spacing:0!important;}
+      .menu button.nav-link:after {content:"›";font-size:19px;line-height:1;}
+      .menu button:disabled,.dialog button:disabled {background:#17232b!important;color:#81929b!important;border-color:#263943!important;opacity:1!important;}
+      .menu button.danger,.dialog button.danger {background:#321f25!important;color:#ffc2c5!important;border-color:#5a323b!important;}
+      .menu button:focus-visible,.dialog button:focus-visible,.menu select:focus-visible {outline:2px solid #9df2e4!important;outline-offset:2px;}
+      .menu .menu-secondary-details {border:0!important;border-top:1px solid #263943!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;}
+      .menu .menu-secondary-details > summary {padding:12px 2px!important;color:#c2d8df!important;font-size:13px!important;border:0!important;}
+      .menu .menu-secondary-details > summary:after {border:0!important;color:#9df2e4;}
+      .menu .menu-secondary-body {padding:0 2px 8px!important;}
+      .settings-form {display:flex;flex-direction:column;gap:0;}
+      .settings-form .setting-row {display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,140px);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #263943;}
+      .menu select,.menu input {background:#0c171f!important;color:#edf5f7!important;border:1px solid #39515b!important;min-height:44px;font-size:14px;border-radius:9px!important;}
+      .menu .progress,.menu .milestone-meter,.menu .crew-xp,.menu .vault-progress-track {height:5px;border-radius:10px;background:#263943;box-shadow:none;}
+      .menu .progress>div,.menu .milestone-meter>div,.menu .crew-xp>div,.menu .vault-progress-track>div {background:#9df2e4;box-shadow:none;}
+      .menu-card-ready,.tab-count,.dock .ready,#productionBadge {display:none!important;}
+      .menu .pioneer-deck-directory {padding-inline:0;border:0;}
+      .menu .pioneer-flight-deck {padding-inline:0;border:0;}
+      .menu .cosmetic-loadout {gap:12px;}
+      .menu .cosmetic-preview-live,.menu .fleet-hangar-stage,.menu .vault-specimen {border-radius:12px!important;background-color:#091117!important;box-shadow:none!important;}
+      .pause-dialog,.title-screen {background:#091117!important;border:1px solid #263943!important;border-radius:22px!important;box-shadow:0 24px 80px #0009!important;}
+      .pause-dialog h2,.title-screen h2 {font-weight:650!important;letter-spacing:-.04em!important;}
+      .dialog button:not(.danger):not(.pause-close):not(#pauseResumeBtn):not(#loadBtn):not(#newGameBtn) {background:#152832!important;color:#e0efef!important;border-color:#34505a!important;}
+      @media(max-width:560px){.menu{border-radius:0!important;border:0!important;padding:calc(10px + var(--safeTop)) 16px calc(20px + var(--safeBottom))!important;}.menu-head{margin:calc(-10px - var(--safeTop)) -16px 6px!important;padding:calc(10px + var(--safeTop)) 16px 10px!important;top:calc(-10px - var(--safeTop))!important;}.menu .content{padding-bottom:calc(20px + var(--safeBottom))!important;}.menu .route-row{min-height:66px!important;padding:11px 12px!important;}}
+      @media(prefers-reduced-motion:reduce){.menu,.menu-content-enter,.route-row{animation:none!important;transition:none!important;}}
+
     </style>
   </head>
   <body>
@@ -5301,7 +5380,7 @@
       </button>
     </div>
     <div class="menu-scrim" id="menuScrim" aria-hidden="true"></div>
-    <div class="menu" id="menu">
+    <div class="menu" id="menu" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
       <div class="menu-head">
         <button class="menu-back" id="menuBack" type="button">Back</button>
         <h3 id="menuTitle">Menu</h3>
@@ -11844,7 +11923,7 @@
           fleetStatusStripHtml() +
           '<div class="fleet-hangar-stage"><canvas data-skin-kind="fleet" data-skin-key="' +
           esc(game.fleet.skin) +
-          '" data-fleet-view="formation" role="img" aria-label="Current fleet formation preview"></canvas><span class="cosmetic-preview-label">Current cruising formation</span></div><div class="fleet-anchor-actions"><button type="button" data-action="scrollFleetSection" data-arg="fleetShipyard">Open Shipyard</button><button type="button" data-action="scrollFleetSection" data-arg="fleetMissions">Open Mission Board</button></div><div class="grid" style="margin-top:8px"><div class="chip"><b>Fleet Slots</b><br>' +
+          '" data-fleet-view="formation" role="img" aria-label="Current fleet formation preview"></canvas><span class="cosmetic-preview-label">Current cruising formation</span></div><div class="grid" style="margin-top:8px"><div class="chip"><b>Fleet Slots</b><br>' +
           game.fleet.ships.length +
           " / " +
           fleetLimit() +
@@ -12089,6 +12168,8 @@
         );
       }
       function scrollFleetSection(id) {
+        if(id==="fleetShipyard")return setMenuTab("frigate|shipyard");
+        if(id==="fleetMissions")return setMenuTab("frigate|missions");
         const safe = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
         const el = ui.menu?.querySelector("#" + safe);
         if (el)
@@ -16011,7 +16092,7 @@
           return { title: objective.action, sub, menu: objective.menu };
         }
         const contact=nearestFrontierContact();
-        if(contact&&contact.d<320&&!game.ship.orbitLocked)return {title:"Recover "+contact.contact.name,sub:Math.round(contact.d)+"u • teal radar marker",menu:"frigate"};
+        if(contact&&contact.d<320&&!game.ship.orbitLocked)return {title:"Recover "+contact.contact.name,sub:Math.round(contact.d)+"u • teal radar marker",menu:"explore"};
         if (game.majorThreat?.status === "active")
           return {
             title: "Prepare for " + game.majorThreat.name,
@@ -16039,7 +16120,7 @@
               Number(arcStage.progress || 0) +
               "/" +
               arcStage.goal,
-            menu: "frigate",
+            menu: "frigate",tab:"expeditions",
           };
         if (h && h.d < 70 && !h.echo.harvested)
           return {
@@ -16068,8 +16149,8 @@
         if (game.frigate.built && fleetReadyCount() > 0)
           return {
             title: "Fleet Mission Ready",
-            sub: fleetReadyCount() + " mission reward ready to claim",
-            menu: "frigate",
+            sub: fleetReadyCount() + " mission rewards ready to claim",
+            menu: "frigate",tab:"missions",
           };
         if (upgradeReady().any)
           return {
@@ -16162,8 +16243,7 @@
           : null;
       }
       function openObjectiveAction() {
-        const m = nextBestAction().menu || "hub";
-        openMenu(m);
+        openRecommendedMenu();
       }
       function feedbackPulse(kind = "action") {
         if (!ui.feedbackFlash) return;
@@ -16346,7 +16426,7 @@
       }
       function btn(label, fn, arg = null, en = true) {
         return (
-          '<button type="button" ' +
+          '<button type="button" class="'+(["openSection","openFrigateTab","setMenuTab","openRecommendedMenu","backToMainMenu"].includes(fn)?"nav-link":"game-action")+'" ' +
           (en ? "" : "disabled") +
           ' data-action="' +
           esc(fn) +
@@ -16494,6 +16574,9 @@
         if (name === "flight") return game.frigate?.built ? "frigate" : "planets";
         const allowed = new Set([
           "hub",
+          "explore",
+          "hangar",
+          "journal",
           "resources",
           "planets",
           "upgrades",
@@ -16508,41 +16591,52 @@
         ]);
         return allowed.has(name) ? name : "hub";
       }
-      function openSection(name = "hub") {
-        const opening = !ui.menu.classList.contains("open");
-        if (opening) {
-          menuWasPaused = !!(paused || modalFreeze || titleOpen || titleMenuMode);
-          paused = true;
-          keys.clear();
-          cleanControlButtons();
-        }
-        activeMenu = normalizeMenuName(name);
+      // Navigation is a stack of full-screen destinations, not a collection of independent toggles.
+      const menuHistory=[];
+      const menuDefaults={planets:"list",upgrades:"ship",frigate:"overview",system:"status",cosmetics:"overview"};
+      function currentMenuRoute(){
+        return {section:activeMenu||"hub",tab:menuTabs[activeMenu]||null,scroll:Math.max(0,ui.menu.scrollTop||0)};
+      }
+      function sameMenuRoute(a,b){return a.section===b.section&&a.tab===b.tab;}
+      function applyMenuRoute(route){
+        activeMenu=route.section;
+        if(route.tab)menuTabs[route.section]=route.tab;
+        if(route.section==="planets"&&route.tab?.startsWith("world:"))selectedPlanetName=route.tab.slice(6);
         ui.menu.classList.remove("closing");
         ui.menu.classList.add("open");
-        document
-          .querySelectorAll(".dock button")
-          .forEach((b) =>
-            b.classList.toggle("active", b.dataset.menu === activeMenu),
-          );
-        syncMenuChrome();
-        renderMenu();
-        requestAnimationFrame(() => {
-          if (ui.menu) ui.menu.scrollTop = 0;
-        });
+        document.querySelectorAll(".dock button").forEach(b=>b.classList.toggle("active",b.dataset.menu===activeMenu));
+        syncMenuChrome();renderMenu();
+        ui.menu.scrollTop=route.scroll||0;
       }
-      function openMenu(name = "hub") {
-        if (activeMenu === name && ui.menu.classList.contains("open")) {
-          closeMenu();
-          return;
+      function openSection(name="hub",tab=null){
+        const section=normalizeMenuName(name),route={section,tab:tab||menuDefaults[section]||null,scroll:0};
+        const opening=!ui.menu.classList.contains("open");
+        if(opening){
+          menuHistory.length=0;
+          menuWasPaused=!!(paused||modalFreeze||titleOpen||titleMenuMode);
+          paused=true;keys.clear();cleanControlButtons();
+          if(section!=="hub"&&!titleMenuMode)menuHistory.push({section:"hub",tab:null,scroll:0});
+        }else if(section==="hub"){
+          menuHistory.length=0;
+        }else{
+          const current=currentMenuRoute();
+          if(sameMenuRoute(current,route))return;
+          menuHistory.push(current);
+          if(menuHistory.length>32)menuHistory.splice(1,1);
         }
-        if (!ui.menu.classList.contains("open") && name !== "hub")
-          activeMenu = null;
-        openSection(name);
+        applyMenuRoute(route);
+      }
+      function openMenu(name="hub"){openSection(name);}
+      function navigateMenuBack(){
+        const route=menuHistory.pop();
+        if(route)applyMenuRoute(route);
+        else closeMenu();
       }
       function closeMenu() {
         const shouldResume = !menuWasPaused && !titleMenuMode && !titleOpen;
         if(!ui.menu.classList.contains("open"))return;
         activeMenu = null;
+        menuHistory.length=0;
         renderMenu.lastSection=null;
         layoutDrag = null;
         ui.menu.classList.add("closing");
@@ -16578,25 +16672,20 @@
         if (!activeMenu || !ui.menu.classList.contains("open")) return;
         activeMenu = normalizeMenuName(activeMenu);
         ui.menu.dataset.section = activeMenu;
-        ui.menuTitle.textContent =
-          {
-            hub: game.frigate?.built ? "Pioneer Command" : "Command Menu",
-            resources: "Resources",
-            planets: "Planet Network",
-            upgrades: "Upgrade Center",
-            frigate: "Pioneer Base",
-            cosmetics: "Cosmetic Hangar",
-            system: "Operations",
-            echoes: "Orbital Echoes",
-            codex: "Planet Codex",
-            activity: "Captain Log",
-            guide: "Pilot Manual",
-            help: "Help / Glossary",
-          }[activeMenu] || "Command Menu";
-        ui.menuNav.innerHTML = "";
+        const key=activeMenu+"|"+(menuTabs[activeMenu]||""),samePage=renderMenu.lastSection===key,
+          oldScroll=ui.menu.scrollTop||0,
+          expanded=samePage?Array.from(ui.menuContent.querySelectorAll("details")).map(d=>d.open):[];
+        ui.menuTitle.textContent = menuRouteTitle(currentMenuRoute());
+        ui.menuBack.textContent="Back";
+        ui.menuBack.disabled=menuHistory.length===0&&!titleMenuMode;
+        ui.menuClose.textContent=titleMenuMode?"Title":"Flight";
+        ui.menuNav.innerHTML = menuNavigationHtml();
         (
           ({
             hub: renderHub,
+            explore: renderExploreDirectory,
+            hangar: renderHangarDirectory,
+            journal: renderJournalDirectory,
             resources: renderResources,
             planets: renderPlanets,
             upgrades: renderUpgrades,
@@ -16612,6 +16701,7 @@
         )();
         hydrateSettingsControls();
         wireMenuButtons();
+        if(samePage){Array.from(ui.menuContent.querySelectorAll("details")).forEach((d,i)=>{if(expanded[i])d.open=true;});ui.menu.scrollTop=oldScroll;}
         const sectionKey=activeMenu+"|"+(menuTabs[activeMenu]||"");
         if(renderMenu.lastSection!==sectionKey){
           renderMenu.lastSection=sectionKey;
@@ -16620,30 +16710,20 @@
         }
         queueSkinPreviews();
       }
-      function menuNavigationHtml() {
-        const sections = [
-          ["hub", "⌂", "Home"],
-          ["planets", "●", "Worlds"],
-          ["resources", "◆", "Cargo"],
-          ["upgrades", "▲", "Upgrades"],
-          ["frigate", "▰", "Pioneer"],
-          ["cosmetics", "◇", "Style"],
-          ["system", "◎", "Records"],
-        ];
-        return sections
-          .map(
-            (section) =>
-              '<button type="button" class="' +
-              (activeMenu === section[0] ? "active" : "") +
-              '" data-action="openSection" data-arg="' +
-              esc(JSON.stringify(section[0])) +
-              '"><span>' +
-              section[1] +
-              "</span>" +
-              esc(section[2]) +
-              "</button>",
-          )
-          .join("");
+      function menuRouteTitle(route){
+        const labels={hub:"Command",explore:"Explore",hangar:"Ship & designs",journal:"Journey",resources:"Cargo",planets:"Worlds",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"System",echoes:"Orbital Echoes",codex:"Planet Codex",activity:"Captain Log",guide:"Pilot Manual",help:"Help"};
+        const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",shipyard:"Shipyard",missions:"Fleet missions",history:"Fleet history",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",daily:"Daily tasks",contracts:"Contracts",milestones:"Milestones",travel:"Travel & atlas",records:"Journey records",settings:"Settings",display:"Display & performance",audio:"Audio & feedback",controls:"Flight controls",data:"Save data",privacy:"Purchases & privacy",achievements:"Achievements",reputation:"Reputation & encounters",collections:"Collections & statistics"},upgrades:{ship:"Ship upgrades",planet:"World upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
+        if(route.section==="planets"&&route.tab?.startsWith("world:")){
+          const world=body(route.tab.slice(6));return world&&(world.discovered||game.discovered.has(world.name)||world.type==="star")?world.name:"Unknown world";
+        }
+        return sub[route.section]?.[route.tab]||labels[route.section]||"Command";
+      }
+      function menuNavigationHtml(){
+        if(activeMenu==="hub")return "";
+        if(titleMenuMode)return '<div class="nav-context"><span class="nav-path">Title / '+esc(menuRouteTitle(currentMenuRoute()))+'</span></div>';
+        const path=menuHistory.filter(r=>r.section!=="hub").map(menuRouteTitle);
+        const label=path.length?path.slice(-1).join(" / "):"Command";
+        return '<div class="nav-context"><button type="button" data-action="backToMainMenu" data-arg="" class="nav-home">Home</button><span aria-hidden="true">/</span><span class="nav-path">'+esc(label==="Command"?menuRouteTitle(currentMenuRoute()):label+" / "+menuRouteTitle(currentMenuRoute()))+'</span></div>';
       }
       function addMobileMenuFooter() {
         if (
@@ -16662,18 +16742,16 @@
       function closeMenuAction() {
         closeMenu();
       }
-      function openRecommendedMenu() {
-        const next = nextBestAction()?.menu || "hub",
-          target = next;
-        if (target === activeMenu) {
-          const title = nextBestAction()?.title || "Recommended action";
-          toast(title + " is already open.");
-          return;
+      function openRecommendedMenu(){
+        const next=nextBestAction(), section=next?.menu||"hub";
+        const title=String(next?.title||"").toLowerCase();
+        if(section==="planets"){
+          const b=planetCaptureReady()||currentTarget();if(b&&body(b.name))return openWorldDetails(b.name);
         }
-        openSection(target);
+        const tab=next?.tab||(section==="frigate"?"overview":section==="system"?"travel":section==="upgrades"?(game.system.isTutorial&&game.missionStage===2||title.includes("planet")||String(next?.sub||"").toLowerCase().includes("mars")||String(next?.sub||"").toLowerCase().includes("planet")?"planet":"ship"):null);
+        openSection(section,tab);
       }
       function hydrateSettingsControls() {
-        if (!$("graphicsSelect")) return;
         const set = (id, val) => {
           const el = $(id);
           if (el) el.value = String(val);
@@ -16701,49 +16779,24 @@
         upgrades: "ship",
         frigate: "overview",
         system: "status",
+        cosmetics:"overview",
       };
       function activeTab(menu, fallback) {
         menuTabs[menu] = menuTabs[menu] || fallback;
         return menuTabs[menu];
       }
-      function tabBar(menu, tabs) {
-        const current = activeTab(menu, tabs[0]?.key || "overview");
-        return (
-          '<div class="section-tabs" role="tablist">' +
-          tabs
-            .map(
-              (t) =>
-                '<button type="button" class="' +
-                (current === t.key ? "active" : "") +
-                '" role="tab" aria-selected="' + String(current === t.key) + '" data-action="setMenuTab" data-arg="' +
-                esc(menu + "|" + t.key) +
-                '">' +
-                esc(t.label) +
-                (t.count
-                  ? '<span class="tab-count">' + esc(t.count) + "</span>"
-                  : "") +
-                "</button>",
-            )
-            .join("") +
-          "</div>"
-        );
+      function tabBar(menu,tabs){
+        const current=activeTab(menu,tabs[0]?.key||"overview");
+        // These links always navigate to another page. Counts are not unread notifications.
+        return '<div class="route-list">'+tabs.filter(t=>t.key!==current).map(t=>routeRow(t.label,t.desc||"","setMenuTab",menu+"|"+t.key,t.icon||"layers")).join("")+'</div>';
       }
-      function setMenuTab(v) {
-        const parts = String(v || "").split("|"),
-          menu = parts[0],
-          tab = parts[1];
-        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","vault","upgrades","cosmetics"],system:["status","ops","travel","records","settings"]};
-        if (!allowed[menu]?.includes(tab)) return;
-        menuTabs[menu] = tab;
-        renderMenu();
-        requestAnimationFrame(() => {
-          if (ui.menu) ui.menu.scrollTop = 0;
-        });
+      function setMenuTab(v){
+        const [menu,tab]=String(v||"").split("|");
+        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","shipyard","missions","history","vault","upgrades","cosmetics"],system:["status","ops","daily","contracts","milestones","travel","records","achievements","reputation","collections","settings","display","audio","controls","data","privacy"],cosmetics:["overview","ship","frigate","trail","fleet","sets"]};
+        if(!allowed[menu]?.includes(tab))return;
+        openSection(menu,tab);
       }
-      function openFrigateTab(tab = "overview") {
-        menuTabs.frigate = tab;
-        openSection("frigate");
-      }
+      function openFrigateTab(tab="overview"){setMenuTab("frigate|"+tab);}
       function tabIntro(title, desc, chips = "") {
         return (
           '<div class="card section-summary"><div class="section-focus-title"><h4>' +
@@ -16793,149 +16846,63 @@
           "</div></div>"
         );
       }
-      function renderHub() {
-        const rs = readyState(),
-          nba = nextBestAction(),
-          surveyBodies = (game.system?.bodies || []).filter(
-            (b) => b.type !== "star",
-          ),
-          surveyKnown = surveyBodies.filter(
-            (b) => bodySurveyed(b),
-          ).length,
-          surveyProgress = surveyBodies.length
-            ? Math.round((surveyKnown / surveyBodies.length) * 100)
-            : 0,
-          core = [
-            [
-              "resources",
-              "◆",
-              "Resources",
-              "Gather colony output and inspect cargo.",
-              rs.resources,
-            ],
-            [
-              "planets",
-              "●",
-              "Worlds",
-              "Target, scan, capture, and develop planets.",
-              rs.planets,
-            ],
-            [
-              "upgrades",
-              "▲",
-              "Ship & World Upgrades",
-              "Improve the Starling and captured worlds.",
-              rs.upgrades,
-            ],
-            [
-              "frigate",
-              "▰",
-              game.frigate?.built ? "Pioneer Base" : "Pioneer Project",
-              "Crew, fleet, adventures, systems, and travel.",
-              rs.frigate,
-            ],
-            [
-              "cosmetics",
-              "◇",
-              "Appearance",
-              "Preview and equip hull, fleet, and trail designs.",
-              0,
-            ],
-          ],
-          explore = [
-            [
-              "echoes",
-              "〰",
-              "Echoes",
-              "Review saved slingshot routes.",
-              rs.echoes,
-            ],
-            [
-              "codex",
-              "☉",
-              "Codex",
-              "Browse surveyed worlds and discoveries.",
-              0,
-            ],
-          ],
-          support = [
-            [
-              "system",
-              "◎",
-              "Operations",
-              "Assignments, atlas, records, save, and settings.",
-              rs.system,
-            ],
-            [
-              "activity",
-              "≡",
-              "Captain Log",
-              "Review the journey so far.",
-              0,
-            ],
-            [
-              "guide",
-              "△",
-              "Pilot Manual",
-              "Guidance for every major system.",
-              0,
-            ],
-            ["help", "?", "Glossary", "Quick definitions and gameplay help.", 0],
-          ];
-        const groupHtml = (title, items) =>
-          '<div class="card"><h4>' +
-          esc(title) +
-          '</h4><div class="grid">' +
-          items
-            .map(
-              (s) =>
-                '<button class="hub-btn" type="button" data-action="openSection" data-arg="' +
-                esc(JSON.stringify(s[0])) +
-                '">' +
-                (s[4]
-                  ? '<em class="menu-card-ready">' +
-                    (s[4] > 99 ? "99+" : s[4]) +
-                    "</em>"
-                  : "") +
-                '<span class="hub-symbol">' +
-                s[1] +
-                "</span><b>" +
-                esc(s[2]) +
-                '</b><small style="display:block;color:var(--muted);margin-top:4px">' +
-                esc(s[3]) +
-                "</small></button>",
-            )
-            .join("") +
-          "</div></div>";
-        ui.menuContent.innerHTML =
-          guidedTutorialCard() +
-          '<div class="command-vista"><span class="command-kicker">Current Expedition</span><h4>' +
-          esc(game.system?.name || "Uncharted System") +
-          '</h4><p>' +
-          surveyKnown +
-          " of " +
-          surveyBodies.length +
-          ' worlds catalogued in this system.</p><div class="command-meter" style="--commandProgress:' +
-          surveyProgress +
-          '%"><span></span></div></div>' +
-          card(
-            "Recommended Next Action",
-            esc(nba.title) +
-              '<br><span style="color:var(--muted)">' +
-              esc(nba.sub) +
-              "</span>",
-            btn("Open " + menuLabel(nba.menu), "openSection", nba.menu),
-          ) +
-          groupHtml("Explore & manage", [core[1],core[3],core[0]]) +
-          (game.frigate.built?card("Discoveries",activeFrontierContacts().length+" drifting contacts in this system. Recover them for salvage and Vault finds.",btn("Track closest contact","trackFrontierContact",null,!!nearestFrontierContact())+btn("Vault","openFrigateTab","vault")+btn("Adventures","openFrigateTab","expeditions")):"") +
-          secondaryDetails("Upgrades, appearance & routes",groupHtml("Ship & journey",[core[2],core[4],...explore])) +
-          secondaryDetails("Records, Settings & Help", groupHtml("Records & Help", support));
+      function navIcon(name){
+        const paths={explore:'<circle cx="12" cy="12" r="8"/><ellipse cx="12" cy="12" rx="3.5" ry="8"/><path d="M4 12h16"/>',pioneer:'<path d="M12 3l8 14-8-3-8 3 8-14zM12 14v7"/>',cargo:'<path d="M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10"/>',ship:'<path d="M12 3l5 5 3 11-8-4-8 4 3-11zM10 8h4"/>',journal:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3"/>',vault:'<path d="M12 3l8 5v8l-8 5-8-5V8zM12 3v18M4 8l16 8M20 8L4 16"/>',route:'<circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 5h8a4 4 0 010 8H9a3 3 0 000 6h8"/>',signal:'<circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="6"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>',layers:'<path d="M12 3l9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/>',crew:'<circle cx="12" cy="7" r="3"/><path d="M5 21v-3a7 7 0 0114 0v3"/>',fleet:'<path d="M12 3l4 8-4-2-4 2zM5 12l4 8-4-2-4 2zM19 12l4 8-4-2-4 2z"/>',help:'<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 116 0c0 2-3 2-3 4m0 3v.2"/>'};
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(paths[name]||paths.layers)+'</svg>';
+      }
+      function routeRow(label,desc,action,arg,icon="layers"){
+        return '<button type="button" class="route-row" data-action="'+esc(action)+'" data-arg="'+esc(JSON.stringify(arg))+'"><span class="route-icon">'+navIcon(icon)+'</span><span class="route-copy"><b>'+esc(label)+'</b>'+(desc?'<small>'+esc(desc)+'</small>':'')+'</span><svg class="route-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 3 5 5-5 5"/></svg></button>';
+      }
+      function routeDirectory(rows){return '<div class="route-list">'+rows.map(r=>routeRow(...r)).join("")+'</div>';}
+      function renderHub(){
+        const nba=nextBestAction(),worlds=(game.system?.bodies||[]).filter(b=>b.type!=="star"),
+          scanned=worlds.filter(bodySurveyed).length;
+        ui.menuContent.innerHTML=guidedTutorialCard()+
+          '<section class="command-status"><span class="screen-eyebrow">CURRENT SYSTEM</span><h2>'+esc(game.system?.name||"Uncharted")+'</h2><p>'+scanned+' of '+worlds.length+' worlds surveyed</p><div class="command-meter" style="--commandProgress:'+Math.round(scanned/Math.max(1,worlds.length)*100)+'%"><span></span></div></section>'+
+          '<section class="next-action"><span class="screen-eyebrow">NEXT STEP</span>'+routeRow(nba.title,nba.sub,"openRecommendedMenu",null,"route")+'</section>'+
+          '<h4 class="directory-heading">Command directory</h4>'+
+          routeDirectory([
+            ["Explore","Worlds, signals, discoveries and travel","openSection","explore","explore"],
+            [game.frigate?.built?"Pioneer":"Pioneer project","Fleet, crew, Vault and adventures","openSection","frigate","pioneer"],
+            ["Cargo","Resources and production","openSection","resources","cargo"],
+            ["Ship & designs","Upgrade and customize your spacecraft","openSection","hangar","ship"],
+            ["Journey","Tasks, records, Echoes and help","openSection","journal","journal"],
+            ["Settings","Controls, audio, display and save data","setMenuTab","system|settings","settings"]
+          ]);
+      }
+      function renderExploreDirectory(){
+        const n=nearestFrontierContact();
+        ui.menuContent.innerHTML=routeDirectory([
+          ["Worlds","Survey, capture and manage planets","openSection","planets","explore"],
+          ["Travel & atlas","Jump, visit systems and investigate anomalies","setMenuTab","system|travel","route"],
+          ["Planet Codex","Your surveyed worlds and collections","openSection","codex","journal"],
+          ...(game.frigate.built?[["Vault","Unique discoveries and passive bonuses","openFrigateTab","vault","vault"]]:[])
+        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
+      }
+      function renderHangarDirectory(){
+        ui.menuContent.innerHTML=routeDirectory([
+          ["Ship upgrades","Thrust, fuel, braking and other systems","setMenuTab","upgrades|ship","ship"],
+          ["World upgrades","Improve your captured worlds","setMenuTab","upgrades|planet","explore"],
+          ["Appearance","Hull designs, engine trails and fleet styles","openSection","cosmetics","layers"],
+          ...(game.frigate.built?[["Base upgrades","Pioneer capacity and systems","openFrigateTab","upgrades","pioneer"]]:[])
+        ]);
+      }
+      function renderJournalDirectory(){
+        ui.menuContent.innerHTML=routeDirectory([
+          ["Tasks","Daily operations, contracts, milestones","setMenuTab","system|ops","route"],
+          ["Journey records","Achievements, faction standing and collections","setMenuTab","system|records","journal"],
+          ["Captain Log","Recent actions and encounter decisions","openSection","activity","journal"],
+          ["Orbital Echoes","View and manage recorded flight routes","openSection","echoes","signal"],
+          ["Pilot Manual","How to use each game system","openSection","guide","help"],
+          ["Help","Quick definitions and guidance","openSection","help","help"]
+        ]);
       }
       function menuLabel(k) {
         return (
           {
-            resources: "Resources",
-            planets: "Planets",
+            explore:"Explore",hangar:"Ship & designs",journal:"Journey",
+            resources: "Cargo",
+            planets: "Worlds",
             upgrades: "Upgrades",
             frigate: game.frigate?.built ? "Pioneer Base" : "Pioneer Project",
             cosmetics: "Cosmetic Hangar",
@@ -17105,7 +17072,16 @@
           return "Speed contracts, volcanic worlds, and high-tier systems.";
         return "Earned from colonies, salvage, encounters, and contracts.";
       }
+      function openWorldDetails(name){
+        if(!body(name))return;
+        openSection("planets","world:"+name);
+      }
       function renderPlanets() {
+        const tab=activeTab("planets","list");
+        if(!tab.startsWith("world:")){
+          ui.menuContent.innerHTML='<p class="screen-intro">Choose a world to see its survey, control and development options.</p><div class="route-list">'+planetListHtml()+"</div>";
+          return;
+        }
         const s = body(selectedPlanetName),
           summary = s
             ? bodySurveyed(s)
@@ -17118,11 +17094,8 @@
             : "Select a planet.";
         const scanRange = s && game.ship ? dist(game.ship, s) - visualRadius(s) : Infinity;
         ui.menuContent.innerHTML =
-          '<div class="list">' +
-          planetListHtml() +
-          "</div>" +
           card(
-            "Selected Planet",
+            "World status",
             summary,
             btn("Set as Target", "setTarget", selectedPlanetName) +
               btn(
@@ -17143,14 +17116,7 @@
           ) +
           secondaryDetails("World History", planetMemoryHtml(s)) +
           secondaryDetails("Survey & Development Details", planetDetailsHtml(s));
-        document.querySelectorAll(".planet[data-planet]").forEach(
-          (e) =>
-            (e.onclick = () => {
-              selectedPlanetName = e.dataset.planet;
-              renderPlanets();
-              wireMenuButtons();
-            }),
-        );
+        if(!s)ui.menuContent.innerHTML=card("World unavailable","This world is not in the current system.",btn("Worlds","openSection","planets"));
       }
       function bodySurveyed(b) {
         return !!(
@@ -17161,58 +17127,13 @@
             game.captured.has(b.name))
         );
       }
-      function planetListHtml() {
-        return game.system.bodies
-          .map((b) => {
-            const known = b.discovered || game.discovered.has(b.name),
-              surveyed = bodySurveyed(b),
-              tag =
-                b.type === "star"
-                  ? "CORE"
-                  : b.factory
-                    ? "FACTORY"
-                    : game.captured.has(b.name)
-                      ? "OWNED"
-                      : !b.capturable
-                        ? surveyed
-                          ? "SURVEY"
-                          : "SIGNAL"
-                        : surveyed
-                          ? b.rarity
-                          : known
-                            ? "SIGNAL"
-                            : "???";
-            return (
-              '<div class="planet ' +
-              (b.name === selectedPlanetName ? "active" : "") +
-              '" data-planet="' +
-              esc(b.name) +
-              '"><div class="dot" style="background:' +
-              b.color +
-              ";color:" +
-              b.color +
-              '"></div><div><b>' +
-              (known ? esc(b.name) : "Unknown World") +
-              "</b><span>" +
-              (known
-                ? b.type === "star"
-                  ? "Star"
-                  : surveyed
-                    ? esc(displayBiome(b)) +
-                      " • " +
-                      esc(b.rarity) +
-                      " • Lv. " +
-                      b.level
-                    : "Detected • Survey scan pending"
-                : "Unsurveyed") +
-              '</span></div><div class="tag ' +
-              (known && b.type !== "star" ? rarityClass(b) : "") +
-              '">' +
-              esc(tag) +
-              "</div></div>"
-            );
-          })
-          .join("");
+      function planetListHtml(){
+        return game.system.bodies.map(b=>{
+          const known=b.discovered||game.discovered.has(b.name)||b.type==="star",surveyed=bodySurveyed(b),
+            status=b.type==="star"?"Star":game.captured.has(b.name)?"Controlled":surveyed?(b.capturable?"Available to capture":"Survey only"):"Survey pending",
+            desc=known?(surveyed&&b.type!=="star"?status+" · "+b.rarity:status):"Unsurveyed signal";
+          return '<button type="button" class="route-row planet-route" data-action="openWorldDetails" data-arg="'+esc(JSON.stringify(b.name))+'"><span class="planet-orb" style="--orb:'+esc(b.color)+'"></span><span class="route-copy"><b>'+esc(known?b.name:"Unknown world")+'</b><small>'+esc(desc)+'</small></span><svg class="route-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 3 5 5-5 5"/></svg></button>';
+        }).join("");
       }
       function planetDetailsHtml(b) {
         if (!b) return "";
@@ -17396,21 +17317,8 @@
             body("Earth"),
           planetReason = planetUpgradeBlockReason(sel);
         if (sel) selectedPlanetName = sel.name;
-        const tab = activeTab("upgrades", "ship"),
-          ready = upgradeReady();
-        const tabs = tabBar("upgrades", [
-          {
-            key: "ship",
-            label: "Ship Systems",
-            count: ready.label === "Starship system ready" ? "!" : "",
-          },
-          {
-            key: "planet",
-            label: "Planet Upgrade",
-            count: sel && canUpgradePlanet(sel) ? "!" : "",
-          },
-        ]);
-        let html = tabs;
+        const tab=activeTab("upgrades","ship");
+        let html="";
         if (tab === "planet") {
           html +=
             card(
@@ -18176,43 +18084,8 @@
           );
           return;
         }
-        const tab = activeTab("frigate", "overview"),
-          readyUpgrades = [
-            "capacity",
-            "reactor",
-            "hangar",
-            "scanner",
-            "command",
-            "vault",
-          ].filter(
-            (k) =>
-              hasFactoryAccess() &&
-              canAfford(frigateCost(k)) &&
-              (game.frigate[k + "Level"] || 0) < 6,
-          ).length,
-          readyFleet = fleetReadyCount();
-        if (!expeditionState().active && !expeditionState().offers.length)
-          generateExpeditionOffers();
-        const expeditionCount = expeditionState().active
-            ? 1
-            : expeditionState().offers.length,
-          crewTraining = crewState().members.filter(
-            (member) =>
-              member.level < 6 &&
-              member.xp >= crewXpNeeded(member) &&
-              canAfford(crewUpgradeCost(member.id)),
-          ).length;
-        const tabs = tabBar("frigate", [
-          { key: "overview", label: "Command" },
-          { key: "expeditions", label: "Adventures", count: expeditionCount || "" },
-          { key: "crew", label: "Crew", count: crewTraining || "" },
-          { key: "fleet", label: "Fleet", count: readyFleet || "" },
-          { key: "vault", label: "Vault", count: vaultPendingEntries().length || "" },
-          { key: "upgrades", label: "Systems", count: readyUpgrades || "" },
-          { key: "cosmetics", label: "Appearance" },
-        ]).replace('class="section-tabs"', 'class="section-tabs frigate-deck-tabs"');
-        // The Command landing view is task-focused; deck-specific technical
-        // information remains accessible only when the pilot requests it.
+        const tab=activeTab("frigate","overview"),readyFleet=fleetReadyCount();
+        if(tab==="expeditions"&&!expeditionState().active&&!expeditionState().offers.length)generateExpeditionOffers();
         const overview =
           '<div class="card pioneer-hero pioneer-command-landing"><div class="section-focus-title"><div><span class="command-kicker">Your Mobile Headquarters</span><h4>' +
           esc(game.frigate.name) +
@@ -18226,12 +18099,11 @@
           '</p><div class="pioneer-primary-actions">'+
           (orbitingFrigate()?btn("Explore a new system","jumpSystem"):btn("Locate Pioneer","setFrigateTarget"))+
           (orbitingFrigate()&&game.ship.fuel<game.ship.maxFuel*.94?btn("Refuel Starling","refuel"):"")+
-          btn("Start an adventure","setMenuTab","frigate|expeditions")+
+          ""+
           '</div></div>'+
-          '<div class="pioneer-deck-directory"><span class="command-kicker">SHIP DIRECTORY</span><div class="pioneer-primary-actions">'+
-          [["Manage my fleet","fleet","Deploy escorts and collect mission rewards."],["Meet the crew","crew","Recruit, train and assign specialists."],["Discovery Vault","vault","Secure discoveries and unlock records."],["Base systems","upgrades","Improve your mobile headquarters."],["Appearance","cosmetics","Equip hull and fleet designs."]].map(([label,deck,desc])=>
-            '<button class="pioneer-deck-link" type="button" data-action="setMenuTab" data-arg="frigate|'+deck+'"><b>'+esc(label)+'</b><small>'+esc(desc)+'</small></button>').join("")+
-          '</div></div>' +
+          '<div class="pioneer-deck-directory"><h4 class="directory-heading">Pioneer directory</h4>'+
+          routeDirectory([["Adventures","Accept or review an expedition","setMenuTab","frigate|expeditions","route"],["Fleet",readyFleet?readyFleet+" mission rewards ready":"Manage escorts and deploy missions","setMenuTab","frigate|fleet","fleet"],["Crew","Recruit, train and assign specialists","setMenuTab","frigate|crew","crew"],["Vault","Secure specimens and review bonuses","setMenuTab","frigate|vault","vault"],["Base upgrades","Improve your mobile headquarters","setMenuTab","frigate|upgrades","pioneer"],["Appearance","Equip Pioneer and fleet designs","openSection","cosmetics","layers"]])+
+          '</div>' +
           '<details class="pioneer-command-details"><summary>Base details and settings</summary>' +
           '<div class="pioneer-command-metrics"><span>Base Lv. ' +
           game.frigate.level +
@@ -18291,15 +18163,19 @@
           .join("");
         // Deck navigation stays visible without a second wall of badges and
         // counters. Context lives inside the deck that owns the information.
-        let html = tab==="overview" ? "" : '<div class="actions pioneer-simple-nav">'+btn("Pioneer directory","setMenuTab","frigate|overview")+'</div>';
+        let html = "";
         if (tab === "expeditions") html += expeditionsHtml();
         else if (tab === "crew") html += crewHtml();
         else if (tab === "fleet")
-          html +=
-            fleetOverviewHtml() +
-            fleetShipyardHtml() +
-            fleetMissionsHtml() +
-            fleetHistoryHtml();
+          html += fleetOverviewHtml()+routeDirectory([
+            ["Fleet missions",readyFleet?readyFleet+" rewards ready to claim":"Launch and manage assignments","setMenuTab","frigate|missions","route"],
+            ["Shipyard","Build and upgrade escorts","setMenuTab","frigate|shipyard","fleet"],
+            ["Fleet history","Completed missions and rewards","setMenuTab","frigate|history","journal"],
+            ["Fleet appearance","Customize escort hull designs","setMenuTab","cosmetics|fleet","layers"]
+          ]);
+        else if(tab==="shipyard")html+=fleetShipyardHtml();
+        else if(tab==="missions")html+=fleetMissionsHtml();
+        else if(tab==="history")html+=fleetHistoryHtml()||card("No completed missions","Launch an assignment from Fleet missions.");
         else if (tab === "vault") html += vaultHtml();
         else if (tab === "upgrades")
           html += card(
@@ -18308,9 +18184,7 @@
             '<div class="list">' + upgradeRows + "</div>",
           );
         else if (tab === "cosmetics")
-          html +=
-            storeHtml() +
-            fleetSkinsHtml();
+          html += routeDirectory([["Pioneer designs","Browse and equip hulls","setMenuTab","cosmetics|frigate","pioneer"],["Fleet designs","Customize escorts","setMenuTab","cosmetics|fleet","fleet"],["All designs","Starling, trails and complete sets","openSection","cosmetics","layers"]]);
         else html += overview;
         ui.menuContent.innerHTML = html;
       }
@@ -18362,6 +18236,8 @@
       }
       function renderCosmetics() {
         refreshSkins(false);
+        const tab=activeTab("cosmetics","overview");
+        if(tab!=="overview"){ui.menuContent.innerHTML=tab==="fleet"?fleetSkinsHtml():storeHtml(tab);return;}
         const ship = activeShipSkin(),
           frigate = activeFrigateSkin(),
           trail = activeTrailSkin(),
@@ -18392,26 +18268,33 @@
           "</b>" +
           cosmeticPreviewHtml("trail", trail.key, "Equipped starship trail") +
           "</div></div>" +
-          secondaryDetails("Browse Starship and Pioneer Designs", storeHtml()) +
-          secondaryDetails("Browse Fleet Formations", fleetSkinsHtml());
+          routeDirectory([
+            ["Starling designs","Browse and equip ship hulls","setMenuTab","cosmetics|ship","ship"],
+            ["Pioneer designs","Browse and equip frigate hulls","setMenuTab","cosmetics|frigate","pioneer"],
+            ["Engine trails","Customize your exhaust trail","setMenuTab","cosmetics|trail","signal"],
+            ["Fleet designs","Customize escort ships","setMenuTab","cosmetics|fleet","fleet"],
+            ["Hull sets","Coordinated designs and purchase restoration","setMenuTab","cosmetics|sets","layers"]
+          ]);
       }
-      function storeHtml() {
+      function storeHtml(section="all") {
         const mode=cosmeticStoreMode();
-        const category=(title,items,kind,owned,equipped,render)=>secondaryDetails(title+" ("+
-          items.filter(v=>owned(v.key)).length+"/"+items.length+" owned)",
-          '<div class="cosmetic-catalog">'+rankCosmetics(items,owned,equipped).map(render).join("")+'</div>');
+        const category=(title,items,kind,owned,equipped,render)=>{
+          if(section!=="all"&&section!==kind)return "";
+          const label=title+" ("+items.filter(v=>owned(v.key)).length+"/"+items.length+" owned)",content='<div class="cosmetic-catalog">'+rankCosmetics(items,owned,equipped).map(render).join("")+'</div>';
+          return section==="all"?secondaryDetails(label,content):'<h4 class="directory-heading">'+esc(label)+'</h4>'+content;
+        };
         return card("Design collection","Visual customization only. Designs never affect power, flight or progression.",
           '<p>'+esc(mode==="apple"?"Apple confirms the current local price before payment.":mode==="web"?"Web Edition designs are complimentary and never require payment.":"Purchases are unavailable in this native build. Earned and owned designs remain usable.")+'</p>')+
           category("Starship Skins",shipSkins,"ship",k=>owns("ship",k),game.frigate.shipSkin,v=>skinHtml(v,"ship"))+
           category("Starship Trail Designs",trailSkins,"trail",ownsTrailSkin,game.frigate.trailSkin,trailSkinHtml)+
           category("Frigate Skins",frigateSkins,"frigate",k=>owns("frigate",k),game.frigate.skin,v=>skinHtml(v,"frigate"))+
-          secondaryDetails("Complete Hull Sets",'<div class="cosmetic-catalog">'+skinCombos.map(c=>{
+          ((section==="all"||section==="sets")?'<h4 class="directory-heading">Complete Hull Sets</h4><div class="cosmetic-catalog">'+skinCombos.map(c=>{
             const own=owns("ship",c.ship)&&owns("frigate",c.frigate);
             return '<article class="cosmetic-card"><b>'+esc(c.key)+'</b><span>'+esc(c.ship+" + "+c.frigate)+'</span><p>'+
               esc(own?"Owned set":c.type==="achievement"?cosmeticUnlockText(c):cosmeticStateText(c,false))+'</p>'+
               (own?btn("Owned","noop",null,false):c.type==="achievement"?btn("Earn in game","noop",null,false):
               cosmeticPurchaseButton(c,"buyCombo",c.key))+'</article>';
-          }).join("")+'</div>')+
+          }).join("")+'</div>':"")+
           (mode==="apple"||mode==="unavailable"?'<div class="actions">'+btn("Restore Apple Purchases","restorePurchases")+'</div>':"");
       }
       function skinHtml(s,kind) {
@@ -18640,30 +18523,18 @@
             name: "Frontier System",
             desc: "A newly charted system.",
           },
-          tab = activeTab("system", "status"),
-          readyDaily = ensureDailyOps(false).ops.filter(
-            (op) => op.complete && !op.claimed,
-          ).length,
-          nearbyEvent = nearestSectorEvent(),
-          eventReady =
-            nearbyEvent &&
-            ((!nearbyEvent.event.mysteryScanned &&
-              nearbyEvent.d <= mysteryScanRadius()) ||
-              (nearbyEvent.event.mysteryScanned && nearbyEvent.d <= 115))
-              ? 1
-              : 0,
-          bhReady = nearestBlackHole()?.d <= 140 ? 1 : 0;
-        const tabs = tabBar("system", [
-          { key: "status", label: "Status" },
-          { key: "ops", label: "Ops", count: readyDaily || "" },
-          { key: "travel", label: "Travel", count: eventReady + bhReady || "" },
-          { key: "records", label: "Records" },
-          { key: "settings", label: "Settings" },
-        ]);
-        let html = tabs;
-        if (tab === "ops") {
-          html += dailyOpsHtml() + milestoneHtml() + contractsHtml();
-        } else if (tab === "travel") {
+          tab = activeTab("system","status");
+        let html="";
+        if(tab==="ops"){
+          html=routeDirectory([
+            ["Daily tasks","Complete daily objectives and claim rewards","setMenuTab","system|daily","journal"],
+            ["Contracts","Find new short-term objectives","setMenuTab","system|contracts","route"],
+            ["Milestones","Long-term expedition rewards","setMenuTab","system|milestones","layers"]
+          ]);
+        }else if(tab==="daily")html=dailyOpsHtml();
+        else if(tab==="contracts")html=contractsHtml();
+        else if(tab==="milestones")html=milestoneHtml();
+        else if (tab === "travel") {
           html +=
             majorThreatHtml() +
             livingSystemEventHtml() +
@@ -18696,25 +18567,29 @@
               '<div class="list">' + blackHoleHtml() + "</div>",
             ) +
             atlasHtml();
-        } else if (tab === "records") {
-          html +=
-            journeyPulseHtml() +
-            reputationHtml() +
-            encounterStoryHtml() +
-            collectionHtml() +
-            questHtml() +
-            achievementsHtml() +
-            captainHtml() +
-            card(
-              "Records & Guidance",
-              "Review your journey or open the pilot manual.",
-              btn("Captain Log", "openSection", "activity") +
-                btn("Pilot Manual", "openSection", "guide") +
-                btn("Help", "openSection", "help"),
-            );
-        } else if (tab === "settings") {
-          html += settingsHtml() + saveHtml();
-        } else {
+        } else if(tab==="records"){
+          html=routeDirectory([
+            ["Achievements","Earned and upcoming achievements","setMenuTab","system|achievements","layers"],
+            ["Reputation & encounters","Faction standing and decisions","setMenuTab","system|reputation","journal"],
+            ["Collections & statistics","Your exploration legacy and progression","setMenuTab","system|collections","vault"],
+            ["Captain Log","Recent actions","openSection","activity","journal"],
+            ["Pilot Manual","Guidance and definitions","openSection","guide","help"]
+          ]);
+        }else if(tab==="achievements")html=achievementsHtml();
+        else if(tab==="reputation")html=reputationHtml()+encounterStoryHtml();
+        else if(tab==="collections")html=journeyPulseHtml()+collectionHtml()+questHtml()+captainHtml();
+        else if(tab==="settings"){
+          html=routeDirectory([
+            ["Display & performance","Graphics quality and reduced motion","setMenuTab","system|display","layers"],
+            ["Audio & feedback","Music, effects and vibration","setMenuTab","system|audio","signal"],
+            ["Flight controls","Sensitivity, sizes and layout","setMenuTab","system|controls","ship"],
+            ["Save data","Save, load, export or import a journey","setMenuTab","system|data","cargo"],
+            ["Purchases & privacy","Ad choices and purchase restoration","setMenuTab","system|privacy","settings"]
+          ]);
+        }else if(["display","audio","controls"].includes(tab))html=settingsHtml(tab);
+        else if(tab==="data")html=saveHtml()+card("New journey","Start over only if you intend to reset your progress.",btn("Start New Journey","resetSaveAndRun"));
+        else if(tab==="privacy")html=monetizationSettingsHtml();
+        else {
           html +=
             majorThreatHtml() +
             livingSystemEventHtml() +
@@ -18836,16 +18711,15 @@
           '<div class="actions"><button type="button" data-action="qaGiveResources" data-arg="">Give Test Resources</button><button type="button" data-action="qaLowFuel" data-arg="">Simulate Low Fuel</button><button type="button" data-action="qaMissionNext" data-arg="">Advance Mission</button><button type="button" data-action="qaBuildFrigate" data-arg="">Build Frigate</button><button type="button" data-action="qaSpawnMythic" data-arg="">Spawn Mythic</button><button type="button" data-action="qaResetOnboarding" data-arg="">Reset Onboarding</button><button type="button" data-action="qaRunTests" data-arg="">Run Self-Tests</button></div>',
         );
       }
-      function settingsHtml() {
-        const panel = (
-          monetizationSettingsHtml() +
-          card(
-            "Settings",
-              "Tune visuals, audio, motion, guidance, and on-screen controls.",
-            '<div class="list"><div class="setting-row"><span>Graphics Quality</span><select id="graphicsSelect"><option>Low</option><option>Medium</option><option>High</option></select></div><div class="setting-row"><span>Motion Effects</span><select id="motionSelect"><option>On</option><option>Reduced</option></select></div><div class="setting-row"><span>Tutorial Tips</span><select id="tipsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Touch Sensitivity</span><select id="touchSelect"><option value="0.75">Low</option><option value="1">Normal</option><option value="1.25">High</option></select></div><div class="setting-row"><span>Performance Mode</span><select id="perfSelect"><option>Auto</option><option>High</option><option>Battery Saver</option></select></div><div class="setting-row"><span>Sound</span><select id="soundSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Music</span><select id="musicSelect"><option>Off</option><option>On</option></select></div><div class="setting-row"><span>Vibration FX</span><select id="vibrationSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Music Volume</span><select id="musicVolumeSelect"><option value="0.25">Low</option><option value="0.55">Normal</option><option value="0.85">High</option></select></div><div class="setting-row"><span>SFX Volume</span><select id="sfxVolumeSelect"><option value="0.35">Low</option><option value="0.75">Normal</option><option value="1">High</option></select></div><div class="setting-row"><span>Touch Controls</span><select id="controlsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Control Hints</span><select id="hintsSelect"><option>On</option><option>Off</option></select></div><div class="setting-row"><span>Joystick Size</span><select id="joystickSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Thrust Button Size</span><select id="thrustSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Release Button Size</span><select id="releaseSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Brake Button Size</span><select id="brakeSizeSelect"><option>Small</option><option>Normal</option><option>Large</option></select></div><div class="setting-row"><span>Control Layout</span><select id="controlLayoutSelect"><option>Fixed</option><option>Move Controls</option></select></div><div class="actions"><button type="button" data-action="resetControlLayout" data-arg="">Reset Control Layout</button></div><div class="sound-meter"></div></div><div class="actions"><button type="button" data-action="applySettingsFromMenu" data-arg="">Apply Settings</button><button type="button" class="danger" data-action="resetSaveAndRun" data-arg="">Reset Save + Run</button></div>',
-          )
-        );
-        return panel.replace("Reset Save + Run", "Start New Journey");
+      function settingsHtml(section="all"){
+        const rows={"graphicsSelect":["Graphics Quality","<option>Low</option><option>Medium</option><option>High</option>"],"motionSelect":["Motion Effects","<option>On</option><option>Reduced</option>"],"tipsSelect":["Tutorial Tips","<option>On</option><option>Off</option>"],"touchSelect":["Touch Sensitivity","<option value=\"0.75\">Low</option><option value=\"1\">Normal</option><option value=\"1.25\">High</option>"],"perfSelect":["Performance Mode","<option>Auto</option><option>High</option><option>Battery Saver</option>"],"soundSelect":["Sound","<option>Off</option><option>On</option>"],"musicSelect":["Music","<option>Off</option><option>On</option>"],"vibrationSelect":["Vibration FX","<option>On</option><option>Off</option>"],"musicVolumeSelect":["Music Volume","<option value=\"0.25\">Low</option><option value=\"0.55\">Normal</option><option value=\"0.85\">High</option>"],"sfxVolumeSelect":["SFX Volume","<option value=\"0.35\">Low</option><option value=\"0.75\">Normal</option><option value=\"1\">High</option>"],"controlsSelect":["Touch Controls","<option>On</option><option>Off</option>"],"hintsSelect":["Control Hints","<option>On</option><option>Off</option>"],"joystickSizeSelect":["Joystick Size","<option>Small</option><option>Normal</option><option>Large</option>"],"thrustSizeSelect":["Thrust Button Size","<option>Small</option><option>Normal</option><option>Large</option>"],"releaseSizeSelect":["Release Button Size","<option>Small</option><option>Normal</option><option>Large</option>"],"brakeSizeSelect":["Brake Button Size","<option>Small</option><option>Normal</option><option>Large</option>"],"controlLayoutSelect":["Control Layout","<option>Fixed</option><option>Move Controls</option>"]};
+        const groups={"display":["graphicsSelect","motionSelect","perfSelect"],"audio":["soundSelect","musicSelect","vibrationSelect","musicVolumeSelect","sfxVolumeSelect"],"controls":["tipsSelect","touchSelect","controlsSelect","hintsSelect","joystickSizeSelect","thrustSizeSelect","releaseSizeSelect","brakeSizeSelect","controlLayoutSelect"]};
+        const titles={display:"Display & performance",audio:"Audio & feedback",controls:"Flight controls"};
+        const keys=section==="all"?Object.keys(groups):[section];
+        return (section==="all"?monetizationSettingsHtml():"")+keys.map(key=>card(titles[key],"",
+          '<div class="settings-form">'+(groups[key]||[]).map(id=>'<label class="setting-row" for="'+id+'"><span>'+esc(rows[id][0])+'</span><select id="'+id+'">'+rows[id][1]+'</select></label>').join("")+
+          (key==="controls"?'<div class="actions">'+btn("Reset Control Layout","resetControlLayout")+'</div>':"")+'</div>',
+          btn("Apply Settings","applySettingsFromMenu"))).join("");
       }
       function debugHtml() {
         if (!DEV_BUILD) return "";
@@ -19082,7 +18956,7 @@
               " / " +
               discoveryCollections.length +
               '</div></div><div class="actions">' +
-              btn("Open Pioneer Vault", "openSection", "frigate") +
+              btn("Open Pioneer Vault", "openFrigateTab", "vault") +
               "</div>",
           ) + discoveryCollectionsHtml()
         );
@@ -20424,9 +20298,9 @@
             0,
           ),
           b = document.querySelector('[data-menu="resources"]');
-        b.classList.toggle("show-badge", ready > 0);
-        ui.productionBadge.textContent =
-          ready > 99 ? "99+" : String(ready || "!");
+        // Readiness belongs on the actual cargo page, not in unexplained badges.
+        b?.classList.remove("show-badge");
+        ui.productionBadge.textContent="";
         const action = smartAction();
         ui.smartBtn.textContent = action.label;
         ui.smartBtn.disabled = !!action.disabled;
@@ -26398,6 +26272,7 @@
         renderMenu,
         openMenu,
         openSection,
+        openWorldDetails,
         backToMainMenu,
         syncMenuChrome,
         openObjectiveAction,
@@ -26736,15 +26611,13 @@
         openMenu("help");
       };
       $("titleSettingsBtn").onclick = () => {
-        resumeAudio();
-        openPause();
-        togglePauseSettings();
+        resumeAudio();titleMenuMode=true;titleOpen=false;paused=true;ui.titleOverlay.classList.remove("show");openSection("system","settings");
       };
       $("resumeBtn").onclick = closePause;
       if ($("pauseResumeBtn")) $("pauseResumeBtn").onclick = closePause;
       $("saveBtn").onclick = () => saveGame(true);
       $("loadPauseBtn").onclick = () => loadGame(true);
-      $("pauseSettingsBtn").onclick = togglePauseSettings;
+      $("pauseSettingsBtn").onclick = () => { closePause();openSection("system","settings"); };
       $("applyPauseSettingsBtn").onclick = applyPauseSettings;
       if ($("pauseResetControlsBtn"))
         $("pauseResetControlsBtn").onclick = resetControlLayout;
@@ -26771,7 +26644,7 @@
         setHudCollapsed(!ui.hud.classList.contains("collapsed"));
       ui.menuLauncher.onclick = () => openMenu("hub");
       ui.menuClose.onclick = closeMenu;
-      ui.menuBack.onclick = backToMainMenu;
+      ui.menuBack.onclick = navigateMenuBack;
       ui.menu.addEventListener("click", (e) => {
         const b = e.target.closest("button[data-action]");
         if (b && !b.disabled) {
