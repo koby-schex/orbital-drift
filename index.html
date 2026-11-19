@@ -5322,6 +5322,24 @@
       @media(max-width:560px){.menu{border-radius:0!important;border:0!important;padding:calc(10px + var(--safeTop)) 16px calc(20px + var(--safeBottom))!important;}.menu-head{margin:calc(-10px - var(--safeTop)) -16px 6px!important;padding:calc(10px + var(--safeTop)) 16px 10px!important;top:calc(-10px - var(--safeTop))!important;}.menu .content{padding-bottom:calc(20px + var(--safeBottom))!important;}.menu .route-row{min-height:66px!important;padding:11px 12px!important;}}
       @media(prefers-reduced-motion:reduce){.menu,.menu-content-enter,.route-row{animation:none!important;transition:none!important;}}
 
+      /* Command deck transitions and specimen plates. */
+      .menu {transform:translateY(12px) scale(.992);transition:opacity .24s ease,transform .28s cubic-bezier(.22,.8,.25,1),visibility 0s linear .28s;}
+      .menu.open {transform:translateY(0) scale(1);transition-delay:0s;}
+      .menu.closing {pointer-events:none;}
+      .menu-head #menuClose {align-items:center;justify-content:center!important;gap:6px;background:#183b3c!important;border:1px solid #4b817c!important;border-radius:12px!important;padding:0 10px!important;color:#d6fff6!important;font-size:12px!important;white-space:nowrap;margin:0!important;min-width:0;}
+      .menu-head #menuClose:after {content:"";width:13px;height:13px;flex:none;background:currentColor;clip-path:polygon(19% 0,100% 50%,19% 100%);}
+      .menu-head h3 {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+      .menu.reduced-motion,.menu.reduced-motion .menu-content-enter {transition:none!important;animation:none!important;}
+      .menu .vault-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;}
+      .menu .vault-entry {display:grid;grid-template-columns:minmax(0,1fr);gap:12px;padding:12px!important;}
+      .menu .vault-specimen {min-height:158px;background:radial-gradient(ellipse at 50% 40%,color-mix(in srgb,var(--vaultColor) 19%,#091117),#050a10 75%)!important;overflow:hidden;}
+      .menu .vault-specimen svg {height:158px;}
+      .menu .vault-entry-copy b {font-size:16px;line-height:1.3;}
+      .menu .vault-entry-copy>span {font-size:12px;line-height:1.5;}
+      .menu .vault-entry-copy .vault-field-note {font-size:13px;color:#c2d3dc;line-height:1.55;margin:9px 0;}
+      .menu .vault-tags .tag {font-size:10px;}
+      .menu .vault-entry-copy .vault-archive-note {color:#a2b6bf;}
+      .menu .vault-entry-copy .vault-perk {color:#a7e8d7!important;}
     </style>
   </head>
   <body>
@@ -7337,14 +7355,14 @@
           { key: "mercy-seed", name: "Mercy Seed", kind: "artifact", source: "planet", families: ["cosmicSpirit"], threat: 3, rarity: "Exotic", colors: ["#bbf7d0", "#ffffff"], visual: "bloom", entry: "A pearl-white seed found at the center of a barren world. It germinates only while two strangers choose to trust each other." },
           { key: "memory-tide", name: "Memory Tide", kind: "phenomenon", source: "space", families: ["cosmicSpirit"], threat: 5, rarity: "Mythic", colors: ["#a7f3d0", "#fbcfe8"], visual: "halo", entry: "A slow wave of borrowed recollection. The vault hears distant homecomings whenever it passes through the containment rings." },
           { key: "inverted-astrolabe", name: "Inverted Astrolabe", kind: "artifact", source: "planet", families: ["parallel"], threat: 5, rarity: "Exotic", colors: ["#f472b6", "#22d3ee"], visual: "disc", entry: "A navigation instrument that points to places the Pioneer chose not to visit. Its needles move whenever a decision becomes irreversible." },
-          { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism sharing Starling's genetic telemetry without sharing its history. It reacts before the crew touches the controls." },
+          { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism repeating the Starling’s flight telemetry before the sensors transmit it. Its behavior suggests a history that diverged from our own." },
           { key: "causality-lace", name: "Causality Lace", kind: "phenomenon", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#c084fc", "#fef08a"], visual: "swarm", entry: "Threads of probability braided into a stable specimen. Every strand records a different outcome for the same discovery." },
-          {"key":"slag-lantern","name":"Slag Lantern","kind":"artifact","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"lantern","entry":"A ceramic lantern burning without oxygen.","perk":"production"},
-          {"key":"iron-orchid","name":"Iron Orchid","kind":"lifeform","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"bloom","entry":"Metal petals open only in a magnetic field.","perk":"survey"},
-          {"key":"solar-spindle","name":"Solar Spindle","kind":"artifact","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#fb923c","#fde68a"],"visual":"spindle","entry":"A filament of frozen stellar plasma.","perk":"fuel"},
+          {"key":"slag-lantern","name":"Slag Lantern","kind":"artifact","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"lantern","entry":"A ceramic lantern recovered beneath a cooled lava flow. Its flame consumes no measurable oxygen, and the vessel remains cool to the touch.","perk":"production"},
+          {"key":"iron-orchid","name":"Iron Orchid","kind":"lifeform","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"bloom","entry":"Thin metallic petals unfold in a magnetic field. The root structure retains the alternating polarity of its native world's buried ore seams.","perk":"survey"},
+          {"key":"solar-spindle","name":"Solar Spindle","kind":"artifact","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#fb923c","#fde68a"],"visual":"spindle","entry":"A filament of apparent stellar plasma suspended in a clear spindle. The containment team has recorded no measurable heat loss since recovery.","perk":"fuel"},
           {"key":"plasma-nest","name":"Plasma Nest","kind":"phenomenon","source":"space","families":["innerForge"],"threat":4,"rarity":"Exotic","colors":["#fb923c","#fde68a"],"visual":"swarm","entry":"A flock of magnetic vortices.","perk":"production"},
           {"key":"aether-shell","name":"Aether Shell","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"shell","entry":"A shell containing a weather cycle.","perk":"survey"},
-          {"key":"cloud-larva","name":"Cloud Larva","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"serpent","entry":"A translucent larva feeding on electrical gradients.","perk":"production"},
+          {"key":"cloud-larva","name":"Cloud Larva","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"serpent","entry":"A translucent organism that feeds on electrical gradients in the cloud layers. Its body contracts in anticipation of nearby discharges.","perk":"production"},
           {"key":"cyclone-needle","name":"Cyclone Needle","kind":"artifact","source":"space","families":["gasFrontier"],"threat":2,"rarity":"Rare","colors":["#60a5fa","#c4b5fd"],"visual":"spindle","entry":"A compass measuring direction in storms.","perk":"fuel"},
           {"key":"storm-crown","name":"Storm Crown","kind":"phenomenon","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#60a5fa","#c4b5fd"],"visual":"crown","entry":"A ring of self-sustaining lightning.","perk":"fuel"},
           {"key":"opal-eye","name":"Opal Eye","kind":"artifact","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"orb","entry":"A polished eye refracting distant stellar spectra.","perk":"survey"},
@@ -7352,7 +7370,7 @@
           {"key":"prismatic-keel","name":"Prismatic Keel","kind":"artifact","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#c084fc","#67e8f9"],"visual":"crystal","entry":"A lost vessel's coherent crystal lattice.","perk":"survey"},
           {"key":"spectrum-anvil","name":"Spectrum Anvil","kind":"phenomenon","source":"space","families":["crystalReach"],"threat":4,"rarity":"Exotic","colors":["#c084fc","#67e8f9"],"visual":"crown","entry":"An intersection of seven polarized beams.","perk":"production"},
           {"key":"seed-compass","name":"Seed Compass","kind":"artifact","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"disc","entry":"An organic instrument pointing toward habitats.","perk":"survey"},
-          {"key":"amber-colony","name":"Amber Colony","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"swarm","entry":"A microbial civilization inside resin.","perk":"production"},
+          {"key":"amber-colony","name":"Amber Colony","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"swarm","entry":"A living microbial community sealed inside ancient resin. Microscopic channels appear to redirect nutrients between individual colonies.","perk":"production"},
           {"key":"lantern-jelly","name":"Lantern Jelly","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#4ade80","#fef08a"],"visual":"jelly","entry":"A vacuum swimmer emitting synchronized pulses.","perk":"fuel"},
           {"key":"living-keystone","name":"Living Keystone","kind":"artifact","source":"space","families":["bioCluster"],"threat":4,"rarity":"Exotic","colors":["#4ade80","#fef08a"],"visual":"reliquary","entry":"A living bridge component seeking its span.","perk":"production"},
           {"key":"oath-tablet","name":"Oath Tablet","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"tablet","entry":"A record etched in an extinct alphabet.","perk":"survey"},
@@ -7362,15 +7380,15 @@
           {"key":"null-pebble","name":"Null Pebble","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"crystal","entry":"A stone with no thermal signature.","perk":"fuel"},
           {"key":"echo-compass","name":"Echo Compass","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"key","entry":"A compass following gravitational wakes.","perk":"fleet"},
           {"key":"night-fin","name":"Night Fin","kind":"lifeform","source":"space","families":["voidRim"],"threat":2,"rarity":"Rare","colors":["#64748b","#67e8f9"],"visual":"wing","entry":"A swimmer outlined by displaced starlight.","perk":"survey"},
-          {"key":"impossible-room","name":"Impossible Room","kind":"phenomenon","source":"space","families":["voidRim"],"threat":6,"rarity":"Mythic","colors":["#64748b","#67e8f9"],"visual":"cube","entry":"A room larger within than without that stores excess reactor energy.","perk":"fuel"},
+          {"key":"impossible-room","name":"Impossible Room","kind":"phenomenon","source":"space","families":["voidRim"],"threat":6,"rarity":"Mythic","colors":["#64748b","#67e8f9"],"visual":"cube","entry":"A sealed chamber with an interior volume greater than its external dimensions. Controlled reactor tests indicate that the anomaly can store otherwise wasted energy.","perk":"fuel"},
           {"key":"mercy-lantern","name":"Mercy Lantern","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"lantern","entry":"A beacon lighting in response to distress.","perk":"fuel"},
           {"key":"dawn-pearl","name":"Dawn Pearl","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A pearl storing a sunrise.","perk":"survey"},
           {"key":"star-garden","name":"Star Garden","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":2,"rarity":"Rare","colors":["#bbf7d0","#fbcfe8"],"visual":"fern","entry":"Plants growing around a phantom sun.","perk":"production"},
-          {"key":"second-sun","name":"Second Sun","kind":"phenomenon","source":"space","families":["cosmicSpirit"],"threat":6,"rarity":"Mythic","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A miniature star whose output exceeds its size.","perk":"production"},
+          {"key":"second-sun","name":"Second Sun","kind":"phenomenon","source":"space","families":["cosmicSpirit"],"threat":6,"rarity":"Mythic","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A miniature stellar phenomenon whose radiant output exceeds every estimate of its mass. Pioneer engineers have used its stable emission profile to refine world-production systems.","perk":"production"},
           {"key":"mirror-flower","name":"Mirror Flower","kind":"lifeform","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"bloom","entry":"Each petal reflects an alternate sky.","perk":"survey"},
           {"key":"fractured-seal","name":"Fractured Seal","kind":"artifact","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"tablet","entry":"A seal opening only in conflicting realities.","perk":"fuel"},
           {"key":"counter-clock","name":"Counter Clock","kind":"artifact","source":"space","families":["parallel"],"threat":2,"rarity":"Rare","colors":["#e879f9","#67e8f9"],"visual":"disc","entry":"A clock synchronized to a future arrival.","perk":"fleet"},
-          {"key":"unwritten-star","name":"Unwritten Star","kind":"phenomenon","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#e879f9","#67e8f9"],"visual":"halo","entry":"A star existing only as a possible future, predicting fleet routes.","perk":"fleet"},
+          {"key":"unwritten-star","name":"Unwritten Star","kind":"phenomenon","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#e879f9","#67e8f9"],"visual":"halo","entry":"A stellar image that resolves only when projected against an anticipated flight path. Observed fluctuations have enabled the navigation team to refine fleet routes.","perk":"fleet"},
         ];
       const crewUniforms = ["#164e63", "#312e81", "#713f12", "#14532d", "#4c1d95"],
         crewTemplates = [
@@ -13953,8 +13971,14 @@
       function vaultPerk(entry){
         const item=vaultCatalog.find(x=>x.key===entry.catalogKey);
         if(!item)return null;
-        const type=item.perk||({artifact:"survey",lifeform:"production",phenomenon:"fuel"})[item.kind];
-        const value=({Unusual:.02,Rare:.04,Exotic:.07,Mythic:.12})[item.rarity]||.01;
+        const breakthrough={
+          "inverted-astrolabe":{type:"survey",value:.07},
+          "second-sun":{type:"production",value:.12},
+          "impossible-room":{type:"fuel",value:.12},
+          "unwritten-star":{type:"fleet",value:.12}
+        }[item.key];
+        if(!breakthrough)return null;
+        const {type,value}=breakthrough;
         return {type,value,label:({survey:"survey rewards",production:"world output",fuel:"jump fuel recovery",fleet:"fleet mission speed"})[type]};
       }
       function vaultBonus(type){
@@ -16603,6 +16627,7 @@
         if(route.tab)menuTabs[route.section]=route.tab;
         if(route.section==="planets"&&route.tab?.startsWith("world:"))selectedPlanetName=route.tab.slice(6);
         ui.menu.classList.remove("closing");
+        ui.menu.classList.toggle("reduced-motion",game.settings?.motion==="Reduced");
         ui.menu.classList.add("open");
         document.querySelectorAll(".dock button").forEach(b=>b.classList.toggle("active",b.dataset.menu===activeMenu));
         syncMenuChrome();renderMenu();
@@ -16641,7 +16666,6 @@
         layoutDrag = null;
         ui.menu.classList.add("closing");
         ui.menu.classList.remove("open", "in-section");
-        ui.menuTitle.textContent = "Menu";
         document.body.classList.remove("menu-open", "menu-section-open");
         document
           .querySelectorAll(".dock button")
@@ -16661,6 +16685,7 @@
           if (ui.menu.classList.contains("open")) return;
           ui.menu.classList.remove("closing");
           delete ui.menu.dataset.section;
+          ui.menuTitle.textContent = "Menu";
           ui.menuNav.innerHTML = "";
           ui.menuContent.innerHTML = "";
         }, 320);
@@ -16678,7 +16703,8 @@
         ui.menuTitle.textContent = menuRouteTitle(currentMenuRoute());
         ui.menuBack.textContent="Back";
         ui.menuBack.disabled=menuHistory.length===0&&!titleMenuMode;
-        ui.menuClose.textContent=titleMenuMode?"Title":"Flight";
+        ui.menuClose.textContent=titleMenuMode?"Return to title":"Resume flight";
+        ui.menuClose.setAttribute("aria-label",titleMenuMode?"Return to title screen":"Close command interface and resume flight");
         ui.menuNav.innerHTML = menuNavigationHtml();
         (
           ({
@@ -16876,7 +16902,7 @@
           ["Worlds","Survey, capture and manage planets","openSection","planets","explore"],
           ["Travel & atlas","Jump, visit systems and investigate anomalies","setMenuTab","system|travel","route"],
           ["Planet Codex","Your surveyed worlds and collections","openSection","codex","journal"],
-          ...(game.frigate.built?[["Vault","Unique discoveries and passive bonuses","openFrigateTab","vault","vault"]]:[])
+          ...(game.frigate.built?[["Vault","Archive discoveries and exceptional research breakthroughs","openFrigateTab","vault","vault"]]:[])
         ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
       }
       function renderHangarDirectory(){
@@ -17677,8 +17703,10 @@
         }else{
           for(let i=0;i<7;i++)shape+='<ellipse cx="80" cy="40" rx="'+(motif==="fern"?6:12)+'" ry="23" transform="rotate('+(i*360/7)+' 80 54)" fill="'+fill+'" stroke="'+b+'" stroke-width=".6"/>';shape+='<circle cx="80" cy="54" r="7" fill="'+b+'"/>';
         }
+        let texture="";for(let i=0;i<34;i++){const x=20+((seed>>>0)+i*73)%121,y=8+((seed>>>0)+i*47)%94,r=.35+(i%4)*.19;texture+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+b+'" opacity="'+(.12+(i%5)*.06)+'"/>';}
+        const plate='<path d="M14 29 V12 H37 M123 12 H146 V29 M14 83 V100 H37 M123 100 H146 V83" fill="none" stroke="'+a+'" stroke-opacity=".46" stroke-width=".7"/><path d="M80 8 V14 M80 98 V104 M17 54 H24 M136 54 H143" stroke="'+b+'" stroke-opacity=".55" stroke-width=".75"/>';
         let marks="";for(let i=0;i<8;i++){const y=25+i*8,x=31+(seed+i*47)%9;marks+=line("M"+x+" "+y+" h"+(3+(seed+i)%7),.6);}
-        return '<svg viewBox="0 0 160 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="'+id+'m" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#f8fafc"/><stop offset=".28" stop-color="'+b+'"/><stop offset=".60" stop-color="'+a+'"/><stop offset="1" stop-color="#050d19"/></linearGradient><radialGradient id="'+id+'g"><stop stop-color="'+b+'" stop-opacity=".8"/><stop offset="1" stop-color="'+a+'" stop-opacity="0"/></radialGradient></defs><ellipse cx="80" cy="54" rx="54" ry="46" fill="'+glow+'" opacity=".28"/><ellipse cx="80" cy="92" rx="45" ry="8" fill="#020617" opacity=".75"/><circle cx="80" cy="54" r="45" stroke="'+a+'" stroke-opacity=".22" stroke-dasharray="2 6" fill="none"/>'+marks+shape+'</svg>';
+        return '<svg viewBox="0 0 160 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="'+id+'m" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#f8fafc"/><stop offset=".28" stop-color="'+b+'"/><stop offset=".60" stop-color="'+a+'"/><stop offset="1" stop-color="#050d19"/></linearGradient><radialGradient id="'+id+'g"><stop stop-color="'+b+'" stop-opacity=".8"/><stop offset="1" stop-color="'+a+'" stop-opacity="0"/></radialGradient></defs><ellipse cx="80" cy="54" rx="54" ry="46" fill="'+glow+'" opacity=".28"/><ellipse cx="80" cy="92" rx="45" ry="8" fill="#020617" opacity=".75"/><circle cx="80" cy="54" r="45" stroke="'+a+'" stroke-opacity=".22" stroke-dasharray="2 6" fill="none"/>'+texture+plate+marks+shape+'</svg>';
       }
       function vaultVisualHtml(entry) {
         const colors = Array.isArray(entry.colors) ? entry.colors : ["#67e8f9", "#fbbf24"];
@@ -17713,7 +17741,7 @@
           esc(entry.name) +
           '</b><span class="vault-origin">' +
           esc(entry.system + " • " + entry.origin) +
-          "</span>"+secondaryDetails("Specimen notes",esc(entry.entry)) +
+          "</span><span class=\"vault-field-note\">"+esc(entry.entry)+"</span>" +
           '<div class="vault-tags"><span class="tag">' +
           esc(vaultKindLabel(entry.kind)) +
           '</span><span class="tag rarity-' +
@@ -17725,7 +17753,7 @@
           " • " +
           esc(vaultThreatLabel(entry.threat)) +
           "</span></div>" +
-          (perk?'<span class="vault-perk">' +(pending?"When secured: ":"Active: ")+"+"+Math.round(perk.value*100)+"% "+esc(perk.label)+"</span>":"") +
+          (perk?'<span class="vault-perk">' +(pending?"Potential research: ":"Research confirmed: ")+"+"+Math.round(perk.value*100)+"% "+esc(perk.label)+"</span>":'<span class="vault-archive-note">Scientific archive record</span>') +
           (pending
             ? '<div class="actions">' +
               btnWhy(
@@ -17995,7 +18023,7 @@
           upgradeReady =
             level < 6 && hasFactoryAccess() && canAfford(frigateCost("vault"));
         return (
-          '<div class="vault-hero"><h4>Pioneer Relic Vault</h4><p>Secure unique specimens to unlock passive bonuses. Surveys and drifting signals reveal new discoveries. Each bonus category is capped at 22%.</p><div class="grid"><div class="chip"><b>Secure Storage</b><br>' +
+          '<div class="vault-hero"><h4>Pioneer Relic Vault</h4><p>Preserve unusual lifeforms, artifacts and anomalies recovered beyond Sol. Most records are scientific discoveries; only exceptional specimens yield operational research breakthroughs.</p><div class="grid"><div class="chip"><b>Secure Storage</b><br>' +
           secured.length +
           " / " +
           capacity +
@@ -18017,12 +18045,12 @@
           ) +
           btn("Open Collections", "openSection", "codex") +
           "</div></div>" +
-          card("Active specimen bonuses",["survey","production","fuel","fleet"].map(type=>'<div class="chip">'+esc(({survey:"Survey rewards",production:"World output",fuel:"Jump fuel recovery",fleet:"Fleet mission speed"})[type])+" +"+Math.round(vaultBonus(type)*100)+"%</div>").join("")) +
+          card("Research breakthroughs",["survey","production","fuel","fleet"].filter(type=>vaultBonus(type)>0).map(type=>'<div class="chip">'+esc(({survey:"Survey rewards",production:"World output",fuel:"Jump fuel recovery",fleet:"Fleet mission speed"})[type])+" +"+Math.round(vaultBonus(type)*100)+"%</div>").join("")||"No operational breakthroughs confirmed. Continue surveying distant systems.") +
           secondaryDetails("Astral Archaeologist hull project",card(
             "Rare Hull Project: Astral Archaeologist",
             skinOwned
-              ? "Field-research refit unlocked. Its specimen canisters, expedition plating, survey lights, and star-chart markings are rendered on the live Pioneer hull."
-              : "Secure 18 Vault discoveries to earn an approachable Rare-class archaeology refit for the ODF Pioneer.",
+              ? "Field-research refit authorized. Its specimen canisters, expedition plating, survey lights and star-chart markings identify the Pioneer as a dedicated research vessel."
+              : "Secure 18 distinct specimens to authorize the Pioneer’s Astral Archaeologist research-hull refit.",
             cosmeticPreviewHtml(
               "frigate",
               "Astral Archaeologist",
