@@ -17726,6 +17726,38 @@
         selectedPlanetName = b.name;
         renderMenu();
       }
+      function vaultSpecimenArt(entry){
+        const item=vaultCatalog.find(x=>x.key===entry.catalogKey)||entry,
+          valid=c=>typeof c==="string"&&/^#[0-9a-f]{6}$/i.test(c),
+          a=valid(item.colors?.[0])?item.colors[0]:"#67e8f9",b=valid(item.colors?.[1])?item.colors[1]:"#fbbf24",
+          seed=vaultStringSeed(item.key||entry.catalogKey||entry.name)>>>0,id="v"+seed,
+          fill="url(#"+id+"m)",glow="url(#"+id+"g)",motif=item.visual||"core";
+        const poly=(points,f=fill)=>'<polygon points="'+points+'" fill="'+f+'" stroke="'+b+'" stroke-opacity=".76" stroke-width=".7"/>';
+        const line=(d,width=1)=>'<path d="'+d+'" fill="none" stroke="'+b+'" stroke-opacity=".68" stroke-width="'+width+'" stroke-linecap="round"/>';
+        const forms={crystal:"80,16 102,40 97,77 74,91 58,61 63,31",spindle:"80,11 94,40 85,54 94,70 80,97 66,70 75,54 66,40",cube:"80,21 107,37 108,72 80,89 52,72 52,37",tablet:"56,24 98,18 105,83 61,90",key:"62,23 98,23 107,45 90,57 91,92 72,92 72,57 53,45",reliquary:"60,20 100,20 111,49 100,85 60,85 49,49",lantern:"66,19 94,19 108,43 99,83 61,83 52,43",pod:"80,15 102,35 105,60 92,88 68,88 55,60 58,35",crown:"48,28 65,51 80,19 95,51 112,28 104,80 56,80"};
+        let shape="";
+        if(forms[motif]){
+          shape=poly(forms[motif])+line("M80 24 L80 83 M56 49 L103 49 M61 77 L98 34");
+          if(motif==="cube")shape+=poly("80,21 107,37 80,54 52,37",b)+poly("80,54 107,37 108,72 80,89",a);
+          if(motif==="lantern"||motif==="pod")shape+='<ellipse cx="80" cy="54" rx="12" ry="22" fill="'+glow+'"/>';
+        }else if(["disc","orb","halo","core","shell"].includes(motif)){
+          shape='<ellipse cx="80" cy="54" rx="28" ry="'+(motif==="disc"?12:25)+'" fill="'+fill+'" stroke="'+b+'" stroke-width="1.3"/>'+line("M51 54 Q80 33 109 54 Q80 74 51 54");
+          if(motif==="halo")shape='<circle cx="80" cy="54" r="28" fill="none" stroke="'+a+'" stroke-width="11"/><circle cx="80" cy="54" r="22" fill="#030917"/>'+line("M54 43 Q80 24 106 43 M54 65 Q80 84 106 65",1.6);
+          if(motif==="shell")for(let i=0;i<6;i++)shape+=line("M80 71 Q"+(45+i*14)+" 44 80 29");
+        }else if(motif==="wing"||motif==="beetle"){
+          shape=poly("80,50 46,25 33,43 58,72 80,64 102,72 127,43 114,25")+'<ellipse cx="80" cy="54" rx="7" ry="30" fill="'+fill+'"/>'+line("M80 50 L46 25 M80 50 L114 25");
+        }else if(motif==="serpent"){
+          shape='<path d="M51 25 C115 10 118 52 77 53 S43 91 106 83" stroke="'+fill+'" stroke-width="14" fill="none" stroke-linecap="round"/>'+line("M51 25 C115 10 118 52 77 53 S43 91 106 83",1.4);
+        }else if(motif==="jelly"||motif==="tendrils"){
+          shape='<path d="M48 54 Q45 16 80 17 Q115 16 112 54 Z" fill="'+fill+'" stroke="'+b+'"/>';for(let i=0;i<7;i++)shape+=line("M"+(53+i*9)+" 51 Q"+(46+i*11)+" 75 "+(57+i*8)+" 91",1.8);
+        }else if(motif==="swarm"){
+          for(let i=0;i<15;i++){const x=49+((seed+i*83)%63),y=22+((seed+i*43)%64),r=2+i%5;shape+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+fill+'" stroke="'+b+'" stroke-width=".6"/>';}
+        }else{
+          for(let i=0;i<7;i++)shape+='<ellipse cx="80" cy="40" rx="'+(motif==="fern"?6:12)+'" ry="23" transform="rotate('+(i*360/7)+' 80 54)" fill="'+fill+'" stroke="'+b+'" stroke-width=".6"/>';shape+='<circle cx="80" cy="54" r="7" fill="'+b+'"/>';
+        }
+        let marks="";for(let i=0;i<8;i++){const y=25+i*8,x=31+(seed+i*47)%9;marks+=line("M"+x+" "+y+" h"+(3+(seed+i)%7),.6);}
+        return '<svg viewBox="0 0 160 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="'+id+'m" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#f8fafc"/><stop offset=".28" stop-color="'+b+'"/><stop offset=".60" stop-color="'+a+'"/><stop offset="1" stop-color="#050d19"/></linearGradient><radialGradient id="'+id+'g"><stop stop-color="'+b+'" stop-opacity=".8"/><stop offset="1" stop-color="'+a+'" stop-opacity="0"/></radialGradient></defs><ellipse cx="80" cy="54" rx="54" ry="46" fill="'+glow+'" opacity=".28"/><ellipse cx="80" cy="92" rx="45" ry="8" fill="#020617" opacity=".75"/><circle cx="80" cy="54" r="45" stroke="'+a+'" stroke-opacity=".22" stroke-dasharray="2 6" fill="none"/>'+marks+shape+'</svg>';
+      }
       function vaultVisualHtml(entry) {
         const colors = Array.isArray(entry.colors) ? entry.colors : ["#67e8f9", "#fbbf24"];
         return (
@@ -17739,7 +17771,7 @@
           esc(colors[1] || colors[0]) +
           '" role="img" aria-label="Contained visual record of ' +
           esc(entry.name) +
-          '"><div class="vault-specimen-core"></div></div>'
+          '">' + vaultSpecimenArt(entry) + '</div>'
         );
       }
       function vaultEntryHtml(entry) {
