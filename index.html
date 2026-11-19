@@ -5201,6 +5201,33 @@
       .pioneer-primary-actions button { text-align:center; justify-content:center; }
       .pioneer-primary-actions .pioneer-deck-link { display:flex; flex-direction:column; gap:5px; min-height:72px; background:#102430; }
       .pioneer-deck-link small { color:#afc4cc; font-size:11px; font-weight:400; line-height:1.4; }
+      /* Frontier collection and simpler navigation */
+      .toast-wrap {top:calc(150px + var(--safeTop));max-height:38px;}
+      .toast {background:transparent!important;border:0!important;box-shadow:none!important;animation:none!important;font-size:11px;color:#c5dce5;text-shadow:0 1px 3px #000;padding:2px 4px;}
+      body.menu-open .toast-wrap {top:calc(58px + var(--safeTop));}
+      .vault-specimen svg {width:100%;height:126px;display:block;position:relative;z-index:2;}
+      .vault-specimen:has(svg)::before,.vault-specimen:has(svg)::after {display:none;}
+      .vault-entry .vault-origin {opacity:.85;}
+      .vault-entry-copy>span {line-height:1.35;}
+      .hub-btn {min-height:64px!important;padding:10px!important;text-align:left!important;}
+      .hub-btn small {display:none!important;}
+      .pioneer-deck-link small {display:none!important;}
+      .pioneer-deck-directory .pioneer-deck-link {min-height:48px!important;}
+      .pioneer-simple-nav button {width:100%;}
+      .vault-entry .menu-secondary-details {margin:2px 0;}
+      .vault-entry .menu-secondary-details summary {font-size:11px;}
+      .hub-btn .hub-symbol {font-size:16px!important;}
+      .vault-perk {color:#a7e8d7!important;font-weight:600;}
+      .vault-specimen {background:radial-gradient(ellipse at 50% 45%,color-mix(in srgb,var(--vaultColor) 22%,#07101b),#040911 74%);}
+      .vault-specimen-core {width:64px;height:64px;box-shadow:inset -10px -8px 20px #020617aa,0 0 18px color-mix(in srgb,var(--vaultColor) 46%,transparent);}
+      .vault-specimen.visual-lantern .vault-specimen-core {border-radius:18% 18% 30% 30%;clip-path:polygon(25% 0,75% 0,100% 30%,80% 100%,20% 100%,0 30%);}
+      .vault-specimen.visual-spindle .vault-specimen-core {clip-path:polygon(50% 0,77% 26%,62% 50%,77% 76%,50% 100%,23% 76%,38% 50%,23% 26%);}
+      .vault-specimen.visual-crown .vault-specimen-core {clip-path:polygon(0 0,26% 39%,50% 4%,74% 39%,100% 0,85% 88%,50% 100%,15% 88%);}
+      .vault-specimen.visual-cube .vault-specimen-core {border-radius:8%;transform:rotate(30deg) skew(-8deg);background:conic-gradient(from 35deg,var(--vaultAccent),#050a17,var(--vaultColor),#050a17,var(--vaultAccent));}
+      .vault-specimen.visual-tablet .vault-specimen-core {border-radius:9%;transform:rotate(-9deg);background:repeating-linear-gradient(0deg,transparent 0 8px,#02061788 8px 10px),linear-gradient(135deg,var(--vaultAccent),var(--vaultColor));}
+      .vault-specimen.visual-key .vault-specimen-core {clip-path:polygon(20% 0,80% 0,95% 40%,61% 48%,61% 70%,82% 70%,82% 84%,61% 84%,61% 100%,39% 100%,39% 48%,5% 40%);}
+      .vault-specimen.visual-fern .vault-specimen-core {clip-path:polygon(50% 0,64% 25%,98% 8%,75% 45%,100% 62%,62% 70%,50% 100%,38% 70%,0 62%,25% 45%,2% 8%,36% 25%);}
+      .vault-specimen.visual-jelly .vault-specimen-core {border-radius:50% 50% 20% 20%;clip-path:polygon(0 0,100% 0,100% 60%,85% 100%,70% 60%,50% 100%,30% 60%,15% 100%,0 60%);}
       /* Pass 28: consistent keyboard focus and compact, legible secondary controls. */
       .menu button:focus-visible,.dialog button:focus-visible,.menu summary:focus-visible { outline:2px solid #d4e9e8; outline-offset:2px; }
       .menu button,.dialog button { overflow-wrap:anywhere; }
@@ -7233,6 +7260,38 @@
           { key: "inverted-astrolabe", name: "Inverted Astrolabe", kind: "artifact", source: "planet", families: ["parallel"], threat: 5, rarity: "Exotic", colors: ["#f472b6", "#22d3ee"], visual: "disc", entry: "A navigation instrument that points to places the Pioneer chose not to visit. Its needles move whenever a decision becomes irreversible." },
           { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism sharing Starling's genetic telemetry without sharing its history. It reacts before the crew touches the controls." },
           { key: "causality-lace", name: "Causality Lace", kind: "phenomenon", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#c084fc", "#fef08a"], visual: "swarm", entry: "Threads of probability braided into a stable specimen. Every strand records a different outcome for the same discovery." },
+          {"key":"slag-lantern","name":"Slag Lantern","kind":"artifact","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"lantern","entry":"A ceramic lantern burning without oxygen.","perk":"production"},
+          {"key":"iron-orchid","name":"Iron Orchid","kind":"lifeform","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"bloom","entry":"Metal petals open only in a magnetic field.","perk":"survey"},
+          {"key":"solar-spindle","name":"Solar Spindle","kind":"artifact","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#fb923c","#fde68a"],"visual":"spindle","entry":"A filament of frozen stellar plasma.","perk":"fuel"},
+          {"key":"plasma-nest","name":"Plasma Nest","kind":"phenomenon","source":"space","families":["innerForge"],"threat":4,"rarity":"Exotic","colors":["#fb923c","#fde68a"],"visual":"swarm","entry":"A flock of magnetic vortices.","perk":"production"},
+          {"key":"aether-shell","name":"Aether Shell","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"shell","entry":"A shell containing a weather cycle.","perk":"survey"},
+          {"key":"cloud-larva","name":"Cloud Larva","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"serpent","entry":"A translucent larva feeding on electrical gradients.","perk":"production"},
+          {"key":"cyclone-needle","name":"Cyclone Needle","kind":"artifact","source":"space","families":["gasFrontier"],"threat":2,"rarity":"Rare","colors":["#60a5fa","#c4b5fd"],"visual":"spindle","entry":"A compass measuring direction in storms.","perk":"fuel"},
+          {"key":"storm-crown","name":"Storm Crown","kind":"phenomenon","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#60a5fa","#c4b5fd"],"visual":"crown","entry":"A ring of self-sustaining lightning.","perk":"fuel"},
+          {"key":"opal-eye","name":"Opal Eye","kind":"artifact","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"orb","entry":"A polished eye refracting distant stellar spectra.","perk":"survey"},
+          {"key":"glass-fern","name":"Glass Fern","kind":"lifeform","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"fern","entry":"Mineral leaves recording gravity changes.","perk":"production"},
+          {"key":"prismatic-keel","name":"Prismatic Keel","kind":"artifact","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#c084fc","#67e8f9"],"visual":"crystal","entry":"A lost vessel's coherent crystal lattice.","perk":"survey"},
+          {"key":"spectrum-anvil","name":"Spectrum Anvil","kind":"phenomenon","source":"space","families":["crystalReach"],"threat":4,"rarity":"Exotic","colors":["#c084fc","#67e8f9"],"visual":"crown","entry":"An intersection of seven polarized beams.","perk":"production"},
+          {"key":"seed-compass","name":"Seed Compass","kind":"artifact","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"disc","entry":"An organic instrument pointing toward habitats.","perk":"survey"},
+          {"key":"amber-colony","name":"Amber Colony","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"swarm","entry":"A microbial civilization inside resin.","perk":"production"},
+          {"key":"lantern-jelly","name":"Lantern Jelly","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#4ade80","#fef08a"],"visual":"jelly","entry":"A vacuum swimmer emitting synchronized pulses.","perk":"fuel"},
+          {"key":"living-keystone","name":"Living Keystone","kind":"artifact","source":"space","families":["bioCluster"],"threat":4,"rarity":"Exotic","colors":["#4ade80","#fef08a"],"visual":"reliquary","entry":"A living bridge component seeking its span.","perk":"production"},
+          {"key":"oath-tablet","name":"Oath Tablet","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"tablet","entry":"A record etched in an extinct alphabet.","perk":"survey"},
+          {"key":"archive-scarab","name":"Archive Scarab","kind":"lifeform","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"beetle","entry":"A mechanical organism repairing inscriptions.","perk":"survey"},
+          {"key":"silent-key","name":"Silent Key","kind":"artifact","source":"space","families":["ancientArchive"],"threat":2,"rarity":"Rare","colors":["#d6b36a","#e2e8f0"],"visual":"key","entry":"A key rotating to match unknown doors.","perk":"fuel"},
+          {"key":"epoch-dial","name":"Epoch Dial","kind":"artifact","source":"space","families":["ancientArchive"],"threat":4,"rarity":"Exotic","colors":["#d6b36a","#e2e8f0"],"visual":"disc","entry":"A device measuring the age of stars.","perk":"production"},
+          {"key":"null-pebble","name":"Null Pebble","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"crystal","entry":"A stone with no thermal signature.","perk":"fuel"},
+          {"key":"echo-compass","name":"Echo Compass","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"key","entry":"A compass following gravitational wakes.","perk":"fleet"},
+          {"key":"night-fin","name":"Night Fin","kind":"lifeform","source":"space","families":["voidRim"],"threat":2,"rarity":"Rare","colors":["#64748b","#67e8f9"],"visual":"wing","entry":"A swimmer outlined by displaced starlight.","perk":"survey"},
+          {"key":"impossible-room","name":"Impossible Room","kind":"phenomenon","source":"space","families":["voidRim"],"threat":6,"rarity":"Mythic","colors":["#64748b","#67e8f9"],"visual":"cube","entry":"A room larger within than without that stores excess reactor energy.","perk":"fuel"},
+          {"key":"mercy-lantern","name":"Mercy Lantern","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"lantern","entry":"A beacon lighting in response to distress.","perk":"fuel"},
+          {"key":"dawn-pearl","name":"Dawn Pearl","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A pearl storing a sunrise.","perk":"survey"},
+          {"key":"star-garden","name":"Star Garden","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":2,"rarity":"Rare","colors":["#bbf7d0","#fbcfe8"],"visual":"fern","entry":"Plants growing around a phantom sun.","perk":"production"},
+          {"key":"second-sun","name":"Second Sun","kind":"phenomenon","source":"space","families":["cosmicSpirit"],"threat":6,"rarity":"Mythic","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A miniature star whose output exceeds its size.","perk":"production"},
+          {"key":"mirror-flower","name":"Mirror Flower","kind":"lifeform","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"bloom","entry":"Each petal reflects an alternate sky.","perk":"survey"},
+          {"key":"fractured-seal","name":"Fractured Seal","kind":"artifact","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"tablet","entry":"A seal opening only in conflicting realities.","perk":"fuel"},
+          {"key":"counter-clock","name":"Counter Clock","kind":"artifact","source":"space","families":["parallel"],"threat":2,"rarity":"Rare","colors":["#e879f9","#67e8f9"],"visual":"disc","entry":"A clock synchronized to a future arrival.","perk":"fleet"},
+          {"key":"unwritten-star","name":"Unwritten Star","kind":"phenomenon","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#e879f9","#67e8f9"],"visual":"halo","entry":"A star existing only as a possible future, predicting fleet routes.","perk":"fleet"},
         ];
       const crewUniforms = ["#164e63", "#312e81", "#713f12", "#14532d", "#4c1d95"],
         crewTemplates = [
@@ -8286,7 +8345,8 @@
           entries: Array.isArray(raw.entries)
             ? raw.entries
                 .filter((entry) => entry && knownCatalog.has(entry.catalogKey))
-                .slice(-120)
+                .sort((a,b)=>Number(b.status==="secured")-Number(a.status==="secured"))
+                .filter((entry,index,all)=>all.findIndex(x=>x.catalogKey===entry.catalogKey)===index)
                 .map((entry) => ({
                   ...entry,
                   threat: clamp(Number(entry.threat || 1), 1, 6),
@@ -8294,7 +8354,7 @@
                 }))
             : [],
           discoveryKeys: Array.isArray(raw.discoveryKeys)
-            ? [...new Set(raw.discoveryKeys.map(String))].slice(-180)
+            ? [...new Set(raw.discoveryKeys.map(String))]
             : [],
         };
       }
@@ -9601,6 +9661,20 @@
           archetype: parallelArchetype(),
         };
       }
+      function frontierPlanetColor(seed,i,family){
+        const groups={innerForge:["#b35632","#ed8856","#80566c","#cead72","#844e39"],gasFrontier:["#799fb6","#ceb7a2","#8091c7","#9bbba7","#e2bb85"],crystalReach:["#6b8acd","#c79bdc","#83c9c9","#9e86bc","#e0cadc"],bioCluster:["#307b75","#94b87a","#6290b5","#c4b467","#627aa8"],ancientArchive:["#a6977d","#c8b69e","#818b9a","#ba8c65","#977c9e"],voidRim:["#577487","#7a6b9d","#a2b3c1","#695d71","#416d7a"]};
+        const pool=groups[family]||palettes, base=pool[Math.floor(rand(seed+i*43+6)*pool.length)],q=rand(seed+i*101+701);
+        return q>.52?light(base,(q-.52)*.32):dark(base,(.52-q)*.32);
+      }
+      function ensureFrontierCapture(system) {
+        if(!system||system.isTutorial||system.specialType)return system;
+        const planets=system.bodies.filter(b=>b.type!=="star");
+        const count=planets.filter(b=>b.capturable).length;
+        const eligible=planets.filter(b=>!b.capturable&&!/gas giant|protected/i.test(b.hazard||""))
+          .sort((a,b)=>(a.captureDifficulty||1)-(b.captureDifficulty||1));
+        for(const b of eligible.slice(0,Math.max(0,Math.min(2,planets.length)-count))) {b.capturable=true;b.upgradeable=true;}
+        return system;
+      }
       function proc(seed) {
         if (isCosmicSpiritRoll(seed)) return cosmicSpiritSystem(seed);
         const mod = sectorModifier(seed, false),
@@ -9642,11 +9716,11 @@
             res = pickFrom(arch.resources, seed + i * 20 + 3),
             pattern = pickFrom(arch.patterns, seed + i * 20 + 13),
             isOuterGiant =
-              arch.key === "gasFrontier" &&
+              i!==0 && arch.key === "gasFrontier" &&
               radius > 26 &&
               rand(seed + i * 20 + 16) > 0.45,
             isSurveyRelic =
-              arch.key === "ancientArchive" && rand(seed + i * 20 + 17) > 0.72;
+              i!==0 && arch.key === "ancientArchive" && rand(seed + i * 20 + 17) > 0.72;
           b.push(
             makeBody({
               name: uniquePlanetName(seed, i, used),
@@ -9654,8 +9728,7 @@
               mass,
               orbitRadius: orbit,
               orbitSpeed: Math.sqrt(star.mass / Math.pow(orbit, 3)) * 0.12,
-              color:
-                palettes[Math.floor(rand(seed + i * 20 + 6) * palettes.length)],
+              color: frontierPlanetColor(seed,i,arch.key),
               resource: res,
               richness:
                 between(seed + i * 20 + 7, 1, 5.5) *
@@ -9671,9 +9744,9 @@
               captureDifficulty:
                 between(seed + i * 20 + 10, 0.8, 2.6) *
                 (isOuterGiant ? 1.18 : 1),
-              capturable: isOuterGiant
+              capturable: isOuterGiant || isSurveyRelic
                 ? false
-                : rand(seed + i * 20 + 11) < arch.capturable,
+                : i===0 || rand(seed + i * 20 + 11) < arch.capturable,
               upgradeable:
                 isOuterGiant || isSurveyRelic
                   ? false
@@ -9711,7 +9784,7 @@
         );
         if (hasBlackHoleRoll(seed) || rand(seed + 44445) < bhBoost * 0.02)
           sys.blackHole = createBlackHole(seed);
-        return sys;
+        return ensureFrontierCapture(sys);
       }
       function proceduralSeedForIndex(i) {
         if (!universeSeed) return 1000 + i * 137;
@@ -10272,7 +10345,7 @@
           );
         resetFlightEffects();
         currentSystemIndex = targetIndex;
-        game.system = systems[currentSystemIndex];
+        game.system = ensureFrontierCapture(systems[currentSystemIndex]);
         syncCurrentSystemSets();
         game.discovered.add(game.system.bodies[0].name);
         manualTargetName = null;
@@ -10294,7 +10367,7 @@
               cls.maxFuel *
                 (0.4 +
                   (game.fleet?.boosts?.fuelRecovery || 0) +
-                  Math.min(0.12, crewRolePower("Navigator") * 0.012)),
+                  Math.min(0.12, crewRolePower("Navigator") * 0.012) + vaultBonus("fuel")),
             cls.maxFuel,
           ),
           trail: [],
@@ -10321,19 +10394,7 @@
         if (leavingTutorial) game.missionStage = tutorialObjectives.length;
         trackDaily("sector", 1);
         generateContracts(game.system.seed);
-        if (game.sectorJumps === 1)
-          showMissionPanel(
-            "New Sector Reached!",
-            "The tutorial loop is complete. Discover rare worlds, build Echo routes, and expand the Codex.",
-            [
-              ["Sector", game.system.name],
-              ["Goal", "Discover rare planets"],
-              ["Codex", "Planet archive unlocked"],
-            ],
-          );
-        toast(
-          "Arrived: " + game.system.name + " • " + sectorModifierName(),
-        );
+        // Arrival is communicated by the persistent system HUD and captain log.
         addActivity(
           "travel",
           "Sector jump complete",
@@ -10633,6 +10694,7 @@
           });
           forceTutorialCommon();
           applyBodyStates(d.bodyStates || []);
+          systems.forEach(ensureFrontierCapture);
           forceTutorialCommon();
           currentSystemIndex = Math.max(
             0,
@@ -10737,7 +10799,7 @@
               ? "Earth"
               : game.system.bodies.find((b) => b.type !== "star")?.name ||
                 game.system.bodies[0].name;
-          manualTargetName = body(d.manualTargetName)
+          manualTargetName = body(d.manualTargetName)||d.manualTargetName==="__FRIGATE__"||(typeof d.manualTargetName==="string"&&d.manualTargetName.startsWith("@contact:"))
             ? d.manualTargetName
             : null;
           zoom = d.zoom || 0.68;
@@ -11425,7 +11487,7 @@
           bonus = match ? fleetMatchBonus(ship).speed : 0,
           reactor = (game.frigate.reactorLevel || 0) * 3,
           cmd = (game.frigate.commandLevel || 0) * 2,
-          crew = Math.min(12,crewDutyPower("fleet")*1.2);
+          crew = Math.min(12,crewDutyPower("fleet")*1.2)+vaultBonus("fleet")*100;
         return Math.max(
           35,
           Math.round(
@@ -12397,7 +12459,7 @@
             b.resource === "DataCores" || b.resource === "Crystal"
               ? 0.35
               : 0.12;
-        return m*(1+Math.min(.12,crewDutyPower("systems")*.01));
+        return m*(1+Math.min(.12,crewDutyPower("systems")*.01)+vaultBonus("production")+(!game.system.isTutorial?(b.memory?.controlMode==="industry"?.12:0)+Math.max(0,worldControlStability(b)-60)*.002:0));
       }
       function productionRate(b) {
         if (
@@ -12415,7 +12477,7 @@
         return Math.max(0,rate)*60*60*TIME_SCALE;
       }
       function researchProductionRate(b){
-        return Math.max(0,Number(b?.branches?.research)||0)*.012*rarityBonus(b);
+        return (Math.max(0,Number(b?.branches?.research)||0)*.012+(b?.memory?.controlMode==="research"?.006:0))*rarityBonus(b);
       }
       function productionPreview(b) {
         if (!b || !game.captured.has(b.name)||!b.developed) return "Not producing yet";
@@ -12479,7 +12541,7 @@
             rarityBonus(b) *
             (1 +
               crewRolePower("Xenologist") * 0.025 +
-              crewDutyPower("vault") * 0.01);
+              crewDutyPower("vault") * 0.01 + vaultBonus("survey"));
         if (!b || b.type === "star") return reward;
         reward.DataCores = Math.max(
           1,
@@ -12549,7 +12611,7 @@
               fmt(filtered) +
               ".",
           );
-        } else
+        } else if(game.system.isTutorial)
           toast("Survey reward: " + b.name + " yielded " + fmt(filtered) + ".");
         registerVaultDiscovery("planet", b.name);
         trackExpeditionProgress("survey", 1);
@@ -12636,7 +12698,7 @@
         return nearbyPlanet(b=>!b.discoveryRewardClaimed,()=>230);
       }
       function nearestRefuelTarget() {
-        return nearbyPlanet(b=>game.captured.has(b.name),b=>visualRadius(b)+120);
+        return nearbyPlanet(b=>game.captured.has(b.name),b=>visualRadius(b)+120+(b.memory?.controlMode==="relay"?100:0));
       }
       function nearestLockTarget() {
         if (!game.ship || !game.system) return { body: null, d: Infinity };
@@ -12920,11 +12982,7 @@
             if (["Exotic", "Mythic"].includes(n.body.rarity))
               game.captainLog.exoticDiscoveries++;
             recordCodex(n.body, "detected");
-            toast(
-              "World detected: " +
-                n.body.name +
-                ". Scan nearby for full survey data.",
-            );
+            if(game.system.isTutorial)toast("World detected: "+n.body.name+". Scan nearby for full survey data.");
             addActivity(
               "discovery",
               n.body.name + " detected",
@@ -12967,7 +13025,7 @@
           );
         }
         if(firstSurvey) saveGame(false);
-        showDiscovery(b, reward);
+        if(game.system.isTutorial)showDiscovery(b, reward);
         if(ui.menu?.classList.contains("open"))renderMenu();
       }
       function capture() {
@@ -12976,7 +13034,7 @@
           return errorToast("Capture requires orbital lock.");
         const b = body(s.lockBody);
         if (!b || b.type === "star")
-          return errorToast("You cannot capture a star.");
+          return errorToast("Lock orbit around a planet first.");
         if (!b.capturable)
           return errorToast(b.name + " is survey-only: " + b.hazard);
         if (game.captured.has(b.name))
@@ -13013,6 +13071,7 @@
           extractorLevel: Math.max(1, b.extractorLevel),
         });
         if (!b.branches) b.branches = defaultBranches();
+        if(!game.system.isTutorial){b.memory.controlMode=b.memory.controlMode||"outpost";}
         game.captured.add(b.name);
         selectedPlanetName = b.name;
         const amount = firstCapture?Math.round(
@@ -13805,16 +13864,26 @@
       }
       function vaultDiscoveryCandidates(source, system = game.system) {
         const family = vaultFamily(system),
-          matching = vaultCatalog.filter(
-            (item) => item.source === source && item.families.includes(family),
-          ),
-          pool = matching.length
-            ? matching
-            : vaultCatalog.filter((item) => item.source === source),
-          unseen = pool.filter(
-            (item) => !vaultState().entries.some((entry) => entry.catalogKey === item.key),
-          );
-        return unseen.length ? unseen : pool;
+          owned=new Set(vaultState().entries.map(e=>e.catalogKey)),
+          unseen=vaultCatalog.filter(item=>item.source===source&&!owned.has(item.key)),
+          matching=unseen.filter(item=>item.families.includes(family));
+        return matching.length?matching:unseen;
+      }
+      function vaultPerk(entry){
+        const item=vaultCatalog.find(x=>x.key===entry.catalogKey);
+        if(!item)return null;
+        const type=item.perk||({artifact:"survey",lifeform:"production",phenomenon:"fuel"})[item.kind];
+        const value=({Unusual:.02,Rare:.04,Exotic:.07,Mythic:.12})[item.rarity]||.01;
+        return {type,value,label:({survey:"survey rewards",production:"world output",fuel:"jump fuel recovery",fleet:"fleet mission speed"})[type]};
+      }
+      function vaultBonus(type){
+        if(!game.frigate?.built)return 0;
+        const vault=vaultState(),prev=vaultBonus.cache;
+        if(!prev||prev.vault!==vault||prev.entries!==vault.entries||prev.count!==vault.entries.length){
+          const sums={};for(const e of vault.entries){if(e.status!=="secured")continue;const p=vaultPerk(e);if(p)sums[p.type]=(sums[p.type]||0)+p.value;}
+          vaultBonus.cache={vault,entries:vault.entries,count:vault.entries.length,sums};
+        }
+        return Math.min(.22,vaultBonus.cache.sums[type]||0);
       }
       function vaultCanSecureReason(entry) {
         if (!game.frigate?.built) return "Build the ODF Pioneer first.";
@@ -13867,13 +13936,20 @@
             vaultStringSeed(origin),
             source === "space" ? 7727 : 3253,
           ),
-          chance = source === "space" ? 0.78 : 0.48;
+          chance = source === "space" || vault.entries.length<3 ? 1 : 0.92;
         if (!force && rand(seed + 31) > chance) return null;
-        const candidates = vaultDiscoveryCandidates(source),
-          template = catalogKey
+        let candidates = vaultDiscoveryCandidates(source);
+        if(vaultSecuredEntries().length<2){
+          const owned=new Set(vault.entries.map(e=>e.catalogKey)),local=candidates.filter(item=>item.threat<=vaultContainment()),
+            other=vaultCatalog.filter(item=>item.source===source&&item.threat<=vaultContainment()&&!owned.has(item.key));
+          if(local.length||other.length)candidates=local.length?local:other;
+        }
+        const template = catalogKey
             ? vaultCatalog.find((item) => item.key === catalogKey && item.source === source)
             : candidates[Math.floor(rand(seed + 97) * candidates.length)];
         if (!template) return null;
+        const existing=vault.entries.find(e=>e.catalogKey===template.key);
+        if(existing)return existing;
         const canSecure =
             template.threat <= vaultContainment() &&
             vaultSecuredEntries().length < vaultCapacity(),
@@ -13908,7 +13984,7 @@
           template.name + " discovered",
           vaultKindLabel(template.kind) + " • " + vaultThreatLabel(template.threat) + " • " + stateText,
         );
-        toast("New " + vaultKindLabel(template.kind).toLowerCase() + ": " + template.name + " • " + stateText + ".");
+        // Unsolicited discovery notices live in the Captain Log and Vault.
         if (canSecure) {
           checkDiscoveryCollections();
           unlockVaultSkin(true);
@@ -13921,6 +13997,7 @@
           reason = vaultCanSecureReason(entry);
         if (reason) return toast(reason);
         entry.status = "secured";
+        vaultBonus.cache=null;
         entry.securedAt = Date.now();
         addActivity(
           "discovery",
@@ -15777,6 +15854,9 @@
             const f = frigatePosition();
             if (f) return f;
           }
+          if(typeof manualTargetName==="string"&&manualTargetName.startsWith("@contact:")){
+            const c=activeFrontierContacts().find(x=>x.id===manualTargetName.slice(9));if(c)return c;
+          }
           const m = body(manualTargetName);
           if (m) return m;
         }
@@ -15930,6 +16010,8 @@
             sub = orbitingFrigate() ? "Jump drive synchronized" : "Return to Pioneer orbit";
           return { title: objective.action, sub, menu: objective.menu };
         }
+        const contact=nearestFrontierContact();
+        if(contact&&contact.d<320&&!game.ship.orbitLocked)return {title:"Recover "+contact.contact.name,sub:Math.round(contact.d)+"u • teal radar marker",menu:"frigate"};
         if (game.majorThreat?.status === "active")
           return {
             title: "Prepare for " + game.majorThreat.name,
@@ -16067,8 +16149,7 @@
         );
       }
       function planetCaptureReady() {
-        const n = nearestBody(),
-          b = n.body;
+        const b = game.ship?.orbitLocked ? body(game.ship.lockBody) : null;
         if (
           !b ||
           b.type === "star" ||
@@ -16845,8 +16926,9 @@
               "</span>",
             btn("Open " + menuLabel(nba.menu), "openSection", nba.menu),
           ) +
-          groupHtml("Flight & Development", core.slice(0, 3)) +
-          groupHtml("Pioneer & Exploration", core.slice(3).concat(explore)) +
+          groupHtml("Explore & manage", [core[1],core[3],core[0]]) +
+          (game.frigate.built?card("Discoveries",activeFrontierContacts().length+" drifting contacts in this system. Recover them for salvage and Vault finds.",btn("Track closest contact","trackFrontierContact",null,!!nearestFrontierContact())+btn("Vault","openFrigateTab","vault")+btn("Adventures","openFrigateTab","expeditions")):"") +
+          secondaryDetails("Upgrades, appearance & routes",groupHtml("Ship & journey",[core[2],core[4],...explore])) +
           secondaryDetails("Records, Settings & Help", groupHtml("Records & Help", support));
       }
       function menuLabel(k) {
@@ -17050,6 +17132,7 @@
                 !!s && s.type !== "star" && !bodySurveyed(s) && scanRange <= 230,
               ) +
               btn("Clear Target", "clearTarget") +
+              (s?.capturable&&!game.captured.has(s.name)?btnWhy("Capture "+s.name,"capture",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first.")+(!game.system.isTutorial&&!s.memory?.raidRewardClaimed?btnWhy("Raid for salvage","raidSelectedWorld",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first."):""):"") +
               btnWhy(
                 "Upgrade Selected Planet",
                 "upgradePlanet",
@@ -17197,8 +17280,19 @@
           "</div></div></div>" +
           restrict +
           prod +
-          branches
+          branches + (owned&&!game.system.isTutorial?card("World control","Active: "+esc(worldControlMode(b))+" • "+worldControlStability(b)+"% stability. Industry increases output, Research adds data, Relay extends refuel range by 100u and improves stability. Station upgrades consolidate control.",["outpost","industry","research","relay"].map(mode=>btn(mode[0].toUpperCase()+mode.slice(1),"setWorldControlMode",mode,worldControlMode(b)!==mode)).join("")):"")
         );
+      }
+      function raidSelectedWorld(){const b=body(selectedPlanetName);if(!b||game.system.isTutorial)return false;return raid(b);}
+      function worldControlMode(b){return b?.memory?.controlMode||"outpost";}
+      function worldControlStability(b){return Math.round(clamp(84-(Number(b?.captureDifficulty)||1)*10+(b?.branches?.station||0)*8+(worldControlMode(b)==="relay"?12:0),50,100));}
+      function setWorldControlMode(mode){
+        const b=body(selectedPlanetName);
+        if(!b||game.system.isTutorial||!game.captured.has(b.name)||!["outpost","industry","research","relay"].includes(mode))return false;
+        if(!b.memory)b.memory=defaultMemory();
+        b.memory.controlMode=mode;
+        addActivity("capture",b.name+" control changed",mode);
+        saveGame(false);renderMenu();return true;
       }
       function branchHtml(b) {
         return (
@@ -17646,6 +17740,38 @@
         selectedPlanetName = b.name;
         renderMenu();
       }
+      function vaultSpecimenArt(entry){
+        const item=vaultCatalog.find(x=>x.key===entry.catalogKey)||entry,
+          valid=c=>typeof c==="string"&&/^#[0-9a-f]{6}$/i.test(c),
+          a=valid(item.colors?.[0])?item.colors[0]:"#67e8f9",b=valid(item.colors?.[1])?item.colors[1]:"#fbbf24",
+          seed=vaultStringSeed(item.key||entry.catalogKey||entry.name)>>>0,id="v"+seed,
+          fill="url(#"+id+"m)",glow="url(#"+id+"g)",motif=item.visual||"core";
+        const poly=(points,f=fill)=>'<polygon points="'+points+'" fill="'+f+'" stroke="'+b+'" stroke-opacity=".76" stroke-width=".7"/>';
+        const line=(d,width=1)=>'<path d="'+d+'" fill="none" stroke="'+b+'" stroke-opacity=".68" stroke-width="'+width+'" stroke-linecap="round"/>';
+        const forms={crystal:"80,16 102,40 97,77 74,91 58,61 63,31",spindle:"80,11 94,40 85,54 94,70 80,97 66,70 75,54 66,40",cube:"80,21 107,37 108,72 80,89 52,72 52,37",tablet:"56,24 98,18 105,83 61,90",key:"62,23 98,23 107,45 90,57 91,92 72,92 72,57 53,45",reliquary:"60,20 100,20 111,49 100,85 60,85 49,49",lantern:"66,19 94,19 108,43 99,83 61,83 52,43",pod:"80,15 102,35 105,60 92,88 68,88 55,60 58,35",crown:"48,28 65,51 80,19 95,51 112,28 104,80 56,80"};
+        let shape="";
+        if(forms[motif]){
+          shape=poly(forms[motif])+line("M80 24 L80 83 M56 49 L103 49 M61 77 L98 34");
+          if(motif==="cube")shape+=poly("80,21 107,37 80,54 52,37",b)+poly("80,54 107,37 108,72 80,89",a);
+          if(motif==="lantern"||motif==="pod")shape+='<ellipse cx="80" cy="54" rx="12" ry="22" fill="'+glow+'"/>';
+        }else if(["disc","orb","halo","core","shell"].includes(motif)){
+          shape='<ellipse cx="80" cy="54" rx="28" ry="'+(motif==="disc"?12:25)+'" fill="'+fill+'" stroke="'+b+'" stroke-width="1.3"/>'+line("M51 54 Q80 33 109 54 Q80 74 51 54");
+          if(motif==="halo")shape='<circle cx="80" cy="54" r="28" fill="none" stroke="'+a+'" stroke-width="11"/><circle cx="80" cy="54" r="22" fill="#030917"/>'+line("M54 43 Q80 24 106 43 M54 65 Q80 84 106 65",1.6);
+          if(motif==="shell")for(let i=0;i<6;i++)shape+=line("M80 71 Q"+(45+i*14)+" 44 80 29");
+        }else if(motif==="wing"||motif==="beetle"){
+          shape=poly("80,50 46,25 33,43 58,72 80,64 102,72 127,43 114,25")+'<ellipse cx="80" cy="54" rx="7" ry="30" fill="'+fill+'"/>'+line("M80 50 L46 25 M80 50 L114 25");
+        }else if(motif==="serpent"){
+          shape='<path d="M51 25 C115 10 118 52 77 53 S43 91 106 83" stroke="'+fill+'" stroke-width="14" fill="none" stroke-linecap="round"/>'+line("M51 25 C115 10 118 52 77 53 S43 91 106 83",1.4);
+        }else if(motif==="jelly"||motif==="tendrils"){
+          shape='<path d="M48 54 Q45 16 80 17 Q115 16 112 54 Z" fill="'+fill+'" stroke="'+b+'"/>';for(let i=0;i<7;i++)shape+=line("M"+(53+i*9)+" 51 Q"+(46+i*11)+" 75 "+(57+i*8)+" 91",1.8);
+        }else if(motif==="swarm"){
+          for(let i=0;i<15;i++){const x=49+((seed+i*83)%63),y=22+((seed+i*43)%64),r=2+i%5;shape+='<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+fill+'" stroke="'+b+'" stroke-width=".6"/>';}
+        }else{
+          for(let i=0;i<7;i++)shape+='<ellipse cx="80" cy="40" rx="'+(motif==="fern"?6:12)+'" ry="23" transform="rotate('+(i*360/7)+' 80 54)" fill="'+fill+'" stroke="'+b+'" stroke-width=".6"/>';shape+='<circle cx="80" cy="54" r="7" fill="'+b+'"/>';
+        }
+        let marks="";for(let i=0;i<8;i++){const y=25+i*8,x=31+(seed+i*47)%9;marks+=line("M"+x+" "+y+" h"+(3+(seed+i)%7),.6);}
+        return '<svg viewBox="0 0 160 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="'+id+'m" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#f8fafc"/><stop offset=".28" stop-color="'+b+'"/><stop offset=".60" stop-color="'+a+'"/><stop offset="1" stop-color="#050d19"/></linearGradient><radialGradient id="'+id+'g"><stop stop-color="'+b+'" stop-opacity=".8"/><stop offset="1" stop-color="'+a+'" stop-opacity="0"/></radialGradient></defs><ellipse cx="80" cy="54" rx="54" ry="46" fill="'+glow+'" opacity=".28"/><ellipse cx="80" cy="92" rx="45" ry="8" fill="#020617" opacity=".75"/><circle cx="80" cy="54" r="45" stroke="'+a+'" stroke-opacity=".22" stroke-dasharray="2 6" fill="none"/>'+marks+shape+'</svg>';
+      }
       function vaultVisualHtml(entry) {
         const colors = Array.isArray(entry.colors) ? entry.colors : ["#67e8f9", "#fbbf24"];
         return (
@@ -17659,12 +17785,12 @@
           esc(colors[1] || colors[0]) +
           '" role="img" aria-label="Contained visual record of ' +
           esc(entry.name) +
-          '"><div class="vault-specimen-core"></div></div>'
+          '">' + vaultSpecimenArt(entry) + '</div>'
         );
       }
       function vaultEntryHtml(entry) {
         const pending = entry.status !== "secured",
-          reason = vaultCanSecureReason(entry),
+          reason = vaultCanSecureReason(entry), perk=vaultPerk(entry),
           colors = Array.isArray(entry.colors) ? entry.colors : ["#67e8f9", "#fbbf24"];
         return (
           '<div class="vault-entry ' +
@@ -17679,9 +17805,8 @@
           esc(entry.name) +
           '</b><span class="vault-origin">' +
           esc(entry.system + " • " + entry.origin) +
-          "</span><span>" +
-          esc(entry.entry) +
-          '</span><div class="vault-tags"><span class="tag">' +
+          "</span>"+secondaryDetails("Specimen notes",esc(entry.entry)) +
+          '<div class="vault-tags"><span class="tag">' +
           esc(vaultKindLabel(entry.kind)) +
           '</span><span class="tag rarity-' +
           esc(String(entry.rarity || "Unusual").toLowerCase()) +
@@ -17692,6 +17817,7 @@
           " • " +
           esc(vaultThreatLabel(entry.threat)) +
           "</span></div>" +
+          (perk?'<span class="vault-perk">' +(pending?"When secured: ":"Active: ")+"+"+Math.round(perk.value*100)+"% "+esc(perk.label)+"</span>":"") +
           (pending
             ? '<div class="actions">' +
               btnWhy(
@@ -17961,7 +18087,7 @@
           upgradeReady =
             level < 6 && hasFactoryAccess() && canAfford(frigateCost("vault"));
         return (
-          '<div class="vault-hero"><h4>Pioneer Relic Vault</h4><p>Every specimen is a persistent record of where it was found and what makes it remarkable. Surface surveys and decoded deep-space signals can reveal new entries.</p><div class="grid"><div class="chip"><b>Secure Storage</b><br>' +
+          '<div class="vault-hero"><h4>Pioneer Relic Vault</h4><p>Secure unique specimens to unlock passive bonuses. Surveys and drifting signals reveal new discoveries. Each bonus category is capped at 22%.</p><div class="grid"><div class="chip"><b>Secure Storage</b><br>' +
           secured.length +
           " / " +
           capacity +
@@ -17972,7 +18098,7 @@
           '</div><div class="chip"><b>Quarantine</b><br>' +
           pending.length +
           '</div><div class="chip"><b>Total Discoveries</b><br>' +
-          vault.entries.length +
+          vault.entries.length + " / "+vaultCatalog.length+
           '</div></div><div class="actions">' +
           btnWhy(
             level >= 6 ? "Vault Fully Upgraded" : "Upgrade Pioneer Vault",
@@ -17983,7 +18109,8 @@
           ) +
           btn("Open Collections", "openSection", "codex") +
           "</div></div>" +
-          card(
+          card("Active specimen bonuses",["survey","production","fuel","fleet"].map(type=>'<div class="chip">'+esc(({survey:"Survey rewards",production:"World output",fuel:"Jump fuel recovery",fleet:"Fleet mission speed"})[type])+" +"+Math.round(vaultBonus(type)*100)+"%</div>").join("")) +
+          secondaryDetails("Astral Archaeologist hull project",card(
             "Rare Hull Project: Astral Archaeologist",
             skinOwned
               ? "Field-research refit unlocked. Its specimen canisters, expedition plating, survey lights, and star-chart markings are rendered on the live Pioneer hull."
@@ -18010,7 +18137,7 @@
                   ) +
                   "</div>"
                 : ""),
-          ) +
+          )) +
           card(
             "Vault Collection",
             sorted.length
@@ -18164,7 +18291,7 @@
           .join("");
         // Deck navigation stays visible without a second wall of badges and
         // counters. Context lives inside the deck that owns the information.
-        let html = tab==="overview" ? "" : tabs;
+        let html = tab==="overview" ? "" : '<div class="actions pioneer-simple-nav">'+btn("Pioneer directory","setMenuTab","frigate|overview")+'</div>';
         if (tab === "expeditions") html += expeditionsHtml();
         else if (tab === "crew") html += crewHtml();
         else if (tab === "fleet")
@@ -20332,6 +20459,87 @@
         if(stage===6)return "Docked? Tap Jump Outward";
         return fallback;
       }
+      // Contacts are deterministic coordinates, not background sprites. Discovery keys
+      // already persist across saves and jumps, so a contact cannot pay twice.
+      function frontierContacts(system=game.system){
+        if(!system||system.isTutorial)return [];
+        if(system.frontierContacts)return system.frontierContacts;
+        const family=vaultFamily(system), seed=Number(system.seed)||1;
+        const types=({
+          innerForge:[["Forge wreck","wreck"],["Plasma fragment","crystal"],["Metallic debris","debris"]],
+          gasFrontier:[["Storm capsule","pod"],["Charged ice","crystal"],["Broken weather probe","wreck"]],
+          crystalReach:[["Prismatic fragment","crystal"],["Glass satellite","wreck"],["Resonant mote","anomaly"]],
+          bioCluster:[["Drifting seed","pod"],["Living filament","anomaly"],["Organic shell","debris"]],
+          ancientArchive:[["Ancient beacon","wreck"],["Engraved fragment","debris"],["Sealed reliquary","pod"]],
+          voidRim:[["Silent derelict","wreck"],["Dark matter mote","anomaly"],["Lost cargo","pod"]],
+          parallel:[["Mirror probe","wreck"],["Impossible fragment","anomaly"],["Inverted crystal","crystal"]],
+          cosmicSpirit:[["Pilgrim light","anomaly"],["Luminous seed","pod"],["Starlight fragment","crystal"]]
+        })[family]||[["Lost cargo","pod"],["Debris field","debris"],["Uncharted signal","anomaly"]];
+        const rings=system.bodies.filter(b=>b.type!=="star"), outer=Math.max(900,...rings.map(b=>b.orbitRadius||0));
+        return system.frontierContacts=Array.from({length:Math.min(14,Math.max(7,rings.length*2))},(_,i)=>{
+          const item=types[i%types.length], a=between(seed+i*71+991,0,TAU),
+            r=i===0?between(seed+981,470,620):between(seed+i*89+993,660,outer+170);
+          // Include the stable sector-local index in the persistent origin.
+          return {id:family+"-"+i,name:item[0],kind:item[1],type:"contact",radius:5,origin:item[0]+" / "+(i+1),x:Math.cos(a)*r,y:Math.sin(a)*r};
+        });
+      }
+      function frontierContactKey(contact,system=game.system){
+        return String(system?.seed||system?.name||"system")+"|space|"+contact.origin;
+      }
+      function activeFrontierContacts(){
+        const keys=vaultState().discoveryKeys,system=game.system,prev=activeFrontierContacts.cache;
+        if(prev?.system===system&&prev.keys===keys&&prev.count===keys.length)return prev.contacts;
+        const seen=new Set(keys),contacts=frontierContacts().filter(c=>!seen.has(frontierContactKey(c)));
+        activeFrontierContacts.cache={system,keys,count:keys.length,contacts};return contacts;
+      }
+      function nearestFrontierContact(){
+        if(!game.ship||!game.frigate?.built||game.system?.isTutorial)return null;
+        let best=null;
+        for(const contact of activeFrontierContacts()){
+          const d=Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y);
+          if(!best||d<best.d)best={contact,d};
+        }
+        return best;
+      }
+      function trackFrontierContact(){
+        const n=nearestFrontierContact();if(!n)return toast("All nearby contacts recovered. Jump to another sector.");
+        manualTargetName="@contact:"+n.contact.id;closeMenu();saveGame(false);
+      }
+      function recoverFrontierContact(){
+        const n=nearestFrontierContact();
+        if(!n||n.d>100||pioneerRescue)return false;
+        const contact=n.contact, key=frontierContactKey(contact), vault=vaultState();
+        if(vault.discoveryKeys.includes(key))return false;
+        const before=vault.entries.length;
+        registerVaultDiscovery("space",contact.origin,true);
+        // The catalog can be exhausted; salvage still has value once per site.
+        if(!vault.discoveryKeys.includes(key))vault.discoveryKeys.push(key);
+        const reward=contact.kind==="crystal"?{Crystal:6,DataCores:2}:contact.kind==="pod"?{Helium3:8,BioGel:3}:contact.kind==="anomaly"?{DataCores:5,Plasma:3}:{Alloy:10,Titanium:3};
+        if(manualTargetName==="@contact:"+contact.id)manualTargetName=null;
+        grantReward(reward,"Frontier recovery");
+        addActivity("discovery",contact.name+" recovered",fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
+        playSound("capture");saveGame(false);renderMenu();return true;
+      }
+      function drawFrontierContacts(){
+        const contacts=activeFrontierContacts(), theme=activeVisualTheme||sectorVisualTheme();
+        for(const contact of contacts){
+          const p=screen(contact.x,contact.y);if(p.x<-35||p.y<-35||p.x>W+35||p.y>H+35)continue;
+          const r=Math.max(5,9*zoom), color=contact.kind==="anomaly"?theme.accent2:contact.kind==="crystal"?theme.accent:"#b9d1dc";
+          ctx.save();ctx.translate(p.x,p.y);
+          ctx.strokeStyle=rgba(color,.72);ctx.fillStyle=rgba(color,.22);ctx.lineWidth=1.15;
+          ctx.beginPath();
+          if(contact.kind==="wreck"){ctx.moveTo(-r,-r*.32);ctx.lineTo(r*.72,-r*.5);ctx.lineTo(r,r*.25);ctx.lineTo(-r*.5,r*.65);ctx.closePath();}
+          else if(contact.kind==="crystal"){ctx.moveTo(0,-r);ctx.lineTo(r*.6,0);ctx.lineTo(0,r);ctx.lineTo(-r*.6,0);ctx.closePath();}
+          else if(contact.kind==="pod"){ctx.ellipse(0,0,r*.75,r*.42,-.5,0,TAU);}
+          else{ctx.arc(0,0,r*.75,0,TAU);}
+          ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.arc(0,0,r+4,0,TAU);ctx.strokeStyle=rgba(color,.28);ctx.stroke();
+          if(Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y)<180){
+            ctx.font="600 10px system-ui";ctx.textAlign="center";ctx.fillStyle=color;ctx.fillText(contact.name,0,r+15);
+          }
+          ctx.restore();
+        }
+      }
       function smartAction() {
         const n = nearestSurveyTarget(), fuelTarget=nearestRefuelTarget(),
           h = nearestEcho(),
@@ -20367,6 +20575,8 @@
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
+        const contact=nearestFrontierContact();
+        if(contact&&contact.d<=100)return {label:"Recover "+contact.contact.name,run:recoverFrontierContact,show:true};
         if(n.body)return {label:"Scan "+n.body.name,run:()=>scanPlanet(n.body.name),show:true};
         if(fuelTarget.body&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
         if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
@@ -20658,6 +20868,7 @@
       }
       function showUpgradePanel(title, summary, rows = []) {
         if (!ui.upgradeOverlay) return;
+        if(!game.system?.isTutorial){addActivity("upgrade",title,summary+" • "+rows.map(([k,v])=>k+": "+v).join(" • "));return;}
         cleanControlButtons();
         paused = true;
         modalFreeze = true;
@@ -20681,6 +20892,7 @@
       }
       function showMissionPanel(title, summary, rows = []) {
         if (!ui.missionOverlay) return;
+        if(!game.system?.isTutorial){addActivity("system",title,summary+" • "+rows.map(([k,v])=>k+": "+v).join(" • "));return;}
         // Never interrupt a major reward or active flight with an advertisement.
         cleanControlButtons();
         paused = true;
@@ -21311,7 +21523,7 @@
         const base = hex(b.name === "Mars" ? "#be7250" : b.color),
           gas = ["bands", "rings", "storm"].includes(b.pattern),
           ocean = b.pattern === "continents", lava = b.pattern === "lava",
-          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%7-3)*.11;
+          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%17-8)*.12;
         const image = rasterAsset(size, size, data => {
           for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
@@ -21322,7 +21534,7 @@
               continue;
             }
             const nz = Math.sqrt(1 - rr),
-              terrain = visualFbm(nx * (3+variation) + 9, ny * (3-variation) + 7, nz * 3 + 5, seed, 5),
+              terrain = visualFbm(nx * (3+variation) + 9, ny * (3-variation) + 7, nz * (3+variation*.45) + 5, seed, 5),
               fine = visualNoise(nx * 70 + 80, ny * 70 + 80, nz * 70, seed + 97),
               bands = 0.5 + 0.26 * Math.sin(ny * (31+variation*34) + (terrain - 0.5) * 7) +
                 0.14 * Math.sin(ny * 67 + terrain * 13),
@@ -21367,6 +21579,7 @@
                 heat=Math.pow(Math.max(0,1-Math.abs(terrain-.51)*15),2)*.25;
               rgb = rgb.map((v, c) => v * (0.36+fine*.12) + [245, 80, 8][c] * crack + heat*[160,45,5][c]);
             }
+            if(variation!==0){const fault=Math.pow(Math.max(0,1-Math.abs(terrain-(.45+(seed%13)*.01))*20),3);rgb=rgb.map((v,c)=>v*(.90+fault*.22)+fault*[18,13,24][c]);}
             for (let c = 0; c < 3; c++) data[i + c] = (rgb[c] * (1 - Math.min(0.8, cloud)) + 235 * Math.min(0.8, cloud)) * limb;
             data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
           }
@@ -21469,16 +21682,17 @@
             ring: false,
           });
         }
-        for (let i = 0, c = Math.min(32,Math.floor((W * H) / asteroidDiv*layout.rocks)); i < c; i++) {
+        for (let i = 0, c = Math.min(64,Math.max(3,Math.floor((W * H) / asteroidDiv*layout.rocks*2.4))); i < c; i++) {
           asteroids.push({
             x: random() * W,
             y: random() * H,
-            r: random() * 2 + 0.7,
+            r: random() * 4.2 + 0.7,
             vx: between(i + 120, -0.02, 0.02),
             vy: between(i + 180, -0.015, 0.025),
             spin: random() * TAU,
             ss: between(i + 210, -0.006, 0.006),
-            pts: Math.floor(between(i + 250, 6, 9)),
+            pts: Math.floor(between(i + 250, 5, 10)),
+            motif:Math.floor(random()*4),
             d: between(i + 300, 0.1, 0.32),
           });
         }
@@ -21629,6 +21843,7 @@
           rock.addColorStop(0.36, "rgba(100,116,139,.48)");
           rock.addColorStop(1, "rgba(15,23,42,.5)");
           ctx.fillStyle = rock;
+          if(a.motif===1){ctx.fillStyle=rgba(theme.accent,.6);ctx.fillRect(-a.r,-a.r*.25,a.r*2,a.r*.5);}else if(a.motif===2){ctx.strokeStyle=rgba(theme.accent2,.5);ctx.strokeRect(-a.r,-a.r*.55,a.r*2,a.r*1.1);}
           ctx.beginPath();
           for (let i = 0; i < a.pts; i++) {
             const ang = (i / a.pts) * TAU,
@@ -22787,7 +23002,7 @@
           parallel:[1.03,1.06,.94],mythic:[1.06,1.08,.94],spirit:[1.04,1.07,.9],
           ancient:[.94,1.08,1.12],freeze:[.98,1.09,1.1],abyss:[1.08,.83,.78],archaeologist:[.94,1.06,1.1]
         }[motif]||[1,1,1];
-        const [length,width,height]=kind==="fleet"?shape.map(v=>1+(v-1)*.35):shape, hardware=kind==="frigate"?28:kind==="fleet"?17:20;
+        const [length,width,height]=kind==="fleet"?shape.map(v=>1+(v-1)*.65):shape.map((v,i)=>1+(v-1)*(i===2?1.15:2.2)), hardware=kind==="frigate"?28:kind==="fleet"?17:20;
         if(["circuit","standard","frontier","command"].includes(motif)){
           mirror([[-hardware,8],[-hardware+4,12],[hardware-8,10],[hardware,6]],"metal",8,2);
           for(const side of [-1,1]){box(-hardware,side*8-1,8,2,"energy",9,0);light(hardware-6,side*9,"white",.65);}
@@ -22800,6 +23015,9 @@
         }else{
           for(const side of [-1,1]){box(-hardware,side*10-3,12,6,"dark",8,2);radiator(-hardware+2,side*10-2,8,4,motif==="abyss"?"dark":"metal");light(-hardware+8,side*10,"accent",.75);}
         }
+        if(["warp","parallel"].includes(motif)){mirror([[-hardware-12,17],[-hardware-3,29],[hardware+4,22],[hardware+10,12]],"metal",3,3);for(const side of [-1,1])engine(-hardware-10,side*23,3);}
+        else if(["spirit","mythic","freeze"].includes(motif)){mirror([[-hardware-8,14],[-hardware+6,28],[hardware+13,12],[hardware+5,8]],"pearl",4,2);}
+        else if(["flare","solar"].includes(motif)){mirror([[-hardware-9,11],[-hardware-14,26],[-hardware+8,22],[hardware+6,10]],"paint",4,4);for(const side of [-1,1])engine(-hardware-12,side*20,4);}
         for(const piece of model.parts){piece.points=piece.points.map(([x,y])=>[x*length,y*width]);piece.z*=height;piece.depth*=height;}
         for(const e of model.engines){e.x*=length;e.y*=width;e.size*=Math.min(width,1.08);}
         for(const lamp of model.lights){lamp.x*=length;lamp.y*=width;}
@@ -22827,7 +23045,7 @@
         };
       }
       function drawCraftEngine(c, engine, skin, thrust) {
-        const {x,y,size}=engine, power=clamp(Number(thrust)||0,0,1), length=size*(2.2+power*8), color=skin.glow||skin.accent||"#7dd3fc";
+        const {x,y,size}=engine, power=clamp(Number(thrust)||0,0,1), length=size*(2.2+power*8)*(["warp","parallel","abyss"].includes(skin.motif)?1.5:["spirit","mythic","freeze"].includes(skin.motif)?.78:1), color=skin.glow||skin.accent||"#7dd3fc";
         c.save(); c.globalCompositeOperation="screen";
         const glow=c.createRadialGradient(x,y,0,x,y,size*(3.1+power*.9));
         glow.addColorStop(0,rgba(color,0.18+power*0.30));glow.addColorStop(1,"rgba(0,0,0,0)");
@@ -23778,6 +23996,7 @@
         drawAnomaly();
         drawBlackHole();
         drawSectorEvent();
+        drawFrontierContacts();
         drawMajorThreat();
         for (const b of game.system.bodies) drawBody(b);
         drawFrigate();
@@ -23827,8 +24046,8 @@
               : null,
           threat =
             game.majorThreat?.status === "active" ? game.majorThreat : null,
-          bodies = game.system.bodies || [],
-          all = [...bodies, frig, bh, ev, threat, game.ship].filter(Boolean),
+          bodies = game.system.bodies || [], contacts=activeFrontierContacts(),
+          all = [...bodies, ...contacts, frig, bh, ev, threat, game.ship].filter(Boolean),
           maxWorld = Math.max(
             900,
             ...all.map(
@@ -24117,6 +24336,7 @@
         c.shadowBlur = 0;
         c.restore();
         label("YOU", sp.x, sp.y + 16, "#fff");
+        for(const contact of contacts){const p=mapPoint(contact);c.fillStyle="#a6e4df";c.fillRect(p.x-1,p.y-1,2,2);}
         c.restore();
       }
       function drawCinematicLight() {
@@ -26141,6 +26361,10 @@
         setTrailSkin,
         upgradeFrigate,
         secureVaultEntry,
+        setWorldControlMode,
+        raidSelectedWorld,
+        recoverFrontierContact,
+        trackFrontierContact,
         upgradePlanet,
         upgradeBranch,
         setTarget,
