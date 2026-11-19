@@ -5493,7 +5493,7 @@
       #onboardingOverlay{padding:0!important;align-items:stretch!important;background:#0b111c!important}
       #onboardingOverlay .expedition-intro{isolation:isolate;display:flex!important;position:relative;flex-direction:column;justify-content:flex-end;gap:15px;max-width:none!important;width:100%!important;height:100%!important;max-height:none!important;padding:calc(var(--safeTop,0px) + 20px) 25px calc(var(--safeBottom,0px) + 22px)!important;overflow:hidden!important;background:#0b111c!important;border:0!important;border-radius:0!important;box-shadow:none!important;text-align:left}
       .expedition-intro .onboard-art{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-height:none!important;z-index:-2;border:0!important;border-radius:0!important;margin:0!important;background:#0b111c url('./assets/threshold-vista.svg') center 44%/cover no-repeat!important;box-shadow:none!important}
-      .expedition-intro .onboard-art::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 12%,#0b111b22 30%,#0b111bbd 51%,#0b111c 72%)!important;transform:none!important;animation:none!important}
+      .expedition-intro .onboard-art::before{content:"";position:absolute;inset:0;width:auto!important;height:auto!important;border-radius:0!important;clip-path:none!important;box-shadow:none!important;background:linear-gradient(180deg,transparent 12%,#0b111b22 30%,#0b111bbd 51%,#0b111c 72%)!important;transform:none!important;animation:none!important}
       .expedition-intro[data-expedition-step="1"] .onboard-art{background-position:38% 56%!important}
       .expedition-intro[data-expedition-step="2"] .onboard-art{background-position:60% 56%!important}
       .expedition-intro[data-expedition-step="3"] .onboard-art{background-position:70% 43%!important}
@@ -5501,6 +5501,13 @@
       .expedition-intro-copy,.expedition-intro .onboard-progress,.expedition-intro .actions{position:relative;width:100%;max-width:460px;margin-left:auto!important;margin-right:auto!important}
       .expedition-kicker{display:flex;align-items:center;gap:8px;font-size:9px;letter-spacing:.2em;color:#cbb48d;font-weight:650}
       .expedition-kicker i{height:1px;width:17px;background:#b99c6e}
+      .expedition-chapter{margin-left:auto;color:#e0caa3;letter-spacing:.12em;font-variant-numeric:tabular-nums}
+      .expedition-intro[data-expedition-step="0"] .expedition-chapter::after{content:"01 / 05"}
+      .expedition-intro[data-expedition-step="1"] .expedition-chapter::after{content:"02 / 05"}
+      .expedition-intro[data-expedition-step="2"] .expedition-chapter::after{content:"03 / 05"}
+      .expedition-intro[data-expedition-step="3"] .expedition-chapter::after{content:"04 / 05"}
+      .expedition-intro[data-expedition-step="4"] .expedition-chapter::after{content:"05 / 05"}
+      @media(max-height:540px){#titleOverlay .title-screen,#onboardingOverlay .expedition-intro{overflow-y:auto!important;justify-content:flex-start}.expedition-intro-copy{margin-top:auto!important}.title-screen .title-hero{flex-shrink:0}}
       #onboardingOverlay #onboardTitle{font-family:var(--nf-heading)!important;color:#f3e9d5!important;font-size:clamp(31px,8vw,49px)!important;font-weight:400!important;line-height:1.07!important;margin:10px 0 12px!important;letter-spacing:-.035em}
       #onboardingOverlay #onboardText{font-size:16px!important;line-height:1.62!important;color:#ddd7ca!important;margin:0!important;text-wrap:pretty;max-width:none!important}
       .expedition-intro .onboard-progress{height:3px!important;border:0!important;background:#3b3a41!important;box-shadow:none!important;margin-top:8px!important}
@@ -5908,7 +5915,7 @@
       <div class="dialog expedition-intro" data-expedition-step="0">
         <div class="onboard-art" aria-hidden="true"></div>
         <div class="expedition-intro-copy">
-          <div class="expedition-kicker">THE NINEFOLD <i></i> FIELD BRIEFING</div>
+          <div class="expedition-kicker">THE NINEFOLD <i></i> FIELD BRIEFING <span class="expedition-chapter" aria-hidden="true"></span></div>
           <h2 id="onboardTitle">The Between</h2>
           <p id="onboardText"></p>
         </div>
@@ -22493,7 +22500,7 @@
         ui.onboardTitle.textContent = betweenDisplayText(onboardingSteps[i][0]);
         ui.onboardText.textContent = betweenDisplayText(onboardingSteps[i][1]);
         const intro=ui.onboardingOverlay.querySelector?.(".expedition-intro");
-        if(intro)intro.dataset.expeditionStep=String(i);
+        if(intro?.dataset)intro.dataset.expeditionStep=String(i);
         ui.onboardProgress.style.width =
           ((i + 1) / onboardingSteps.length) * 100 + "%";
         ui.nextOnboard.textContent =
@@ -25246,8 +25253,17 @@
               }
             }
             if(right-left>12 && bottom-top>6){
-              c.fillStyle="rgba(4,12,19,.38)";c.fillRect(left+3,top+2,Math.min(9,(right-left)*.3),1.6);
-              c.fillStyle="rgba(219,235,241,.48)";c.fillRect(left+3,top+2,.65,1.6);
+              const width=Math.min(12,(right-left)*.31),x=left+3,y=top+2;
+              const recess=c.createLinearGradient(x,y,x,y+2.5);
+              recess.addColorStop(0,"#060b13");recess.addColorStop(.40,rgba(dark(color,.5),.82));recess.addColorStop(1,rgba(light(color,.38),.9));
+              c.fillStyle=recess;c.fillRect(x,y,width,2.2);
+              c.fillStyle=rgba("#e2d3b4",.55);c.fillRect(x+.3,y+1.8,width-.6,.35);
+              for(let k=1;k<width-1;k+=2.4){c.fillStyle=rgba("#0a101c",.6);c.fillRect(x+k,y+.3,.55,1.45);}
+            }
+            if((material==="hull"||material==="paint")&&right-left>20&&bottom-top>9){
+              const ridge=c.createLinearGradient(left,top,right,bottom);
+              ridge.addColorStop(0,rgba("#f1e2bd",.12));ridge.addColorStop(.42,rgba("#e7d3af",.28));ridge.addColorStop(.56,rgba("#141923",.30));ridge.addColorStop(1,rgba("#101522",.02));
+              c.fillStyle=ridge;c.beginPath();c.moveTo(left+4,top+2);c.lineTo(right-2,top+(bottom-top)*.48);c.lineTo(right-4,top+(bottom-top)*.64);c.lineTo(left+3,top+5);c.closePath();c.fill();
             }
             c.restore();
           }
