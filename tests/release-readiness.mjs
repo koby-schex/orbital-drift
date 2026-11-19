@@ -1282,7 +1282,7 @@ console.log(
 checkpoint("frontier expansion");
 api.initGame(false);api.dismissPanels();
 const frontier=api.prepareVaultTest(626262);
-assert.ok(api.vaultCatalog.length>=56);
+assert.equal(api.vaultCatalog.length,72);
 assert.equal(new Set(api.vaultCatalog.map(x=>x.key)).size,api.vaultCatalog.length);
 const frontierQA=vm.runInContext(`({
   frontierContacts,activeFrontierContacts,frontierContactKey,recoverFrontierContact,
@@ -1323,7 +1323,7 @@ for(let seed=1;seed<300;seed++){
   if(!system.specialType)assert.ok(system.bodies.some(b=>b.type!=="star"&&b.capturable),"Every ordinary generated sector needs a foothold");
 }
 const contacts=frontierQA.activeFrontierContacts();
-assert.ok(contacts.length>=7&&contacts.length<=14);
+assert.ok(contacts.length>=7&&contacts.length<=15);
 assert.equal(new Set(contacts.map(c=>c.id)).size,contacts.length);
 assert.deepEqual(frontierQA.frontierContacts(),frontierQA.frontierContacts(JSON.parse(JSON.stringify({...frontier,frontierContacts:undefined}))));
 const contact=contacts[0];
@@ -1395,9 +1395,30 @@ assert.equal(api.loadGame(false),true);
 
 
 
+checkpoint("cosmic life");
+api.initGame(false);api.dismissPanels();
+const cosmicQA=vm.runInContext(`({cosmicLifeContact,frontierContacts,drawCosmicLifeContact,activeFrontierContacts,recoverFrontierContact,frontierContactKey})`,context);
+let lifeSeed=null;
+for(let seed=626262;seed<626362;seed++){
+ const sys=api.proc(seed);
+ if(!sys.specialType&&cosmicQA.cosmicLifeContact(sys)){lifeSeed=seed;break;}
+}
+assert.ok(lifeSeed!==null);
+const lifeSystem=api.prepareVaultTest(lifeSeed);
+const life=cosmicQA.cosmicLifeContact(lifeSystem);
+assert.ok(life&&life.catalogKey);
+assert.equal(cosmicQA.frontierContacts(lifeSystem).filter(c=>c.kind==="cosmic").length,1);
+assert.ok(api.vaultCatalog.some(t=>t.key===life.catalogKey&&t.source==="space"));
+cosmicQA.drawCosmicLifeContact(life,{x:100,y:100});
+api.game.ship.x=life.x;api.game.ship.y=life.y;api.game.ship.orbitLocked=false;api.game.ship.lockBody=null;
+assert.equal(cosmicQA.recoverFrontierContact(),true);
+assert.ok(api.vaultState().entries.some(e=>e.catalogKey===life.catalogKey));
+assert.ok(!cosmicQA.activeFrontierContacts().some(c=>c.id===life.id));
+assert.equal(api.saveGame(false),true);assert.equal(api.loadGame(false),true);
+assert.ok(!cosmicQA.activeFrontierContacts().some(c=>c.id===life.id));
 checkpoint("orbital concord");
 api.initGame(false);api.dismissPanels();api.prepareVaultTest(626262);api.dismissPanels();
-const concordQA=vm.runInContext(`({charterConcordWorld,concordCharterReason,concordChartered,concordLocalBonus,concordLanes,recordConcordEcho,productionRate,worldControlMode,renderConcord,
+const concordQA=vm.runInContext(`({charterConcordWorld,concordCharterReason,concordChartered,concordLocalBonus,concordLanes,recordConcordEcho,productionRate,worldControlMode,renderConcord,settlementProfile,drawConcordSettlement,
   establish(b){b.captured=true;b.discovered=true;b.developed=true;b.level=1;game.captured.add(b.name);game.discovered.add(b.name);},
   lock(b){game.ship.orbitLocked=true;game.ship.lockBody=b.name;},
   release(b){b.captured=false;b.developed=false;game.captured.delete(b.name);},
@@ -1431,9 +1452,16 @@ portA.memory.controlMode="research";portB.memory.controlMode="industry";
 assert.ok(Math.abs(concordQA.concordLocalBonus(portA)-.072)<1e-8);
 assert.ok(Math.abs(concordQA.concordLocalBonus(portB)-.072)<1e-8);
 concordQA.renderConcord();assert.match(concordQA.markup,/90% route quality/);
+assert.equal(concordQA.settlementProfile(portA).stage,0);
+portA.branches={extractor:2,station:3,research:3};
+const developedProfile=concordQA.settlementProfile(portA);
+assert.equal(developedProfile.stage,3);
+assert.match(developedProfile.name,/Observatory/);
+concordQA.drawConcordSettlement(portA,{x:100,y:100},30,developedProfile);
 const portNames=[portA.name,portB.name];
 assert.equal(api.saveGame(false),true);assert.equal(api.loadGame(false),true);
 const restoredA=api.body(portNames[0]),restoredB=api.body(portNames[1]);
+assert.equal(concordQA.settlementProfile(restoredA).stage,3);
 assert.ok(concordQA.concordChartered(restoredA));assert.equal(concordQA.concordLanes().length,1);
 assert.ok(Math.abs(concordQA.concordLocalBonus(restoredA)-.072)<1e-8);
 concordQA.release(restoredB);assert.equal(concordQA.concordLanes()[0].active,false);

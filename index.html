@@ -7396,6 +7396,22 @@
           {"key":"fractured-seal","name":"Fractured Seal","kind":"artifact","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"tablet","entry":"A broken tablet whose edges occasionally align with an unseen matching surface. The alignment occurs only when nearby instruments record incompatible spatial readings.","perk":"fuel"},
           {"key":"counter-clock","name":"Counter Clock","kind":"artifact","source":"space","families":["parallel"],"threat":2,"rarity":"Rare","colors":["#e879f9","#67e8f9"],"visual":"disc","entry":"An intact chronometer that synchronizes with an arrival which has not yet occurred. Its movement changes whenever the Pioneer revises its planned route.","perk":"fleet"},
           {"key":"unwritten-star","name":"Unwritten Star","kind":"phenomenon","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#e879f9","#67e8f9"],"visual":"halo","entry":"A stellar image that resolves only when projected against an anticipated flight path. Observed fluctuations have enabled the navigation team to refine fleet routes.","perk":"fleet"},
+          {"key":"ember-ray","name":"Ember Ray","kind":"lifeform","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#e06e35","#ffe0a0"],"visual":"ray","entry":"A broad silicon-based swimmer travels along stellar magnetic currents. Its translucent fins channel charged dust into branching luminous veins."},
+          {"key":"forge-heart","name":"Forge Heart","kind":"artifact","source":"planet","families":["innerForge"],"threat":3,"rarity":"Rare","colors":["#993d38","#fbbf24"],"visual":"engine","entry":"A layered ceramic engine recovered from a basalt chamber. Its nested rotors exchange thermal energy without making physical contact."},
+          {"key":"storm-whale","name":"Storm Whale","kind":"lifeform","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#5269bd","#a6edff"],"visual":"whale","entry":"A vast gas-feeding organism follows charged plasma streams above giant worlds. The Pioneer archives shed tissue and acoustic readings rather than the living animal."},
+          {"key":"pressure-bloom","name":"Pressure Bloom","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#427a97","#a2ece7"],"visual":"bloom","entry":"A colony of inflated membranes survives intense atmospheric pressure. Each chamber changes color in response to local fluctuations in density."},
+          {"key":"prism-mantle","name":"Prism Mantle","kind":"lifeform","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#9e6bc7","#9be6ee"],"visual":"ray","entry":"A thin mineral membrane glides through dust lanes, collecting grains across its refractive fins. Shed fragments preserve its precise optical structure."},
+          {"key":"facet-loom","name":"Facet Loom","kind":"artifact","source":"planet","families":["crystalReach"],"threat":3,"rarity":"Rare","colors":["#7651aa","#f3c8ff"],"visual":"engine","entry":"An interlocking array of crystal rollers produces thin sheets of patterned mineral. The original purpose of the woven lattice remains unknown."},
+          {"key":"veil-medusa","name":"Veil Medusa","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#319c90","#b7f7c3"],"visual":"medusa","entry":"A transparent vacuum organism trails long filaments that collect ionized particles. The crew retrieves a detached membrane while leaving the organism undisturbed."},
+          {"key":"root-archive","name":"Root Archive","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#487b43","#e0df94"],"visual":"fern","entry":"A root network stores chemical traces of successive seasons. Its oldest surviving branch predates all recognizable organisms in the surrounding survey area."},
+          {"key":"choir-relic","name":"Choir Relic","kind":"artifact","source":"space","families":["ancientArchive"],"threat":3,"rarity":"Rare","colors":["#917342","#ffdfa1"],"visual":"engine","entry":"Three concentric resonators emit harmonics when exposed to ancient transmissions. Their inscriptions resemble architectural plans for an unidentified orbital sanctuary."},
+          {"key":"pilgrim-mask","name":"Pilgrim Mask","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":2,"rarity":"Rare","colors":["#9a7959","#e8d8b7"],"visual":"mask","entry":"A ceremonial faceplate made from fine overlapping metallic leaves. Wear patterns indicate generations of careful repair rather than a single owner."},
+          {"key":"null-seraph","name":"Null Seraph","kind":"lifeform","source":"space","families":["voidRim"],"threat":5,"rarity":"Exotic","colors":["#26394d","#82e6ff"],"visual":"ray","entry":"A near-black organism absorbs passing light except along the edges of its six fins. Remote observation records a shed scale with an unusually low thermal signature."},
+          {"key":"dark-bell","name":"Dark Bell","kind":"artifact","source":"planet","families":["voidRim"],"threat":3,"rarity":"Rare","colors":["#34384d","#b3a8e9"],"visual":"bell","entry":"A hollow metallic chamber responds to gravitational disturbances with low-frequency vibrations. Its surface carries no visible seams or manufacturing marks."},
+          {"key":"aurora-pilgrim","name":"Aurora Pilgrim","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":4,"rarity":"Exotic","colors":["#9bd6b3","#fff0bc"],"visual":"medusa","entry":"A luminous traveler moves slowly along nebular filaments. Its drifting membranes release particles that retain the spectrum of nearby stars for hours."},
+          {"key":"dawn-reliquary","name":"Dawn Reliquary","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":3,"rarity":"Exotic","colors":["#c3e2b9","#fff4d4"],"visual":"bell","entry":"A small vessel opens only under a narrow band of pale light. Inside, layered translucent material traces the outline of a vanished stellar nursery."},
+          {"key":"mirror-leviathan","name":"Mirror Leviathan","kind":"lifeform","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#a45ce2","#67e8f9"],"visual":"whale","entry":"A massive drifting form is visible in two incompatible orientations. The Pioneer records remote spectral samples while avoiding the unstable boundary around its body."},
+          {"key":"fracture-lens","name":"Fracture Lens","kind":"artifact","source":"planet","families":["parallel"],"threat":4,"rarity":"Exotic","colors":["#b76fb5","#8ce0ec"],"visual":"mask","entry":"A segmented lens produces images of the same terrain at conflicting angles. No observed position accounts for all of its simultaneous projections."},
         ];
       const crewUniforms = ["#164e63", "#312e81", "#713f12", "#14532d", "#4c1d95"],
         crewTemplates = [
@@ -16980,7 +16996,7 @@
           ["Planet Codex","Archived planetary surveys and discovery collections","openSection","codex","journal"],
           ...(game.frigate.built?[["Orbital Concord","Charter settlements and chart supply lanes through flight","openSection","concord","route"]]:[]),
           ...(game.frigate.built?[["Vault","Archive discoveries and exceptional research breakthroughs","openFrigateTab","vault","vault"]]:[])
-        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
+        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" survey and recovery contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
       }
       function renderHangarDirectory(){
         ui.menuContent.innerHTML=routeDirectory([
@@ -17378,11 +17394,26 @@
         }
         return best;
       }
+      const settlementRoles={
+        outpost:{name:"Haven",color:"#e9cb91",desc:"Habitat clusters and sheltered landing facilities."},
+        industry:{name:"Foundry",color:"#f4b076",desc:"Industrial districts joined by illuminated transport corridors."},
+        research:{name:"Observatory",color:"#91d7ee",desc:"Scientific campuses and orbital instrument arrays."},
+        relay:{name:"Waystation",color:"#9de5bc",desc:"Navigation beacons and civilian docking infrastructure."}
+      };
+      function settlementProfile(b){
+        if(!concordChartered(b))return null;
+        const m=b.memory||{},br=b.branches||{},role=settlementRoles[worldControlMode(b)]||settlementRoles.outpost;
+        const service=Math.min(3,Math.floor((Number(m.refuels)||0)/2))+Math.min(3,Math.floor((Number(m.echoes)||0)/2));
+        const score=Math.max(0,Number(br.station)||0)*2+Math.max(0,Number(br.extractor)||0)+Math.max(0,Number(br.research)||0)+service;
+        const stage=score>=12?3:score>=6?2:score>=2?1:0;
+        const environment=({lava:"Thermal",craters:"Basin",crystal:"Prismatic",continents:"Coastal",bands:"Cloud",storm:"Stormshield",rings:"Ringward",glow:"Luminous"})[b.pattern]||"Frontier";
+        return {stage,name:environment+" "+role.name,color:role.color,desc:role.desc,stageName:["Landing enclave","Established settlement","Connected township","Orbital metropolis"][stage],score,active:concordActive(b)};
+      }
       function concordWorldCard(b){
         if(!b||!concordEligibleSystem(game.system)||!game.frigate?.built||!b.captured)return "";
-        const charter=concordChartered(b),reason=concordCharterReason(b);
+        const charter=concordChartered(b),reason=concordCharterReason(b),settlement=settlementProfile(b);
         return card("Orbital Concord",charter?
-          "Ratified charter · "+esc(worldControlMode(b))+" · "+Math.round(concordLocalBonus(b)*100)+"% linked supply output. Complementary settlements benefit from pilot-charted Echo lanes.":
+          "<b>"+esc(settlement.name)+"</b> · "+esc(settlement.stageName)+". "+esc(settlement.desc)+" "+Math.round(concordLocalBonus(b)*100)+"% linked supply output. Station, extractor and research upgrades plus local flight service shape visible growth.":
           "Optional settlement charter. Establish a station or demonstrate local flight service, then ratify from orbit. "+costHtml(concordCharterCost),
           charter?btn("View Concord","openSection","concord"):btnWhy("Ratify charter","charterConcordWorld",b.name,!reason,reason));
       }
@@ -17393,7 +17424,7 @@
           lanes=concordLanes(),archived=eligible.filter(sys=>sys!==game.system&&sys.bodies.some(concordChartered));
         ui.menuContent.innerHTML=card("A civilization traced by flight","Charter settlements and fly real Orbital Echo routes between them. Different world roles form complementary supply lanes; the best active lane adds up to 8% local output. No offline decay or mandatory management.")+
           '<section class="command-status"><span class="screen-eyebrow">CONCORD REGISTER</span><h2>'+active.length+' active charters</h2><p>'+chartered.length+' lifetime charters · '+eligible.reduce((sum,sys)=>sum+concordLanes(sys).filter(l=>l.active).length,0)+' active lanes</p></section>'+
-          card("Current sector",local.length?"Select a controlled world to view its charter and development.":"No controlled frontier worlds in this sector.",local.length?routeDirectory(local.map(b=>[b.name,concordChartered(b)?"Chartered · "+worldControlMode(b):"Unchartered settlement","openWorldDetails",b.name,"explore"])):btn("View worlds","openSection","planets"))+
+          card("Current sector",local.length?"Select a controlled world to view its charter and development.":"No controlled frontier worlds in this sector.",local.length?routeDirectory(local.map(b=>[b.name,concordChartered(b)?settlementProfile(b).stageName+" · "+settlementProfile(b).name:"Unchartered settlement","openWorldDetails",b.name,"explore"])):btn("View worlds","openSection","planets"))+
           card("Charted Echo lanes",lanes.length?lanes.map(l=>'<div class="log"><b>'+esc(l.from)+" ↔ "+esc(l.to)+'</b><span>'+l.quality+'% route quality · '+(l.active?"Connected":"Dormant — charter control required")+'</span></div>').join(""):"Ratify two settlements, then complete an Orbital Echo from one to the other with at least 60% quality.")+
           (archived.length?card("Distant charters",archived.map(sys=>'<div class="log"><b>'+esc(sys.name)+'</b><span>'+sys.bodies.filter(concordActive).length+' active settlements · '+concordLanes(sys).length+' charted lanes</span></div>').join("")):"");
       }
@@ -17850,7 +17881,21 @@
         const line=(d,width=1)=>'<path d="'+d+'" fill="none" stroke="'+b+'" stroke-opacity=".68" stroke-width="'+width+'" stroke-linecap="round"/>';
         const forms={crystal:"80,16 102,40 97,77 74,91 58,61 63,31",spindle:"80,11 94,40 85,54 94,70 80,97 66,70 75,54 66,40",cube:"80,21 107,37 108,72 80,89 52,72 52,37",tablet:"56,24 98,18 105,83 61,90",key:"62,23 98,23 107,45 90,57 91,92 72,92 72,57 53,45",reliquary:"60,20 100,20 111,49 100,85 60,85 49,49",lantern:"66,19 94,19 108,43 99,83 61,83 52,43",pod:"80,15 102,35 105,60 92,88 68,88 55,60 58,35",crown:"48,28 65,51 80,19 95,51 112,28 104,80 56,80"};
         let shape="";
-        if(item.key==="second-sun"){
+        if(motif==="ray"){
+          shape=poly("80,31 58,24 23,39 49,67 73,59 80,91 87,59 111,67 137,39 102,24");
+          shape+=line("M80 31 L80 91 M80 43 Q50 34 23 39 M80 43 Q110 34 137 39 M80 52 L49 67 M80 52 L111 67",1.5);
+        }else if(motif==="whale"){
+          shape='<path d="M24 54 Q40 14 89 28 Q115 32 123 49 L145 33 L139 57 L145 76 L121 65 Q96 89 55 77 Q31 70 24 54Z" fill="'+fill+'" stroke="'+b+'"/>'+line("M34 53 Q76 44 118 55 M45 64 Q79 76 107 63",1.5)+poly("73,64 86,96 96,68");
+        }else if(motif==="medusa"){
+          shape='<path d="M35 49 Q37 9 80 13 Q123 9 125 49 Q80 70 35 49Z" fill="'+fill+'" stroke="'+b+'"/>';
+          for(let i=0;i<9;i++)shape+=line("M"+(40+i*10)+" 53 Q"+(28+i*13)+" 75 "+(44+i*9)+" 95",1.4);
+          shape+='<ellipse cx="80" cy="36" rx="22" ry="19" fill="'+glow+'"/>';
+        }else if(motif==="engine"||motif==="bell"){
+          shape=motif==="bell"?'<path d="M56 25 Q80 11 104 25 L113 68 L126 82 Q80 95 34 82 L47 68Z" fill="'+fill+'" stroke="'+b+'"/>'+line("M43 79 Q80 66 117 79 M80 20 V72",1.5):poly("51,24 109,24 119,54 109,84 51,84 41,54");
+          for(let i=0;i<3;i++)shape+='<ellipse cx="80" cy="'+(38+i*16)+'" rx="'+(motif==="bell"?18+i*5:29)+'" ry="7" fill="none" stroke="'+b+'" stroke-width="1.4"/>';
+        }else if(motif==="mask"){
+          shape=poly("49,23 80,13 111,23 118,54 103,84 80,98 57,84 42,54")+poly("53,43 75,47 67,58 52,53",a)+poly("107,43 85,47 93,58 108,53",a)+line("M80 16 V88 M62 74 L80 80 L98 74",1.4);
+        }else if(item.key==="second-sun"){
           for(let i=0;i<18;i++){const angle=i*Math.PI/9,x=80+Math.cos(angle)*29,y=54+Math.sin(angle)*29,xx=80+Math.cos(angle)*(37+i%3*3),yy=54+Math.sin(angle)*(37+i%3*3);shape+=line("M"+x+" "+y+" L"+xx+" "+yy,1.2);}
           shape+='<circle cx="80" cy="54" r="28" fill="'+glow+'"/><circle cx="80" cy="54" r="19" fill="'+fill+'"/>'+line("M62 51 Q79 36 97 56 M64 61 Q82 73 96 57",1.4);
         }else if(item.key==="inverted-astrolabe"||item.key==="epoch-dial"){
@@ -20570,12 +20615,23 @@
           cosmicSpirit:[["Pilgrim light","anomaly"],["Luminous seed","pod"],["Starlight fragment","crystal"]]
         })[family]||[["Lost cargo","pod"],["Debris field","debris"],["Uncharted signal","anomaly"]];
         const rings=system.bodies.filter(b=>b.type!=="star"), outer=Math.max(900,...rings.map(b=>b.orbitRadius||0));
-        return system.frontierContacts=Array.from({length:Math.min(14,Math.max(7,rings.length*2))},(_,i)=>{
+        const contacts=Array.from({length:Math.min(14,Math.max(7,rings.length*2))},(_,i)=>{
           const item=types[i%types.length], a=between(seed+i*71+991,0,TAU),
             r=i===0?between(seed+981,470,620):between(seed+i*89+993,660,outer+170);
           // Include the stable sector-local index in the persistent origin.
           return {id:family+"-"+i,name:item[0],kind:item[1],type:"contact",radius:5,origin:item[0]+" / "+(i+1),x:Math.cos(a)*r,y:Math.sin(a)*r};
         });
+        const life=cosmicLifeContact(system);if(life)contacts.push(life);
+        return system.frontierContacts=contacts;
+      }
+      function cosmicLifeContact(system){
+        if(!system||system.isTutorial)return null;
+        const family=vaultFamily(system),seed=Number(system.seed)||1,
+          keys={innerForge:"ember-ray",gasFrontier:"storm-whale",crystalReach:"prism-mantle",bioCluster:"veil-medusa",ancientArchive:"choir-relic",voidRim:"null-seraph",cosmicSpirit:"aurora-pilgrim",parallel:"mirror-leviathan"},
+          key=keys[family],item=vaultCatalog.find(v=>v.key===key);
+        if(!item||(!system.specialType&&rand(mixSeed(seed,0x4c494645))>.62))return null;
+        const a=between(mixSeed(seed,7216),0,TAU),distance=between(mixSeed(seed,7217),740,1120);
+        return {id:family+"-living-contact",name:item.name,kind:"cosmic",type:"contact",radius:12,origin:"Field observation / "+key,catalogKey:key,visual:item.visual,colors:item.colors,x:Math.cos(a)*distance,y:Math.sin(a)*distance};
       }
       function frontierContactKey(contact,system=game.system){
         return String(system?.seed||system?.name||"system")+"|space|"+contact.origin;
@@ -20605,19 +20661,44 @@
         const contact=n.contact, key=frontierContactKey(contact), vault=vaultState();
         if(vault.discoveryKeys.includes(key))return false;
         const before=vault.entries.length;
-        registerVaultDiscovery("space",contact.origin,true);
+        registerVaultDiscovery("space",contact.origin,true,contact.catalogKey||null);
         // The catalog can be exhausted; salvage still has value once per site.
         if(!vault.discoveryKeys.includes(key))vault.discoveryKeys.push(key);
-        const reward=contact.kind==="crystal"?{Crystal:6,DataCores:2}:contact.kind==="pod"?{Helium3:8,BioGel:3}:contact.kind==="anomaly"?{DataCores:5,Plasma:3}:{Alloy:10,Titanium:3};
+        const reward=contact.kind==="cosmic"?{DataCores:5}:contact.kind==="crystal"?{Crystal:6,DataCores:2}:contact.kind==="pod"?{Helium3:8,BioGel:3}:contact.kind==="anomaly"?{DataCores:5,Plasma:3}:{Alloy:10,Titanium:3};
         if(manualTargetName==="@contact:"+contact.id)manualTargetName=null;
-        grantReward(reward,"Frontier recovery");
-        addActivity("discovery",contact.name+" recovered",fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
+        grantReward(reward,contact.kind==="cosmic"?"Field observation":"Frontier recovery");
+        addActivity("discovery",contact.name+(contact.kind==="cosmic"?" observed":" recovered"),fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
         playSound("capture");saveGame(false);renderMenu();return true;
+      }
+      function drawCosmicLifeContact(contact,p){
+        const radius=contact.visual==="whale"?48:contact.visual==="ray"?34:28,
+          r=clamp(radius*zoom,12,72),a=contact.colors[0],b=contact.colors[1],
+          reduced=game.settings?.motion==="Reduced",phase=reduced?0:t*.025,low=game.settings?.graphics==="Low"||game.settings?.performanceMode==="Battery Saver";
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-.25+Math.sin(phase*.3)*.08);
+        if(!low){const glow=ctx.createRadialGradient(0,0,0,0,0,r*1.65);glow.addColorStop(0,rgba(b,.15));glow.addColorStop(1,rgba(a,0));ctx.fillStyle=glow;ctx.fillRect(-r*1.7,-r*1.7,r*3.4,r*3.4);}
+        const g=ctx.createLinearGradient(-r,-r,r,r);g.addColorStop(0,rgba(b,.85));g.addColorStop(.45,rgba(a,.7));g.addColorStop(1,rgba(a,.12));
+        ctx.fillStyle=g;ctx.strokeStyle=rgba(b,.8);ctx.lineWidth=Math.max(.7,r*.035);ctx.beginPath();
+        if(contact.visual==="whale"){
+          ctx.moveTo(-r,0);ctx.bezierCurveTo(-r*.8,-r*.65,r*.35,-r*.55,r*.68,-r*.08);ctx.lineTo(r,r*-.42);ctx.lineTo(r*.9,0);ctx.lineTo(r,r*.38);ctx.lineTo(r*.66,r*.12);ctx.bezierCurveTo(r*.25,r*.6,-r*.75,r*.45,-r,0);ctx.closePath();ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.moveTo(-r*.1,r*.14);ctx.lineTo(r*.2,r*.67);ctx.lineTo(r*.43,r*.15);ctx.closePath();ctx.fill();ctx.stroke();
+          for(let i=0;i<4;i++){ctx.beginPath();ctx.ellipse(-r*.45+i*r*.21,0,r*.075,r*.26,-.35,0,TAU);ctx.stroke();}
+        }else if(contact.visual==="ray"){
+          const flap=Math.sin(phase)*r*.14;ctx.moveTo(0,-r*.52);ctx.quadraticCurveTo(-r*.45,-r*.72,-r,-r*.13+flap);ctx.lineTo(-r*.46,r*.42);ctx.lineTo(-r*.16,r*.19);ctx.lineTo(0,r*.83);ctx.lineTo(r*.16,r*.19);ctx.lineTo(r*.46,r*.42);ctx.lineTo(r,-r*.13+flap);ctx.quadraticCurveTo(r*.45,-r*.72,0,-r*.52);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(0,-r*.45);ctx.lineTo(0,r*.8);ctx.moveTo(-r*.88,-r*.13+flap);ctx.quadraticCurveTo(0,-r*.4,r*.88,-r*.13+flap);ctx.stroke();
+        }else if(contact.visual==="medusa"){
+          ctx.moveTo(-r*.78,0);ctx.bezierCurveTo(-r*.7,-r,r*.7,-r,r*.78,0);ctx.quadraticCurveTo(0,r*.4,-r*.78,0);ctx.fill();ctx.stroke();
+          for(let i=0;i<(low?5:9);i++){const x=(i/ (low?4:8)-.5)*r*1.35;ctx.beginPath();ctx.moveTo(x,r*.08);ctx.quadraticCurveTo(x+Math.sin(phase+i)*r*.2,r*.52,x-r*.12,r*(.82+i%3*.09));ctx.stroke();}
+        }else{
+          for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,r*(.45+i*.19),r*(.22+i*.1),i*.7+phase*.15,0,TAU);ctx.stroke();}
+          ctx.beginPath();ctx.arc(0,0,r*.17,0,TAU);ctx.fill();
+        }
+        ctx.restore();
+        if(Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y)<180){ctx.save();ctx.font="500 10px system-ui";ctx.textAlign="center";ctx.fillStyle=b;ctx.fillText(contact.name,p.x,p.y+r+13);ctx.restore();}
       }
       function drawFrontierContacts(){
         const contacts=activeFrontierContacts(), theme=activeVisualTheme||sectorVisualTheme();
         for(const contact of contacts){
-          const p=screen(contact.x,contact.y);if(p.x<-35||p.y<-35||p.x>W+35||p.y>H+35)continue;
+          const p=screen(contact.x,contact.y),margin=contact.kind==="cosmic"?100:35;if(p.x<-margin||p.y<-margin||p.x>W+margin||p.y>H+margin)continue;
+          if(contact.kind==="cosmic"){drawCosmicLifeContact(contact,p);continue;}
           const r=Math.max(5,9*zoom), color=contact.kind==="anomaly"?theme.accent2:contact.kind==="crystal"?theme.accent:"#b9d1dc";
           ctx.save();ctx.translate(p.x,p.y);
           ctx.strokeStyle=rgba(color,.72);ctx.fillStyle=rgba(color,.22);ctx.lineWidth=1.15;
@@ -20670,7 +20751,7 @@
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
         const contact=nearestFrontierContact();
-        if(contact&&contact.d<=100)return {label:"Recover "+contact.contact.name,run:recoverFrontierContact,show:true};
+        if(contact&&contact.d<=100)return {label:(contact.contact.kind==="cosmic"?"Observe ":"Recover ")+contact.contact.name,run:recoverFrontierContact,show:true};
         if(n.body)return {label:"Scan "+n.body.name,run:()=>scanPlanet(n.body.name),show:true};
         if(fuelTarget.body&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
         if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
@@ -22240,8 +22321,41 @@
         const angle = game.settings?.motion === "Reduced" ? -.8 : t * .003 - .8;
         drawOrbitalStation(p.x+Math.cos(angle)*(r+19),p.y+Math.sin(angle)*(r+19),.6,angle);
       }
+      function drawConcordSettlement(b,p,r,profile){
+        if(!profile?.active||r<7)return;
+        const seed=b.featureSeed||1,quality=game.settings?.graphics||"High",low=quality==="Low"||game.settings?.performanceMode==="Battery Saver",
+          star=game.system.bodies.find(o=>o.type==="star"),sun=star?Math.atan2(star.y-b.y,star.x-b.x):-2.4,
+          clusters=1+profile.stage*2,role=worldControlMode(b);
+        ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,r*.95,0,TAU);ctx.clip();
+        for(let i=0;i<clusters;i++){
+          const a=sun+Math.PI+(rand(seed+i*43)-.5)*1.8,rr=r*(.3+rand(seed+i*67)*.45),x=p.x+Math.cos(a)*rr,y=p.y+Math.sin(a)*rr;
+          ctx.fillStyle=rgba(profile.color,.13);ctx.beginPath();ctx.ellipse(x,y,r*.12,r*.065,a,0,TAU);ctx.fill();
+          const n=low?5:8+profile.stage*3;
+          for(let j=0;j<n;j++){
+            const dx=(rand(seed+i*101+j*7)-.5)*r*.21,dy=(rand(seed+i*103+j*11)-.5)*r*.13;
+            ctx.fillStyle=rgba(profile.color,.5+rand(seed+j*13)*.45);ctx.fillRect(x+dx,y+dy,Math.max(.65,r*.018),Math.max(.6,r*.014));
+          }
+          if(profile.stage>=2&&!low){ctx.strokeStyle=rgba(profile.color,.36);ctx.lineWidth=Math.max(.5,r*.009);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(p.x+Math.cos(a+.32)*rr,p.y+Math.sin(a+.32)*rr);ctx.stroke();}
+        }
+        ctx.restore();
+        if(profile.stage>=1){
+          const spin=game.settings?.motion==="Reduced"?seed%6:t*.0015+seed%6;
+          const count=profile.stage>=3?3:profile.stage>=2?2:1;
+          for(let i=0;i<count;i++){
+            const a=spin+i*TAU/count,x=p.x+Math.cos(a)*(r+13+i*3),y=p.y+Math.sin(a)*(r+13+i*3);
+            drawOrbitalStation(x,y,.27+profile.stage*.07,a);
+            ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.strokeStyle=rgba(profile.color,.8);ctx.lineWidth=.8;
+            if(role==="research"){ctx.beginPath();ctx.arc(0,-4,4,Math.PI,TAU);ctx.stroke();}
+            else if(role==="relay"){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-9);ctx.stroke();ctx.beginPath();ctx.arc(0,-9,1.1,0,TAU);ctx.fillStyle=profile.color;ctx.fill();}
+            else if(role==="industry"){ctx.fillStyle=rgba(profile.color,.65);ctx.fillRect(-6,-3,4,6);ctx.fillRect(2,-3,4,6);}
+            else{ctx.strokeRect(-4,-3,8,6);}
+            ctx.restore();
+          }
+        }
+      }
       function drawPlanetDevelopment(b, p, r) {
         if (!b || b.type === "star" || r < 5) return;
+        const settlement=settlementProfile(b);if(settlement?.active){drawConcordSettlement(b,p,r,settlement);return;}
         const level=Math.max(1,b.level||1),seed=b.featureSeed||1,
           star=game.system.bodies.find(body=>body.type==="star"),
           angle=star?Math.atan2(star.y-b.y,star.x-b.x):-2.4;
