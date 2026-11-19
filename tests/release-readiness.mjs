@@ -1282,7 +1282,7 @@ console.log(
 checkpoint("frontier expansion");
 api.initGame(false);api.dismissPanels();
 const frontier=api.prepareVaultTest(626262);
-assert.equal(api.vaultCatalog.length,72);
+assert.equal(api.vaultCatalog.length,88,"Retain all 72 legacy discoveries and add 16 Between records");
 assert.equal(new Set(api.vaultCatalog.map(x=>x.key)).size,api.vaultCatalog.length);
 const frontierQA=vm.runInContext(`({
   frontierContacts,activeFrontierContacts,frontierContactKey,recoverFrontierContact,

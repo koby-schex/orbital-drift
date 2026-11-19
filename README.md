@@ -7,6 +7,9 @@ This conversion preserves the established gameplay and save identities of the fo
 ## Pass 40 — Art of the Between
 Eight reach motifs, formation-specific relief, distinctive life observations, threshold architecture and crossing aperture effects. All existing progression and save keys remain intact. See the production contract for canon boundaries.
 
+## Pass 41 — Life Between the Nine
+Sixteen new Vault discoveries, eight local living events, deeper independent cultural records, field research and resource references. Existing saves, economy and discovery keys continue unchanged.
+
 ---
 
 ## Historical development record
