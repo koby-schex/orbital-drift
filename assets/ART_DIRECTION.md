@@ -1,3 +1,7 @@
+## Pass 42 — Ninefold presentation rebuild
+
+Ink navy, charcoal slate, aged gold, warm ivory, subdued jade. Editorial serif titles paired with readable system sans. Layered irregular strata, graded light, microtexture and coherent depth. No claim that this is final production illustration. Navigation and action IDs remain unchanged.
+
 ## Pass 40 — Art of the Between
 
 Eight seeded cached environment compositions; different relief patterns for seven formations; eight dedicated field-entity silhouettes; open threshold stations, settlement districts, shared hull arches, and aperture arrival choreography. These are new local visual treatments, not added playable geography or new encounter mechanics. Reduced Motion and Low/Battery Saver budgets are retained; real-device visual review remains required.
