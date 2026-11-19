@@ -1319,6 +1319,22 @@ api.registerVaultDiscovery("planet","Repeated known item",true,one.catalogKey);
 assert.equal(api.vaultState().entries.length,count);
 assert.equal(frontierQA.hydrateVault({entries:[one,{...one,status:"secured"}]}).entries.length,1);
 assert.equal(new Set(api.vaultCatalog.map(t=>frontierQA.vaultSpecimenArt({catalogKey:t.key}))).size,api.vaultCatalog.length);
+assert.ok(api.vaultCatalog.every(t=>t.entry.length>=60),"Every specimen should have a substantive field record");
+assert.equal(api.vaultCatalog.filter(t=>frontierQA.vaultPerk({catalogKey:t.key})).length,4,"Only four research breakthroughs grant perks");
+const fieldQA=vm.runInContext(`({lore,vaultEntryHtml})`,context);
+const patterns=["bands","continents","craters","lava","crystal","storm","rings","glow"];
+const fieldNotes=patterns.map(p=>fieldQA.lore("Test frontier","Alloy",true,p));
+assert.equal(new Set(fieldNotes).size,patterns.length,"Survey language must distinguish visible terrain");
+assert.ok(fieldNotes.every(note=>note.includes("Alloy")&&!note.includes("Newly charted world")));
+assert.equal(fieldQA.lore("Test frontier","Alloy",true,"star"),"A stellar body anchors the local orbital network.");
+const legacy={...one,entry:"Legacy specimen note"};
+const refreshed=api.vaultCatalog.find(t=>t.key===one.catalogKey);
+assert.ok(fieldQA.vaultEntryHtml(legacy).includes(refreshed.entry.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"))||!fieldQA.vaultEntryHtml(legacy).includes("Legacy specimen note"),"Existing finds display updated field notes");
+for(const key of ["second-sun","inverted-astrolabe","glass-fern","archive-scarab"]){
+  const art=frontierQA.vaultSpecimenArt({catalogKey:key});
+  assert.ok(art.startsWith("<svg")&&art.endsWith("</svg>")&&!/NaN|undefined/.test(art),"Specimen artwork must render valid coordinates");
+}
+
 assert.equal(frontierQA.vaultPerk({catalogKey:"iron-orchid"}),null,"Ordinary specimens are archive records");
 assert.equal(frontierQA.vaultPerk({catalogKey:"storm-crown"}),null,"Rarity alone must not grant a perk");
 for(const key of ["inverted-astrolabe","second-sun","impossible-room","unwritten-star"])assert.ok(frontierQA.vaultPerk({catalogKey:key}).value>0,"Exceptional research grants a bounded benefit");
