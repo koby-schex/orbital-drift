@@ -6166,6 +6166,563 @@
       }
       // END BETWEEN ART PROFILES
 
+      // BEGIN REACH DISCOVERIES
+      const REACH_DISCOVERY_RECORDS=[
+  {
+    "key": "cinder-spindle",
+    "name": "Cinder Spindle",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "innerForge"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "spindle",
+    "colors": [
+      "#a75b39",
+      "#e4bc87"
+    ],
+    "entry": "A spindle of fused plates alters its alignment near heat seams. Detached plates retain a readable sequence of thermal changes."
+  },
+  {
+    "key": "sinter-sail",
+    "name": "Sinter Sail",
+    "kind": "lifeform",
+    "source": "space",
+    "families": [
+      "innerForge"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "wing",
+    "colors": [
+      "#b65e48",
+      "#f2c393"
+    ],
+    "entry": "Broad overlapping membranes gather suspended warm grains. Shed layers are sampled without disturbing the moving form."
+  },
+  {
+    "key": "pressure-iris",
+    "name": "Pressure Iris",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "gasFrontier"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "disc",
+    "colors": [
+      "#66889c",
+      "#c4dfdc"
+    ],
+    "entry": "A segmented valve responds to the pressure bands surrounding its recovery site. No manufacturer is established."
+  },
+  {
+    "key": "bell-skein",
+    "name": "Bell Skein",
+    "kind": "lifeform",
+    "source": "space",
+    "families": [
+      "gasFrontier"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "jelly",
+    "colors": [
+      "#7095b4",
+      "#e0c7e8"
+    ],
+    "entry": "Interlinked hollow chambers expand at different rates and leave a delicate wake of detached membrane."
+  },
+  {
+    "key": "angle-tablet",
+    "name": "Angle Tablet",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "crystalReach"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "tablet",
+    "colors": [
+      "#8e83c1",
+      "#d8e9e0"
+    ],
+    "entry": "A plate preserves several incompatible reflection angles. Independent readings are logged separately."
+  },
+  {
+    "key": "facet-crown",
+    "name": "Facet Crown",
+    "kind": "phenomenon",
+    "source": "space",
+    "families": [
+      "crystalReach"
+    ],
+    "threat": 4,
+    "rarity": "Exotic",
+    "visual": "crown",
+    "colors": [
+      "#a383bd",
+      "#e8d9ae"
+    ],
+    "entry": "Seven luminous facets form a broken crown; their relative alignment changes as the passage is surveyed."
+  },
+  {
+    "key": "root-clasp",
+    "name": "Root Clasp",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "bioCluster"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "fern",
+    "colors": [
+      "#63866c",
+      "#ddd59d"
+    ],
+    "entry": "A clasp of fibrous material tightens in response to vibration. Its attachment site is unknown."
+  },
+  {
+    "key": "silk-canopy",
+    "name": "Silk Canopy",
+    "kind": "lifeform",
+    "source": "space",
+    "families": [
+      "bioCluster"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "jelly",
+    "colors": [
+      "#568b83",
+      "#e1cf9c"
+    ],
+    "entry": "A moving canopy suspends thin independent threads. The crew recovers only shed material."
+  },
+  {
+    "key": "margin-script",
+    "name": "Margin Script",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "ancientArchive"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "tablet",
+    "colors": [
+      "#a18b72",
+      "#dfc49a"
+    ],
+    "entry": "A narrow strip bears repeated marks around an empty center. The text remains undeciphered."
+  },
+  {
+    "key": "witness-array",
+    "name": "Witness Array",
+    "kind": "artifact",
+    "source": "space",
+    "families": [
+      "ancientArchive"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "reliquary",
+    "colors": [
+      "#8b8193",
+      "#e4cba2"
+    ],
+    "entry": "A suspended array of broken frames repeats a short recorded sequence. The original context is unresolved."
+  },
+  {
+    "key": "absence-gauge",
+    "name": "Absence Gauge",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "voidRim"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "spindle",
+    "colors": [
+      "#627080",
+      "#c0c4d5"
+    ],
+    "entry": "A small gauge registers a repeatable gap in its own readings. Its calibration standard has not been identified."
+  },
+  {
+    "key": "hollow-arc",
+    "name": "Hollow Arc",
+    "kind": "phenomenon",
+    "source": "space",
+    "families": [
+      "voidRim"
+    ],
+    "threat": 4,
+    "rarity": "Exotic",
+    "visual": "halo",
+    "colors": [
+      "#536d8b",
+      "#c9b5d7"
+    ],
+    "entry": "Separated outlines remain visible only to particular instruments. The crew documents the disagreement."
+  },
+  {
+    "key": "offset-lens",
+    "name": "Offset Lens",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "parallel"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "orb",
+    "colors": [
+      "#9372b4",
+      "#c8dedb"
+    ],
+    "entry": "A lens presents two displaced images under identical conditions. The discrepancy remains unexplained."
+  },
+  {
+    "key": "twin-suture",
+    "name": "Twin Suture",
+    "kind": "phenomenon",
+    "source": "space",
+    "families": [
+      "parallel"
+    ],
+    "threat": 5,
+    "rarity": "Exotic",
+    "visual": "tendrils",
+    "colors": [
+      "#946eae",
+      "#e1b3c7"
+    ],
+    "entry": "Two suspended seams appear to intersect on one instrument and remain separate on another."
+  },
+  {
+    "key": "veil-vessel",
+    "name": "Veil Vessel",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "cosmicSpirit"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "lantern",
+    "colors": [
+      "#799d89",
+      "#e6d6ad"
+    ],
+    "entry": "A shallow vessel retains a recurring luminous pattern. Its intended use remains unknown."
+  },
+  {
+    "key": "glimmer-rosette",
+    "name": "Glimmer Rosette",
+    "kind": "lifeform",
+    "source": "space",
+    "families": [
+      "cosmicSpirit"
+    ],
+    "threat": 4,
+    "rarity": "Exotic",
+    "visual": "bloom",
+    "colors": [
+      "#8bad9b",
+      "#f1deb0"
+    ],
+    "entry": "A radial membrane sheds small luminous flecks at regular intervals; observation remains remote."
+  }
+];
+      const REACH_DISCOVERY_EVENTS=[
+  {
+    "key": "field-sinter-sail",
+    "name": "Sinter Sail observation",
+    "families": [
+      "innerForge"
+    ],
+    "desc": "A drifting sheet of warm mineral dust obscures a nearby passage.",
+    "color": "#f2c393",
+    "visual": "crystalMotes",
+    "choices": [
+      {
+        "label": "Chart the cool margin",
+        "result": "A marked passage avoids the densest dust.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Collect settled grains",
+        "result": "Detached grains are recovered for material study.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  },
+  {
+    "key": "field-bell-skein",
+    "name": "Bell Skein observation",
+    "families": [
+      "gasFrontier"
+    ],
+    "desc": "A chain of hollow pressure chambers begins to contract along a route.",
+    "color": "#e0c7e8",
+    "visual": "auroraTide",
+    "choices": [
+      {
+        "label": "Measure the pressure wave",
+        "result": "The crew maps a stable interval between contractions.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Guide nearby vessels",
+        "result": "Travelers follow the marked low-pressure margin.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  },
+  {
+    "key": "field-facet-crown",
+    "name": "Facet Crown observation",
+    "families": [
+      "crystalReach"
+    ],
+    "desc": "A band of refractive fragments creates overlapping silhouettes near a crossing.",
+    "color": "#e8d9ae",
+    "visual": "auroraTide",
+    "choices": [
+      {
+        "label": "Compare instrument readings",
+        "result": "Conflicting observations are preserved in the archive.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Recover loose facets",
+        "result": "Only detached mineral fragments are collected.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  },
+  {
+    "key": "field-silk-canopy",
+    "name": "Silk Canopy observation",
+    "families": [
+      "bioCluster"
+    ],
+    "desc": "A living canopy has drifted across a marked passage.",
+    "color": "#e1cf9c",
+    "visual": "auroraTide",
+    "choices": [
+      {
+        "label": "Observe migration",
+        "result": "The canopy is mapped from a safe distance.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Redirect traffic",
+        "result": "The crew guides approaching travelers clear of the habitat.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  },
+  {
+    "key": "field-witness-array",
+    "name": "Witness Array observation",
+    "families": [
+      "ancientArchive"
+    ],
+    "desc": "A cluster of unclaimed markers begins emitting the same short pattern.",
+    "color": "#e4cba2",
+    "visual": "crystalMotes",
+    "choices": [
+      {
+        "label": "Record the sequence",
+        "result": "The archive retains the signal without assigning a maker.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Restore a route marker",
+        "result": "One damaged marker is repaired for travelers.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  },
+  {
+    "key": "field-hollow-arc",
+    "name": "Hollow Arc observation",
+    "families": [
+      "voidRim"
+    ],
+    "desc": "Two instruments disagree about a narrow passage boundary.",
+    "color": "#c9b5d7",
+    "visual": "auroraTide",
+    "choices": [
+      {
+        "label": "Cross-check the instruments",
+        "result": "Independent readings are filed side by side.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Mark an exclusion lane",
+        "result": "The uncertain boundary is marked for later surveys.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  },
+  {
+    "key": "field-twin-suture",
+    "name": "Twin Suture observation",
+    "families": [
+      "parallel"
+    ],
+    "desc": "A crossing emits incompatible position readings at its outer edge.",
+    "color": "#e1b3c7",
+    "visual": "prismaticTide",
+    "choices": [
+      {
+        "label": "Preserve both readings",
+        "result": "Neither reading is discarded or treated as proof of origin.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Warn travelers",
+        "result": "The Pioneer publishes a conservative approach corridor.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  },
+  {
+    "key": "field-glimmer-rosette",
+    "name": "Glimmer Rosette observation",
+    "families": [
+      "cosmicSpirit"
+    ],
+    "desc": "A luminous rosette gathering moves slowly across a quiet current.",
+    "color": "#f1deb0",
+    "visual": "auroraTide",
+    "choices": [
+      {
+        "label": "Record its rhythm",
+        "result": "The crew records the pattern without attributing intent.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 8
+        }
+      },
+      {
+        "label": "Clear the approach",
+        "result": "Local traffic is directed around the gathering.",
+        "reward": {
+          "Alloy": 12,
+          "Crystal": 8
+        }
+      }
+    ]
+  }
+];
+      const REACH_DISCOVERY_FORMS={
+  "sinter-sail": {
+    "kind": "ember",
+    "lobes": 4,
+    "limbs": 6
+  },
+  "bell-skein": {
+    "kind": "braid",
+    "lobes": 4,
+    "limbs": 6
+  },
+  "facet-crown": {
+    "kind": "prism",
+    "lobes": 7,
+    "limbs": 6
+  },
+  "silk-canopy": {
+    "kind": "veil",
+    "lobes": 5,
+    "limbs": 6
+  },
+  "witness-array": {
+    "kind": "choir",
+    "lobes": 4,
+    "limbs": 6
+  },
+  "hollow-arc": {
+    "kind": "hollow",
+    "lobes": 4,
+    "limbs": 3
+  },
+  "twin-suture": {
+    "kind": "mirror",
+    "lobes": 4,
+    "limbs": 6
+  },
+  "glimmer-rosette": {
+    "kind": "pilgrim",
+    "lobes": 4,
+    "limbs": 6
+  }
+};
+      function reachDiscoveryContact(system,family){
+        if(!system||system.isTutorial)return null;
+        const item=REACH_DISCOVERY_RECORDS.find(r=>r.source==="space"&&r.families.includes(family));
+        if(!item)return null;
+        let hash=2166136261;for(const ch of String(system.seed??1)+":"+family)hash=Math.imul(hash^ch.charCodeAt(0),16777619)>>>0;
+        if(!system.specialType&&hash%100>=65)return null;
+        const angle=(hash%6283)/1000, distance=880+((hash>>>8)%420);
+        return {id:family+"-field-observation",name:item.name,kind:"cosmic",type:"contact",radius:12,origin:"Field observation / "+item.key,catalogKey:item.key,visual:item.visual,colors:item.colors,x:Math.cos(angle)*distance,y:Math.sin(angle)*distance};
+      }
+      function reachEventPool(templates,family,recent){
+        const fresh=templates.filter(t=>!recent.has(t.key)),available=fresh.length?fresh:templates;
+        return available.filter(t=>!t.families||t.families.includes(family));
+      }
+      // END REACH DISCOVERIES
       // BEGIN BETWEEN FIELD ARCHIVE
       const BETWEEN_NATIVE_RECORDS=[
   {
@@ -8246,7 +8803,7 @@
           "Reality-Bending",
         ],
         vaultCatalog = [
-          ...BETWEEN_NATIVE_RECORDS,
+          ...BETWEEN_NATIVE_RECORDS, ...REACH_DISCOVERY_RECORDS,
           { key: "ember-reliquary", name: "Ember Reliquary", kind: "artifact", source: "planet", families: ["innerForge"], threat: 2, rarity: "Unusual", colors: ["#fb923c", "#fde68a"], visual: "reliquary", entry: "A heat-blackened casket whose inner rings remain aligned with an unlocated reference point. It warms whenever the Pioneer changes course." },
           { key: "foundry-heart", name: "Foundry Heart", kind: "artifact", source: "space", families: ["innerForge"], threat: 4, rarity: "Rare", colors: ["#ef4444", "#fbbf24"], visual: "core", entry: "A self-heating alloy engine recovered between worlds. Its chambers forge microscopic tools, then dismantle them before anyone can learn their purpose." },
           { key: "cinder-mite", name: "Cinder Mite Colony", kind: "lifeform", source: "planet", families: ["innerForge"], threat: 3, rarity: "Rare", colors: ["#f97316", "#fef3c7"], visual: "swarm", entry: "Silicate organisms that swim through molten metal. The colony arranges itself into tiny constellations when exposed to engine vibration." },
@@ -8344,7 +8901,7 @@
           { key: "pilgrim-mirrors", family: "diplomacy", name: "The Pilgrim Mirrors", hook: "Luminous travelers are leaving gifts at worlds where your earlier choices helped strangers.", color: "#d9f99d", leadRole: "Expedition Envoy", stages: [["encounter",1,"Answer a pilgrim contact"],["vault",1,"Preserve a luminous gift"],["jump",2,"Follow the shadowless path"],["threat",1,"Shield the pilgrims from the Memory Tide"]], threat: "memory-tempest", reward: { Crystal: 48, BioGel: 36, DataCores: 32 }, vaultKey: "memory-tide", rewardText: "pilgrim knowledge, restorative cultures, and the Memory Tide" },
         ],
         livingEventTemplates = [
-          ...BETWEEN_LIVING_EVENTS,
+          ...BETWEEN_LIVING_EVENTS, ...REACH_DISCOVERY_EVENTS,
           { key: "comet-migration", name: "Comet Migration", desc: "A bright family of comets is crossing the inhabited orbital lanes.", color: "#bae6fd", visual: "cometTrail", choices: [{ label: "Chart a safe passage", result: "The Pioneer publishes a clean route through the procession.", reward: { DataCores: 9, Helium3: 12 } }, { label: "Harvest the outer tails", result: "Fleet collectors skim rare ice without disturbing the migration.", reward: { Crystal: 12, BioGel: 7 } }] },
           { key: "aurora-spawning", name: "Aurora Spawning", desc: "Magnetic lifeforms are gathering inside a planet-wide aurora.", color: "#4ade80", visual: "auroraTide", choices: [{ label: "Observe quietly", result: "The spawning pattern becomes a new xenology reference.", reward: { DataCores: 12, BioGel: 10 } }, { label: "Stabilize the field", result: "The Pioneer prevents a magnetic collapse and recovers charged crystals.", reward: { Crystal: 14, Plasma: 8 } }] },
           { key: "relay-market", name: "Wayfarer Relay Market", desc: "A temporary market has assembled around an old communications relay.", color: "#fde68a", visual: "crystalMotes", choices: [{ label: "Trade expedition charts", result: "Fresh route intelligence reaches the bridge.", reward: { Helium3: 16, DataCores: 8 } }, { label: "Restock the fleet", result: "The quarterdeck secures useful hull stock and repair metal.", reward: { Alloy: 22, Titanium: 10 } }] },
@@ -15602,7 +16159,7 @@
           return state.records[key];
         }
         const recent = new Set(state.history.slice(0, 4).map((entry) => entry.templateKey)),
-          pool = livingEventTemplates.filter((template) => !recent.has(template.key)),
+          pool = reachEventPool(livingEventTemplates,vaultFamily(system),recent),
           template = (pool.length ? pool : livingEventTemplates)[Math.floor(rand(seed + 29) * (pool.length ? pool.length : livingEventTemplates.length))],
           record = {
             id: "world-event-" + key,
@@ -21708,6 +22265,7 @@
           return {id:family+"-"+i,name:item[0],kind:item[1],type:"contact",radius:5,origin:item[0]+" / "+(i+1),x:Math.cos(a)*r,y:Math.sin(a)*r};
         });
         const life=cosmicLifeContact(system);if(life)contacts.push(life);
+        const field=reachDiscoveryContact(system,family);if(field)contacts.push(field);
         return system.frontierContacts=contacts;
       }
       function cosmicLifeContact(system){
@@ -21758,7 +22316,7 @@
       }
 
       function paintBetweenLife(c,contact,r,phase,settings={}){
-        const art=betweenLifeArt(contact),budget=betweenArtBudget(settings),a=contact.colors[0],b=contact.colors[1],
+        const art=REACH_DISCOVERY_FORMS[contact?.catalogKey]||betweenLifeArt(contact),budget=betweenArtBudget(settings),a=contact.colors[0],b=contact.colors[1],
           q=budget.animate?phase:0,k=art.kind;
         c.save();c.rotate(k==="mirror"?.2:k==="braid"?-.28:0);
         const fill=c.createLinearGradient(-r,-r,r,r);
