@@ -21516,7 +21516,8 @@
         const base = hex(b.name === "Mars" ? "#be7250" : b.color),
           gas = ["bands", "rings", "storm"].includes(b.pattern),
           ocean = b.pattern === "continents", lava = b.pattern === "lava",
-          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%17-8)*.12;
+          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%17-8)*.12,
+          feature=b.frontierFeature, featureAccent=feature?hex(feature.accent):null;
         const image = rasterAsset(size, size, data => {
           for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
@@ -21573,13 +21574,16 @@
               rgb = rgb.map((v, c) => v * (0.36+fine*.12) + [245, 80, 8][c] * crack + heat*[160,45,5][c]);
             }
             if(variation!==0){const fault=Math.pow(Math.max(0,1-Math.abs(terrain-(.45+(seed%13)*.01))*20),3);rgb=rgb.map((v,c)=>v*(.90+fault*.22)+fault*[18,13,24][c]);}
-            if(b.frontierFeature){
-              const f=b.frontierFeature,accent=hex(f.accent),polar=Math.abs(ny),ridge=Math.max(0,1-Math.abs(terrain-.53)*35),spot=Math.hypot(nx-.22,ny+.16);
+            if(feature){
+              const f=feature,accent=featureAccent,polar=Math.abs(ny),ridge=Math.max(0,1-Math.abs(terrain-.53)*35),spot=Math.hypot(nx-.22,ny+.16);
               let strength=0;
               if(f.feature==="polar frost")strength=Math.max(0,(polar-.72)*3);
               else if(["prism veins","magma rifts","anomalous lattice","basalt scars"].includes(f.feature))strength=ridge*.65;
               else if(f.feature==="impact basin")strength=Math.max(0,1-Math.abs(spot-.31)*24)*.44;
-              else if(["polar vortex","double storm","ocean gyres"].includes(f.feature))strength=Math.max(0,1-Math.abs(spot-.22)*20)*.35;
+              else if(f.feature==="polar vortex")strength=Math.max(0,1-Math.abs(Math.hypot(nx,ny+.65)-.16)*24)*.5;
+              else if(f.feature==="double storm")strength=Math.max(0,1-Math.min(Math.abs(spot-.22),Math.abs(Math.hypot(nx+.32,ny-.28)-.15))*20)*.43;
+              else if(f.feature==="ocean gyres")strength=Math.max(0,1-Math.abs(spot-.22)*20)*.35;
+              else if(f.feature==="archipelago")strength=Math.max(0,1-Math.abs(terrain-.48)*34)*.35;
               else if(["night emissions","thermal crown","crystal ridges"].includes(f.feature))strength=Math.max(0,terrain-.58)*1.6;
               else if(f.feature==="shear belts")strength=Math.max(0,Math.sin(ny*42+terrain*5))*.22;
               if(strength)rgb=rgb.map((v,c)=>v*(1-strength)+[accent.r,accent.g,accent.b][c]*strength);
