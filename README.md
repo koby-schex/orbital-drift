@@ -1,4 +1,12 @@
-# Orbital Drift
+# Ninefold: Between the Nine
+
+Explore the uncertain crossing environments between the Nine Worlds. Your expedition has already passed through a crossing; this is not conventional space above a world. Ride gravity knots, lock and release from strange formations, rescue crews, establish settlements, develop the Pioneer, negotiate with independent cultures and chart enduring Echo routes.
+
+This conversion preserves the established gameplay and save identities of the former Orbital Drift build. Historical implementation names remain in the engine for compatibility. See [setting and art direction](docs/BETWEEN_THE_NINE.md) for production boundaries. This is a major visual and presentation foundation; actual iPhone visual and usability review is still required.
+
+---
+
+## Historical development record
 
 Orbital Drift is a portrait mobile gravity-exploration game. Pilot the Starling, use orbit locks and slingshot releases, capture and develop frontier worlds, construct the ODF Pioneer, dispatch fleet ships, record Echo routes, and discover rare anomaly systems.
 

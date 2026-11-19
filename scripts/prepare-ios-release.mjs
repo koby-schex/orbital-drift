@@ -24,7 +24,7 @@ function setPlist(key, type, value) {
   try { plistBuddy(`Set :${key} ${value}`); }
   catch { plistBuddy(`Add :${key} ${type} ${value}`); }
 }
-setPlist("CFBundleDisplayName", "string", "Orbital Drift");
+setPlist("CFBundleDisplayName", "string", "Between the Nine");
 setPlist("CFBundleShortVersionString", "string", version);
 setPlist("CFBundleVersion", "string", build);
 // The source file is the official game icon, not Capacitor's template art.
@@ -52,7 +52,7 @@ for (const img of contents.images) {
   execFileSync("sips", ["-z", String(pixels), String(pixels), imagePath, "--out", path.join(catalog,img.filename)], { stdio: "pipe" });
 }
 await writeFile(contentsPath, JSON.stringify(contents, null, 2) + "\n");
-console.log(`iOS branding applied: Orbital Drift ${version} (${build}), real game AppIcon`);
+console.log(`iOS branding applied: Between the Nine ${version} (${build}), real game AppIcon`);
 
 // StoreKit classes are compiled into the generated native App target.
 execFileSync(process.execPath, [path.join(root, "scripts/install-ios-storekit.mjs")], { stdio: "inherit" });

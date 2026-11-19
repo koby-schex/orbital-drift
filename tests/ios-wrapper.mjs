@@ -9,7 +9,7 @@ const ignore = await readFile(new URL(".gitignore", root), "utf8");
 const guide = await readFile(new URL("MOBILE_RELEASE.md", root), "utf8");
 const smoke = await readFile(new URL("scripts/smoke-ios-simulator.sh", root), "utf8");
 
-assert.equal(config.appName, "Orbital Drift");
+assert.equal(config.appName, "Between the Nine");
 assert.equal(config.webDir, "dist", "Native app must package bundled game assets, not use a remote URL");
 assert.match(config.appId, /^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)+$/);
 assert.equal(config.server, undefined, "Release shell must not depend on a remote game server");

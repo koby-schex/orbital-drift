@@ -15,7 +15,7 @@ test "$BUNDLE_ID" = "com.orbitaldrift.game"
 DISPLAY_NAME=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' "$APP_PATH/Info.plist")
 VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Info.plist")
 BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP_PATH/Info.plist")
-test "$DISPLAY_NAME" = "Orbital Drift"
+test "$DISPLAY_NAME" = "Between the Nine"
 test "$VERSION" = "$(node -p 'require("./package.json").version')"
 test "$BUILD" = "$GITHUB_RUN_NUMBER"
 test -s "ios/App/App/Assets.xcassets/AppIcon.appiconset/OrbitalDrift-AppIcon-1024.png"

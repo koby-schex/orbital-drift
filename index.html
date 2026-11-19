@@ -8,13 +8,13 @@
     />
     <meta
       name="description"
-      content="Orbital Drift is a portrait mobile space exploration game about orbit locking, gravity slingshots, planet capture, upgrades, Echo routes, and rare anomaly worlds."
+      content="Ninefold: Between the Nine is an exploration game set entirely in the strange crossing environments between the Nine Worlds."
     />
     <meta name="theme-color" content="#030511" />
     <meta name="color-scheme" content="dark" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Orbital Drift" />
+    <meta name="apple-mobile-web-app-title" content="Between the Nine" />
     <meta
       name="apple-mobile-web-app-status-bar-style"
       content="black-translucent"
@@ -22,7 +22,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./assets/orbital-drift-icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./assets/orbital-drift-icon-192.png" />
-    <title>Orbital Drift</title>
+    <title>Ninefold: Between the Nine</title>
     <style>
       :root {
         --panel: rgba(6, 10, 23, 0.82);
@@ -4991,7 +4991,7 @@
       }
 
       .pioneer-hero {
-        background: linear-gradient(90deg, rgba(5, 13, 21, .94), rgba(5, 13, 21, .6)), url('./assets/deep-field.webp') center 25% / cover;
+        background: linear-gradient(90deg, rgba(5, 13, 21, .94), rgba(5, 13, 21, .6)), url('./assets/between-shelves.svg') center 25% / cover;
       }
       .fleet-hangar-stage, .cosmetic-preview-live {
         border-radius: 9px;
@@ -5010,7 +5010,7 @@
       .title-feature { border-radius: 8px; background: rgba(6, 14, 23, .84); border-color: var(--line); }
       .title-actions button { border-radius: 8px; }
       .title-hangar-vignette { opacity: .45; }
-      .discovery-stage { border-radius: 10px; background: linear-gradient(0deg, rgba(2, 7, 13, .65), rgba(2, 7, 13, .45)), url('./assets/deep-field.webp') center / cover; }
+      .discovery-stage { border-radius: 10px; background: linear-gradient(0deg, rgba(2, 7, 13, .65), rgba(2, 7, 13, .45)), url('./assets/between-shelves.svg') center / cover; }
       .discovery-stage:before, .discovery-orbit, .discovery-world, .discovery-satellite { display: none; }
       .discovery-stage:after { background: linear-gradient(0deg, rgba(2, 7, 13, .85), transparent 30%); }
       #discoveryPortrait { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
@@ -5193,7 +5193,7 @@
       body.hud-collapsed .objective-pill.training #objectivePillSub { display:block; white-space:normal; line-height:1.35; }
       .objective-pill.training { min-height:55px; text-align:left; }
       .objective-pill.training b { white-space:normal; }
-      .pioneer-command-landing.pioneer-hero { border-radius:16px; border-color:#57717a; background:linear-gradient(155deg,#0f2835a6,#040c15de),url('./assets/deep-field.webp') center/cover; padding:15px; }
+      .pioneer-command-landing.pioneer-hero { border-radius:16px; border-color:#57717a; background:linear-gradient(155deg,#0f2835a6,#040c15de),url('./assets/between-shelves.svg') center/cover; padding:15px; }
       .pioneer-command-landing .cosmetic-preview-live { height:clamp(140px,25vh,220px); background:radial-gradient(ellipse,#17384988,transparent 70%); border:0; }
       .pioneer-flight-deck,.pioneer-deck-directory { padding:12px 6px; border-top:1px solid #38505a; }
       .pioneer-flight-deck h4 { color:#e1f2f2; font-size:18px; margin:7px 0; }
@@ -5347,17 +5347,33 @@
       .menu .planet-route .planet-orb {width:36px;height:36px;box-shadow:inset -9px -6px 13px #000b,0 0 9px color-mix(in srgb,var(--orb) 26%,transparent);}
       .menu .vault-specimen svg {max-width:260px;margin-inline:auto;}
       .menu .vault-field-note {max-width:65ch;}
+
+      /* Between the Nine: warm ceramic, aged gold and veil-light; dimensions and safe areas unchanged. */
+      :root{--panel:rgba(15,13,31,.88);--panel2:rgba(228,209,171,.075);--line:rgba(218,194,152,.2);--text:#f2ede0;--muted:#b7b6c9;--a:#a2e3d3;--b:#bfa3ed;--good:#9de5ba;--warn:#f3d99e;--glass:linear-gradient(145deg,rgba(219,193,146,.12),rgba(143,115,182,.045))}
+      body{background:#100d21}
+      .title-eyebrow{color:#d9bf89;letter-spacing:.19em}
+      .title-screen .title-logo{color:#f5ebd2;-webkit-text-fill-color:#f5ebd2;letter-spacing:-.045em;text-shadow:0 4px 32px #0a071b,0 0 26px #9380c94a}
+      .title-version{color:#a9ddcf;letter-spacing:.13em}
+      .title-sub{color:#c9c3d3}
+      .title-screen,.dialog,.menu,.pause-dialog{border-color:rgba(212,187,145,.24)}
+      .title-showcase{background:#171328;border-color:rgba(218,194,152,.36)}
+      .card,.command-vista,.chip,.discovery-stage{border-color:rgba(215,191,152,.18)}
+      .pioneer-command-landing.pioneer-hero{border-color:#8c8173;background:linear-gradient(155deg,#231d3aae,#0b1023e8),url('./assets/between-shelves.svg') center/cover}
+      .logo{color:#ead9b3}.badge{border-color:rgba(223,195,146,.24)}
+      button:not(.danger){border-color:rgba(194,172,134,.24)}
+      .title-panel{background:linear-gradient(155deg,rgba(26,23,45,.9),rgba(10,12,26,.94))}
+
     </style>
   </head>
   <body>
     <canvas
       id="game"
       role="img"
-      aria-label="Orbital Drift flight view"
+      aria-label="Between the Nine traversal view"
     ></canvas>
     <div class="hud" id="hud">
       <div class="top">
-        <div class="logo">Orbital Drift</div>
+        <div class="logo">Between the Nine</div>
         <div class="badge" id="systemBadge">Sol System</div>
         <button class="hud-toggle" id="hudToggle" type="button">
           Minimize
@@ -5473,17 +5489,17 @@
     </div>
     <div class="overlay show" id="titleOverlay">
       <div class="dialog title-screen">
-        <div class="title-eyebrow">ODF Deep-Space Initiative</div>
-        <div class="title-logo">Orbital Drift</div>
-        <div class="title-version">Deep-Space Exploration</div>
+        <div class="title-eyebrow">THE NINEFOLD · AN EXPLORATION GAME</div>
+        <div class="title-logo">Between the Nine</div>
+        <div class="title-version">EXPLORATION BETWEEN WORLDS</div>
         <p class="title-sub">
-          Chart your own course across the frontier.
+          The Nine are known. The passages between them are not.
         </p>
         <div class="title-hero">
           <div
             class="title-showcase"
             role="img"
-            aria-label="Orbital Drift cinematic starship approaching a frontier world"
+            aria-label="Traversal vessels approaching a fractured formation in a crossing environment"
           >
             <canvas class="title-render-canvas" id="titleCanvas"></canvas>
             <div class="title-hangar-vignette"></div>
@@ -5883,7 +5899,181 @@
         SAVE_BACKUP_KEY = "orbital-drift-save-backup-v1",
         SAVE_VERSION = 20,
         APP_VERSION = "0.26.0",
-        STORE_TITLE = "Orbital Drift: Sol";
+        STORE_TITLE = "Ninefold: Between the Nine";
+
+      // BEGIN BETWEEN PRESENTATION CONTRACT
+      // These labels never replace identity keys, save fields, resource ids, or action payloads.
+      // Local crossing geography is not the Nine Worlds, and its deeper origins remain unknown.
+      const BETWEEN_TITLE = "Ninefold: Between the Nine";
+      const BETWEEN_BODY_LABELS = Object.freeze({
+        Sun:"Bindlight Knot", Mercury:"Needle Shard", Venus:"Violet Furnace",
+        Earth:"First Anchorage", Mars:"Redglass Shelf", Jupiter:"Hollow Crown",
+        Saturn:"Veilwheel", Uranus:"Glasswake", Neptune:"Stillrift"
+      });
+      function betweenDisplayText(value) {
+        if (typeof value !== "string" || !value) return value;
+        let s=value;
+        const cap=(match,word)=>match===match.toUpperCase()?word.toUpperCase():
+          /^[A-Z]/.test(match)?word.charAt(0).toUpperCase()+word.slice(1):word;
+        s=s.replace(/\bOrbital Drift(?:: Sol)?\b/g,"Between the Nine")
+          .replace(/\bODF Pioneer\b/g,"Pioneer")
+          .replace(/\bSol System\b/g,"First Reach")
+          .replace(/\bNyra Sol\b|\bSol\b/g,m=>m==="Nyra Sol"?m:"First Reach")
+          .replace(/\b(Sun|Mercury|Venus|Earth|Mars|Jupiter|Saturn|Uranus|Neptune)\b/g,m=>BETWEEN_BODY_LABELS[m])
+          .replace(/\b(?:Deep[- ]Space|deep[- ]space|outer space|uncharted space|Outer Space)\b/g,m=>cap(m,"the Between"))
+          .replace(/\b(?:solar systems?|star systems?)\b/gi,m=>cap(m,/s$/i.test(m)?"crossing reaches":"crossing reach"))
+          .replace(/\bstellar primary\b/gi,m=>cap(m,"gravity knot"))
+          .replace(/\b(?:the system's star|local star|central star|the system star)\b/gi,m=>cap(m,"the gravity knot"))
+          .replace(/\bblack holes?\b/gi,m=>cap(m,/s$/i.test(m)?"collapse gates":"collapse gate"))
+          .replace(/\bCosmic Spirit\b/g,"Veil Presence")
+          .replace(/\bParallel System\b/g,"Folded Reach")
+          .replace(/\bHelium-?3\b/g,"Anchor Flux")
+          .replace(/\bDarkMatter\b|\bDark Matter\b/g,"Veil Residue")
+          .replace(/\b(?:starships?|spacecraft|spaceships?)\b/gi,m=>cap(m,/s$/i.test(m)?"vessels":"vessel"))
+          .replace(/\bplanetary\b/gi,m=>cap(m,"formation"))
+          .replace(/\bplanets?\b/gi,m=>cap(m,/s$/i.test(m)?"formations":"formation"))
+          // Preserve cosmological references and boundary-crossing phrases; other world labels describe local masses.
+          .replace(/\b(?:the Nine Worlds|Nine Worlds|[Ww]orld (?:One|Two|Three|Four|Five|Six|Seven|Eight|Nine|[1-9])|between worlds|between the worlds|inter-worlds?)\b|\bworlds?\b/gi,m=>{
+            if (/^(?:the nine worlds|nine worlds|world (?:one|two|three|four|five|six|seven|eight|nine|[1-9])|between(?: the)? worlds|inter-worlds?)$/i.test(m)) return m;
+            return cap(m,/s$/i.test(m)?"formations":"formation");
+          })
+          .replace(/\bhomeworld\b/gi,m=>cap(m,"anchorage"))
+          .replace(/\bcapture capacity\b/gi,m=>cap(m,"holding capacity"))
+          .replace(/\bcaptured\b/gi,m=>cap(m,"claimed"))
+          .replace(/\bcaptures\b/gi,m=>cap(m,"claims"))
+          .replace(/\bcapture\b/gi,m=>cap(m,"claim"))
+          .replace(/\bcapturable\b/gi,m=>cap(m,"claimable"))
+          .replace(/\bSystem Atlas\b/g,"Crossing Atlas")
+          .replace(/\bFrontier System\b/g,"Frontier Reach")
+          .replace(/\bLiving System\b/g,"Living Reach")
+          .replace(/\bJump Outward\b/g,"Cross Outward")
+          .replace(/\bBegin Uncharted Jump\b/g,"Open Uncharted Crossing")
+          .replace(/\bReturn to Space\b/gi,m=>cap(m,"return to traversal"))
+          .replace(/\b(?:solar radiation|stellar radiation)\b/gi,m=>cap(m,"anchor radiation"))
+          .replace(/\bgas giant\b/gi,m=>cap(m,"pressure mass"))
+          .replace(/\bsolar impact\b/gi,m=>cap(m,"anchor impact"))
+          .replace(/\b(?:uncharted systems|distant systems|frontier systems)\b/gi,m=>cap(m,m.split(" ")[0].toLowerCase()+" reaches"))
+          .replace(/\binterstellar\b/gi,m=>cap(m,"cross-reach"))
+          .replace(/\bgalactic\b/gi,m=>cap(m,"crossing"))
+          .replace(/\bgalax(y|ies)\b/gi,m=>cap(m,/ies$/i.test(m)?"distant folds":"distant fold"));
+        if (s.trim()==="System") s=s.replace("System","Reach");
+        if (s.trim()==="Jump") s=s.replace("Jump","Cross");
+        return s;
+      }
+      function betweenSectorName(value) {
+        return betweenDisplayText(value).replace(/ System$/, " Reach");
+      }
+      // A DOM-only compatibility layer for legacy templates. Only text and accessibility
+      // labels change. Preserve implicit option values before changing their display text.
+      function betweenTranslateNode(node) {
+        if (!node) return;
+        if (node.nodeType===3) {
+          const parent=node.parentElement;
+          if (!parent || /^(SCRIPT|STYLE|TEXTAREA|INPUT)$/i.test(parent.tagName||"") || parent.isContentEditable) return;
+          const value=betweenDisplayText(node.nodeValue);
+          if (value===node.nodeValue) return;
+          if (parent.tagName==="OPTION"&&!parent.hasAttribute("value")) parent.setAttribute("value",parent.value);
+          node.nodeValue=value;return;
+        }
+        if (node.nodeType!==1) return;
+        if (/^(SCRIPT|STYLE|TEXTAREA|INPUT)$/i.test(node.tagName||"")||node.isContentEditable) return;
+        for(const attr of ["aria-label","title","placeholder"]) {
+          if(!node.hasAttribute(attr))continue;
+          const old=node.getAttribute(attr),value=betweenDisplayText(old);
+          if(value!==old)node.setAttribute(attr,value);
+        }
+        for(const child of node.childNodes||[])betweenTranslateNode(child);
+      }
+      function installBetweenPresentation() {
+        if(typeof MutationObserver!=="function"||!document.body?.childNodes)return;
+        betweenTranslateNode(document.body);
+        const options={subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["aria-label","title","placeholder"]};
+        const observer=new MutationObserver(records=>{
+          observer.disconnect();
+          try {
+            const roots=new Set();
+            for(const record of records){
+              if(record.type==="childList")for(const node of record.addedNodes)roots.add(node);
+              else roots.add(record.target);
+            }
+            for(const node of roots)if(node.isConnected!==false)betweenTranslateNode(node);
+          }finally{observer.observe(document.body,options);}
+        });
+        observer.observe(document.body,options);
+      }
+      // Seeded geometry is presentation-only. Its extent never exceeds the existing
+      // body radius; no collision, gravity, capture availability or resource changes.
+      const BETWEEN_FORMATIONS=Object.freeze([
+        {name:"Terraced shelf",segments:12,stretch:.76,kind:0},
+        {name:"Prismatic core",segments:7,stretch:.91,kind:1},
+        {name:"Petal mantle",segments:24,stretch:.97,kind:2},
+        {name:"Coiled lens",segments:18,stretch:.72,kind:3},
+        {name:"Split strata",segments:10,stretch:.83,kind:4},
+        {name:"Woven shell",segments:20,stretch:.9,kind:5},
+        {name:"Crowned lattice",segments:16,stretch:.96,kind:6}
+      ]);
+      function betweenFormationProfile(b) {
+        let hash=2166136261;
+        for(const char of String(b?.name||"") + ":" + String(b?.featureSeed??0)){
+          hash=Math.imul(hash^char.charCodeAt(0),16777619)>>>0;
+        }
+        let index=hash%BETWEEN_FORMATIONS.length;
+        if(b?.name==="Earth")index=0;
+        else if(b?.name==="Mars")index=4;
+        else if(b?.name==="Venus")index=2;
+        else if(b?.pattern==="crystal")index=1;
+        else if(b?.pattern==="rings")index=3;
+        else if(b?.type==="star")index=6;
+        const base=BETWEEN_FORMATIONS[index];
+        return {...base,phase:((hash>>>8)%6283)/1000,seed:hash};
+      }
+      function betweenContourPoints(b,r) {
+        const f=betweenFormationProfile(b),points=[];
+        for(let i=0;i<f.segments;i++){
+          const a=i/f.segments*Math.PI*2,theta=a+f.phase;
+          const noise=((Math.imul(f.seed^(i+17),1597334677)>>>8)%1000)/1000;
+          let rad;
+          switch(f.kind){
+            case 0:rad=.77+.13*Math.sin(3*a+.35)+.07*noise;break;
+            case 1:rad=i%2?.79:.98;break;
+            case 2:rad=.78+.17*Math.cos(5*a);break;
+            case 3:rad=.89+.085*Math.sin(2*a+.5);break;
+            case 4:rad=i%3===0?.70:.95-.08*noise;break;
+            case 5:rad=.88+.07*Math.sin(4*a)+.035*noise;break;
+            default:rad=i%2?.68:.99;
+          }
+          const px=Math.cos(a)*r*rad,py=Math.sin(a)*r*rad*f.stretch;
+          points.push([px*Math.cos(f.phase)-py*Math.sin(f.phase),px*Math.sin(f.phase)+py*Math.cos(f.phase)]);
+        }
+        return points;
+      }
+      function betweenContourPath(c,b,x,y,r){
+        c.beginPath();
+        betweenContourPoints(b,r).forEach(([px,py],i)=>i?c.lineTo(x+px,y+py):c.moveTo(x+px,y+py));
+        c.closePath();
+      }
+      function paintBetweenFacets(c,b,x,y,r) {
+        if(r<5)return;
+        const f=betweenFormationProfile(b),pts=betweenContourPoints(b,r);
+        c.save();betweenContourPath(c,b,x,y,r);c.clip();
+        c.globalAlpha=.13;
+        for(let i=0;i<pts.length;i+=2){
+          const a=pts[i],d=pts[(i+1)%pts.length];
+          c.fillStyle=i%4===0?"#f4e8c7":"#29233f";
+          c.beginPath();c.moveTo(x-r*.16,y-r*.12);c.lineTo(x+a[0],y+a[1]);c.lineTo(x+d[0],y+d[1]);c.closePath();c.fill();
+        }
+        c.globalAlpha=.4;c.strokeStyle=f.kind===4?"#eac7ff":"#d0f2df";c.lineWidth=Math.max(.55,r*.015);
+        for(let i=0;i<(f.kind===4?4:3);i++){
+          const q=(i-1.5)*.31;
+          c.beginPath();c.moveTo(x-r,y+r*q);c.lineTo(x-r*.2,y+r*(q+.13));
+          c.lineTo(x+r*.15,y+r*(q-.12));c.lineTo(x+r,y+r*(q+.08));c.stroke();
+        }
+        c.restore();
+        c.save();c.strokeStyle="rgba(231,217,182,.38)";c.lineWidth=Math.max(.55,r*.014);
+        betweenContourPath(c,b,x,y,r);c.stroke();c.restore();
+      }
+      // END BETWEEN PRESENTATION CONTRACT
+
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -8065,7 +8255,7 @@
       const tutorials = [
         [
           "Welcome to Orbital Drift",
-          "You are learning to ride gravity. Earth is captured and your first goal is Mars.",
+          "You entered the Between through a crossing near the Fractured Meridian. This is not a sky above any world. Learn to ride the attractions of this place; First Anchorage is secured, and your first destination is Redglass Shelf.",
         ],
         [
           "Orbit Lock",
@@ -8087,7 +8277,7 @@
       const onboardingSteps = [
         [
           "Welcome, Pilot",
-          "Use the left joystick to aim and THRUST to fly. You start safely orbiting Earth. Hold THRUST while locked to build speed for free, then tap RELEASE to launch toward Mars.",
+          "Your vessel has already passed through a crossing near World Five. You are in the Between, not above a world. Aim with the joystick; hold THRUST. You start safely orbiting Earth. Hold THRUST while locked to build speed for free, then tap RELEASE toward Mars.",
         ],
         [
           "Orbit, Then Act",
@@ -9006,6 +9196,7 @@
         );
       }
       function toast(m) {
+        m=typeof betweenDisplayText==="function"?betweenDisplayText(m):m;
         if (ui.toasts.firstChild?.textContent === m) return;
         while (ui.toasts.children.length) ui.toasts.removeChild(ui.toasts.lastChild);
         const e = document.createElement("div");
@@ -9452,7 +9643,7 @@
             atmosphere: true,
             factory: true,
             developed: true,
-            hazard: "Protected homeworld",
+            hazard: "Protected expedition anchorage",
             pattern: "continents",
             rarity: "Common",
           }),
@@ -9555,8 +9746,8 @@
           modifier: sectorModifiers[0],
           archetype: {
             key: "tutorial",
-            name: "Humanity's Home System",
-            desc: "Humanity's home system and the starting point of every pilot's first expedition.",
+            name: "Threshold Anchorage",
+            desc: "A sheltered local crossing environment where new expedition vessels establish their first anchorage. Its origin is not known.",
           },
         };
       }
@@ -15266,7 +15457,7 @@
         const rep = Number(encounterState().reputation[template.faction] || 0);
         ui.encounterContext.innerHTML =
           '<div class="chip"><b>Sector</b><br>' +
-          esc(game.system.name) +
+          esc(betweenSectorName(game.system.name)) +
           '</div><div class="chip"><b>Standing</b><br>' +
           esc(reputationRank(rep) + " • " + rep) +
           '</div><div class="chip"><b>Technology</b><br>' +
@@ -17621,7 +17812,7 @@
           '<section class="command-status"><span class="screen-eyebrow">CONCORD REGISTER</span><h2>'+active.length+' active charters</h2><p>'+chartered.length+' lifetime charters · '+eligible.reduce((sum,sys)=>sum+concordLanes(sys).filter(l=>l.active).length,0)+' active lanes</p></section>'+
           card("Current sector",local.length?"Select a controlled world to view its charter and development.":"No controlled frontier worlds in this sector.",local.length?routeDirectory(local.map(b=>[b.name,concordChartered(b)?settlementProfile(b).stageName+" · "+settlementProfile(b).name:"Unchartered settlement","openWorldDetails",b.name,"explore"])):btn("View worlds","openSection","planets"))+
           card("Charted Echo lanes",lanes.length?lanes.map(l=>'<div class="log"><b>'+esc(l.from)+" ↔ "+esc(l.to)+'</b><span>'+l.quality+'% route quality · '+(l.active?"Connected":"Dormant — charter control required")+'</span></div>').join(""):"Ratify two settlements, then complete an Orbital Echo from one to the other with at least 60% quality.")+
-          (archived.length?card("Distant charters",archived.map(sys=>'<div class="log"><b>'+esc(sys.name)+'</b><span>'+sys.bodies.filter(concordActive).length+' active settlements · '+concordLanes(sys).length+' charted lanes</span></div>').join("")):"");
+          (archived.length?card("Distant charters",archived.map(sys=>'<div class="log"><b>'+esc(betweenSectorName(sys.name))+'</b><span>'+sys.bodies.filter(concordActive).length+' active settlements · '+concordLanes(sys).length+' charted lanes</span></div>').join("")):"");
       }
       function worldControlMode(b){return b?.memory?.controlMode||"outpost";}
       function worldControlStability(b){return Math.round(clamp(84-(Number(b?.captureDifficulty)||1)*10+(b?.branches?.station||0)*8+(worldControlMode(b)==="relay"?12:0),50,100));}
@@ -18996,7 +19187,7 @@
             livingSystemEventHtml() +
             card(
               "Current Sector",
-              esc(game.system.name) +
+              esc(betweenSectorName(game.system.name)) +
                 " contains " +
                 game.system.bodies.length +
                 " major bodies. Current target: " +
@@ -19051,7 +19242,7 @@
             livingSystemEventHtml() +
             card(
               "Current Sector",
-              esc(game.system.name) +
+              esc(betweenSectorName(game.system.name)) +
                 " contains " +
                 game.system.bodies.length +
                 " major bodies. Current target: " +
@@ -20650,10 +20841,10 @@
         ui.boostBar.style.width =
           (s.orbitLocked ? orbitMomentum(s.lockCharge) : clamp((s.boost / s.maxBoost) * 100, 0, 100)) + "%";
         ui.nearest.textContent = n.body
-          ? n.body.name + " " + Math.max(0, Math.round(n.d)) + " km"
+          ? betweenDisplayText(n.body.name) + " " + Math.max(0, Math.round(n.d)) + " km"
           : "None";
         ui.captured.textContent =
-          captureCapacityUsed() + " / " + captureLimit() + " + Earth";
+          captureCapacityUsed() + " / " + captureLimit() + " + First Anchorage";
         const controlsVisible = !!(
           !titleOpen &&
           !modalFreeze &&
@@ -20696,8 +20887,8 @@
         if (ui.touchBrake)
           ui.touchBrake.classList.toggle("show", !!controlsVisible);
         ui.systemBadge.textContent = ui.hud?.classList.contains("collapsed")
-          ? game.system.name + " • " + sectorArchetypeName()
-          : game.system.name + " • " + sectorArchetypeName() +
+          ? betweenSectorName(game.system.name) + " • " + sectorArchetypeName()
+          : betweenSectorName(game.system.name) + " • " + sectorArchetypeName() +
             " • " + sectorModifierName() + " • Target: " + targetText();
         const manual =
           manualTargetName &&
@@ -20766,7 +20957,7 @@
         b?.classList.remove("show-badge");
         ui.productionBadge.textContent="";
         const action = smartAction();
-        ui.smartBtn.textContent = action.label;
+        ui.smartBtn.textContent = betweenDisplayText(action.label);
         ui.smartBtn.disabled = !!action.disabled;
         ui.smartBtn.classList.toggle("travel", action.tone === "travel");
         ui.smartBtn.classList.toggle(
@@ -21569,9 +21760,9 @@
       // two decoded images and one viewport raster, including on Retina screens.
       const cinematicArt = { images: new Map(), frame: null, key: "" };
       const CINEMATIC_ART = Object.freeze({
-        deep: "./assets/deep-field.webp",
-        parallel: "./assets/parallel-rift.webp",
-        spirit: "./assets/spirit-nebula.webp",
+        deep: "./assets/between-shelves.svg",
+        parallel: "./assets/between-fold.svg",
+        spirit: "./assets/between-veil.svg",
       });
       function cinematicArtKind(system = game.system) {
         return system?.specialType === "parallel" ? "parallel" :
@@ -21738,7 +21929,7 @@
         const glow = c.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.8, 0, 0, r * 1.25);
         glow.addColorStop(0, rgba(light(b.color, 0.4), b.atmosphere ? 0.22 : 0.06)); glow.addColorStop(1, "rgba(0,0,0,0)");
         c.fillStyle = glow; c.fillRect(-r * 1.3, -r * 1.3, r * 2.6, r * 2.6);
-        c.save(); c.beginPath(); c.arc(0, 0, r, 0, TAU); c.clip();
+        c.save(); betweenContourPath(c,b,0,0,r); c.clip();
         c.fillStyle = b.color; c.fillRect(-r, -r, r * 2, r * 2);
         const texture = surfaceTexture(b, game.settings?.graphics==="Low"?128:b.name === "Earth" && r > 180 ? 512 : 256);
         if (texture) c.drawImage(texture, -r, -r, r * 2, r * 2);
@@ -21750,7 +21941,7 @@
           c.strokeStyle = rgba(light(b.color, 0.75), 0.7); c.lineWidth = Math.max(1, r * 0.014);
           c.beginPath(); c.arc(0, 0, r, Math.PI * 0.92, Math.PI * 1.82); c.stroke();
         }
-        rings(true); c.restore();
+        paintBetweenFacets(c,b,0,0,r); rings(true); c.restore();
         return !!texture;
       }
       function renderDiscoveryPortrait() {
@@ -21864,7 +22055,7 @@
           } catch (error) { /* A failed texture must never interrupt flight. */ }
         };
         image.onerror = () => {};
-        image.src = "./assets/earth-albedo.webp";
+        image.src = "./assets/between-anchorage.svg";
       }
       function paintEarthTexel(data, i, nx, ny, nz, size, rr) {
         const {pixels, width, height} = earthAlbedo,
@@ -22167,6 +22358,7 @@
           glow.addColorStop(0.12, rgba(galaxy.color, 0.1));
           glow.addColorStop(0.5, rgba(galaxy.color, 0.035));
           glow.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.strokeStyle=rgba(galaxy.color,.13);ctx.lineWidth=1.1;ctx.beginPath();ctx.ellipse(0,0,galaxy.rx,galaxy.rx*.35,.42,0,Math.PI*1.65);ctx.stroke();
           ctx.fillStyle = glow; ctx.fillRect(-galaxy.rx, -galaxy.rx, galaxy.rx * 2, galaxy.rx * 2);
           ctx.restore();
         }
@@ -22187,10 +22379,8 @@
             ctx.strokeStyle = s.h;
             ctx.lineWidth = 0.55;
             ctx.beginPath();
-            ctx.moveTo(x - s.r * 4.5, y);
-            ctx.lineTo(x + s.r * 4.5, y);
-            ctx.moveTo(x, y - s.r * 4.5);
-            ctx.lineTo(x, y + s.r * 4.5);
+            ctx.moveTo(x - s.r * 2.6, y + s.r * 1.1);
+            ctx.lineTo(x + s.r * 2.6, y - s.r * 1.1);
             ctx.stroke();
           }
         }
@@ -22339,16 +22529,17 @@
           ctx.font = "500 11px Inter, system-ui";
           ctx.textAlign = "center";
           ctx.fillStyle = "rgba(238,245,255,.92)";
-          ctx.fillText(b.name, p.x, p.y - r - 10);
+          ctx.fillText(betweenDisplayText(b.name), p.x, p.y - r - 10);
         }
         ctx.restore();
       }
       function drawFrontierGlobe(b,p,r){
         const f=b.frontierFeature;
-        ctx.save();
+        ctx.save();betweenContourPath(ctx,b,p.x,p.y,r);ctx.clip();
         if(f&&f.flatten<1){ctx.translate(p.x,p.y);ctx.rotate(f.tilt);ctx.scale(f.shape==="prolate"?f.flatten:1,f.shape==="oblate"?f.flatten:1);ctx.rotate(-f.tilt);ctx.translate(-p.x,-p.y);}
         drawPlanetBase(b,p,r);drawDetailedSurface(b,p,r);drawPlanetLighting(b,p,r);
         ctx.restore();
+        paintBetweenFacets(ctx,b,p.x,p.y,r);
         if(f&&r>8&&game.settings?.graphics!=="Low"&&["dust halo","inclined rings","split rings"].includes(f.feature)&&b.pattern!=="rings"){
           ctx.save();ctx.strokeStyle=rgba(f.accent,.23);ctx.lineWidth=Math.max(.6,r*.035);ctx.beginPath();ctx.ellipse(p.x,p.y,r*1.45,r*.7,f.tilt,0,TAU);ctx.stroke();ctx.restore();
         }
@@ -22386,8 +22577,7 @@
         core.addColorStop(0.62, b.color);
         core.addColorStop(1, dark(b.color, 0.42));
         ctx.fillStyle = core;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, TAU);
+        betweenContourPath(ctx,b,p.x,p.y,r);
         ctx.fill();
         ctx.save();
         ctx.clip();
@@ -22400,9 +22590,12 @@
         ctx.restore();
         ctx.strokeStyle = "rgba(255,255,255,.2)";
         ctx.lineWidth = Math.max(1, r * 0.035);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 0.98, 0, TAU);
+        betweenContourPath(ctx,b,p.x,p.y,r * .98);
         ctx.stroke();
+        paintBetweenFacets(ctx,b,p.x,p.y,r);
+        ctx.save();ctx.strokeStyle=rgba(light(b.color,.45),.33);ctx.lineWidth=Math.max(.6,r*.02);
+        for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(p.x,p.y,r*(1.3+i*.24),r*(.46+i*.09),.57+i*.74,0,TAU);ctx.stroke();}
+        ctx.restore();
         if (game.settings?.graphics !== "Low") {
           ctx.save(); ctx.globalCompositeOperation = "screen";
           for (let i = 0; i < visualDetailBudget(game.settings).corona; i++) {
@@ -23483,6 +23676,14 @@
           for(const side of [-1,1]) box(-17+i*10,side*12-1.5,7,3,"metal",8,1.5);
         }
         for(const side of [-1,1]) light(kind==="frigate"?47:33,side*(kind==="frigate"?9:5),side===1?"red":"cyan",0.6);
+        // Crossing-navigation ceramic plates and split guidance fins, bounded to the original hull.
+        // Geometry and colors are shared by flight, hangar, fleet and title previews.
+        const hullPoints=model.parts.flatMap(p=>p.points),minX=Math.min(...hullPoints.map(p=>p[0])),maxX=Math.max(...hullPoints.map(p=>p[0])),
+          halfWidth=Math.max(5,...hullPoints.map(p=>Math.abs(p[1]))),span=maxX-minX,left=minX+span*.22,right=minX+span*.78,
+          keel=kind==="frigate"?6:4;
+        part([[left,-1.2],[left+span*.12,-3.4],[right,-1.6],[right+span*.055,0],[right,1.5],[left+span*.12,3.4],[left,1.2]],"pearl",keel,1);
+        mirror([[left,halfWidth*.34],[left+span*.15,halfWidth*.68],[right,halfWidth*.45],[right-span*.13,halfWidth*.31]],"metal",keel,1);
+        mirror([[left+span*.14,halfWidth*.51],[right-span*.05,halfWidth*.39],[right-span*.13,halfWidth*.33],[left+span*.08,halfWidth*.44]],"energy2",keel+.35,0);
         if(spacecraftModels.size>=96) spacecraftModels.delete(spacecraftModels.keys().next().value);
         spacecraftModels.set(key,model); return model;
       }
@@ -23494,11 +23695,11 @@
         const primary=skin.primary||"#93c5fd", secondary=skin.secondary||"#162333",
           stealth=skin.motif==="abyss";
         return {
-          hull:craftMix(primary,stealth?"#364454":"#9caab6",stealth?0.34:0.24),
-          metal:craftMix(primary,"#8d9da9",0.55), dark:craftMix(secondary,"#15202c",0.45),
+          hull:craftMix(primary,stealth?"#343044":"#d8cfb6",stealth?0.34:0.39),
+          metal:craftMix(primary,"#aa946e",0.52), dark:craftMix(secondary,"#201b31",0.45),
           paint:craftMix(primary,"#5a6672",0.12), cargo:craftMix(primary,"#be8c51",0.38),
-          pearl:craftMix(primary,"#e5ebe4",0.7), solar:"#233d61", vent:"#0a121c",
-          glass:"#234c62", energy:skin.accent||"#67e8f9",energy2:skin.glow||"#c084fc"
+          pearl:craftMix(primary,"#f2e7c9",0.74), solar:"#32304c", vent:"#14101e",
+          glass:"#285451", energy:skin.accent||"#8ce0d0",energy2:skin.glow||"#c8b1ed"
         };
       }
       function drawCraftEngine(c, engine, skin, thrust) {
@@ -24035,7 +24236,7 @@
         ctx.fillStyle = "rgba(255,255,255,.86)";
         ctx.font = "900 11px Inter, system-ui";
         ctx.textAlign = "center";
-        ctx.fillText("BLACK HOLE", p.x, p.y - 64);
+        ctx.fillText("COLLAPSE GATE", p.x, p.y - 64);
         ctx.restore();
       }
       function drawSectorEvent() {
@@ -24307,7 +24508,7 @@
         ctx.fillStyle = "#e0f2fe";
         ctx.font = "600 10px Inter, system-ui";
         ctx.textAlign = "center";
-        ctx.fillText(text, w / 2, 15.5);
+        ctx.fillText(betweenDisplayText(text), w / 2, 15.5);
         ctx.restore();
       }
       function drawRareSystemAura() {
@@ -24548,7 +24749,7 @@
           rr(c, x - tw / 2, y - 8, tw, 12, 6);
           c.fill();
           c.fillStyle = color;
-          c.fillText(text.slice(0, 10), x, y);
+          c.fillText(betweenDisplayText(text).slice(0, 10), x, y);
         };
         c.save();
         const bg = c.createRadialGradient(cx, cy, 0, cx, cy, radarR);
@@ -27251,7 +27452,7 @@
         const a = smartAction();
         // During motion a different planet/action may become eligible between HUD ticks.
         // Never execute a different action than the one the player saw.
-        if (!a.show || a.disabled || ui.smartBtn.textContent !== a.label) {
+        if (!a.show || a.disabled || ui.smartBtn.textContent !== (typeof betweenDisplayText==="function"?betweenDisplayText(a.label):a.label)) {
           updateUI();
           return false;
         }
@@ -27558,6 +27759,7 @@
       registerOfflineSupport();
       registerNativeLifecycle();
       registerNativePurchaseUpdates();
+      installBetweenPresentation();
       requestAnimationFrame(loop);
     </script>
   </body>

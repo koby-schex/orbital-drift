@@ -1,6 +1,6 @@
 {
   "appId": "com.orbitaldrift.game",
-  "appName": "Orbital Drift",
+  "appName": "Between the Nine",
   "webDir": "dist",
   "ios": {
     "contentInset": "never",
