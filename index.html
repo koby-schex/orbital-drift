@@ -5211,6 +5211,11 @@
       .vault-entry-copy>span {line-height:1.35;}
       .hub-btn {min-height:64px!important;padding:10px!important;text-align:left!important;}
       .hub-btn small {display:none!important;}
+      .pioneer-deck-link small {display:none!important;}
+      .pioneer-deck-directory .pioneer-deck-link {min-height:48px!important;}
+      .pioneer-simple-nav button {width:100%;}
+      .vault-entry .menu-secondary-details {margin:2px 0;}
+      .vault-entry .menu-secondary-details summary {font-size:11px;}
       .hub-btn .hub-symbol {font-size:16px!important;}
       .vault-perk {color:#a7e8d7!important;font-weight:600;}
       .vault-specimen {background:radial-gradient(ellipse at 50% 45%,color-mix(in srgb,var(--vaultColor) 22%,#07101b),#040911 74%);}
@@ -13873,9 +13878,12 @@
       }
       function vaultBonus(type){
         if(!game.frigate?.built)return 0;
-        return Math.min(.22,vaultSecuredEntries().reduce((sum,e)=>{
-          const perk=vaultPerk(e);return sum+(perk?.type===type?perk.value:0);
-        },0));
+        const vault=vaultState(),prev=vaultBonus.cache;
+        if(!prev||prev.vault!==vault||prev.entries!==vault.entries||prev.count!==vault.entries.length){
+          const sums={};for(const e of vault.entries){if(e.status!=="secured")continue;const p=vaultPerk(e);if(p)sums[p.type]=(sums[p.type]||0)+p.value;}
+          vaultBonus.cache={vault,entries:vault.entries,count:vault.entries.length,sums};
+        }
+        return Math.min(.22,vaultBonus.cache.sums[type]||0);
       }
       function vaultCanSecureReason(entry) {
         if (!game.frigate?.built) return "Build the ODF Pioneer first.";
@@ -13928,11 +13936,14 @@
             vaultStringSeed(origin),
             source === "space" ? 7727 : 3253,
           ),
-          chance = source === "space" ? 1 : 0.92;
+          chance = source === "space" || vault.entries.length<3 ? 1 : 0.92;
         if (!force && rand(seed + 31) > chance) return null;
         let candidates = vaultDiscoveryCandidates(source);
-        const benign=candidates.filter(item=>item.threat<=vaultContainment());
-        if(vaultSecuredEntries().length<2&&benign.length)candidates=benign;
+        if(vaultSecuredEntries().length<2){
+          const owned=new Set(vault.entries.map(e=>e.catalogKey)),local=candidates.filter(item=>item.threat<=vaultContainment()),
+            other=vaultCatalog.filter(item=>item.source===source&&item.threat<=vaultContainment()&&!owned.has(item.key));
+          if(local.length||other.length)candidates=local.length?local:other;
+        }
         const template = catalogKey
             ? vaultCatalog.find((item) => item.key === catalogKey && item.source === source)
             : candidates[Math.floor(rand(seed + 97) * candidates.length)];
@@ -13986,6 +13997,7 @@
           reason = vaultCanSecureReason(entry);
         if (reason) return toast(reason);
         entry.status = "secured";
+        vaultBonus.cache=null;
         entry.securedAt = Date.now();
         addActivity(
           "discovery",
@@ -16914,9 +16926,9 @@
               "</span>",
             btn("Open " + menuLabel(nba.menu), "openSection", nba.menu),
           ) +
-          groupHtml("Flight & Development", core.slice(0, 3)) +
-          groupHtml("Pioneer & Exploration", core.slice(3).concat(explore)) +
+          groupHtml("Explore & manage", [core[1],core[3],core[0]]) +
           (game.frigate.built?card("Discoveries",activeFrontierContacts().length+" drifting contacts in this system. Recover them for salvage and Vault finds.",btn("Track closest contact","trackFrontierContact",null,!!nearestFrontierContact())+btn("Vault","openFrigateTab","vault")+btn("Adventures","openFrigateTab","expeditions")):"") +
+          secondaryDetails("Upgrades, appearance & routes",groupHtml("Ship & journey",[core[2],core[4],...explore])) +
           secondaryDetails("Records, Settings & Help", groupHtml("Records & Help", support));
       }
       function menuLabel(k) {
@@ -17791,9 +17803,8 @@
           esc(entry.name) +
           '</b><span class="vault-origin">' +
           esc(entry.system + " • " + entry.origin) +
-          "</span><span>" +
-          esc(entry.entry) +
-          '</span><div class="vault-tags"><span class="tag">' +
+          "</span>"+secondaryDetails("Specimen notes",esc(entry.entry)) +
+          '<div class="vault-tags"><span class="tag">' +
           esc(vaultKindLabel(entry.kind)) +
           '</span><span class="tag rarity-' +
           esc(String(entry.rarity || "Unusual").toLowerCase()) +
@@ -18277,7 +18288,7 @@
           .join("");
         // Deck navigation stays visible without a second wall of badges and
         // counters. Context lives inside the deck that owns the information.
-        let html = tab==="overview" ? "" : tabs;
+        let html = tab==="overview" ? "" : '<div class="actions pioneer-simple-nav">'+btn("Pioneer directory","setMenuTab","frigate|overview")+'</div>';
         if (tab === "expeditions") html += expeditionsHtml();
         else if (tab === "crew") html += crewHtml();
         else if (tab === "fleet")
