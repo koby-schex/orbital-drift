@@ -1,3 +1,7 @@
+## Pass 40 — Art of the Between
+
+Eight seeded cached environment compositions; different relief patterns for seven formations; eight dedicated field-entity silhouettes; open threshold stations, settlement districts, shared hull arches, and aperture arrival choreography. These are new local visual treatments, not added playable geography or new encounter mechanics. Reduced Motion and Low/Battery Saver budgets are retained; real-device visual review remains required.
+
 # Between the Nine — conversion art direction
 
 New original local vector artwork: layered crossing shelves, fractured membranes, luminous veils, an invented non-Earth anchorage texture, and the split-threshold icon. These are game-local production designs, not locked depictions of any of the Nine Worlds. Procedural silhouettes and existing bounded canvas caches drive variation; vessel geometry and cosmetic colors retain the original progression. Physical-device performance and final art review remain release gates.
