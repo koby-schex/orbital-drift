@@ -10760,7 +10760,8 @@
           if (!game.ship) resetShip();
           else {
             const frigateLock = !!d.ship.orbitLocked && d.ship.lockBody === "__FRIGATE__" && game.frigate.built;
-            const wasLocked = !!d.ship.orbitLocked && !!body(d.ship.lockBody);
+            const savedAnchor = body(d.ship.lockBody);
+            const wasLocked = !!d.ship.orbitLocked && !!savedAnchor && savedAnchor.type !== "star";
             game.ship.orbitLocked = wasLocked;
             if (wasLocked) {
               lockShipToBody(body(d.ship.lockBody));
@@ -10771,12 +10772,24 @@
               game.ship.orbitLocked = true;
               game.ship.lockBody = "__FRIGATE__";
               game.ship.lockCharge = orbitMomentum(d.ship.lockCharge);
+              game.ship.lockDirection = d.ship.lockDirection === -1 ? -1 : 1;
             } else {
               game.ship.lockBody = null;
               game.ship.lockCharge = 0;
             }
           }
           pioneerRescue = game.frigate.built ? hydratePioneerRescue(d.pioneerRescue) : null;
+          if(game.ship.orbitLocked && pioneerRescue?.phase!=="outbound"){
+            const anchor=orbitAnchor();
+            if(anchor){
+              const saved=d.ship;
+              game.ship.lockAngle=Number.isFinite(saved.lockAngle)?saved.lockAngle:Math.atan2(game.ship.y-anchor.y,game.ship.x-anchor.x);
+              game.ship.lockRadius=Number.isFinite(saved.lockRadius)&&saved.lockRadius>0?saved.lockRadius:
+                Math.max(1,Math.hypot(game.ship.x-anchor.x,game.ship.y-anchor.y));
+              game.ship.angle=Number.isFinite(saved.angle)?saved.angle:game.ship.lockAngle+Math.PI/2*game.ship.lockDirection;
+              updateOrbit(0);
+            }
+          }
           game.negotiationAnomaly = createAnomaly(currentSystemIndex);
           game.sectorEvent =
             d.sectorEvent || createSectorEvent(currentSystemIndex);
@@ -10793,8 +10806,10 @@
             (d.savedAt ? new Date(d.savedAt).toLocaleString() : "unknown time");
           if (manual && !titleOpen) toast("Saved game loaded.");
           if (recoveredBackup) {
-            localStorage.setItem(SAVE_KEY, raw);
-            toast("Primary save was damaged. Restored the automatic backup.");
+            // A readable backup remains playable even if repairing the primary hits a quota error.
+            try { localStorage.setItem(SAVE_KEY, raw); }
+            catch(error) { console.warn("Primary save repair unavailable",error); }
+            toast("Primary save was damaged. Loaded the automatic backup.");
             addActivity(
               "save",
               "Backup save restored",
@@ -10888,8 +10903,21 @@
             !Object.values(data.resources).every((v) => finite(v) && v >= 0) ||
             !object(data.ship) || !["x", "y", "vx", "vy", "fuel"].every((k) => finite(data.ship[k])) ||
             !Array.isArray(data.bodyStates) || !data.bodyStates.length) return false;
-        if (!data.bodyStates.every((s) => object(s) && Array.isArray(s.bodies) &&
+        if (!data.bodyStates.every((s) => object(s) && Array.isArray(s.bodies) && s.bodies.length>0 &&
             s.bodies.every((b) => object(b) && typeof b.name === "string"))) return false;
+        // Reject nested corruption before mutating the active journey. Missing optional
+        // fields remain legal for older save versions.
+        if (data.dailyOps != null && (!object(data.dailyOps) || !Array.isArray(data.dailyOps.ops) ||
+            !data.dailyOps.ops.every(op=>object(op)&&typeof op.id==="string"&&finite(op.goal)&&op.goal>0))) return false;
+        if (data.fleet != null) {
+          if(!object(data.fleet)) return false;
+          for(const key of ["ships","missions","completed","available"])
+            if(data.fleet[key]!==undefined && (!Array.isArray(data.fleet[key]) ||
+                !data.fleet[key].every(entry=>object(entry)&&typeof entry.id==="string"))) return false;
+          if(data.fleet.missions?.some(m=>!finite(m.endAt))) return false;
+        }
+        if(data.unclaimedProduction!=null && (!object(data.unclaimedProduction) ||
+            !Object.values(data.unclaimedProduction).every(v=>finite(v)&&v>=0))) return false;
         for (const key of ["currentSystemIndex", "systemCount", "missionStage", "upgradeLevel"])
           if (data[key] !== undefined && (!Number.isSafeInteger(data[key]) || data[key] < 0)) return false;
         if ((data.currentSystemIndex || 0) >= data.bodyStates.length ||
@@ -11123,8 +11151,10 @@
           if (now >= mission.endAt) {
             if (!["returning", "ready"].includes(ship.status)) {
               ship.status = "returning";
-              ship.returnStartedAt = now;
+              ship.returnStartedAt = Math.min(now,mission.endAt);
             }
+            if(ship.status==="returning" && !Number.isFinite(ship.returnStartedAt))
+              ship.returnStartedAt=Math.min(now,mission.endAt);
           } else if (
             ship.status === "launching" &&
             now - Number(ship.departureAt || 0) >= FLEET_TRANSITION_MS
@@ -12050,7 +12080,7 @@
           }
           if (now >= m.endAt && ship && !["returning", "ready"].includes(ship.status)) {
             ship.status = "returning";
-            ship.returnStartedAt = now;
+            ship.returnStartedAt = Math.min(now,m.endAt);
             changed = true;
           }
           if (
@@ -12063,11 +12093,12 @@
           if (now >= m.endAt && !m.notified) {
             m.notified = true;
             changed = true;
-            toast((ship?.name || m.shipName || "Fleet ship") + " is returning from " + m.title + ".");
+            const ready = !ship || ship.status==="ready";
+            toast((ship?.name || m.shipName || "Fleet ship") + (ready ? " has returned from " : " is returning from ") + m.title + ".");
             addActivity(
               "system",
-              "Fleet ship returning",
-              m.title + " is complete. The escort is approaching the Pioneer.",
+              ready ? "Fleet reward ready" : "Fleet ship returning",
+              m.title + (ready ? " is complete. Claim the mission reward." : " is complete. The escort is approaching the Pioneer."),
             );
           }
         });
@@ -15331,6 +15362,7 @@
         game.captainLog.rescueCount++;
         toast((game.frigate.name || "ODF Pioneer") + " received the fuel distress call and is breaking orbit.");
         addActivity("travel", "Pioneer rescue launched", "The frigate left stellar orbit to recover the stranded Starling.");
+        saveGame(false);
         return true;
       }
       function updatePioneerRescue(dt) {
