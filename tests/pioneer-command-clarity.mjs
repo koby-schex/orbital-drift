@@ -10,7 +10,7 @@ const overviewStart=render.indexOf("        const overview =");
 const upgradeStart=render.indexOf("        const upgradeRows =",overviewStart);
 const overview=render.slice(overviewStart,upgradeStart);
 assert.match(overview,/What would you like to do\?/);
-for(const label of ["Explore a new system","Start an adventure","Manage my fleet","Meet the crew"]){
+for(const label of ["Explore a new system","Adventures","Fleet","Crew"]){
   assert.ok(overview.includes(label),"Pioneer landing must expose "+label);
 }
 assert.match(overview,/<details class="pioneer-command-details"/);
@@ -21,9 +21,9 @@ assert.doesNotMatch(overview,/pioneer-hero-grid/,"Old four-metric command dashbo
 assert.doesNotMatch(render,/Command Shortcuts/,"Avoid duplicated shortcut panel on the landing screen");
 assert.doesNotMatch(render,/tabIntro\(/,"Decks should open directly, without repeated intro badges");
 for(const tab of ['"overview"','"expeditions"','"crew"','"fleet"','"vault"','"upgrades"','"cosmetics"']){
-  assert.ok(render.includes("key: "+tab),"Retain Pioneer deck "+tab);
+  assert.ok(render.includes("activeTab") && (tab==='"overview"' || new RegExp("tab\\s*===\\s*"+tab).test(render)),"Retain Pioneer deck "+tab);
 }
-for(const call of ["expeditionsHtml()","crewHtml()","fleetOverviewHtml()","vaultHtml()","fleetSkinsHtml()"]){
+for(const call of ["expeditionsHtml()","crewHtml()","fleetOverviewHtml()","vaultHtml()","fleetMissionsHtml()","fleetShipyardHtml()","fleetHistoryHtml()"]){
   assert.ok(render.includes(call),"Must retain functional Pioneer content "+call);
 }
 assert.match(html,/\.pioneer-primary-actions\s*\{/);
