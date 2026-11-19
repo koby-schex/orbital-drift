@@ -9783,6 +9783,10 @@
         const pool=groups[family]||palettes, base=pool[Math.floor(rand(seed+i*43+6)*pool.length)],q=rand(seed+i*101+701);
         return q>.52?light(base,(q-.52)*.32):dark(base,(.52-q)*.32);
       }
+      function frontierV2Color(seed,i,family,pattern){
+        const colors={lava:["#963b31","#e27a32","#4c293b","#c95027"],crystal:["#328c94","#8765bb","#b1dbd4","#c86aa4"],continents:["#186f88","#517f59","#b39b5b","#3c568e"],craters:["#7a777c","#b19077","#55596b","#a96f55"],bands:["#d7ac72","#668fc0","#a66f8d","#93c1b2"],storm:["#577cba","#b9a5d9","#bc8f68","#477d79"],rings:["#bd9863","#758eb0","#c8b2a2","#8e729d"],glow:["#396782","#8d477d","#4b876c","#7256a8"]};
+        return rand(mixSeed(seed,i+1,73))<.65?pickFrom(colors[pattern]||palettes,mixSeed(seed,i+1,74)):frontierPlanetColor(seed,i,family);
+      }
       function ensureFrontierCapture(system) {
         if(!system||system.isTutorial||system.specialType)return system;
         const planets=system.bodies.filter(b=>b.type!=="star");
@@ -9792,7 +9796,49 @@
         for(const b of eligible.slice(0,Math.max(0,Math.min(2,planets.length)-count))) {b.capturable=true;b.upgradeable=true;}
         return system;
       }
-      function proc(seed) {
+      // Version 1 remains available for previously charted sectors: names are save identifiers.
+      function frontierWorldName(seed,index,used){
+        const first=["Ael","Vor","Kha","Iri","Zan","Oph","Nau","Esh","Tal","Uru","Myr","Qel","Rha","Sao","Vey","Dru","Yth","Bex","Cae","Lys","Noq","Pha","Tze","Xan","Jor","Kio","Oss","Aeon","Va","Syr","Elo","Bran"];
+        const middle=["a","e","i","o","u","ae","ir","or","en","ith","al","un","esh","av","yr","el"];
+        const last=["ra","th","ion","is","um","ara","ek","os","eth","uun","aya","yx","ora","esh","ari","oth","ea","on","ul","em","ath","ix","iel","une"];
+        const nouns=["Cairn","Sundown","Pilgrim","Glasswater","Red Silence","Nightfall","Stillwater","Emberfall","Pale Harbor","Last Light","Far Shore","Blue Hour","Hollow Crown","Winterwake","Iron Tide","Silent Meridian","Obsidian Sea","Ashwind","Long Dusk","White Current","Copper Rain","Deep Lantern"];
+        const pick=(a,k)=>a[Math.floor(rand(k)*a.length)];
+        let name;
+        for(let attempt=0;attempt<32;attempt++){
+          const k=mixSeed(seed,index+1,attempt+1,0x574f524c),mode=Math.floor(rand(k+9)*10);
+          const coined=pick(first,k+1)+pick(middle,k+2)+pick(last,k+3);
+          name=mode<6?coined:mode<8?pick(nouns,k+4)+" "+pick(last,k+5).toUpperCase():mode===8?coined+" "+["I","II","III","IV","V","VI"][Math.floor(rand(k+6)*6)]:pick(first,k+7).toUpperCase()+"-"+String(100+Math.floor(rand(k+8)*900));
+          if(!used.has(name)){used.add(name);return name;}
+        }
+        name="Chart "+Number(seed).toString(36).toUpperCase()+"-"+(index+1);
+        while(used.has(name))name+="A";
+        used.add(name);return name;
+      }
+      function frontierFeatures(seed,i,pattern,rarity){
+        const k=mixSeed(seed,i+1,0x504c414e),q=rand(k+1);
+        const exotic=rarity==="Exotic"||rarity==="Mythic";
+        const pools={
+          bands:["shear belts","polar vortex","double storm"],
+          storm:["double storm","polar vortex","shear belts"],
+          rings:["split rings","dust halo","inclined rings"],
+          lava:["magma rifts","basalt scars","thermal crown"],
+          craters:["impact basin","basalt scars","dust halo"],
+          crystal:["prism veins","crystal ridges","polar frost"],
+          continents:["polar frost","ocean gyres","archipelago"],
+          glow:["night emissions","prism veins","thermal crown"]
+        };
+        const list=pools[pattern]||["impact basin","polar frost"];
+        const feature=exotic&&rand(k+3)<.4?"anomalous lattice":pickFrom(list,k+4);
+        return {feature,shape:q<.15?"oblate":q<.26?"prolate":"spherical",
+          flatten:q<.26?.78+rand(k+5)*.15:1,tilt:(rand(k+6)-.5)*1.1,
+          accent:pickFrom(["#eabf80","#84d8eb","#eaa8ce","#b7e4a0","#c5b7ff","#f1e5d0"],k+7)};
+      }
+      function frontierFeatureDescription(b){
+        const f=b.frontierFeature;if(!f)return "";
+        const descriptions={"shear belts":"Opposing atmospheric currents form narrow shear belts.","polar vortex":"A persistent vortex circulates around one pole.","double storm":"Two long-lived storm centers dominate the visible atmosphere.","split rings":"The ring system contains a pronounced division.","dust halo":"A faint halo of fine orbital dust surrounds the body.","inclined rings":"The ring plane is inclined relative to the visible equator.","magma rifts":"Thermal imaging reveals branching magma rifts.","basalt scars":"Dark basalt scars cross the surface.","thermal crown":"A concentrated luminous region marks high thermal activity.","impact basin":"One broad impact basin dominates the visible hemisphere.","prism veins":"Reflective mineral veins trace the surface.","crystal ridges":"Angular ridges form a dense reflective lattice.","polar frost":"Pale deposits cap the polar regions.","ocean gyres":"Broad curved markings suggest circulating surface material.","archipelago":"Clusters of small landforms break the visible surface.","night emissions":"Localized emissions remain visible against the night hemisphere.","anomalous lattice":"A coherent geometric emission pattern crosses the surface; its origin remains unconfirmed."};
+        return (descriptions[f.feature]||"")+(f.shape==="spherical"?"":" Orbital imagery indicates a "+f.shape+" profile.");
+      }
+      function proc(seed, generationVersion=2) {
         if (isCosmicSpiritRoll(seed)) return cosmicSpiritSystem(seed);
         const mod = sectorModifier(seed, false),
           arch = sectorArchetype(seed, false),
@@ -9820,8 +9866,10 @@
               : arch.key === "gasFrontier"
                 ? 1.08
                 : 1);
-          orbit += gap;
-          const radius = between(seed + i * 20 + 1, arch.size[0], arch.size[1]),
+          // Keep legacy orbit distances intact; new charts vary their spacing pattern.
+          const layout=generationVersion===1?0:Math.floor(rand(mixSeed(seed,0x4c41594f))*4);
+          orbit += layout===1?gap*(i%3===0?1.55:.85):layout===2?gap*(.9+i*.075):layout===3?gap*(i%2===0?1.35:.85):gap;
+          const radius = generationVersion===1?between(seed + i * 20 + 1, arch.size[0], arch.size[1]):between(seed+i*20+1,arch.size[0],arch.size[1])*([.68, .88, 1, 1.12, 1.25][Math.floor(rand(mixSeed(seed,i+1,97))*5)]),
             mass =
               radius *
               radius *
@@ -9840,12 +9888,12 @@
               i!==0 && arch.key === "ancientArchive" && rand(seed + i * 20 + 17) > 0.72;
           b.push(
             makeBody({
-              name: uniquePlanetName(seed, i, used),
+              name: generationVersion===1?uniquePlanetName(seed,i,used):frontierWorldName(seed,i,used),
               radius,
               mass,
               orbitRadius: orbit,
               orbitSpeed: Math.sqrt(star.mass / Math.pow(orbit, 3)) * 0.12,
-              color: frontierPlanetColor(seed,i,arch.key),
+              color: generationVersion===1?frontierPlanetColor(seed,i,arch.key):frontierV2Color(seed,i,arch.key,pattern),
               resource: res,
               richness:
                 between(seed + i * 20 + 7, 1, 5.5) *
@@ -9886,7 +9934,9 @@
             }),
           );
         }
+        if(generationVersion!==1)for(let i=1;i<b.length;i++){const world=b[i];world.frontierFeature=frontierFeatures(seed,i-1,world.pattern,world.rarity);world.lore+=" "+frontierFeatureDescription(world);}
         const sys = {
+          generationVersion,
           name: star.name + " System",
           seed,
           bodies: b,
@@ -10606,6 +10656,7 @@
           shipName: game.shipName,
           bodyStates: systems.map((s) => ({
             seed: s.seed,
+            generationVersion: s.generationVersion || 1,
             name: s.name,
             isTutorial: !!s.isTutorial,
             isSpecial: !!s.isSpecial,
@@ -10799,7 +10850,7 @@
                 systems[idx] = parallelSystem(ss.seed);
               else if (ss.specialType === "cosmicSpirit")
                 systems[idx] = cosmicSpiritSystem(ss.seed);
-              else systems[idx] = proc(ss.seed);
+              else systems[idx] = proc(ss.seed,ss.generationVersion===2?2:1);
               if (ss.name) systems[idx].name = ss.name;
               if (ss.bodies?.[0]?.name && systems[idx].bodies?.[0])
                 systems[idx].bodies[0].name = ss.bodies[0].name;
@@ -11083,7 +11134,7 @@
             !object(data.ship) || !["x", "y", "vx", "vy", "fuel"].every((k) => finite(data.ship[k])) ||
             !Array.isArray(data.bodyStates) || !data.bodyStates.length) return false;
         if (!data.bodyStates.every((s) => object(s) && Array.isArray(s.bodies) && s.bodies.length>0 &&
-            s.bodies.every((b) => object(b) && typeof b.name === "string"))) return false;
+            (s.generationVersion===undefined||[1,2].includes(s.generationVersion)) && s.bodies.every((b) => object(b) && typeof b.name === "string"))) return false;
         // Reject nested corruption before mutating the active journey. Missing optional
         // fields remain legal for older save versions.
         if (data.dailyOps != null && (!object(data.dailyOps) || !Array.isArray(data.dailyOps.ops) ||
@@ -12756,6 +12807,7 @@
           resource: surveyed ? b.resource : null,
           biome: surveyed ? displayBiome(b) : "Survey pending",
           className: surveyed ? planetClass(b) : "Unclassified world",
+          planetaryFeature: surveyed&&b.frontierFeature?frontierFeatureDescription(b):null,
           archetypeKey:
             game.system.specialType || game.system.archetype?.key || "unknown",
           archetypeName:
@@ -17227,7 +17279,7 @@
           "</b><br>" +
           esc(displayBiome(b)) +
           ". " +
-          esc(anomalyDesc(b) || b.lore) +
+          esc(b.frontierFeature?b.lore:(anomalyDesc(b) || b.lore)) +
           '</p><div class="grid"><div class="chip">Status: ' +
           (b.capturable ? (owned ? "Captured" : "Capturable") : "Survey only") +
           '</div><div class="chip ' +
@@ -19430,7 +19482,7 @@
                     (e.surveyed
                       ? esc(e.biome) + " • " + esc(label(e.resource))
                       : "Close survey required for classification") +
-                    "</span><span>Status: " +
+                    "</span>"+(e.surveyed&&e.planetaryFeature?"<span>"+esc(e.planetaryFeature)+"</span>":"")+"<span>Status: " +
                     (e.captured ? "Captured" : e.surveyed ? "Surveyed" : "Detected") +
                     " • Level " +
                     (e.level || 0) +
@@ -21455,7 +21507,7 @@
         if (b.name === "Earth") requestEarthAlbedo();
         const mappedEarth = b.name === "Earth" && !!earthAlbedo.pixels;
         const seed = visualSeed(b.name + ":" + b.featureSeed),
-          key = [seed, b.pattern, b.color, b.atmosphere, size, mappedEarth].join(":");
+          key = [seed, b.pattern, b.color, b.atmosphere, b.frontierFeature?.feature, b.frontierFeature?.accent, size, mappedEarth].join(":");
         if (renderAssets.surfaces.has(key)) {
           const image = renderAssets.surfaces.get(key);
           renderAssets.surfaces.delete(key); renderAssets.surfaces.set(key, image);
@@ -21467,7 +21519,8 @@
         const base = hex(b.name === "Mars" ? "#be7250" : b.color),
           gas = ["bands", "rings", "storm"].includes(b.pattern),
           ocean = b.pattern === "continents", lava = b.pattern === "lava",
-          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%17-8)*.12;
+          variation = b.name==="Earth"||b.name==="Mars"?0:(seed%17-8)*.12,
+          feature=b.frontierFeature, featureAccent=feature?hex(feature.accent):null;
         const image = rasterAsset(size, size, data => {
           for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
@@ -21524,6 +21577,20 @@
               rgb = rgb.map((v, c) => v * (0.36+fine*.12) + [245, 80, 8][c] * crack + heat*[160,45,5][c]);
             }
             if(variation!==0){const fault=Math.pow(Math.max(0,1-Math.abs(terrain-(.45+(seed%13)*.01))*20),3);rgb=rgb.map((v,c)=>v*(.90+fault*.22)+fault*[18,13,24][c]);}
+            if(feature){
+              const f=feature,accent=featureAccent,polar=Math.abs(ny),ridge=Math.max(0,1-Math.abs(terrain-.53)*35),spot=Math.hypot(nx-.22,ny+.16);
+              let strength=0;
+              if(f.feature==="polar frost")strength=Math.max(0,(polar-.72)*3);
+              else if(["prism veins","magma rifts","anomalous lattice","basalt scars"].includes(f.feature))strength=ridge*.65;
+              else if(f.feature==="impact basin")strength=Math.max(0,1-Math.abs(spot-.31)*24)*.44;
+              else if(f.feature==="polar vortex")strength=Math.max(0,1-Math.abs(Math.hypot(nx,ny+.65)-.16)*24)*.5;
+              else if(f.feature==="double storm")strength=Math.max(0,1-Math.min(Math.abs(spot-.22),Math.abs(Math.hypot(nx+.32,ny-.28)-.15))*20)*.43;
+              else if(f.feature==="ocean gyres")strength=Math.max(0,1-Math.abs(spot-.22)*20)*.35;
+              else if(f.feature==="archipelago")strength=Math.max(0,1-Math.abs(terrain-.48)*34)*.35;
+              else if(["night emissions","thermal crown","crystal ridges"].includes(f.feature))strength=Math.max(0,terrain-.58)*1.6;
+              else if(f.feature==="shear belts")strength=Math.max(0,Math.sin(ny*42+terrain*5))*.22;
+              if(strength)rgb=rgb.map((v,c)=>v*(1-strength)+[accent.r,accent.g,accent.b][c]*strength);
+            }
             for (let c = 0; c < 3; c++) data[i + c] = (rgb[c] * (1 - Math.min(0.8, cloud)) + 235 * Math.min(0.8, cloud)) * limb;
             data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
           }
@@ -21867,9 +21934,7 @@
           drawUnchartedBody(b, p, r);
         } else {
           drawRarityField(b, p, r);
-          drawPlanetBase(b, p, r);
-          drawDetailedSurface(b, p, r);
-          drawPlanetLighting(b, p, r);
+          drawFrontierGlobe(b,p,r);
           drawRarityDetails(b, p, r);
           if (ringed) drawPlanetRings(p, r, b, true);
         }
@@ -21897,8 +21962,18 @@
         }
         ctx.restore();
       }
+      function drawFrontierGlobe(b,p,r){
+        const f=b.frontierFeature;
+        ctx.save();
+        if(f&&f.flatten<1){ctx.translate(p.x,p.y);ctx.rotate(f.tilt);ctx.scale(f.shape==="prolate"?f.flatten:1,f.shape==="oblate"?f.flatten:1);ctx.rotate(-f.tilt);ctx.translate(-p.x,-p.y);}
+        drawPlanetBase(b,p,r);drawDetailedSurface(b,p,r);drawPlanetLighting(b,p,r);
+        ctx.restore();
+        if(f&&r>8&&game.settings?.graphics!=="Low"&&["dust halo","inclined rings","split rings"].includes(f.feature)&&b.pattern!=="rings"){
+          ctx.save();ctx.strokeStyle=rgba(f.accent,.23);ctx.lineWidth=Math.max(.6,r*.035);ctx.beginPath();ctx.ellipse(p.x,p.y,r*1.45,r*.7,f.tilt,0,TAU);ctx.stroke();ctx.restore();
+        }
+      }
       function drawUnchartedBody(b, p, r) {
-        drawPlanetBase(b, p, r); drawDetailedSurface(b, p, r); drawPlanetLighting(b, p, r);
+        drawFrontierGlobe(b,p,r);
         if (r > 7) {
           ctx.save(); ctx.font = "500 9px Inter, system-ui"; ctx.textAlign = "center";
           ctx.fillStyle = "rgba(187,207,213,.72)"; ctx.fillText("UNCHARTED", p.x, p.y + r + 19); ctx.restore();
@@ -22009,9 +22084,9 @@
       }
       function planetRingProfile(b) {
         const seed=visualSeed(b.name+":"+b.featureSeed);
-        return {tilt:b.name==="Saturn"?-.32:-.62+(seed%101)/100*.9,
+        return {tilt:b.frontierFeature?.feature==="inclined rings"?b.frontierFeature.tilt+.65:b.name==="Saturn"?-.32:-.62+(seed%101)/100*.9,
           flatten:b.name==="Saturn"?1:.78+(seed%37)/100,
-          gap:.42+(seed%13)/100};
+          gap:b.frontierFeature?.feature==="split rings"?.28:.42+(seed%13)/100};
       }
       function drawPlanetLighting(b, p, r) {
         if (r < 4) return;

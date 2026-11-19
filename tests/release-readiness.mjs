@@ -1292,6 +1292,30 @@ const frontierQA=vm.runInContext(`({
   targetContact(){const n=nearestFrontierContact();manualTargetName="@contact:"+n.contact.id;return currentTarget();},
   drawFrontierContacts
 })`,context);
+const diversityQA=vm.runInContext(`({proc,frontierWorldName,frontierFeatureDescription,frontierFeatures})`,context);
+const names=new Set(),shapes=new Set(),features=new Set(),colors=new Set();
+let total=0,minRadius=Infinity,maxRadius=0;
+for(let seed=1;seed<=100;seed++){
+  const sys=diversityQA.proc(seed*317+19,2);
+  if(sys.specialType)continue;
+  const legacy=diversityQA.proc(sys.seed,1);
+  assert.equal(legacy.generationVersion,1);
+  assert.equal(sys.generationVersion,2);
+  assert.deepEqual(sys.bodies.map(b=>b.name),diversityQA.proc(sys.seed,2).bodies.map(b=>b.name));
+  assert.equal(new Set(sys.bodies.map(b=>b.name)).size,sys.bodies.length);
+  assert.equal(legacy.bodies.length,sys.bodies.length);
+  assert.ok(legacy.bodies.slice(1).every(b=>!b.frontierFeature));
+  for(const b of sys.bodies.slice(1)){
+    total++;names.add(b.name);colors.add(b.color);shapes.add(b.frontierFeature.shape);features.add(b.frontierFeature.feature);
+    minRadius=Math.min(minRadius,b.radius);maxRadius=Math.max(maxRadius,b.radius);
+    assert.ok(b.frontierFeature.flatten>=.78&&b.frontierFeature.flatten<=1);
+    assert.ok(diversityQA.frontierFeatureDescription(b).length>15);
+    assert.ok(b.lore.includes(diversityQA.frontierFeatureDescription(b)));
+    assert.ok(Number.isFinite(b.mass)&&b.mass>0);
+  }
+}
+assert.ok(names.size>total*.65,"Names should rarely repeat across surveyed sectors");
+assert.equal(shapes.size,3);assert.ok(features.size>=12);assert.ok(colors.size>=20);assert.ok(maxRadius/minRadius>4);
 const eligible=frontier.bodies.find(b=>b.type!=="star"&&b.capturable);
 assert.ok(eligible,"Frontier systems must offer genuine capture opportunities");
 for(let seed=1;seed<300;seed++){
@@ -1351,6 +1375,24 @@ assert.equal(api.saveGame(false),true);
 assert.equal(api.loadGame(false),true);
 assert.equal(frontierQA.worldControlMode(api.body(eligible.name)),"relay");
 assert.equal(frontierQA.activeFrontierContacts().some(c=>c.id===contact.id),false,"Recovered contact cannot respawn on reload");
+assert.equal(api.game.system.generationVersion,2,"New sector generator version survives save/load");
+const v2Save=api.saveState();
+const legacyQA=vm.runInContext(`({prepareLegacy(){
+  const sys=proc(626262,1);systems=[sol(),sys];currentSystemIndex=1;game.system=sys;updateBodies(sys);resetShip();
+  const b=sys.bodies.find(b=>b.capturable);b.captured=true;b.discovered=true;b.level=2;
+  game.captured=new Set([b.name]);game.discovered=new Set([b.name]);return b.name;
+}})`,context);
+const legacyName=legacyQA.prepareLegacy(),legacySave=api.saveState();
+delete legacySave.bodyStates[1].generationVersion;
+localStorage.setItem(api.SAVE_KEY,JSON.stringify(legacySave));
+assert.equal(api.loadGame(false),true,"Unversioned sector saves remain loadable");
+assert.equal(api.game.system.generationVersion,1);
+assert.equal(api.body(legacyName).level,2);
+assert.ok(api.game.captured.has(legacyName));
+assert.equal(api.saveState().bodyStates[1].generationVersion,1);
+localStorage.setItem(api.SAVE_KEY,JSON.stringify(v2Save));
+assert.equal(api.loadGame(false),true);
+
 
 
 checkpoint("unified menu navigation");
