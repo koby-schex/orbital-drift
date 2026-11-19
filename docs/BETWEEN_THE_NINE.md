@@ -20,3 +20,9 @@ Sixteen local Vault records and eight choice-driven living events extend the exi
 
 ## Pass 42: Presentation rebuild
 Replace ongoing global DOM text observation with explicit renderer-boundary translation and contextual labels. Existing action payloads and identity strings stay intact. Shared navy/ivory/aged-gold style applies to title, pause, command surfaces and flight controls. Three local artwork plates are original procedural matte compositions, not approved franchise showcase art. Replace flat polygon fan and heavily saturated effects with textured relief and restrained atmosphere. Full iPhone visual inspection and remaining narrative copy audit are required.
+
+## Pass 43: Field language and navigation
+Seven tutorial objectives, onboarding, flight tips, both manuals, local formation classifications and observations, eight reach profiles, eight mystery signals and selected Vault records rewritten. Display of old saves derives formations from stable keys rather than altering persistent names. Navigation headings and cross-reach atlas use consistent explicit labels. No changes to reward tables, encounter choice indexes, route identity, game physics, save schema or cosmological canon. Legacy encounter and adventure prose remains a separate polish target.
+
+### Follow-up
+Directly revised legacy tutorial milestones, quest and achievement objectives, training completion dialog rows, factory hints, reset prompts and dynamic HUD target names. Title uses a framed field plate, quiet typography, and clear expedition action hierarchy. Original internal body IDs remain unchanged.
