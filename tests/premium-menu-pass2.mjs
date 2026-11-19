@@ -20,7 +20,7 @@ assert.match(html,/\.menu-secondary-details\s*>\s*summary:focus-visible/,
   "Native disclosures must have a visible keyboard focus state");
 
 const hub=fn("renderHub","menuLabel");
-for(const section of ["Explore","Pioneer","Cargo","Ship & designs","Journey","Settings"])assert.ok(hub.includes(section),"Main directory must retain "+section);
+for(const section of ["Explore","Pioneer","Cargo","Vessel & designs","Journey","Settings"])assert.ok(hub.includes(section),"Main directory must retain "+section);
 assert.match(hub,/routeDirectory\(/);
 assert.doesNotMatch(hub,/menu-card-ready|tab-count|<details class="menu-secondary-details">/);
 const resources=fn("renderResources","resourceHint");
@@ -31,7 +31,7 @@ assert.match(resources,/data-action="claimProduction"|claimProduction/,
 const planets=fn("renderPlanets","bodySurveyed");
 assert.match(planets,/planetListHtml\(\)/);
 assert.match(planets,/btn\("Set as Target"/);
-assert.match(planets,/secondaryDetails\("World History", planetMemoryHtml\(s\)\)/);
+assert.match(planets,/secondaryDetails\("Formation history", planetMemoryHtml\(s\)\)/);
 assert.match(planets,/secondaryDetails\("Survey & Development Details", planetDetailsHtml\(s\)\)/);
 
 const upgrades=fn("renderUpgrades","shipClassProgressHtml");

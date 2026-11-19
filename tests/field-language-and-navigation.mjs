@@ -15,3 +15,7 @@ assert.equal(JSON.stringify(objectives.map(x=>x.target)),JSON.stringify(["Mars",
 assert.equal(objectives.length,7);assert.ok(objectives.every(x=>x.text.length>20));assert.doesNotMatch(objectives.map(x=>x.text).join(" "),/\b(?:Earth|Mars|Venus|Sol)\b/);
 assert.match(html,/function fieldObservation\(b\)/);assert.match(html,/esc\(fieldObservation\(s\)\)/);assert.match(html,/SAVE_VERSION = 20/);
 console.log("Field language: eight reach and formation records, seven unchanged tutorial targets and explicit display aliases passed.");
+
+// Check authored milestone sources in addition to the initial objective array.
+for (const marker of ["Mars Captured!","Venus Survey Complete!","Upgrade Mars outpost","Travel to Venus","Return to Earth Factory","Mars Outpost Upgraded!","Capture Mars."]) assert.ok(!html.includes(marker), "Obsolete tutorial copy: "+marker);
+assert.match(html,/Redglass Shelf claimed/);assert.match(html,/Violet Furnace surveyed/);assert.match(html,/Redglass Shelf developed/);assert.match(html,/title-art-caption/);assert.match(html,/title-panel-kicker/);
