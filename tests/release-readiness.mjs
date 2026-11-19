@@ -1375,6 +1375,24 @@ assert.equal(api.saveGame(false),true);
 assert.equal(api.loadGame(false),true);
 assert.equal(frontierQA.worldControlMode(api.body(eligible.name)),"relay");
 assert.equal(frontierQA.activeFrontierContacts().some(c=>c.id===contact.id),false,"Recovered contact cannot respawn on reload");
+assert.equal(api.game.system.generationVersion,2,"New sector generator version survives save/load");
+const v2Save=api.saveState();
+const legacyQA=vm.runInContext(`({prepareLegacy(){
+  const sys=proc(626262,1);systems=[sol(),sys];currentSystemIndex=1;game.system=sys;updateBodies(sys);resetShip();
+  const b=sys.bodies.find(b=>b.capturable);b.captured=true;b.discovered=true;b.level=2;
+  game.captured=new Set([b.name]);game.discovered=new Set([b.name]);return b.name;
+}})`,context);
+const legacyName=legacyQA.prepareLegacy(),legacySave=api.saveState();
+delete legacySave.bodyStates[1].generationVersion;
+localStorage.setItem(api.SAVE_KEY,JSON.stringify(legacySave));
+assert.equal(api.loadGame(false),true,"Unversioned sector saves remain loadable");
+assert.equal(api.game.system.generationVersion,1);
+assert.equal(api.body(legacyName).level,2);
+assert.ok(api.game.captured.has(legacyName));
+assert.equal(api.saveState().bodyStates[1].generationVersion,1);
+localStorage.setItem(api.SAVE_KEY,JSON.stringify(v2Save));
+assert.equal(api.loadGame(false),true);
+
 
 
 checkpoint("unified menu navigation");
