@@ -11844,7 +11844,7 @@
           fleetStatusStripHtml() +
           '<div class="fleet-hangar-stage"><canvas data-skin-kind="fleet" data-skin-key="' +
           esc(game.fleet.skin) +
-          '" data-fleet-view="formation" role="img" aria-label="Current fleet formation preview"></canvas><span class="cosmetic-preview-label">Current cruising formation</span></div><div class="fleet-anchor-actions"><button type="button" data-action="scrollFleetSection" data-arg="fleetShipyard">Open Shipyard</button><button type="button" data-action="scrollFleetSection" data-arg="fleetMissions">Open Mission Board</button></div><div class="grid" style="margin-top:8px"><div class="chip"><b>Fleet Slots</b><br>' +
+          '" data-fleet-view="formation" role="img" aria-label="Current fleet formation preview"></canvas><span class="cosmetic-preview-label">Current cruising formation</span></div><div class="grid" style="margin-top:8px"><div class="chip"><b>Fleet Slots</b><br>' +
           game.fleet.ships.length +
           " / " +
           fleetLimit() +
@@ -16512,7 +16512,7 @@
       }
       // Navigation is a stack of full-screen destinations, not a collection of independent toggles.
       const menuHistory=[];
-      const menuDefaults={upgrades:"ship",frigate:"overview",system:"status",cosmetics:"overview"};
+      const menuDefaults={planets:"list",upgrades:"ship",frigate:"overview",system:"status",cosmetics:"overview"};
       function currentMenuRoute(){
         return {section:activeMenu||"hub",tab:menuTabs[activeMenu]||null,scroll:Math.max(0,ui.menu.scrollTop||0)};
       }
@@ -16520,6 +16520,7 @@
       function applyMenuRoute(route){
         activeMenu=route.section;
         if(route.tab)menuTabs[route.section]=route.tab;
+        if(route.section==="planets"&&route.tab?.startsWith("world:"))selectedPlanetName=route.tab.slice(6);
         ui.menu.classList.remove("closing");
         ui.menu.classList.add("open");
         document.querySelectorAll(".dock button").forEach(b=>b.classList.toggle("active",b.dataset.menu===activeMenu));
@@ -16626,7 +16627,10 @@
       }
       function menuRouteTitle(route){
         const labels={hub:"Command",explore:"Explore",hangar:"Ship & designs",journal:"Journey",resources:"Cargo",planets:"Worlds",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"System",echoes:"Orbital Echoes",codex:"Planet Codex",activity:"Captain Log",guide:"Pilot Manual",help:"Help"};
-        const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",travel:"Travel & atlas",records:"Journey records",settings:"Settings"},upgrades:{ship:"Ship upgrades",planet:"World upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
+        const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",shipyard:"Shipyard",missions:"Fleet missions",history:"Fleet history",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",daily:"Daily tasks",contracts:"Contracts",milestones:"Milestones",travel:"Travel & atlas",records:"Journey records",settings:"Settings",display:"Display & performance",audio:"Audio & feedback",controls:"Flight controls",data:"Save data",privacy:"Purchases & privacy",achievements:"Achievements",reputation:"Reputation & encounters",collections:"Collections & statistics"},upgrades:{ship:"Ship upgrades",planet:"World upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
+        if(route.section==="planets"&&route.tab?.startsWith("world:")){
+          const world=body(route.tab.slice(6));return world&&(world.discovered||game.discovered.has(world.name)||world.type==="star")?world.name:"Unknown world";
+        }
         return sub[route.section]?.[route.tab]||labels[route.section]||"Command";
       }
       function menuNavigationHtml(){
@@ -16655,6 +16659,9 @@
       function openRecommendedMenu(){
         const next=nextBestAction(), section=next?.menu||"hub";
         const title=String(next?.title||"").toLowerCase();
+        if(section==="planets"){
+          const b=planetCaptureReady()||currentTarget();if(b&&body(b.name))return openWorldDetails(b.name);
+        }
         const tab=section==="frigate"?(title.includes("fleet")?"fleet":title.includes("adventure")?"expeditions":"overview"):section==="system"?"travel":section==="upgrades"?(title.includes("planet")||String(next?.sub||"").toLowerCase().includes("planet")?"planet":"ship"):null;
         openSection(section,tab);
       }
@@ -16700,7 +16707,7 @@
       }
       function setMenuTab(v){
         const [menu,tab]=String(v||"").split("|");
-        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","vault","upgrades","cosmetics"],system:["status","ops","travel","records","settings"],cosmetics:["overview","ship","frigate","trail","fleet","sets"]};
+        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","shipyard","missions","history","vault","upgrades","cosmetics"],system:["status","ops","daily","contracts","milestones","travel","records","achievements","reputation","collections","settings","display","audio","controls","data","privacy"],cosmetics:["overview","ship","frigate","trail","fleet","sets"]};
         if(!allowed[menu]?.includes(tab))return;
         openSection(menu,tab);
       }
@@ -16980,7 +16987,16 @@
           return "Speed contracts, volcanic worlds, and high-tier systems.";
         return "Earned from colonies, salvage, encounters, and contracts.";
       }
+      function openWorldDetails(name){
+        if(!body(name))return;
+        openSection("planets","world:"+name);
+      }
       function renderPlanets() {
+        const tab=activeTab("planets","list");
+        if(!tab.startsWith("world:")){
+          ui.menuContent.innerHTML='<p class="screen-intro">Choose a world to see its survey, control and development options.</p><div class="route-list">'+planetListHtml()+"</div>";
+          return;
+        }
         const s = body(selectedPlanetName),
           summary = s
             ? bodySurveyed(s)
@@ -16993,11 +17009,8 @@
             : "Select a planet.";
         const scanRange = s && game.ship ? dist(game.ship, s) - visualRadius(s) : Infinity;
         ui.menuContent.innerHTML =
-          '<div class="list">' +
-          planetListHtml() +
-          "</div>" +
           card(
-            "Selected Planet",
+            "World status",
             summary,
             btn("Set as Target", "setTarget", selectedPlanetName) +
               btn(
@@ -17018,14 +17031,7 @@
           ) +
           secondaryDetails("World History", planetMemoryHtml(s)) +
           secondaryDetails("Survey & Development Details", planetDetailsHtml(s));
-        document.querySelectorAll(".planet[data-planet]").forEach(
-          (e) =>
-            (e.onclick = () => {
-              selectedPlanetName = e.dataset.planet;
-              renderPlanets();
-              wireMenuButtons();
-            }),
-        );
+        if(!s)ui.menuContent.innerHTML=card("World unavailable","This world is not in the current system.",btn("Worlds","openSection","planets"));
       }
       function bodySurveyed(b) {
         return !!(
@@ -17036,58 +17042,13 @@
             game.captured.has(b.name))
         );
       }
-      function planetListHtml() {
-        return game.system.bodies
-          .map((b) => {
-            const known = b.discovered || game.discovered.has(b.name),
-              surveyed = bodySurveyed(b),
-              tag =
-                b.type === "star"
-                  ? "CORE"
-                  : b.factory
-                    ? "FACTORY"
-                    : game.captured.has(b.name)
-                      ? "OWNED"
-                      : !b.capturable
-                        ? surveyed
-                          ? "SURVEY"
-                          : "SIGNAL"
-                        : surveyed
-                          ? b.rarity
-                          : known
-                            ? "SIGNAL"
-                            : "???";
-            return (
-              '<div class="planet ' +
-              (b.name === selectedPlanetName ? "active" : "") +
-              '" data-planet="' +
-              esc(b.name) +
-              '"><div class="dot" style="background:' +
-              b.color +
-              ";color:" +
-              b.color +
-              '"></div><div><b>' +
-              (known ? esc(b.name) : "Unknown World") +
-              "</b><span>" +
-              (known
-                ? b.type === "star"
-                  ? "Star"
-                  : surveyed
-                    ? esc(displayBiome(b)) +
-                      " • " +
-                      esc(b.rarity) +
-                      " • Lv. " +
-                      b.level
-                    : "Detected • Survey scan pending"
-                : "Unsurveyed") +
-              '</span></div><div class="tag ' +
-              (known && b.type !== "star" ? rarityClass(b) : "") +
-              '">' +
-              esc(tag) +
-              "</div></div>"
-            );
-          })
-          .join("");
+      function planetListHtml(){
+        return game.system.bodies.map(b=>{
+          const known=b.discovered||game.discovered.has(b.name)||b.type==="star",surveyed=bodySurveyed(b),
+            status=b.type==="star"?"Star":game.captured.has(b.name)?"Controlled":surveyed?(b.capturable?"Available to capture":"Survey only"):"Survey pending",
+            desc=known?(surveyed&&b.type!=="star"?status+" · "+b.rarity:status):"Unsurveyed signal";
+          return '<button type="button" class="route-row planet-route" data-action="openWorldDetails" data-arg="'+esc(JSON.stringify(b.name))+'"><span class="planet-orb" style="--orb:'+esc(b.color)+'"></span><span class="route-copy"><b>'+esc(known?b.name:"Unknown world")+'</b><small>'+esc(desc)+'</small></span><svg class="route-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 3 5 5-5 5"/></svg></button>';
+        }).join("");
       }
       function planetDetailsHtml(b) {
         if (!b) return "";
@@ -17273,7 +17234,8 @@
         if (sel) selectedPlanetName = sel.name;
         const tab = activeTab("upgrades", "ship"),
           ready = upgradeReady();
-        const tabs = tabBar("upgrades", [
+        const tabs = ""; /* Ship and world upgrades are separate destinations in the Ship directory. */
+        const legacyUpgradeLinks = [
           {
             key: "ship",
             label: "Ship Systems",
@@ -17284,8 +17246,8 @@
             label: "Planet Upgrade",
             count: sel && canUpgradePlanet(sel) ? "!" : "",
           },
-        ]);
-        let html = tabs;
+        ];
+        let html = '<div class="route-list">'+(tab==="ship"?routeRow("World upgrades","Manage captured worlds","setMenuTab","upgrades|planet","explore"):routeRow("Ship upgrades","Improve the Starling","setMenuTab","upgrades|ship","ship"))+'</div>';
         if (tab === "planet") {
           html +=
             card(
@@ -18101,12 +18063,11 @@
           '</p><div class="pioneer-primary-actions">'+
           (orbitingFrigate()?btn("Explore a new system","jumpSystem"):btn("Locate Pioneer","setFrigateTarget"))+
           (orbitingFrigate()&&game.ship.fuel<game.ship.maxFuel*.94?btn("Refuel Starling","refuel"):"")+
-          btn("Start an adventure","setMenuTab","frigate|expeditions")+
+          ""+
           '</div></div>'+
-          '<div class="pioneer-deck-directory"><span class="command-kicker">SHIP DIRECTORY</span><div class="pioneer-primary-actions">'+
-          [["Manage my fleet","fleet","Deploy escorts and collect mission rewards."],["Meet the crew","crew","Recruit, train and assign specialists."],["Discovery Vault","vault","Secure discoveries and unlock records."],["Base systems","upgrades","Improve your mobile headquarters."],["Appearance","cosmetics","Equip hull and fleet designs."]].map(([label,deck,desc])=>
-            '<button class="pioneer-deck-link" type="button" data-action="setMenuTab" data-arg="frigate|'+deck+'"><b>'+esc(label)+'</b><small>'+esc(desc)+'</small></button>').join("")+
-          '</div></div>' +
+          '<div class="pioneer-deck-directory"><h4 class="directory-heading">Pioneer directory</h4>'+
+          routeDirectory([["Adventures","Accept or review an expedition","setMenuTab","frigate|expeditions","route"],["Fleet",readyFleet?readyFleet+" mission rewards ready":"Manage escorts and deploy missions","setMenuTab","frigate|fleet","fleet"],["Crew","Recruit, train and assign specialists","setMenuTab","frigate|crew","crew"],["Vault","Secure specimens and review bonuses","setMenuTab","frigate|vault","vault"],["Base upgrades","Improve your mobile headquarters","setMenuTab","frigate|upgrades","pioneer"],["Appearance","Equip Pioneer and fleet designs","openSection","cosmetics","layers"]])+
+          '</div>' +
           '<details class="pioneer-command-details"><summary>Base details and settings</summary>' +
           '<div class="pioneer-command-metrics"><span>Base Lv. ' +
           game.frigate.level +
@@ -18166,15 +18127,19 @@
           .join("");
         // Deck navigation stays visible without a second wall of badges and
         // counters. Context lives inside the deck that owns the information.
-        let html = tab==="overview" ? "" : '<div class="actions pioneer-simple-nav">'+btn("Pioneer directory","setMenuTab","frigate|overview")+'</div>';
+        let html = "";
         if (tab === "expeditions") html += expeditionsHtml();
         else if (tab === "crew") html += crewHtml();
         else if (tab === "fleet")
-          html +=
-            fleetOverviewHtml() +
-            fleetShipyardHtml() +
-            fleetMissionsHtml() +
-            fleetHistoryHtml();
+          html += fleetOverviewHtml()+routeDirectory([
+            ["Fleet missions",readyFleet?readyFleet+" rewards ready to claim":"Launch and manage assignments","setMenuTab","frigate|missions","route"],
+            ["Shipyard","Build and upgrade escorts","setMenuTab","frigate|shipyard","fleet"],
+            ["Fleet history","Completed missions and rewards","setMenuTab","frigate|history","journal"],
+            ["Fleet appearance","Customize escort hull designs","setMenuTab","cosmetics|fleet","layers"]
+          ]);
+        else if(tab==="shipyard")html+=fleetShipyardHtml();
+        else if(tab==="missions")html+=fleetMissionsHtml();
+        else if(tab==="history")html+=fleetHistoryHtml()||card("No completed missions","Launch an assignment from Fleet missions.");
         else if (tab === "vault") html += vaultHtml();
         else if (tab === "upgrades")
           html += card(
@@ -18183,9 +18148,7 @@
             '<div class="list">' + upgradeRows + "</div>",
           );
         else if (tab === "cosmetics")
-          html +=
-            storeHtml() +
-            fleetSkinsHtml();
+          html += routeDirectory([["Pioneer designs","Browse and equip hulls","setMenuTab","cosmetics|frigate","pioneer"],["Fleet designs","Customize escorts","setMenuTab","cosmetics|fleet","fleet"],["All designs","Starling, trails and complete sets","openSection","cosmetics","layers"]]);
         else html += overview;
         ui.menuContent.innerHTML = html;
       }
@@ -26273,6 +26236,7 @@
         renderMenu,
         openMenu,
         openSection,
+        openWorldDetails,
         backToMainMenu,
         syncMenuChrome,
         openObjectiveAction,
