@@ -1282,7 +1282,10 @@ console.log(
 checkpoint("frontier expansion");
 api.initGame(false);api.dismissPanels();
 const frontier=api.prepareVaultTest(626262);
-assert.equal(api.vaultCatalog.length,88,"Retain all 72 legacy discoveries and add 16 Between records");
+const priorVaultKeys = ["cinder-loom","ember-filament","fold-bell","curtain-brood","facet-suture","prismatic-wake","root-veil","hush-pollen","unclaimed-seal","palimpsest-frame","still-skin","hollow-thread","paired-witness","offset-skein","veil-censer","lantern-weave","ember-reliquary","foundry-heart","cinder-mite","storm-ray","thunder-pearl","choir-eel","mnemonic-shard","prism-beetle","refraction-ghost","spore-cathedral","orbiting-kelp","genesis-pod","witness-coin","cartographer-sarcophagus","archive-moth","absence-glass","void-mimic","gravity-knot","pilgrim-moth","mercy-seed","memory-tide","inverted-astrolabe","counterself","causality-lace","slag-lantern","iron-orchid","solar-spindle","plasma-nest","aether-shell","cloud-larva","cyclone-needle","storm-crown","opal-eye","glass-fern","prismatic-keel","spectrum-anvil","seed-compass","amber-colony","lantern-jelly","living-keystone","oath-tablet","archive-scarab","silent-key","epoch-dial","null-pebble","echo-compass","night-fin","impossible-room","mercy-lantern","dawn-pearl","star-garden","second-sun","mirror-flower","fractured-seal","counter-clock","unwritten-star","ember-ray","forge-heart","storm-whale","pressure-bloom","prism-mantle","facet-loom","veil-medusa","root-archive","choir-relic","pilgrim-mask","null-seraph","dark-bell","aurora-pilgrim","dawn-reliquary","mirror-leviathan","fracture-lens"];
+const catalogKeys = new Set(api.vaultCatalog.map(x=>x.key));
+for(const key of priorVaultKeys) assert.ok(catalogKeys.has(key),"Retain previously released discovery: "+key);
+assert.ok(api.vaultCatalog.length>=priorVaultKeys.length,"The released catalog is a minimum, not a cap");
 assert.equal(new Set(api.vaultCatalog.map(x=>x.key)).size,api.vaultCatalog.length);
 const frontierQA=vm.runInContext(`({
   frontierContacts,activeFrontierContacts,frontierContactKey,recoverFrontierContact,
@@ -1323,7 +1326,7 @@ for(let seed=1;seed<300;seed++){
   if(!system.specialType)assert.ok(system.bodies.some(b=>b.type!=="star"&&b.capturable),"Every ordinary generated sector needs a foothold");
 }
 const contacts=frontierQA.activeFrontierContacts();
-assert.ok(contacts.length>=7&&contacts.length<=15);
+assert.ok(contacts.length>=7&&contacts.length<=16,"Up to 14 salvage contacts plus two independent observation contacts");
 assert.equal(new Set(contacts.map(c=>c.id)).size,contacts.length);
 assert.deepEqual(frontierQA.frontierContacts(),frontierQA.frontierContacts(JSON.parse(JSON.stringify({...frontier,frontierContacts:undefined}))));
 const contact=contacts[0];
