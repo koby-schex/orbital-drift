@@ -6026,6 +6026,7 @@
           [/\bODF Pioneer\b/g,"Pioneer"],[/\bSol System\b/g,"First Reach"],[/\bbeyond Sol\b/g,"beyond First Reach"],[/\bEarth Factory\b/g,"First Anchorage factory"],
           [/\bEarth reserve\b/g,"First Anchorage reserve"],[/\bMars distance\b/g,"Redglass Shelf distance"],[/\bMars upgrade\b/g,"Redglass Shelf upgrade"],[/\bVenus distance\b/g,"Violet Furnace distance"],
           [/\b(?:orbit|approach|follow|return to|travel toward|toward|scan|capture|claim|target|refuel at|lock onto|reach|upgrade|replace|survey)\s+(Earth|Mars|Venus|Mercury|Jupiter|Saturn|Uranus|Neptune|Sun)\b/gi,m=>m.replace(/\b(Earth|Mars|Venus|Mercury|Jupiter|Saturn|Uranus|Neptune|Sun)\b/g,k=>BETWEEN_BODY_LABELS[k])],
+          [/\b((?:manual |claim |capture )?target set:\s*|objective:\s*|target:\s*|nearest:\s*|go to\s+|survey complete:\s*|formation detected:\s*|world detected:\s*|refueled at\s+|within \d+u of\s+)(Earth|Mars|Venus|Mercury|Jupiter|Saturn|Uranus|Neptune|Sun)\b/gi,(_,prefix,key)=>prefix+BETWEEN_BODY_LABELS[Object.keys(BETWEEN_BODY_LABELS).find(k=>k.toLowerCase()===key.toLowerCase())]],
           [/\b(Earth|Mars|Venus) (captured|scanned|surveyed|claimed)\b/g,(_,k,v)=>BETWEEN_BODY_LABELS[k]+" "+(v==="captured"?"claimed":v)],
           [/\bCapture (?=[A-Z])/g,"Claim "],[/\bContact (Earth|Mars|Venus|Mercury|Jupiter|Saturn|Uranus|Neptune)\b/g,(_,k)=>"Contact "+BETWEEN_BODY_LABELS[k]],[/\bcapture (?=First Anchorage|Redglass Shelf|Violet Furnace|the formation|this formation|this world|an eligible)/g,"claim "],
           [/\bJump Outward\b/g,"Cross Outward"],[/\bPlanet Codex\b/g,"Field Codex"],[/\bSystem Atlas\b/g,"Crossing Atlas"],
@@ -14424,7 +14425,7 @@
               ".",
           );
         } else if(game.system.isTutorial)
-          toast("Survey complete: " + b.name + " · recovered " + fmt(filtered) + ".");
+          toast("Survey complete: " + fieldBodyName(b.name) + " · recovered " + fmt(filtered) + ".");
         registerVaultDiscovery("planet", b.name);
         trackExpeditionProgress("survey", 1);
         markMeaningfulMoment("survey");
@@ -14797,7 +14798,7 @@
             if (["Exotic", "Mythic"].includes(n.body.rarity))
               game.captainLog.exoticDiscoveries++;
             recordCodex(n.body, "detected");
-            if(game.system.isTutorial)toast("World detected: "+n.body.name+". Scan nearby for full survey data.");
+            if(game.system.isTutorial)toast("Formation detected: "+fieldBodyName(n.body.name)+". Scan nearby for full survey data.");
             addActivity(
               "discovery",
               n.body.name + " detected",
@@ -14812,7 +14813,7 @@
           b = typeof target === "string" ? body(target) : n.body;
         if (!b || b.type === "star") return toast("No planetary world is in scanner range.");
         const range = dist(game.ship, b) - visualRadius(b);
-        if (range > 230) return toast("Move within 230u of " + b.name + " to complete a survey scan.");
+        if (range > 230) return toast("Move within 230u of " + fieldBodyName(b.name) + " to complete a survey scan.");
         const wasDetected = b.discovered || game.discovered.has(b.name);
         b.discovered = true;
         game.discovered.add(b.name);
@@ -14911,7 +14912,7 @@
         recordCodex(b, "captured");
         playSound("capture");
         vibrate("capture");
-        toast(firstCapture?"Captured "+b.name+". Gained "+amount+" "+label(b.resource)+".":b.name+" reconnected to the network.");
+        toast(firstCapture?"Claimed "+fieldBodyName(b.name)+". Gained "+amount+" "+label(b.resource)+".":fieldBodyName(b.name)+" reconnected to the network.");
         addActivity(
           "capture",
           fieldBodyName(b.name) + " claimed",
@@ -15040,7 +15041,7 @@
           game.ship.fuel = game.ship.maxFuel;
           if(restored>=game.ship.maxFuel*.10)recordPlanet(n.body, "refuels", 1);
           playSound("refuel");
-          toast("Refueled at " + n.body.name + ".");
+          toast("Refueled at " + fieldBodyName(n.body.name) + ".");
           saveGame(false);
         } else
           toast("Orbit-lock the ODF Pioneer or move near a captured planet.");
@@ -15245,7 +15246,7 @@
         if (!game.captured.has(b.name) && !b.factory)
           return toast("Capture " + b.name + " first.");
         if (!b.upgradeable)
-          return toast(b.name + " cannot support branch upgrades.");
+          return toast(fieldBodyName(b.name) + " cannot support branch upgrades.");
         const br = b.branches || (b.branches = defaultBranches());
         const before = br[branch] || 0;
         if (before >= 5) return toast("That branch is maxed.");
@@ -17725,7 +17726,7 @@
         if (!b) return toast("Target not found.");
         manualTargetName = b.name;
         selectedPlanetName = b.name;
-        toast("Manual target set: " + b.name + ".");
+        toast("Manual target set: " + fieldBodyName(b.name) + ".");
         saveGame(false);
         renderMenu();
       }
@@ -17906,11 +17907,11 @@
         if (planetCaptureReady())
           return {
             title: "Capture nearby world",
-            sub: planetCaptureReady().name,
+            sub: fieldBodyName(planetCaptureReady().name),
             menu: "planets",
           };
         return {
-          title: target ? "Objective: " + target.name : "Explore",
+          title: target ? "Objective: " + (target.type==="frigate"?fieldVesselName(target.name):fieldBodyName(target.name)) : "Explore",
           sub: target
             ? "Distance: " +
               Math.round(
@@ -20637,7 +20638,7 @@
             "</b><span>Nearest</span><b>" +
             esc(n.body?.name || "None") +
             "</b><span>Orbit</span><b>" +
-            (s.orbitLocked ? esc(s.lockBody) : "Free Flight") +
+            (s.orbitLocked ? esc(s.lockBody==="__FRIGATE__"?fieldVesselName(game.frigate.name):fieldBodyName(s.lockBody)) : "Free Flight") +
             "</b><span>Fuel</span><b>" +
             Math.round(s.fuel || 0) +
             "/" +
@@ -22044,7 +22045,7 @@
             : visualRadius(target);
         return (
           (target.type === "frigate"
-            ? game.frigate.name || "ODF Pioneer"
+            ? fieldVesselName(game.frigate.name)
             : fieldBodyName(target.name)) +
           " • " +
           Math.round(Math.max(0, dist(game.ship, target) - rad)) +
@@ -22128,7 +22129,7 @@
           ui.touchThrust.textContent = "THRUST";
           ui.touchThrust.setAttribute("aria-label",s.orbitLocked?"Thrust in orbit without fuel":"Thrust vessel");
           const lockName = nLock.body?.type === "frigate"
-            ? (game.frigate.name || "ODF Pioneer")
+            ? fieldVesselName(game.frigate.name)
             : nLock.body ? fieldBodyName(nLock.body.name) : null;
           ui.orbitRelease.setAttribute("aria-label", game.ship?.orbitLocked
             ? "Release orbit and slingshot, "+charge+" percent momentum"
@@ -22583,7 +22584,7 @@
         closeDiscoveryPanel();
         if(ui.menu.classList.contains("open"))closeMenu();
         saveGame(false);
-        toast("Capture target set: " + b.name + ". Lock orbit when you arrive.");
+        toast("Claim target set: " + fieldBodyName(b.name) + ". Lock orbit when you arrive.");
       }
       function discoveryBg(b) {
         const r = rarityInfo(b);
@@ -25847,10 +25848,10 @@
       function drawTargetPill(x, y, name, d, color) {
         ctx.save();
         ctx.font = "500 10px Inter, system-ui";
-        let label = name;
+        let label = fieldBodyName(fieldVesselName(name));
         const suffix = " • " + d + " km";
         while (label.length > 4 && ctx.measureText(label + suffix).width > 160)
-          label = label.slice(0, -2).trimEnd() + "…";
+          label = label.replace(/…$/, "").slice(0, -2).trimEnd() + "…";
         const text = label + suffix,
           pad = 9,
           w = Math.min(178, ctx.measureText(text).width + pad * 2),
@@ -25868,7 +25869,7 @@
         ctx.fillStyle = "#e0f2fe";
         ctx.font = "600 10px Inter, system-ui";
         ctx.textAlign = "center";
-        ctx.fillText(betweenDisplayText(text), w / 2, 15.5);
+        ctx.fillText(text, w / 2, 15.5);
         ctx.restore();
       }
       function drawRareSystemAura() {
