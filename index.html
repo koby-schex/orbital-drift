@@ -5417,6 +5417,21 @@
       @media(max-height:650px){.ninefold-seal{width:34px;height:34px;margin-bottom:4px}.title-screen .title-showcase{height:22vh!important;min-height:100px!important}.title-screen .title-sub{margin:5px auto 8px!important}.title-screen .title-logo{font-size:clamp(30px,7vw,46px)!important}}
       @media(prefers-reduced-motion:reduce){.menu,.menu-content-enter,.route-row,.dialog{animation:none!important;transition:none!important}}
 
+    
+      /* Field manual / navigation hierarchy */
+      .menu .nav-context{display:flex;align-items:center;gap:8px;min-width:0;padding:6px 0 10px;border-bottom:1px solid var(--nf-stroke);margin-bottom:10px}
+      .menu .nav-context .nav-path{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+      .menu .nav-home{min-height:36px;padding:6px 10px!important;font-size:12px!important}
+      .menu .guide-card{border-left:3px solid var(--nf-gold)!important}
+      .menu .guide-num{background:#2b2a29!important;color:var(--nf-gold)!important;border:1px solid #60533d!important;box-shadow:none!important}
+      .menu .manual-section{padding:14px!important;line-height:1.55}
+      .menu .manual-section b{color:var(--nf-ivory)!important;font-size:15px!important;margin-bottom:3px}
+      .menu .manual-section span{color:var(--nf-muted)!important}
+      .menu .screen-intro{font-size:14px!important;line-height:1.55;color:var(--nf-muted)!important}
+      .menu .disabled-reason{font-size:12px!important;line-height:1.5;color:var(--nf-muted)!important}
+      .menu .card-body .actions button{min-height:44px}
+      .menu .route-copy{overflow-wrap:anywhere;min-width:0}
+
     </style>
   </head>
   <body>
@@ -5964,7 +5979,7 @@
         Earth:"First Anchorage", Mars:"Redglass Shelf", Jupiter:"Hollow Crown",
         Saturn:"Veilwheel", Uranus:"Glasswake", Neptune:"Stillrift"
       });
-      const BETWEEN_UI_LABELS=Object.freeze({"Orbital Drift":"Between the Nine","Orbital Drift: Sol":"Between the Nine","ODF Pioneer":"Pioneer","Sol System":"First Reach","Sol":"First Reach","Worlds":"Formations","Planets":"Formations","World":"Formation","Planet":"Formation","Planet Codex":"Field Codex","System Atlas":"Crossing Atlas","System":"Reach","Frontier System":"Frontier Reach","Living System":"Living Reach","Cosmic Spirit":"Veil Presence","Parallel System":"Folded Reach","Jump":"Cross","Jump Outward":"Cross Outward","Begin Uncharted Jump":"Open Crossing","Return to Space":"Resume Flight","Capture":"Claim","Captured":"Claimed","Capturable":"Claimable","Capturing Planets":"Claiming Formations","Capture capacity":"Claim capacity","Black Hole":"Collapse Gate","Black Holes":"Collapse Gates","Helium-3":"Anchor Flux","Dark Matter":"Veil Residue","DarkMatter":"Veil Residue","Frigate":"Pioneer","Resources":"Cargo","World upgrades":"Formation upgrades","Planet Upgrades":"Formation upgrades","World status":"Formation status","Unknown World":"Unknown formation","Planet Class":"Formation class","Planetary Survey":"Formation survey","Factory Worlds":"Factory formations","Orbital Concord":"Concord","Captain Log":"Expedition Log","Pilot Manual":"Flight Manual","Starling designs":"Vessel designs","Ship & designs":"Vessel & designs","Ship upgrades":"Vessel upgrades","Ship Class":"Vessel class","Travel & atlas":"Crossings & atlas","Menu Home":"Command","CURRENT SYSTEM":"CURRENT REACH","Quantum Crystal":"Crystal","Protected homeworld":"Protected expedition anchorage","Gas Giant":"Pressure mass","Gas giant":"Pressure mass","Solar systems":"Crossing reaches"});
+      const BETWEEN_UI_LABELS=Object.freeze({"Orbital Drift":"Between the Nine","Orbital Drift: Sol":"Between the Nine","ODF Pioneer":"Pioneer","Sol System":"First Reach","Sol":"First Reach","Worlds":"Formations","Planets":"Formations","World":"Formation","Planet":"Formation","Planet Codex":"Field Codex","System Atlas":"Crossing Atlas","System":"Reach","Frontier System":"Frontier Reach","Living System":"Living Reach","Cosmic Spirit":"Veil Presence","Parallel System":"Folded Reach","Jump":"Cross","Jump Outward":"Cross Outward","Begin Uncharted Jump":"Open Crossing","Return to Space":"Resume Flight","Capture":"Claim","Enter Black Hole":"Enter collapse gate","Scan World":"Scan formation","Unknown world":"Unknown formation","Living Systems":"Living events","Parallel Systems":"Folded reaches","Cosmic Spirit Systems":"Veil reaches","Star Atlas":"Crossing Atlas","Captured":"Claimed","Capturable":"Claimable","Capturing Planets":"Claiming Formations","Capture capacity":"Claim capacity","Black Hole":"Collapse Gate","Black Holes":"Collapse Gates","Helium-3":"Anchor Flux","Dark Matter":"Veil Residue","DarkMatter":"Veil Residue","Frigate":"Pioneer","Resources":"Cargo","World upgrades":"Formation upgrades","Planet Upgrades":"Formation upgrades","World status":"Formation status","Unknown World":"Unknown formation","Planet Class":"Formation class","Planetary Survey":"Formation survey","Factory Worlds":"Factory formations","Orbital Concord":"Concord","Captain Log":"Expedition Log","Pilot Manual":"Flight Manual","Starling designs":"Vessel designs","Ship & designs":"Vessel & designs","Ship upgrades":"Vessel upgrades","Ship Class":"Vessel class","Travel & atlas":"Crossings & atlas","Menu Home":"Command","CURRENT SYSTEM":"CURRENT REACH","Quantum Crystal":"Crystal","Protected homeworld":"Protected expedition anchorage","Gas Giant":"Pressure mass","Gas giant":"Pressure mass","Solar systems":"Crossing reaches"});
       function betweenDisplayText(value) {
         if(typeof value!=="string"||!value)return value;
         const trimmed=value.trim(),exact=Object.prototype.hasOwnProperty.call(BETWEEN_BODY_LABELS,trimmed)?BETWEEN_BODY_LABELS[trimmed]:Object.prototype.hasOwnProperty.call(BETWEEN_UI_LABELS,trimmed)?BETWEEN_UI_LABELS[trimmed]:null;
@@ -5975,7 +5990,7 @@
           [/\bEarth reserve\b/g,"First Anchorage reserve"],[/\bMars distance\b/g,"Redglass Shelf distance"],[/\bMars upgrade\b/g,"Redglass Shelf upgrade"],[/\bVenus distance\b/g,"Violet Furnace distance"],
           [/\b(?:orbit|approach|follow|return to|travel toward|toward|scan|capture|claim|target|refuel at|lock onto|reach|upgrade|replace|survey)\s+(Earth|Mars|Venus|Mercury|Jupiter|Saturn|Uranus|Neptune|Sun)\b/gi,m=>m.replace(/\b(Earth|Mars|Venus|Mercury|Jupiter|Saturn|Uranus|Neptune|Sun)\b/g,k=>BETWEEN_BODY_LABELS[k])],
           [/\b(Earth|Mars|Venus) (captured|scanned|surveyed|claimed)\b/g,(_,k,v)=>BETWEEN_BODY_LABELS[k]+" "+(v==="captured"?"claimed":v)],
-          [/\bCapture (?=[A-Z])/g,"Claim "],[/\bcapture (?=First Anchorage|Redglass Shelf|Violet Furnace|the formation|this formation|this world|an eligible)/g,"claim "],
+          [/\bCapture (?=[A-Z])/g,"Claim "],[/\bContact (Earth|Mars|Venus|Mercury|Jupiter|Saturn|Uranus|Neptune)\b/g,(_,k)=>"Contact "+BETWEEN_BODY_LABELS[k]],[/\bcapture (?=First Anchorage|Redglass Shelf|Violet Furnace|the formation|this formation|this world|an eligible)/g,"claim "],
           [/\bJump Outward\b/g,"Cross Outward"],[/\bPlanet Codex\b/g,"Field Codex"],[/\bSystem Atlas\b/g,"Crossing Atlas"],
           [/\b(?:uncharted|outer|deep) space\b/gi,"the Between"],[/\b(?:solar|star) systems?\b/gi,m=>/s$/i.test(m)?"crossing reaches":"crossing reach"],
           [/\bblack holes?\b/gi,m=>/s$/i.test(m)?"collapse gates":"collapse gate"],[/\bHelium-?3\b/g,"Anchor Flux"],[/\bDark Matter\b/g,"Veil Residue"],
@@ -5986,7 +6001,7 @@
         for(const [pattern,replacement] of phrases)s=s.replace(pattern,replacement);
         return s;
       }
-      function betweenSectorName(value) {return betweenDisplayText(value).replace(/ System$/, " Reach");}
+      function betweenSectorName(value) {return betweenDisplayText(String(value||"Uncharted reach")).replace(/ System$/, " Reach");}
       function betweenTranslateNode(node) {
         if(!node)return;
         if(node.nodeType===3){
@@ -6063,6 +6078,15 @@
         c.save();c.strokeStyle="rgba(218,197,157,.24)";c.lineWidth=Math.max(.45,r*.009);betweenContourPath(c,b,x,y,r);c.stroke();c.restore();
       }
       // END BETWEEN PRESENTATION CONTRACT
+
+      // BEGIN FIELD LANGUAGE
+      const FIELD_FORMATIONS=Object.freeze({"Mercury":{"biome":"Needle shale","lore":"Dark needles of dense mineral material rise from a fractured slab. Strong attraction from Bindlight Knot limits access."},"Venus":{"biome":"Corrosive veil","lore":"Layers of violet mineral film enclose a high-pressure interior. Survey instruments can sample its outer margins."},"Earth":{"biome":"Protected anchorage","lore":"A stable suspended shelf fitted with expedition shelters and a factory. First Anchorage is the starting foothold, not a home world."},"Mars":{"biome":"Redglass terraces","lore":"Iron-rich terraces break into exposed mineral seams. The stable approach makes this a suitable first outpost."},"Jupiter":{"biome":"Pressure crown","lore":"Interlocking dense membranes produce broad pressure bands. The formation supports limited harvesting but cannot support a claim."},"Saturn":{"biome":"Veilwheel strata","lore":"A broad swept ring of loose fragments surrounds the main mass. Safe collection requires careful approach."},"Uranus":{"biome":"Glasswake ridges","lore":"Cold translucent ridges are embedded in an inclined mass. Measurements indicate concentrated material in deep seams."},"Neptune":{"biome":"Stillrift currents","lore":"Dark blue folded layers contain persistent turbulence and inconsistent attraction readings."}});
+      const FIELD_REACHES=Object.freeze({"innerForge":{"name":"Forge Chain","desc":"Heat-scored mineral shelves, exposed seams and abundant structural stock."},"gasFrontier":{"name":"Pressure Reach","desc":"Suspended pressure masses, layered membranes and turbulent currents rich in Anchor Flux."},"crystalReach":{"name":"Crystal Reach","desc":"Intersecting mineral structures and refractive surfaces; rich in crystal and valuable field records."},"bioCluster":{"name":"Living Reach","desc":"Rooted shelves and drifting biological membranes offer useful biological material and settlement potential."},"ancientArchive":{"name":"Archive Reach","desc":"Unidentified constructions, layered inscriptions and persistent local signals. Their makers and ages remain unconfirmed."},"voidRim":{"name":"Quiet Rim","desc":"Sparse formations, weak instrument readings and isolated anomalies. Approach with care."},"parallel":{"name":"Folded Reach","desc":"An unstable local crossing leads to unusual formations. Its return passage cannot be retraced after departure."},"cosmicSpirit":{"name":"Veil Reach","desc":"Luminous membranes and unusual recurring signals. Their deeper nature is unresolved."}});
+      function fieldBodyName(name){return Object.prototype.hasOwnProperty.call(BETWEEN_BODY_LABELS,name)?BETWEEN_BODY_LABELS[name]:String(name??"Unknown formation");}
+      function fieldVesselName(name){return name==="ODF Pioneer"?"Pioneer":String(name||"Pioneer");}
+      function fieldReachProfile(system){const key=system?.specialType||system?.archetype?.key;return system?.isTutorial?{name:"Threshold Anchorage",desc:"A protected expedition foothold in the Between. Complete your flight training here before crossing outward."}:FIELD_REACHES[key]||{name:"Uncharted reach",desc:"Survey nearby formations to establish a reliable field record."};}
+      // END FIELD LANGUAGE
+
 
       // BEGIN BETWEEN ART PROFILES
       // Pure, stable presentation profiles. These do not create traversable geography.
@@ -7782,28 +7806,28 @@
           className: "Riftveil World",
           biome: "Riftveil Anomaly World",
           hazard: "Thin-space rift shear",
-          desc: "A rare world surrounded by thin-space veils. Its horizon appears split into faint duplicate layers.",
+          desc: "A rare formation enclosed by layered veils; its visible edge appears in duplicate.",
         },
         {
           key: "aurora",
           className: "Aurora Crown World",
           biome: "Aurora Crown Anomaly",
           hazard: "Charged aurora turbulence",
-          desc: "A luminous world wearing a shifting aurora crown that bends nearby starlight into soft ribbons.",
+          desc: "A luminous formation with a moving crown of refracted local light.",
         },
         {
           key: "mirrortide",
           className: "Mirror Tide World",
           biome: "Mirror Tide Anomaly",
           hazard: "Reflective gravity tides",
-          desc: "A reflective anomaly world with surface tides that move like liquid glass.",
+          desc: "A reflective mass with shifting glass-like layers.",
         },
         {
           key: "voidbloom",
           className: "Voidbloom World",
           biome: "Voidbloom Anomaly",
           hazard: "Dark-energy bloom field",
-          desc: "A dark-energy bloom pulses beneath the crust, blossoming with strange light as you approach.",
+          desc: "A localized emission pulses beneath the surface; its source is unconfirmed.",
         },
       ];
       const mythicTypes = [
@@ -7812,28 +7836,28 @@
           className: "Paradox World",
           biome: "Paradox Mythic World",
           hazard: "Contradictory mass readings",
-          desc: "A mythic planet where instruments disagree with themselves and gravity folds inward and outward at once.",
+          desc: "A mythic formation displaying incompatible attraction measurements.",
         },
         {
           key: "astralcrown",
           className: "Astral Crown World",
           biome: "Astral Crown Mythic World",
           hazard: "Crown-ring singularity arcs",
-          desc: "A crown of luminous arcs circles the planet like a broken halo.",
+          desc: "A series of luminous arcs surrounds the formation.",
         },
         {
           key: "dreamforge",
           className: "Dreamforge World",
           biome: "Dreamforge Mythic World",
           hazard: "Reality-forged pressure waves",
-          desc: "A mythic world with dreamlike continents and surface patterns that redraw between scans.",
+          desc: "A formation whose surface pattern differs between repeated observations.",
         },
         {
           key: "eventide",
           className: "Eventide Singularity World",
           biome: "Eventide Singularity",
           hazard: "Near-singularity light drag",
-          desc: "A planet wrapped in a dim singularity veil. Light slows around its edge, leaving violet afterimages.",
+          desc: "A dim veil produces persistent violet afterimages near the edge of the formation.",
         },
       ];
       const planetIdentities = {
@@ -8004,8 +8028,8 @@
           key: "forgeheart",
           archetype: "innerForge",
           name: "Forgeheart Lattice",
-          signal: "A rhythmic thermal pulse is moving between the inner worlds without losing energy.",
-          clue: "The pulse is a navigation lattice built to open only when a vessel matches the system's gravity rhythm.",
+          signal: "A rhythmic thermal pulse travels along the exposed seams without measurable decay.",
+          clue: "The timing matches a local attraction pattern. Follow the response recommended by the recorded phase alignment.",
           insightChoice: 0,
           reward: { DataCores: 5, Plasma: 4 },
         },
@@ -8013,8 +8037,8 @@
           key: "stormchoir",
           archetype: "gasFrontier",
           name: "Choir in the Storm",
-          signal: "Several gas giants are repeating the same radio chord through different storms.",
-          clue: "The chord marks a survivable corridor and reveals which response will avoid the strongest pressure wake.",
+          signal: "Several pressure masses repeat an identical harmonic through turbulent currents.",
+          clue: "Changes in the harmonic indicate a relatively stable passage through the strongest pressure wake.",
           insightChoice: 1,
           reward: { DataCores: 5, Helium3: 6 },
         },
@@ -8022,8 +8046,8 @@
           key: "prismmemory",
           archetype: "crystalReach",
           name: "Prism Memory",
-          signal: "Reflected starlight is arriving before the source that produced it.",
-          clue: "The crystals preserve moments rather than light. One encounter response aligns with the memory already stored here.",
+          signal: "Several sensors register reflected light before the corresponding source measurement.",
+          clue: "The recorded phase alignment favors one response. The apparent timing discrepancy remains unexplained.",
           insightChoice: 0,
           reward: { DataCores: 5, Crystal: 6 },
         },
@@ -8031,8 +8055,8 @@
           key: "sleepingbiosphere",
           archetype: "bioCluster",
           name: "The Sleeping Biosphere",
-          signal: "Organic compounds across multiple worlds are breathing in perfect synchronization.",
-          clue: "The system is protecting a dormant migration network. A careful response can wake it without causing harm.",
+          signal: "Separated living membranes contract in synchronized pulses.",
+          clue: "The recorded sequence indicates a less disruptive approach to the gathering.",
           insightChoice: 1,
           reward: { DataCores: 5, BioGel: 5 },
         },
@@ -8040,8 +8064,8 @@
           key: "palimpsest",
           archetype: "ancientArchive",
           name: "Palimpsest Beacon",
-          signal: "A buried transmission keeps rewriting its own origin coordinates.",
-          clue: "The newest coordinates are a warning; the oldest are an invitation. The archive identifies the safer interpretation.",
+          signal: "A buried transmission alternates between two sets of local coordinates.",
+          clue: "Comparing both records suggests that one response avoids the marked hazard; the maker is still unknown.",
           insightChoice: 0,
           reward: { DataCores: 8, Crystal: 3 },
         },
@@ -8049,8 +8073,8 @@
           key: "missingshadow",
           archetype: "voidRim",
           name: "The Missing Shadow",
-          signal: "A region of empty space is blocking stars but registering no mass.",
-          clue: "The darkness is a folded transit wake. Its edges reveal the only response that will not destabilize the fold.",
+          signal: "A low-signal region obscures distant light but produces no consistent mass reading.",
+          clue: "Measured edge disturbances identify a less destabilizing response. The nature of the region remains uncertain.",
           insightChoice: 2,
           reward: { DataCores: 6, DarkMatter: 1 },
         },
@@ -8058,8 +8082,8 @@
           key: "pilgrimlight",
           archetype: "cosmicSpirit",
           name: "Pilgrim Light",
-          signal: "A pale light is circling the system without casting a shadow.",
-          clue: "The light is following Starling's future path and brightens around a single compassionate response.",
+          signal: "A pale luminous structure follows a recurring path without a consistent shadow.",
+          clue: "The signal strengthens during the recorded low-disturbance response. Its intent, if any, cannot be determined.",
           insightChoice: 1,
           reward: { DataCores: 8, Crystal: 8 },
         },
@@ -8067,8 +8091,8 @@
           key: "counterwake",
           archetype: "parallel",
           name: "Counterfactual Wake",
-          signal: "Sensors are receiving Starling's engine signature from several impossible positions at once.",
-          clue: "Only one signature belongs to this universe. Following it prevents the breach from copying your next decision.",
+          signal: "Instruments register the Starling's signature at incompatible local positions.",
+          clue: "One reading matches the expedition's last verified route. Follow the corresponding response without assuming another universe.",
           insightChoice: 2,
           reward: { DataCores: 10, DarkMatter: 2 },
         },
@@ -8186,53 +8210,53 @@
         ],
         vaultCatalog = [
           ...BETWEEN_NATIVE_RECORDS,
-          { key: "ember-reliquary", name: "Ember Reliquary", kind: "artifact", source: "planet", families: ["innerForge"], threat: 2, rarity: "Unusual", colors: ["#fb923c", "#fde68a"], visual: "reliquary", entry: "A heat-blackened casket whose inner rings remain aligned with a star that no longer exists. It warms whenever the Pioneer changes course." },
+          { key: "ember-reliquary", name: "Ember Reliquary", kind: "artifact", source: "planet", families: ["innerForge"], threat: 2, rarity: "Unusual", colors: ["#fb923c", "#fde68a"], visual: "reliquary", entry: "A heat-blackened casket whose inner rings remain aligned with an unlocated reference point. It warms whenever the Pioneer changes course." },
           { key: "foundry-heart", name: "Foundry Heart", kind: "artifact", source: "space", families: ["innerForge"], threat: 4, rarity: "Rare", colors: ["#ef4444", "#fbbf24"], visual: "core", entry: "A self-heating alloy engine recovered between worlds. Its chambers forge microscopic tools, then dismantle them before anyone can learn their purpose." },
           { key: "cinder-mite", name: "Cinder Mite Colony", kind: "lifeform", source: "planet", families: ["innerForge"], threat: 3, rarity: "Rare", colors: ["#f97316", "#fef3c7"], visual: "swarm", entry: "Silicate organisms that swim through molten metal. The colony arranges itself into tiny constellations when exposed to engine vibration." },
           { key: "storm-ray", name: "Storm Ray", kind: "lifeform", source: "space", families: ["gasFrontier"], threat: 2, rarity: "Unusual", colors: ["#38bdf8", "#e0f2fe"], visual: "wing", entry: "A translucent drifter that rides charged magnetospheres. Its fins flash with the weather pattern of the world where it was born." },
           { key: "thunder-pearl", name: "Thunder Pearl", kind: "artifact", source: "planet", families: ["gasFrontier"], threat: 3, rarity: "Rare", colors: ["#818cf8", "#f0abfc"], visual: "orb", entry: "A pressure-grown sphere holding a continuous lightning storm. The discharge repeats a navigational warning every eleven minutes." },
-          { key: "choir-eel", name: "Choir Eel", kind: "lifeform", source: "planet", families: ["gasFrontier"], threat: 4, rarity: "Rare", colors: ["#22d3ee", "#c4b5fd"], visual: "serpent", entry: "A ribbon-bodied organism from a gas giant's upper atmosphere. It answers radio signals with chords too precise to be instinctive." },
+          { key: "choir-eel", name: "Choir Eel", kind: "lifeform", source: "planet", families: ["gasFrontier"], threat: 4, rarity: "Rare", colors: ["#22d3ee", "#c4b5fd"], visual: "serpent", entry: "A ribbon-bodied organism from a pressure mass's outer membrane. It answers radio signals with chords too precise to be instinctive." },
           { key: "mnemonic-shard", name: "Mnemonic Shard", kind: "artifact", source: "planet", families: ["crystalReach"], threat: 2, rarity: "Unusual", colors: ["#a78bfa", "#67e8f9"], visual: "crystal", entry: "A crystal that replays the last shadow cast across it. Older layers contain silhouettes belonging to no known species." },
-          { key: "prism-beetle", name: "Prism Beetle", kind: "lifeform", source: "planet", families: ["crystalReach"], threat: 1, rarity: "Unusual", colors: ["#f0abfc", "#bae6fd"], visual: "beetle", entry: "A gentle mineral grazer with a shell that splits starlight into moving maps. It sleeps facing the nearest uncharted system." },
+          { key: "prism-beetle", name: "Prism Beetle", kind: "lifeform", source: "planet", families: ["crystalReach"], threat: 1, rarity: "Unusual", colors: ["#f0abfc", "#bae6fd"], visual: "beetle", entry: "A gentle mineral grazer with a shell that splits local light into moving maps. It sleeps facing the nearest uncharted system." },
           { key: "refraction-ghost", name: "Refraction Ghost", kind: "phenomenon", source: "space", families: ["crystalReach"], threat: 5, rarity: "Exotic", colors: ["#c084fc", "#ffffff"], visual: "halo", entry: "A contained knot of light that arrives a fraction before its own reflection. Vault instruments record two incompatible positions at once." },
-          { key: "spore-cathedral", name: "Spore Cathedral", kind: "lifeform", source: "planet", families: ["bioCluster"], threat: 3, rarity: "Rare", colors: ["#4ade80", "#fde68a"], visual: "bloom", entry: "A dormant fungal city folded into a seed-sized lattice. Under moonlight, its towers briefly unfold and broadcast a scent-based history." },
-          { key: "orbiting-kelp", name: "Orbital Kelp", kind: "lifeform", source: "space", families: ["bioCluster"], threat: 2, rarity: "Unusual", colors: ["#2dd4bf", "#bbf7d0"], visual: "tendrils", entry: "Vacuum flora that grows along magnetic field lines. Its fronds point toward nearby life long before the scanners do." },
+          { key: "spore-cathedral", name: "Spore Cathedral", kind: "lifeform", source: "planet", families: ["bioCluster"], threat: 3, rarity: "Rare", colors: ["#4ade80", "#fde68a"], visual: "bloom", entry: "A dormant fungal city folded into a seed-sized lattice. under low illumination, its towers briefly unfold and broadcast a scent-based history." },
+          { key: "orbiting-kelp", name: "Orbital Kelp", kind: "lifeform", source: "space", families: ["bioCluster"], threat: 2, rarity: "Unusual", colors: ["#2dd4bf", "#bbf7d0"], visual: "tendrils", entry: "Suspended flora that grows along magnetic field lines. Its fronds point toward nearby life long before the scanners do." },
           { key: "genesis-pod", name: "Genesis Pod", kind: "artifact", source: "planet", families: ["bioCluster"], threat: 5, rarity: "Exotic", colors: ["#84cc16", "#fef08a"], visual: "pod", entry: "An engineered seed vault with room for an entire lost biosphere. Something inside is patiently adapting to the containment field." },
-          { key: "witness-coin", name: "Witness Coin", kind: "artifact", source: "planet", families: ["ancientArchive"], threat: 1, rarity: "Unusual", colors: ["#d6b36a", "#fff7d6"], visual: "disc", entry: "A ceremonial disc engraved on both sides with the same night sky, separated by twelve thousand years." },
+          { key: "witness-coin", name: "Witness Coin", kind: "artifact", source: "planet", families: ["ancientArchive"], threat: 1, rarity: "Unusual", colors: ["#d6b36a", "#fff7d6"], visual: "disc", entry: "A ceremonial disc engraved on both sides with two near-identical local patterns of uncertain age." },
           { key: "cartographer-sarcophagus", name: "Cartographer Sarcophagus", kind: "artifact", source: "space", families: ["ancientArchive"], threat: 4, rarity: "Rare", colors: ["#b45309", "#fde68a"], visual: "reliquary", entry: "A sealed navigation cradle whose occupant mapped routes by dreaming. The lid now draws new lines toward every system the Pioneer visits." },
           { key: "archive-moth", name: "Archive Moth", kind: "lifeform", source: "planet", families: ["ancientArchive"], threat: 2, rarity: "Rare", colors: ["#eab308", "#fef9c3"], visual: "wing", entry: "Its metallic wings carry microscopic text. Each generation adds a chapter, turning the species into a living library." },
           { key: "absence-glass", name: "Absence Glass", kind: "artifact", source: "planet", families: ["voidRim"], threat: 4, rarity: "Rare", colors: ["#334155", "#38bdf8"], visual: "crystal", entry: "A pane cut from material that refuses to reflect its surroundings. Looking through it reveals stars that sensors cannot confirm." },
           { key: "void-mimic", name: "Void Mimic", kind: "lifeform", source: "space", families: ["voidRim"], threat: 5, rarity: "Exotic", colors: ["#020617", "#22d3ee"], visual: "tendrils", entry: "A lightless organism that imitates the outline of nearby vessels. It has begun copying the Pioneer from memory rather than sight." },
           { key: "gravity-knot", name: "Gravity Knot", kind: "phenomenon", source: "space", families: ["voidRim"], threat: 6, rarity: "Mythic", colors: ["#111827", "#a78bfa"], visual: "halo", entry: "A pinched loop of spacetime held in a counter-rotating cage. Objects placed near it briefly remember falling in another direction." },
-          { key: "pilgrim-moth", name: "Pilgrim Lightwing", kind: "lifeform", source: "space", families: ["cosmicSpirit"], threat: 2, rarity: "Rare", colors: ["#d9f99d", "#fef9c3"], visual: "wing", entry: "A luminous traveler that follows acts of mercy across interstellar distances. Its wingbeats leave no measurable force, only warmth." },
-          { key: "mercy-seed", name: "Mercy Seed", kind: "artifact", source: "planet", families: ["cosmicSpirit"], threat: 3, rarity: "Exotic", colors: ["#bbf7d0", "#ffffff"], visual: "bloom", entry: "A pearl-white seed found at the center of a barren world. It germinates only while two strangers choose to trust each other." },
+          { key: "pilgrim-moth", name: "Pilgrim Lightwing", kind: "lifeform", source: "space", families: ["cosmicSpirit"], threat: 2, rarity: "Rare", colors: ["#d9f99d", "#fef9c3"], visual: "wing", entry: "A luminous traveler observed near rescue routes across distant reaches. Its movements coincide with warmth but no measurable propulsive force." },
+          { key: "mercy-seed", name: "Mercy Seed", kind: "artifact", source: "planet", families: ["cosmicSpirit"], threat: 3, rarity: "Exotic", colors: ["#bbf7d0", "#ffffff"], visual: "bloom", entry: "A pearl-white seed found at the center of a barren world. It germinated during two recorded exchanges; a causal relationship is unconfirmed." },
           { key: "memory-tide", name: "Memory Tide", kind: "phenomenon", source: "space", families: ["cosmicSpirit"], threat: 5, rarity: "Mythic", colors: ["#a7f3d0", "#fbcfe8"], visual: "halo", entry: "A slow wave of borrowed recollection. The vault hears distant homecomings whenever it passes through the containment rings." },
           { key: "inverted-astrolabe", name: "Inverted Astrolabe", kind: "artifact", source: "planet", families: ["parallel"], threat: 5, rarity: "Exotic", colors: ["#f472b6", "#22d3ee"], visual: "disc", entry: "A navigation instrument that points to places the Pioneer chose not to visit. Its needles move whenever a decision becomes irreversible." },
-          { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism repeating the Starling’s flight telemetry before the sensors transmit it. Its behavior suggests a history that diverged from our own." },
-          { key: "causality-lace", name: "Causality Lace", kind: "phenomenon", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#c084fc", "#fef08a"], visual: "swarm", entry: "Threads of probability braided into a stable specimen. Every strand records a different outcome for the same discovery." },
+          { key: "counterself", name: "Counterself Chrysalis", kind: "lifeform", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#e879f9", "#67e8f9"], visual: "pod", entry: "A sealed organism repeating the Starling’s flight telemetry before the sensors transmit it. Its behavior suggests an unexplained relationship between the readings." },
+          { key: "causality-lace", name: "Causality Lace", kind: "phenomenon", source: "space", families: ["parallel"], threat: 6, rarity: "Mythic", colors: ["#c084fc", "#fef08a"], visual: "swarm", entry: "Threads of probability braided into a stable specimen. Every strand presents a conflicting measurement of the same observation." },
           {"key":"slag-lantern","name":"Slag Lantern","kind":"artifact","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"lantern","entry":"A ceramic lantern recovered beneath a cooled lava flow. Its flame consumes no measurable oxygen, and the vessel remains cool to the touch.","perk":"production"},
           {"key":"iron-orchid","name":"Iron Orchid","kind":"lifeform","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"bloom","entry":"Thin metallic petals unfold in a magnetic field. The root structure retains the alternating polarity of its native world's buried ore seams.","perk":"survey"},
           {"key":"solar-spindle","name":"Solar Spindle","kind":"artifact","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#fb923c","#fde68a"],"visual":"spindle","entry":"A filament of apparent stellar plasma suspended in a clear spindle. The containment team has recorded no measurable heat loss since recovery.","perk":"fuel"},
           {"key":"plasma-nest","name":"Plasma Nest","kind":"phenomenon","source":"space","families":["innerForge"],"threat":4,"rarity":"Exotic","colors":["#fb923c","#fde68a"],"visual":"swarm","entry":"A cluster of magnetic vortices recovered from a stellar wake. Individual loops exchange charge without touching, maintaining a stable arrangement that resembles a nesting colony.","perk":"production"},
           {"key":"aether-shell","name":"Aether Shell","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"shell","entry":"A translucent shell containing a miniature atmospheric circulation. Clouds form along its inner ridges and collapse into droplets that never leave the enclosure.","perk":"survey"},
           {"key":"cloud-larva","name":"Cloud Larva","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"serpent","entry":"A translucent organism that feeds on electrical gradients in the cloud layers. Its body contracts in anticipation of nearby discharges.","perk":"production"},
-          {"key":"cyclone-needle","name":"Cyclone Needle","kind":"artifact","source":"space","families":["gasFrontier"],"threat":2,"rarity":"Rare","colors":["#60a5fa","#c4b5fd"],"visual":"spindle","entry":"A slender instrument recovered from a derelict drifting above a gas giant. Its needle aligns with the deepest pressure front rather than the local magnetic field.","perk":"fuel"},
+          {"key":"cyclone-needle","name":"Cyclone Needle","kind":"artifact","source":"space","families":["gasFrontier"],"threat":2,"rarity":"Rare","colors":["#60a5fa","#c4b5fd"],"visual":"spindle","entry":"A slender instrument recovered from a derelict drifting above a pressure mass. Its needle aligns with the deepest pressure front rather than the local magnetic field.","perk":"fuel"},
           {"key":"storm-crown","name":"Storm Crown","kind":"phenomenon","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#60a5fa","#c4b5fd"],"visual":"crown","entry":"A ring of self-sustaining electrical arcs. Each discharge follows the previous one through empty space, even with the containment chamber isolated from external power.","perk":"fuel"},
-          {"key":"opal-eye","name":"Opal Eye","kind":"artifact","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"orb","entry":"A polished lens that separates distant stellar light into extraordinarily fine spectral bands. Minute fractures suggest it was part of a much larger observation instrument.","perk":"survey"},
+          {"key":"opal-eye","name":"Opal Eye","kind":"artifact","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"orb","entry":"A polished lens that separates distant local light into extraordinarily fine spectral bands. Minute fractures suggest it was part of a much larger observation instrument.","perk":"survey"},
           {"key":"glass-fern","name":"Glass Fern","kind":"lifeform","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"fern","entry":"A branching mineral organism whose delicate leaves bend when local gravity shifts. Growth rings preserve a record of tidal stresses from its native world.","perk":"production"},
           {"key":"prismatic-keel","name":"Prismatic Keel","kind":"artifact","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#c084fc","#67e8f9"],"visual":"crystal","entry":"A fragment of a vessel's crystalline load-bearing lattice. Internal layers distribute stress through shifting bands of color instead of conventional joints.","perk":"survey"},
           {"key":"spectrum-anvil","name":"Spectrum Anvil","kind":"phenomenon","source":"space","families":["crystalReach"],"threat":4,"rarity":"Exotic","colors":["#c084fc","#67e8f9"],"visual":"crown","entry":"Seven polarized beams intersect within a stationary volume of vacuum. The resulting interference pattern refuses to disperse when individual beams are obstructed.","perk":"production"},
           {"key":"seed-compass","name":"Seed Compass","kind":"artifact","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"disc","entry":"A fibrous instrument containing living rootlets. Its central growth turns toward environments with favorable biological conditions, even through the hull of a survey craft.","perk":"survey"},
           {"key":"amber-colony","name":"Amber Colony","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"swarm","entry":"A living microbial community sealed inside ancient resin. Microscopic channels appear to redirect nutrients between individual colonies.","perk":"production"},
-          {"key":"lantern-jelly","name":"Lantern Jelly","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#4ade80","#fef08a"],"visual":"jelly","entry":"A vacuum-adapted swimmer that emits synchronized pulses from translucent chambers. Its rhythmic changes appear to announce nearby organisms to the rest of its kind.","perk":"fuel"},
+          {"key":"lantern-jelly","name":"Lantern Jelly","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#4ade80","#fef08a"],"visual":"jelly","entry":"A drifting membrane organism that emits synchronized pulses from translucent chambers. Its rhythmic changes appear to announce nearby organisms to the rest of its kind.","perk":"fuel"},
           {"key":"living-keystone","name":"Living Keystone","kind":"artifact","source":"space","families":["bioCluster"],"threat":4,"rarity":"Exotic","colors":["#4ade80","#fef08a"],"visual":"reliquary","entry":"An organic structural component recovered from drifting ruins. Fresh growth repeatedly extends toward an absent neighboring segment, as if attempting to restore its original span.","perk":"production"},
           {"key":"oath-tablet","name":"Oath Tablet","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"tablet","entry":"A weathered record inscribed in an extinct alphabet. Repeating symbols suggest a formal agreement, although the parties named in it have yet to be identified.","perk":"survey"},
           {"key":"archive-scarab","name":"Archive Scarab","kind":"lifeform","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"beetle","entry":"A mechanical organism that repairs damaged inscriptions with microscopic tools. It continues its work even after the material is moved far from the original ruin.","perk":"survey"},
           {"key":"silent-key","name":"Silent Key","kind":"artifact","source":"space","families":["ancientArchive"],"threat":2,"rarity":"Rare","colors":["#d6b36a","#e2e8f0"],"visual":"key","entry":"A rotating assembly with no recognizable teeth or circuitry. It periodically locks into a precise alignment, presumably matching a door that has not yet been located.","perk":"fuel"},
-          {"key":"epoch-dial","name":"Epoch Dial","kind":"artifact","source":"space","families":["ancientArchive"],"threat":4,"rarity":"Exotic","colors":["#d6b36a","#e2e8f0"],"visual":"disc","entry":"A finely layered instrument that responds to variations in stellar spectra. The crew suspects its concentric scales were used to measure the passage of stellar lifetimes.","perk":"production"},
+          {"key":"epoch-dial","name":"Epoch Dial","kind":"artifact","source":"space","families":["ancientArchive"],"threat":4,"rarity":"Exotic","colors":["#d6b36a","#e2e8f0"],"visual":"disc","entry":"A finely layered instrument that responds to variations in local emission spectra. The crew suspects its concentric scales were used to measure the passage of long observation intervals.","perk":"production"},
           {"key":"null-pebble","name":"Null Pebble","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"crystal","entry":"A rough stone with no detectable thermal signature. Heat applied to its surface disappears from the instruments without producing any measurable external radiation.","perk":"fuel"},
           {"key":"echo-compass","name":"Echo Compass","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"key","entry":"A compact compass recovered near a gravitational wake. Its pointer follows the residual path of a passing vessel rather than the nearest massive body.","perk":"fleet"},
-          {"key":"night-fin","name":"Night Fin","kind":"lifeform","source":"space","families":["voidRim"],"threat":2,"rarity":"Rare","colors":["#64748b","#67e8f9"],"visual":"wing","entry":"A vacuum swimmer visible only through the starlight displaced along its narrow fins. It changes direction without any detectable propulsive discharge.","perk":"survey"},
+          {"key":"night-fin","name":"Night Fin","kind":"lifeform","source":"space","families":["voidRim"],"threat":2,"rarity":"Rare","colors":["#64748b","#67e8f9"],"visual":"wing","entry":"A drifting organism visible only through the local light displaced along its narrow fins. It changes direction without any detectable propulsive discharge.","perk":"survey"},
           {"key":"impossible-room","name":"Impossible Room","kind":"phenomenon","source":"space","families":["voidRim"],"threat":6,"rarity":"Mythic","colors":["#64748b","#67e8f9"],"visual":"cube","entry":"A sealed chamber with an interior volume greater than its external dimensions. Controlled reactor tests indicate that the anomaly can store otherwise wasted energy.","perk":"fuel"},
           {"key":"mercy-lantern","name":"Mercy Lantern","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"lantern","entry":"A beacon recovered from an abandoned shelter. It remains dark during routine transmissions but responds to distress calls with a slow, warm pulse.","perk":"fuel"},
           {"key":"dawn-pearl","name":"Dawn Pearl","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A pearlescent sphere whose interior light shifts through the colors of sunrise. Spectral analysis suggests the same stellar horizon is repeating inside it.","perk":"survey"},
@@ -8910,104 +8934,102 @@
         reward,
       }));
       const tutorials = [
-        [
-          "Welcome to Orbital Drift",
-          "You entered the Between through a crossing near the Fractured Meridian. This is not a sky above any world. Learn to ride the attractions of this place; First Anchorage is secured, and your first destination is Redglass Shelf.",
-        ],
-        [
-          "Orbit Lock",
-          "Approach a planet and use LOCK. Hold THRUST while locked to build momentum without fuel. BRAKE reduces orbital speed; RELEASE launches you along your orbit.",
-        ],
-        [
-          "Context Actions",
-          "Important flight actions appear on screen only when they are available: Capture, Refuel, Harvest Echo, or Recover.",
-        ],
-        [
-          "Orbital Echoes",
-          "Good routes become Echoes. Follow them for assist, harvest particles, and decode relics.",
-        ],
-        [
-          "No Harsh Game Over",
-          "Running out of fuel triggers rescue and recovery instead of forcing a restart.",
-        ],
-      ];
+  [
+    "Welcome to the Between",
+    "You crossed near the Fractured Meridian, World Five. The formations here are not the Nine Worlds. First Anchorage is a protected expedition site; Redglass Shelf is your first destination."
+  ],
+  [
+    "Orbit and release",
+    "Approach a formation and tap LOCK. Hold THRUST to build momentum without fuel. BRAKE slows your orbit. RELEASE launches you along the direction of travel."
+  ],
+  [
+    "Available actions",
+    "Scan, Claim, Refuel, Harvest Echo and Recover appear when their requirements are met. Read the action before tapping."
+  ],
+  [
+    "Orbital Echoes",
+    "Precise passages leave a route record called an Orbital Echo. Follow it for assistance or recover its wake for supplies."
+  ],
+  [
+    "Recovery",
+    "Running out of fuel does not end your expedition. Recovery can return you to safety; once built, the Pioneer can respond to distress."
+  ]
+];
       const onboardingSteps = [
-        [
-          "Welcome, Pilot",
-          "Your vessel has already passed through a crossing near World Five. You are in the Between, not above a world. Aim with the joystick; hold THRUST. You start safely orbiting Earth. Hold THRUST while locked to build speed for free, then tap RELEASE toward Mars.",
-        ],
-        [
-          "Orbit, Then Act",
-          "Follow the target marker. Use BRAKE near Mars, tap LOCK when available, then use Scan and Capture. A full RELEASE meter gives the strongest slingshot.",
-        ],
-        [
-          "Build Your Network",
-          "Captured planets support your expedition over time. Gather their output and develop worlds from the Command Menu.",
-        ],
-        [
-          "Strengthen the Starling",
-          "The Upgrade Center shows your ship systems, hull progress, required resources, and the benefit of every improvement.",
-        ],
-        [
-          "Explore Beyond Sol",
-          "Build the ODF Pioneer, jump beyond Sol, scan unknown signals, and preserve your discoveries in the Codex.",
-        ],
-      ];
+  [
+    "The Between",
+    "Your vessel has already passed through a crossing near World Five. You are in the Between, not above a world. You begin safely locked to First Anchorage."
+  ],
+  [
+    "Depart First Anchorage",
+    "Hold THRUST to build orbital momentum without fuel. Release toward the Redglass Shelf marker. Steer with the joystick; BRAKE before approaching the formation."
+  ],
+  [
+    "Survey and claim",
+    "Tap LOCK when available, then Scan. Once a survey is complete, use Claim on eligible uninhabited formations. Independent inhabited sites remain protected."
+  ],
+  [
+    "Support your expedition",
+    "Claimed formations produce materials. Open Menu → Cargo to gather them. Vessel & designs contains your vessel and formation upgrades."
+  ],
+  [
+    "The Pioneer",
+    "Complete training to build your mobile base. Lock to the Pioneer and use Cross Outward to visit an uncharted reach. Your discoveries will be recorded in the Field Codex and Vault."
+  ]
+];
       const tutorialObjectives = [
-        {
-          title: "First Orbit",
-          action: "Capture Mars",
-          text: "Hold THRUST at Earth to charge your slingshot. Tap RELEASE when aimed toward Mars, follow its marker, then BRAKE, LOCK, Scan and Capture.",
-          menu: "planets",
-          target: "Mars",
-        },
-        {
-          title: "Flight Systems",
-          action: "Upgrade the Starling",
-          text: "Follow the Earth marker and lock orbit. Open Menu → Upgrade Center → Ship Systems. Pick an affordable upgrade; Earth is your first factory.",
-          menu: "upgrades",
-          target: "Earth",
-        },
-        {
-          title: "Working Outpost",
-          action: "Develop Mars",
-          text: "Return to Mars, lock orbit, then open Upgrade Center → Planet Upgrades and raise Mars to Level 2. Collect cargo in Resources if needed.",
-          menu: "upgrades",
-          target: "Mars",
-        },
-        {
-          title: "Deep Scan",
-          action: "Survey Venus",
-          text: "Target Venus and approach until Scan Venus appears in the lower-right. Tap it. Capture is optional; your goal is the survey.",
-          menu: "planets",
-          target: "Venus",
-        },
-        {
-          title: "Fleet Foundation",
-          action: "Build the ODF Pioneer",
-          text: "Return to Earth and lock orbit, then open Menu → Pioneer Project → Build ODF Pioneer. Earth supplies the tutorial construction reserve.",
-          menu: "frigate",
-          target: "Earth",
-        },
-        {
-          title: "Pioneer Rendezvous",
-          action: "Dock with the Pioneer",
-          text: "Target the frigate, fly close, and LOCK into orbit around it.",
-          menu: "frigate",
-          target: "__FRIGATE__",
-        },
-        {
-          title: "First Expedition",
-          action: "Jump to a new system",
-          text: "While orbiting the Pioneer, use the on-screen Jump Outward action.",
-          menu: "frigate",
-          target: "__FRIGATE__",
-        },
-      ];
+  {
+    "title": "First passage",
+    "action": "Claim Redglass Shelf",
+    "text": "Hold THRUST while locked to First Anchorage to build momentum without using fuel. Aim your departure toward Redglass Shelf and tap RELEASE. Follow the marker, BRAKE, then LOCK. Scan the formation before claiming it.",
+    "menu": "planets",
+    "target": "Mars"
+  },
+  {
+    "title": "Vessel systems",
+    "action": "Upgrade the Starling",
+    "text": "Return to First Anchorage and tap LOCK. Open Menu → Vessel & designs → Vessel upgrades. Choose an affordable improvement at the factory.",
+    "menu": "upgrades",
+    "target": "Earth"
+  },
+  {
+    "title": "Working outpost",
+    "action": "Develop Redglass Shelf",
+    "text": "Return to Redglass Shelf and lock orbit. Open Menu → Vessel & designs → Formation upgrades. Raise Redglass Shelf to level 2. Gather settlement output in Cargo if needed.",
+    "menu": "upgrades",
+    "target": "Mars"
+  },
+  {
+    "title": "Field observation",
+    "action": "Survey Violet Furnace",
+    "text": "Follow the Violet Furnace marker. When the Scan action appears, tap it to record the formation. You do not need to claim this site.",
+    "menu": "planets",
+    "target": "Venus"
+  },
+  {
+    "title": "Expedition foundation",
+    "action": "Build the Pioneer",
+    "text": "Return to First Anchorage and lock orbit. Open Menu → Pioneer project and build the Pioneer. Your training reserve covers construction.",
+    "menu": "frigate",
+    "target": "Earth"
+  },
+  {
+    "title": "Rendezvous",
+    "action": "Dock with the Pioneer",
+    "text": "Follow the Pioneer marker, approach slowly and tap LOCK. You are ready to cross when your vessel is orbiting the Pioneer.",
+    "menu": "frigate",
+    "target": "__FRIGATE__"
+  },
+  {
+    "title": "Beyond First Reach",
+    "action": "Open your first crossing",
+    "text": "While locked to the Pioneer, tap Cross Outward. Your next reach is unexplored.",
+    "menu": "frigate",
+    "target": "__FRIGATE__"
+  }
+];
       function tutorialObjective(stage = game.missionStage || 0) {
-        return tutorialObjectives[
-          clamp(Math.floor(stage), 0, tutorialObjectives.length - 1)
-        ];
+        return tutorialObjectives[clamp(Math.floor(stage),0,tutorialObjectives.length-1)];
       }
       const badWords = [
         "fuck",
@@ -9948,41 +9970,29 @@
       }
       function planetClass(b) {
         if (!b) return "Unknown";
-        if (b.type === "star") return "Stellar Primary";
-        const a = anomalyType(b);
-        if (a) return a.className;
-        if (!b.capturable) return "Restricted Survey Body";
-        if (b.factory) return "Factory World";
-        if (b.resource === "DarkMatter") return "Anomaly World";
-        if (b.atmosphere) return "Atmospheric Planet";
-        return "Frontier Planet";
+        if (b.type === "star") return "Gravity anchor";
+        const a=anomalyType(b);if(a)return a.className.replace(/ World$/," formation");
+        if(!b.capturable)return "Protected / survey only";
+        if(b.factory)return "Factory formation";
+        if(b.resource==="DarkMatter")return "Anomalous formation";
+        return b.atmosphere?"Pressure formation":"Frontier formation";
       }
       function anomalyDesc(b) {
-        const a = anomalyType(b);
-        return a ? a.desc : "";
+        const a=anomalyType(b);return a?a.desc:"";
       }
       function displayBiome(b) {
-        const a = anomalyType(b);
-        return a ? a.biome : b?.biome || "Unknown World";
+        if(!b)return "Unknown formation";
+        if(FIELD_FORMATIONS[b.name])return FIELD_FORMATIONS[b.name].biome;
+        const a=anomalyType(b);return a?a.biome.replace(/ World$/," formation"):inferBiome(b.name,b.resource,b.atmosphere);
       }
-      function inferBiome(n, r, atm) {
-        if (n === "Mercury") return "Cratered Inner Rock";
-        if (n === "Venus") return "Sulfur Cloud Furnace";
-        if (n === "Earth") return "Habitable Ocean World";
-        if (n === "Mars") return "Iron Desert";
-        if (n === "Jupiter") return "Striped Gas Giant";
-        if (n === "Saturn") return "Ringed Gas Giant";
-        if (n === "Uranus") return "Tilted Ice Giant";
-        if (n === "Neptune") return "Deep Blue Storm Giant";
-        if (r === "Crystal")
-          return atm ? "Crystal Cloud Belt" : "Crystal Highlands";
-        if (r === "Helium3") return "Gas-Rich Outer World";
-        if (r === "BioGel") return "Organic Frontier";
-        if (r === "DarkMatter") return "Anomalous Deep-Space World";
-        if (r === "Titanium") return "Titanium Ridge World";
-        if (r === "Plasma") return "Volcanic Plasma World";
-        if (r === "DataCores") return "Ancient Signal World";
-        return atm ? "Storm Atmosphere" : "Rocky Mineral World";
+      function inferBiome(n,r,atm){
+        if(FIELD_FORMATIONS[n])return FIELD_FORMATIONS[n].biome;
+        return ({Crystal:atm?"Refractive membrane":"Crystal ridges",Helium3:"Flux-bearing folds",BioGel:"Living shelf",DarkMatter:"Low-signal anomaly",Titanium:"Dense mineral ridges",Plasma:"Thermal fissures",DataCores:"Signal-bearing structure"})[r]||(atm?"Turbulent pressure layers":"Fractured mineral shelf");
+      }
+      function fieldObservation(b){
+        if(!b)return "No observation recorded.";
+        const local=lore(b.name,b.resource,b.atmosphere,b.pattern),feature=b.frontierFeature?frontierFeatureDescription(b):"";
+        return [anomalyDesc(b)||local,feature].filter(Boolean).join(" ");
       }
       function inferHazard(r, atm, m) {
         if (r === "DarkMatter") return "Gravitational distortion";
@@ -9993,36 +10003,23 @@
         if (m > 40000) return "Extreme gravity";
         return atm ? "Electrical weather" : "Low surface stability";
       }
-      function lore(n, r, atm, p) {
-        if (n === "Earth")
-          return "Homeworld command, protected oceans, cloud systems, and the first orbital factory network.";
-        if (n === "Mars")
-          return "Rust-red frontier world with exposed mineral basins and stable low-orbit lanes.";
-        if (n === "Venus")
-          return "A bright toxic world wrapped in yellow cloud decks and crushing atmospheric pressure.";
-        if (n === "Jupiter")
-          return "Massive striped gas giant. Too unstable to claim, but valuable for orbital harvesting.";
-        if (n === "Saturn")
-          return "Ringed giant surrounded by icy debris bands and hazardous harvest routes.";
-        if (n === "Uranus")
-          return "Cold cyan ice giant with unusual tilt and high-value deep atmospheric compounds.";
-        if (n === "Neptune")
-          return "Deep blue outer giant with dark storms and anomalous gravitational readings.";
+      function lore(n,r,atm,p){
+        if(FIELD_FORMATIONS[n])return FIELD_FORMATIONS[n].lore;
         const terrain={
-          bands:["Long belts wrap the visible hemisphere.","Broad parallel bands mark the planet's circulation."],
-          continents:["Distinct landmasses interrupt the surface.","Wide regional boundaries are visible from orbit."],
-          craters:["Overlapping impact basins scar the visible surface.","Older craters lie beneath more recent impact marks."],
-          lava:["Bright fissures divide dark surface regions.","Thermal scans reveal extensive heated channels."],
-          crystal:["Reflective formations scatter light across the surface.","Angular mineral structures dominate the visible terrain."],
-          storm:["Large rotating disturbances dominate orbital imagery.","Irregular bands trace the world's turbulent regions."],
-          rings:["A broad debris ring surrounds the world.","Orbital debris casts shifting shadows across the world."],
-          glow:["Luminous regions remain visible on the night side.","Unusual emissions trace the visible surface."],
-          star:["A stellar body anchors the local orbital network."]
-        }[p]||["Surface readings vary considerably across the visible hemisphere."];
-        const choice=terrain[(Array.from(String(n)).reduce((sum,ch)=>sum+ch.charCodeAt(0),0))%terrain.length];
-        if(p==="star")return choice;
-        return choice+" "+(atm?"Spectral readings through the atmosphere":"Exposed-surface readings")+" indicate "+label(r)+" deposits.";
+          bands:["Layered ribbons follow the curvature of the mass.","Parallel seams reveal opposing local currents."],
+          continents:["Suspended terraces overlap in an irregular stack.","Distinct shelves interrupt the surface."],
+          craters:["Deep depressions expose successive mineral strata.","Overlapping basins scar the visible mass."],
+          lava:["Bright thermal seams divide dark mineral plates.","Heated channels extend beneath fractured shelves."],
+          crystal:["Reflective ridges scatter light through the outer layers.","Angular mineral lattices dominate the exposed material."],
+          storm:["Rotating disturbances trace the outer membrane.","Opposing pressure currents distort the visible surface."],
+          rings:["Loose material circulates around the main formation.","Suspended fragments cast shifting shadows across the mass."],
+          glow:["Localized luminous emissions persist between scans.","Unusual emissions mark the surface; their origin is unknown."],
+          star:["A concentrated gravitational anchor shapes local passage routes."]
+        }[p]||["Irregular strata are visible on the exposed formation."];
+        const choice=terrain[Array.from(String(n)).reduce((sum,ch)=>sum+ch.charCodeAt(0),0)%terrain.length];
+        return p==="star"?choice:choice+" "+(atm?"Outer membrane readings":"Exposed material readings")+" indicate "+betweenDisplayText(label(r))+".";
       }
+
       function forceTutorialCommon() {
         const solSystem = systems.find((s) => s.isTutorial);
         if (!solSystem) return;
@@ -10234,7 +10231,7 @@
         return game.system?.modifier?.name || "Calm Drift";
       }
       function sectorArchetypeName() {
-        return game.system?.archetype?.name || "Frontier System";
+        return fieldReachProfile(game.system).name;
       }
       function sol() {
         const sun = makeBody({
@@ -14787,7 +14784,7 @@
       function upgradeFrigate(type = "capacity") {
         if (!game.frigate.built) return toast("Build the frigate first.");
         if (!hasFactoryAccess())
-          return toast("Frigate upgrades require a captured factory world.");
+          return toast("Pioneer upgrades require access to a claimed factory.");
         const prop = type + "Level",
           before = game.frigate[prop] || 0;
         if (before >= 6) return toast("That system is maxed.");
@@ -17211,7 +17208,7 @@
         if (game.ship?.fuel / game.ship?.maxFuel < 0.22)
           return {
             title: "Refuel soon",
-            sub: n.body ? "Nearest: " + n.body.name : "Find a captured planet",
+            sub: n.body ? "Nearest: " + fieldBodyName(n.body.name) : "Find a claimed formation",
             menu: "resources",
           };
         if (
@@ -17222,7 +17219,7 @@
           let sub = objective.title + " • Step " + (game.missionStage + 1) + "/" + tutorialObjectives.length;
           if (game.missionStage === 0 && target)
             sub =
-              "Mars distance: " +
+              "Redglass Shelf distance: " +
               Math.round(
                 Math.max(0, dist(game.ship, target) - visualRadius(target)),
               ) +
@@ -17230,9 +17227,9 @@
           else if (game.missionStage === 1)
             sub = upgradeReady().any ? "Upgrade ready now" : "Collect the listed resources";
           else if (game.missionStage === 2)
-            sub = canUpgradePlanet(body("Mars")) ? "Mars upgrade ready" : "Review Mars requirements";
+            sub = canUpgradePlanet(body("Mars")) ? "Redglass Shelf upgrade ready" : "Review Redglass Shelf requirements";
           else if (game.missionStage === 3)
-            sub = target ? "Venus distance: " + Math.round(Math.max(0, dist(game.ship, target) - visualRadius(target))) + "u" : "Follow the Venus target";
+            sub = target ? "Violet Furnace distance: " + Math.round(Math.max(0, dist(game.ship, target) - visualRadius(target))) + "u" : "Follow the Violet Furnace marker";
           else if (game.missionStage === 4)
             sub = pioneerConstructionReserveAvailable()
               ? "Pioneer construction ready — Earth reserve secured"
@@ -17242,7 +17239,7 @@
           else if (game.missionStage === 5)
             sub = target ? "Pioneer distance: " + Math.round(Math.max(0, dist(game.ship, target) - (target.radius || 42))) + "u" : "Set the Pioneer target";
           else if (game.missionStage === 6)
-            sub = orbitingFrigate() ? "Jump drive synchronized" : "Return to Pioneer orbit";
+            sub = orbitingFrigate() ? "Crossing ready" : "Return to Pioneer orbit";
           return { title: objective.action, sub, menu: objective.menu };
         }
         const contact=nearestFrontierContact();
@@ -17260,7 +17257,7 @@
         if (livingEvent?.status === "active")
           return {
             title: livingEvent.name,
-            sub: "A temporary system event awaits your decision",
+            sub: "A local event awaits your decision",
             menu: "system",
           };
         const activeArc = expeditionState().active,
@@ -17634,7 +17631,7 @@
           if ((game.shipSystems?.[key] || 0) >= def.max)
             return def.name + " is already maxed.";
           if (!hasFactoryAccess())
-            return "Return to a captured factory world. Earth starts as your first factory.";
+            return "Return to a claimed factory formation. First Anchorage is your first factory.";
           return firstMissingReason(cost) || "";
         }
         if (kind === "planetUpgrade") {
@@ -17651,9 +17648,9 @@
           if (game.frigate.built)
             return "The ODF Pioneer has already been built.";
           if (game.system.isTutorial && game.missionStage < 4)
-            return "Complete the Sol tutorial objectives first.";
+            return "Complete the First Reach training objectives first.";
           if (!game.system.isTutorial || !hasFactoryAccess())
-            return "Return to Earth Factory to build your first frigate.";
+            return "Return to First Anchorage to build the Pioneer.";
           if (pioneerConstructionReserveAvailable()) return "";
           return firstMissingReason(buildCost()) || "";
         }
@@ -17670,7 +17667,7 @@
           const n = nearestBody();
           return n.body && game.captured.has(n.body.name)
             ? "Move closer to " + n.body.name + " to refuel."
-            : "Move near a captured planet to refuel.";
+            : "Approach a claimed formation to refuel.";
         }
         if (kind === "harvestEcho") {
           const h = nearestEcho();
@@ -17873,10 +17870,10 @@
         queueSkinPreviews();
       }
       function menuRouteTitle(route){
-        const labels={hub:"Command",explore:"Explore",hangar:"Ship & designs",journal:"Journey",resources:"Cargo",planets:"Worlds",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"System",echoes:"Orbital Echoes",codex:"Planet Codex",concord:"Orbital Concord",civilizations:"Civilizations",activity:"Captain Log",guide:"Pilot Manual",help:"Help"};
-        const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",shipyard:"Shipyard",missions:"Fleet missions",history:"Fleet history",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",daily:"Daily tasks",contracts:"Contracts",milestones:"Milestones",travel:"Travel & atlas",records:"Journey records",settings:"Settings",display:"Display & performance",audio:"Audio & feedback",controls:"Flight controls",data:"Save data",privacy:"Purchases & privacy",achievements:"Achievements",reputation:"Reputation & encounters",collections:"Collections & statistics"},upgrades:{ship:"Ship upgrades",planet:"World upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
+        const labels={hub:"Command",explore:"Explore",hangar:"Vessel & designs",journal:"Journey",resources:"Cargo",planets:"Formations",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"Reach",echoes:"Orbital Echoes",codex:"Field Codex",concord:"Concord",civilizations:"Civilizations",activity:"Expedition Log",guide:"Flight Manual",help:"Help"};
+        const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",shipyard:"Shipyard",missions:"Fleet missions",history:"Fleet history",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",daily:"Daily tasks",contracts:"Contracts",milestones:"Milestones",travel:"Crossings & atlas",records:"Journey records",settings:"Settings",display:"Display & performance",audio:"Audio & feedback",controls:"Flight controls",data:"Save data",privacy:"Purchases & privacy",achievements:"Achievements",reputation:"Reputation & encounters",collections:"Collections & statistics"},upgrades:{ship:"Vessel upgrades",planet:"Formation upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
         if(route.section==="planets"&&route.tab?.startsWith("world:")){
-          const world=body(route.tab.slice(6));return world&&(world.discovered||game.discovered.has(world.name)||world.type==="star")?world.name:"Unknown world";
+          const world=body(route.tab.slice(6));return world&&(world.discovered||game.discovered.has(world.name)||world.type==="star")?fieldBodyName(world.name):"Unknown formation";
         }
         return sub[route.section]?.[route.tab]||labels[route.section]||"Command";
       }
@@ -17885,7 +17882,7 @@
         if(titleMenuMode)return '<div class="nav-context"><span class="nav-path">Title / '+esc(menuRouteTitle(currentMenuRoute()))+'</span></div>';
         const path=menuHistory.filter(r=>r.section!=="hub").map(menuRouteTitle);
         const label=path.length?path.slice(-1).join(" / "):"Command";
-        return '<div class="nav-context"><button type="button" data-action="backToMainMenu" data-arg="" class="nav-home">Home</button><span aria-hidden="true">/</span><span class="nav-path">'+esc(label==="Command"?menuRouteTitle(currentMenuRoute()):label+" / "+menuRouteTitle(currentMenuRoute()))+'</span></div>';
+        return '<div class="nav-context"><button type="button" data-action="backToMainMenu" data-arg="" class="nav-home">Command</button><span aria-hidden="true">/</span><span class="nav-path">'+esc(label==="Command"?menuRouteTitle(currentMenuRoute()):label+" / "+menuRouteTitle(currentMenuRoute()))+'</span></div>';
       }
       function addMobileMenuFooter() {
         if (
@@ -18027,7 +18024,7 @@
             ["Explore","Formations, signals, discoveries and crossings","openSection","explore","explore"],
             [game.frigate?.built?"Pioneer":"Pioneer project","Onboard personnel, fleet operations, research and expedition leads","openSection","frigate","pioneer"],
             ["Cargo","Inventory and settlement supplies","openSection","resources","cargo"],
-            ["Ship & designs","Engineering systems and hull configurations","openSection","hangar","ship"],
+            ["Vessel & designs","Engineering systems and hull configurations","openSection","hangar","ship"],
             ["Journey","Operations, flight records, Echoes and pilot guidance","openSection","journal","journal"],
             ["Settings","Controls, audio, display and save data","setMenuTab","system|settings","settings"]
           ]);
@@ -18035,17 +18032,17 @@
       function renderExploreDirectory(){
         const n=nearestFrontierContact();
         ui.menuContent.innerHTML=routeDirectory([
-          ["Worlds","Survey formations, claim eligible sites and develop outposts","openSection","planets","explore"],
-          ["Travel & atlas","Chart crossings and investigate unexplained signals","setMenuTab","system|travel","route"],
-          ["Planet Codex","Archived formation surveys and discovery collections","openSection","codex","journal"],
-          ...(game.frigate.built?[["Orbital Concord","Charter settlements and chart supply lanes through flight","openSection","concord","route"],["Civilizations","Discover independent cultures and establish contact","openSection","civilizations","signal"]]:[]),
+          ["Formations","Survey formations, claim eligible sites and develop outposts","openSection","planets","explore"],
+          ["Crossings & atlas","Chart crossings and investigate unexplained signals","setMenuTab","system|travel","route"],
+          ["Field Codex","Archived formation surveys and discovery collections","openSection","codex","journal"],
+          ...(game.frigate.built?[["Concord","Charter settlements and chart supply lanes through flight","openSection","concord","route"],["Civilizations","Discover independent cultures and establish contact","openSection","civilizations","signal"]]:[]),
           ...(game.frigate.built?[["Vault","Archive discoveries and exceptional research breakthroughs","openFrigateTab","vault","vault"]]:[])
         ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" survey and recovery contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
       }
       function renderHangarDirectory(){
         ui.menuContent.innerHTML=routeDirectory([
-          ["Ship upgrades","Thrust, fuel, braking and other systems","setMenuTab","upgrades|ship","ship"],
-          ["World upgrades","Develop your claimed formations","setMenuTab","upgrades|planet","explore"],
+          ["Vessel upgrades","Thrust, fuel, braking and other systems","setMenuTab","upgrades|ship","ship"],
+          ["Formation upgrades","Develop your claimed formations","setMenuTab","upgrades|planet","explore"],
           ["Appearance","Hull designs, engine trails and fleet styles","openSection","cosmetics","layers"],
           ...(game.frigate.built?[["Base upgrades","Pioneer capacity and systems","openFrigateTab","upgrades","pioneer"]]:[])
         ]);
@@ -18054,9 +18051,9 @@
         ui.menuContent.innerHTML=routeDirectory([
           ["Tasks","Daily operations, contracts, milestones","setMenuTab","system|ops","route"],
           ["Journey records","Achievements, faction standing and collections","setMenuTab","system|records","journal"],
-          ["Captain Log","Recent actions and encounter decisions","openSection","activity","journal"],
+          ["Expedition Log","Recent actions and encounter decisions","openSection","activity","journal"],
           ["Orbital Echoes","View and manage recorded flight routes","openSection","echoes","signal"],
-          ["Pilot Manual","Flight procedures and onboard system guidance","openSection","guide","help"],
+          ["Flight Manual","Flight procedures and onboard system guidance","openSection","guide","help"],
           ["Help","Quick definitions and guidance","openSection","help","help"]
         ]);
       }
@@ -18249,12 +18246,12 @@
         const s = body(selectedPlanetName),
           summary = s
             ? bodySurveyed(s)
-              ? esc(s.name) +
+              ? esc(fieldBodyName(s.name)) +
                 " · " +
                 esc(displayBiome(s)) +
                 ". " +
-                esc(s.lore)
-              : esc(s.name) + " detected. Complete a close scan to reveal its survey record."
+                esc(fieldObservation(s))
+              : esc(fieldBodyName(s.name)) + " detected. Complete a close scan to reveal its survey record."
             : "Select a planet.";
         const scanRange = s && game.ship ? dist(game.ship, s) - visualRadius(s) : Infinity;
         ui.menuContent.innerHTML =
@@ -18263,15 +18260,15 @@
             summary,
             btn("Set as Target", "setTarget", selectedPlanetName) +
               btn(
-                bodySurveyed(s) ? "Survey Complete" : "Scan World",
+                bodySurveyed(s) ? "Survey Complete" : "Scan formation",
                 "scanPlanet",
                 selectedPlanetName,
                 !!s && s.type !== "star" && !bodySurveyed(s) && scanRange <= 230,
               ) +
               btn("Clear Target", "clearTarget") +
-              (s?.capturable&&!game.captured.has(s.name)?btnWhy("Capture "+s.name,"capture",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first.")+(!game.system.isTutorial&&!s.memory?.raidRewardClaimed?btnWhy("Raid for salvage","raidSelectedWorld",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first."):""):"") +
+              (s?.capturable&&!game.captured.has(s.name)?btnWhy("Capture "+s.name,"capture",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this formation first.")+(!game.system.isTutorial&&!s.memory?.raidRewardClaimed?btnWhy("Raid for salvage","raidSelectedWorld",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first."):""):"") +
               btnWhy(
-                "Upgrade World",
+                "Upgrade formation",
                 "upgradePlanet",
                 null,
                 !!s && canUpgradePlanet(s),
@@ -18280,9 +18277,9 @@
           ) +
           civilizationCard(s) +
           concordWorldCard(s) +
-          secondaryDetails("World History", planetMemoryHtml(s)) +
+          secondaryDetails("Formation history", planetMemoryHtml(s)) +
           secondaryDetails("Survey & Development Details", planetDetailsHtml(s));
-        if(!s)ui.menuContent.innerHTML=card("World unavailable","This world is not in the current system.",btn("Worlds","openSection","planets"));
+        if(!s)ui.menuContent.innerHTML=card("Formation unavailable","This world is not in the current system.",btn("Worlds","openSection","planets"));
       }
       function bodySurveyed(b) {
         return !!(
@@ -18296,9 +18293,9 @@
       function planetListHtml(){
         return game.system.bodies.map(b=>{
           const known=b.discovered||game.discovered.has(b.name)||b.type==="star",surveyed=bodySurveyed(b),
-            status=b.type==="star"?"Star":game.captured.has(b.name)?"Controlled":surveyed?(b.civilization?"Inhabited · protected":b.capturable?"Available to capture":"Survey only"):"Survey pending",
+            status=b.type==="star"?"Gravity anchor":game.captured.has(b.name)?"Claimed":surveyed?(b.civilization?"Inhabited · protected":b.capturable?"Claim available":"Survey only"):"Survey pending",
             desc=known?(surveyed&&b.type!=="star"?status+" · "+b.rarity:status):"Unsurveyed signal";
-          return '<button type="button" class="route-row planet-route" data-action="openWorldDetails" data-arg="'+esc(JSON.stringify(b.name))+'"><span class="planet-orb" style="--orb:'+esc(b.color)+'"></span><span class="route-copy"><b>'+esc(known?b.name:"Unknown world")+'</b><small>'+esc(desc)+'</small></span><svg class="route-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 3 5 5-5 5"/></svg></button>';
+          return '<button type="button" class="route-row planet-route" data-action="openWorldDetails" data-arg="'+esc(JSON.stringify(b.name))+'"><span class="planet-orb" style="--orb:'+esc(b.color)+'"></span><span class="route-copy"><b>'+esc(known?fieldBodyName(b.name):"Unknown formation")+'</b><small>'+esc(desc)+'</small></span><svg class="route-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 3 5 5-5 5"/></svg></button>';
         }).join("");
       }
       function planetDetailsHtml(b) {
@@ -18347,7 +18344,7 @@
           "</b><br>" +
           esc(displayBiome(b)) +
           ". " +
-          esc(b.frontierFeature?b.lore:(anomalyDesc(b) || b.lore)) +
+          esc(fieldObservation(b)) +
           '</p><div class="grid"><div class="chip">Status: ' +
           (b.capturable ? (owned ? "Captured" : "Capturable") : "Survey only") +
           '</div><div class="chip ' +
@@ -19387,7 +19384,7 @@
         if(tab==="expeditions"&&!expeditionState().active&&!expeditionState().offers.length)generateExpeditionOffers();
         const overview =
           '<div class="card pioneer-hero pioneer-command-landing"><div class="section-focus-title"><div><span class="command-kicker">Your Mobile Headquarters</span><h4>' +
-          esc(game.frigate.name) +
+          esc(fieldVesselName(game.frigate.name)) +
           '</h4></div><span class="tag rarity-unusual">' +
           (orbitingFrigate() ? "Docked" : "Remote") +
           '</span></div><p>Mobile headquarters • '+esc(game.system?.name||"Uncharted")+'</p>' +
@@ -19847,16 +19844,16 @@
             majorThreatHtml() +
             livingSystemEventHtml() +
             card(
-              "Current Sector",
+              "Current reach",
               esc(betweenSectorName(game.system.name)) +
                 " contains " +
                 game.system.bodies.length +
                 " major bodies. Current target: " +
                 (target ? esc(target.name) : "None") +
                 ".<br><b>" +
-                esc(arch.name) +
+                esc(fieldReachProfile(game.system).name) +
                 ":</b> " +
-                esc(arch.desc) +
+                esc(fieldReachProfile(game.system).desc) +
                 "<br><b>" +
                 esc(mod.name) +
                 ":</b> " +
@@ -19870,8 +19867,8 @@
               '<div class="list">' + rareEventHtml() + "</div>",
             ) +
             card(
-              "Black Hole / Parallel Access",
-              "Black holes are exceptionally rare, single-use gateways to unstable Parallel systems.",
+              "Collapse gate access",
+              "A collapse gate is a rare, one-use passage to an unstable Folded Reach.",
               '<div class="list">' + blackHoleHtml() + "</div>",
             ) +
             atlasHtml();
@@ -20132,8 +20129,8 @@
       }
       function atlasHtml() {
         return card(
-          "Star Atlas",
-          "Revisit charted systems or order the Pioneer toward an unknown destination. Parallel systems collapse from the atlas after departure.",
+          "Crossing Atlas",
+          "Revisit charted reaches or chart a new crossing. Unstable folded routes cannot be revisited after departure.",
           '<div class="list">' +
             game.visitedSectors
               .map((s) => {
@@ -20145,10 +20142,10 @@
                   (locked ? "rarity-mythic" : "") +
                   '"><b>' +
                   (s.index === currentSystemIndex ? "Current: " : "") +
-                  esc(s.name) +
+                  esc(betweenSectorName(s.name)) +
                   "</b><span>Charted visits: " +
                   s.visits +
-                  (locked ? " • Collapsed Parallel route" : "") +
+                  (locked ? " • Passage closed" : "") +
                   '</span><div class="actions">' +
                   btn(
                     locked ? "Non-returnable" : "Travel",
@@ -20735,104 +20732,104 @@
           "</div>";
       }
       function renderGuide() {
-        const sections = [
-          [
-            "Flight Basics",
-            "Use the joystick to steer, THRUST to accelerate, BRAKE to slow your drift, and RELEASE to break orbit when locked. Skilled pilots ride gravity instead of burning fuel.",
-          ],
-          [
-            "Capturing Planets",
-            "Approach an eligible world, tap LOCK, then use the on-screen Capture action while orbit-locked. Captured worlds join your frontier network and begin supporting the fleet.",
-          ],
-          [
-            "Upgrades",
-            "Open Ship & designs to improve your vessel and frontier worlds. Ship upgrades add visible modules; world upgrades expand stations, beacons, and surface infrastructure.",
-          ],
-          [
-            "Production",
-            "Developed worlds generate resources over time. Transfer them from Cargo when production is ready. Factory worlds unlock major ship and frigate systems.",
-          ],
-          [
-            "Independent Civilizations",
-            "Survey inhabited worlds, open communications from orbit, offer a cultural exchange and demonstrate shared navigation through an Orbital Echo. Their territory stays independent; no conquest or mandatory diplomacy.",
-          ],
-          [
-            "Orbital Concord",
-            "Optional frontier charters connect settlements through actual flight. Ratify from orbit after establishing local service, then record a 60% or better Echo between two chartered worlds. Complementary world roles share a modest supply benefit. Released worlds retain their history but their lanes go dormant." ,
-          ],
-          [
-            "Echoes",
-            "Precise slingshot routes crystallize into Orbital Echoes. Follow them, harvest their wake, and turn expert flight paths into permanent advantages.",
-          ],
-          [
-            "Frigate",
-            "The ODF Pioneer is your mobile base. Build it at Earth Factory, then upgrade its reactor, hangar, scanner, capacity, Fleet Command, and Vault systems. Once built, it can lead the expedition into uncharted space.",
-          ],
-          [
-            "Expedition Arcs",
-            "The Pioneer offers optional, self-contained adventures rather than a single required path. Choose one lead at a time, complete its field objectives during exploration, and face a matching final threat. Completed or archived leads never return.",
-          ],
-          [
-            "Pioneer Crew",
-            "Crew specialists can be renamed, given different uniforms, assigned to bridge, Vault, fleet, or systems duty, and chosen to lead expeditions. Field work earns experience; training raises their level and strengthens role bonuses.",
-          ],
-          [
-            "Living Systems",
-            "Temporary migrations, markets, festivals, stellar phenomena, and other events make frontier systems change around you. Each event offers a clear choice and rewards that reflect what happened.",
-          ],
-          [
-            "Major Threats",
-            "Dangerous contacts reward preparation. Brief the crew, deploy a fleet screen, and fortify the Pioneer before choosing a role-based response. An underprepared attempt causes a safe retreat and can be tried again.",
-          ],
-          [
-            "Exploration Encounters",
-            "Every sector beyond Sol contains a contact with multiple responses. Approach its signal, then choose based on your ship systems, fleet, resources, faction standing, and earlier decisions. Outcomes are permanent and recorded in the Captain's Log.",
-          ],
-          [
-            "Deep-Space Mysteries",
-            "Each system family carries a unique mystery. Enter scanning range to decode its clue before approaching the source. The decoded clue highlights one informed encounter response with stronger rewards and additional faction standing.",
-          ],
-          [
-            "Codex Collections",
-            "The Codex groups discoveries into themed collections. Catalogue worlds, decode mysteries, resolve encounters, and secure Vault specimens to earn automatic collection rewards.",
-          ],
-          [
-            "Pioneer Relic Vault",
-            "Planet surveys and decoded deep-space signals can reveal artifacts, lifeforms, and phenomena. Safe discoveries enter secure storage; dangerous or overflow finds remain in quarantine until Vault capacity and containment are upgraded. Secure 18 distinct specimens to authorize the Astral Archaeologist research-hull refit. Only exceptional specimens provide operational research benefits.",
-          ],
-          [
-            "Faction Reputation",
-            "Rescue and research decisions build standing with the Frontier Coalition, Wayfarer Guild, and Echo Collective. Trust 3 unlocks a permanent faction technology. The optional Silent Choir chronicle can surface across three encounters.",
-          ],
-          [
-            "Rarities",
-            "Worlds can be Common, Unusual, Rare, Exotic, or Mythic. Higher rarity worlds usually have better bonuses and more unusual visuals.",
-          ],
-          [
-            "Saving",
-            "The game autosaves after major actions. Manual Save and Load are available in Menu → System. New Game warns before replacing local progress.",
-          ],
-          [
-            "Mobile Tips",
-            "Keep the phone upright. Change joystick, thrust, brake, release, sensitivity, music, sound, and performance in Settings.",
-          ],
-          [
-            "Black Holes",
-            "Black holes are exceptionally rare, single-use gateways. Entering one costs 22% of stored resources, collapses the breach, and sends you to a one-way Parallel system.",
-          ],
-          [
-            "Parallel Systems",
-            "Parallel systems are alternate-universe breaches reached only through black holes. Every planet inside is Mythic, the system cannot be revisited through the Star Atlas, and the first breach unlocks the Parallel Chaos starship skin.",
-          ],
-          [
-            "Cosmic Spirit Systems",
-            "Cosmic Spirit systems are legendary luminous discoveries. Reaching your first one unlocks the Spirit Voyager frigate design.",
-          ],
-          [
-            "Troubleshooting",
-            "If sound is silent, tap once and check Settings. If flight stutters, switch to Battery Saver or Reduced Motion. Locked actions show what you still need.",
-          ],
-        ];
+        const sections=[
+  [
+    "Flight controls",
+    "Steer with the joystick. THRUST accelerates; BRAKE slows you. LOCK binds your vessel to a nearby formation. RELEASE turns orbital momentum into a departure."
+  ],
+  [
+    "Claiming formations",
+    "Scan an eligible uninhabited formation and lock orbit. Tap Claim when it appears. Claimed formations supply your expedition; independent inhabited sites cannot be claimed."
+  ],
+  [
+    "Vessel and formation upgrades",
+    "Open Vessel & designs from Command. A factory is required for most vessel and Pioneer improvements. Choose Formation upgrades to develop claimed sites."
+  ],
+  [
+    "Cargo and output",
+    "Claimed formations accumulate materials during active flight. Open Cargo and gather output; inventories and upgrade costs are shown there."
+  ],
+  [
+    "The Pioneer",
+    "Your mobile base unlocks after training. Build at First Anchorage. Crew, fleet, adventures, Vault and base upgrades are under Pioneer."
+  ],
+  [
+    "Crossings and atlas",
+    "Lock to the Pioneer and use Cross Outward to chart an unexplored reach. Open Explore → Crossings & atlas to return to a charted reach."
+  ],
+  [
+    "Orbital Echoes",
+    "Accurate passages leave route records. Follow or harvest a recorded Echo for rewards. High-quality routes also support cultural agreements and supply lanes."
+  ],
+  [
+    "Concord",
+    "Charter claimed sites with local service from orbit. Fly a 60% or better Echo between chartered formations to establish a lane. Lanes become dormant if a site is released."
+  ],
+  [
+    "Independent cultures",
+    "Survey inhabited formations and establish communication from orbit. Exchange materials and demonstrate navigation to earn trust. Their territory remains independent."
+  ],
+  [
+    "Adventures",
+    "Choose one optional adventure from the Pioneer. Meet its field objectives and prepare for its final threat. Completed or archived adventures do not repeat."
+  ],
+  [
+    "Crew and fleet",
+    "Recruit specialists, assign duties and train them as experience accumulates. Build support craft and dispatch fleet missions from the Pioneer."
+  ],
+  [
+    "Living events",
+    "Temporary migrations, gatherings and local disturbances can occur in a reach. Choose a response in Crossings & atlas; each event resolves once."
+  ],
+  [
+    "Major threats",
+    "Prepare your crew, fleet screen and Pioneer before choosing a response. A failed attempt can retreat safely and try again."
+  ],
+  [
+    "Signal encounters",
+    "Scan an unknown signal before approaching it. The decoded observation highlights an informed response; choices depend on equipment, supplies and standing."
+  ],
+  [
+    "Field Codex",
+    "Survey formations, investigate mysteries and complete collections to receive expedition supplies. Observations are records, not explanations of the Between."
+  ],
+  [
+    "Vault",
+    "Archive artifacts, detached biological samples and phenomena. Upgrade capacity and containment to secure dangerous discoveries. Secure 18 distinct records to unlock the Astral Archaeologist hull."
+  ],
+  [
+    "Standing",
+    "Decisions affect standing with the Frontier Coalition, Wayfarer Guild and Echo Collective. Trust 3 unlocks a faction technology. These are local contacts, not established factions of the Nine Worlds."
+  ],
+  [
+    "Rarity",
+    "Common, Unusual, Rare, Exotic and Mythic classify formation and design rarity. Unusual formations can offer higher survey rewards."
+  ],
+  [
+    "Collapse gates",
+    "Exceptionally rare gates consume 22% of stored resources and lead to an unstable Folded Reach. The gate cannot be used twice."
+  ],
+  [
+    "Folded reaches",
+    "All formations in these unstable reaches are Mythic. Once you depart, the route cannot be revisited. The first entry unlocks the Parallel Chaos design."
+  ],
+  [
+    "Veil reaches",
+    "Rare luminous reaches exhibit unexplained local phenomena. Your first discovery unlocks the Spirit Voyager design."
+  ],
+  [
+    "Saving",
+    "Progress saves automatically after major actions. Use Pause to save or load manually; Settings → Save data supports backup export and import."
+  ],
+  [
+    "Settings",
+    "Change control sizes, sensitivity, audio, motion and graphics through Settings. Battery Saver and Reduced Motion can help on slower devices."
+  ],
+  [
+    "Recovery",
+    "If fuel runs out, use the available recovery action. With the Pioneer built, a rescue vessel can respond to distress."
+  ]
+];
         ui.menuContent.innerHTML =
           card(
             "Pilot Manual",
@@ -21063,68 +21060,68 @@
         ];
       }
       function renderHelp() {
-        const items = [
-          [
-            "Flight Controls",
-            "Use the joystick to steer, THRUST to accelerate, BRAKE to slow down, and LOCK / RELEASE to enter or leave orbit.",
-          ],
-          [
-            "Orbit Lock",
-            "Appears when you are close enough to a planet. LOCK holds you in orbit; RELEASE turns that orbit into a slingshot.",
-          ],
-          [
-            "Capture",
-            "Appears on screen when you are orbit-locked around an eligible uncaptured planet.",
-          ],
-          [
-            "Production",
-            "Captured developed planets generate resources over time. Collect them from Resources.",
-          ],
-          [
-            "Echoes",
-            "Clean routes can become Orbital Echoes. Follow or harvest them for resources and route mastery.",
-          ],
-          [
-            "Pioneer Base",
-            "Your mobile headquarters and progression hub. It carries fleet command, sector travel, upgrades, and deeper customization between systems.",
-          ],
-          [
-            "Exploration Encounters",
-            "Investigate marked signals beyond Sol. Choices can require upgrades, fleet support, resources, Echoes, or faction trust and may affect your hull, rewards, reputation, and story.",
-          ],
-          [
-            "Mystery Scans",
-            "Unknown signals can be decoded from long range. Scanning reveals a persistent clue and highlights one informed response when you reach the encounter.",
-          ],
-          [
-            "Codex Collections",
-            "Complete themed world, mystery, and encounter records to receive expedition supplies automatically.",
-          ],
-          [
-            "Factory Worlds",
-            "Factory worlds allow ship and frigate upgrades. Earth starts as your first factory.",
-          ],
-          [
-            "Rarities",
-            "Planets and skins range from Common to Mythic. Higher rarity generally means stronger bonuses or cooler visuals.",
-          ],
-          [
-            "Black Holes",
-            "An exceptionally rare black hole can be entered from the System menu or its nearby action. The breach collapses after use.",
-          ],
-          [
-            "Parallel Systems",
-            "The rarest system type. These are one-way alternate-universe systems with all-Mythic planets and cannot be revisited after leaving.",
-          ],
-          [
-            "Cosmic Spirit Systems",
-            "Legendary systems alive with luminous green, white, and gold currents. The first discovery unlocks Spirit Voyager.",
-          ],
-          [
-            "Menus",
-            "Use Core Commands for progress, Exploration Records for discoveries, and System & Help for saves and settings.",
-          ],
-        ];
+        const items=[
+  [
+    "Flight controls",
+    "Steer with the joystick. THRUST accelerates; BRAKE slows you. LOCK binds your vessel to a nearby formation. RELEASE turns orbital momentum into a departure."
+  ],
+  [
+    "Claiming formations",
+    "Scan an eligible uninhabited formation and lock orbit. Tap Claim when it appears. Claimed formations supply your expedition; independent inhabited sites cannot be claimed."
+  ],
+  [
+    "Vessel and formation upgrades",
+    "Open Vessel & designs from Command. A factory is required for most vessel and Pioneer improvements. Choose Formation upgrades to develop claimed sites."
+  ],
+  [
+    "Cargo and output",
+    "Claimed formations accumulate materials during active flight. Open Cargo and gather output; inventories and upgrade costs are shown there."
+  ],
+  [
+    "The Pioneer",
+    "Your mobile base unlocks after training. Build at First Anchorage. Crew, fleet, adventures, Vault and base upgrades are under Pioneer."
+  ],
+  [
+    "Crossings and atlas",
+    "Lock to the Pioneer and use Cross Outward to chart an unexplored reach. Open Explore → Crossings & atlas to return to a charted reach."
+  ],
+  [
+    "Orbital Echoes",
+    "Accurate passages leave route records. Follow or harvest a recorded Echo for rewards. High-quality routes also support cultural agreements and supply lanes."
+  ],
+  [
+    "Independent cultures",
+    "Survey inhabited formations and establish communication from orbit. Exchange materials and demonstrate navigation to earn trust. Their territory remains independent."
+  ],
+  [
+    "Signal encounters",
+    "Scan an unknown signal before approaching it. The decoded observation highlights an informed response; choices depend on equipment, supplies and standing."
+  ],
+  [
+    "Vault",
+    "Archive artifacts, detached biological samples and phenomena. Upgrade capacity and containment to secure dangerous discoveries. Secure 18 distinct records to unlock the Astral Archaeologist hull."
+  ],
+  [
+    "Collapse gates",
+    "Exceptionally rare gates consume 22% of stored resources and lead to an unstable Folded Reach. The gate cannot be used twice."
+  ],
+  [
+    "Folded reaches",
+    "All formations in these unstable reaches are Mythic. Once you depart, the route cannot be revisited. The first entry unlocks the Parallel Chaos design."
+  ],
+  [
+    "Saving",
+    "Progress saves automatically after major actions. Use Pause to save or load manually; Settings → Save data supports backup export and import."
+  ],
+  [
+    "Settings",
+    "Change control sizes, sensitivity, audio, motion and graphics through Settings. Battery Saver and Reduced Motion can help on slower devices."
+  ],
+  [
+    "Recovery",
+    "If fuel runs out, use the available recovery action. With the Pioneer built, a rescue vessel can respond to distress."
+  ]
+];
         ui.menuContent.innerHTML =
           card(
             "How to Play",
@@ -21637,17 +21634,17 @@
       }
       function tutorialFlightHint(ship,stage,fallback=""){
         if(stage===0){
-          if(ship.orbitLocked&&ship.lockBody==="Earth")return orbitMomentum(ship.lockCharge)>=95?"RELEASE toward Mars":"Hold THRUST • free orbit boost";
-          if(ship.orbitLocked&&ship.lockBody==="Mars")return "Scan, then capture Mars";
-          if(ship.orbitLocked)return "Release to travel toward Mars";
-          return "Follow Mars • BRAKE, then LOCK";
+          if(ship.orbitLocked&&ship.lockBody==="Earth")return orbitMomentum(ship.lockCharge)>=95?"RELEASE toward Redglass Shelf":"Hold THRUST • free orbit boost";
+          if(ship.orbitLocked&&ship.lockBody==="Mars")return "Scan, then Claim";
+          if(ship.orbitLocked)return "Release toward Redglass Shelf";
+          return "Follow target • BRAKE, then LOCK";
         }
-        if(stage===1)return ship.orbitLocked&&ship.lockBody==="Earth"?"Menu → Ship Systems":"Return to Earth • LOCK";
-        if(stage===2)return ship.orbitLocked&&ship.lockBody==="Mars"?"Menu → Planet Upgrades":"Return to Mars • LOCK";
-        if(stage===3)return "Approach Venus • tap Scan";
-        if(stage===4)return ship.orbitLocked&&ship.lockBody==="Earth"?"Menu → Pioneer Project":"Return to Earth Factory";
+        if(stage===1)return ship.orbitLocked&&ship.lockBody==="Earth"?"Menu → Vessel upgrades":"Return to First Anchorage • LOCK";
+        if(stage===2)return ship.orbitLocked&&ship.lockBody==="Mars"?"Menu → Formation upgrades":"Return to Redglass Shelf • LOCK";
+        if(stage===3)return "Approach Violet Furnace • Scan";
+        if(stage===4)return ship.orbitLocked&&ship.lockBody==="Earth"?"Menu → Pioneer project":"Return to First Anchorage";
         if(stage===5)return "Follow Pioneer • tap LOCK";
-        if(stage===6)return "Docked? Tap Jump Outward";
+        if(stage===6)return "Docked? Tap Cross Outward";
         return fallback;
       }
       // Contacts are deterministic coordinates, not background sprites. Discovery keys
@@ -21914,7 +21911,7 @@
           actual = reward || b.lastDiscoveryReward || discoveryReward(b);
         ui.discoveryTitle.textContent =
           "Survey complete: " + betweenDisplayText(b.name);
-        ui.discoveryText.textContent = betweenDisplayText((b.lore || b.biome) + " " + rar.desc);
+        ui.discoveryText.textContent = betweenDisplayText(fieldObservation(b) + " " + rar.desc);
         const visualSeed = Math.abs(Math.round((b.featureSeed || 1) * 997)),
           rarityColor = rar.color || "#7dd3fc";
         ui.discoveryOverlay.style.setProperty("--discoveryColor", rarityColor);
@@ -28107,7 +28104,7 @@
         const journey = $("titleJourney");
         if (journey) {
           journey.hidden = !has;
-          journey.textContent = has ? meta.shipName + " • " + meta.sector : "";
+          journey.textContent = has ? fieldVesselName(meta.shipName) + " • " + betweenSectorName(meta.sector) : "";
         }
       }
       function replayTips() {
