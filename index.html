@@ -16996,7 +16996,7 @@
           ["Planet Codex","Archived planetary surveys and discovery collections","openSection","codex","journal"],
           ...(game.frigate.built?[["Orbital Concord","Charter settlements and chart supply lanes through flight","openSection","concord","route"]]:[]),
           ...(game.frigate.built?[["Vault","Archive discoveries and exceptional research breakthroughs","openFrigateTab","vault","vault"]]:[])
-        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
+        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" survey and recovery contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
       }
       function renderHangarDirectory(){
         ui.menuContent.innerHTML=routeDirectory([
@@ -20615,12 +20615,23 @@
           cosmicSpirit:[["Pilgrim light","anomaly"],["Luminous seed","pod"],["Starlight fragment","crystal"]]
         })[family]||[["Lost cargo","pod"],["Debris field","debris"],["Uncharted signal","anomaly"]];
         const rings=system.bodies.filter(b=>b.type!=="star"), outer=Math.max(900,...rings.map(b=>b.orbitRadius||0));
-        return system.frontierContacts=Array.from({length:Math.min(14,Math.max(7,rings.length*2))},(_,i)=>{
+        const contacts=Array.from({length:Math.min(14,Math.max(7,rings.length*2))},(_,i)=>{
           const item=types[i%types.length], a=between(seed+i*71+991,0,TAU),
             r=i===0?between(seed+981,470,620):between(seed+i*89+993,660,outer+170);
           // Include the stable sector-local index in the persistent origin.
           return {id:family+"-"+i,name:item[0],kind:item[1],type:"contact",radius:5,origin:item[0]+" / "+(i+1),x:Math.cos(a)*r,y:Math.sin(a)*r};
         });
+        const life=cosmicLifeContact(system);if(life)contacts.push(life);
+        return system.frontierContacts=contacts;
+      }
+      function cosmicLifeContact(system){
+        if(!system||system.isTutorial)return null;
+        const family=vaultFamily(system),seed=Number(system.seed)||1,
+          keys={innerForge:"ember-ray",gasFrontier:"storm-whale",crystalReach:"prism-mantle",bioCluster:"veil-medusa",ancientArchive:"choir-relic",voidRim:"null-seraph",cosmicSpirit:"aurora-pilgrim",parallel:"mirror-leviathan"},
+          key=keys[family],item=vaultCatalog.find(v=>v.key===key);
+        if(!item||(!system.specialType&&rand(mixSeed(seed,0x4c494645))>.62))return null;
+        const a=between(mixSeed(seed,7216),0,TAU),distance=between(mixSeed(seed,7217),740,1120);
+        return {id:family+"-living-contact",name:item.name,kind:"cosmic",type:"contact",radius:12,origin:"Field observation / "+key,catalogKey:key,visual:item.visual,colors:item.colors,x:Math.cos(a)*distance,y:Math.sin(a)*distance};
       }
       function frontierContactKey(contact,system=game.system){
         return String(system?.seed||system?.name||"system")+"|space|"+contact.origin;
@@ -20650,19 +20661,44 @@
         const contact=n.contact, key=frontierContactKey(contact), vault=vaultState();
         if(vault.discoveryKeys.includes(key))return false;
         const before=vault.entries.length;
-        registerVaultDiscovery("space",contact.origin,true);
+        registerVaultDiscovery("space",contact.origin,true,contact.catalogKey||null);
         // The catalog can be exhausted; salvage still has value once per site.
         if(!vault.discoveryKeys.includes(key))vault.discoveryKeys.push(key);
-        const reward=contact.kind==="crystal"?{Crystal:6,DataCores:2}:contact.kind==="pod"?{Helium3:8,BioGel:3}:contact.kind==="anomaly"?{DataCores:5,Plasma:3}:{Alloy:10,Titanium:3};
+        const reward=contact.kind==="cosmic"?{DataCores:5}:contact.kind==="crystal"?{Crystal:6,DataCores:2}:contact.kind==="pod"?{Helium3:8,BioGel:3}:contact.kind==="anomaly"?{DataCores:5,Plasma:3}:{Alloy:10,Titanium:3};
         if(manualTargetName==="@contact:"+contact.id)manualTargetName=null;
-        grantReward(reward,"Frontier recovery");
-        addActivity("discovery",contact.name+" recovered",fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
+        grantReward(reward,contact.kind==="cosmic"?"Field observation":"Frontier recovery");
+        addActivity("discovery",contact.name+(contact.kind==="cosmic"?" observed":" recovered"),fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
         playSound("capture");saveGame(false);renderMenu();return true;
+      }
+      function drawCosmicLifeContact(contact,p){
+        const radius=contact.visual==="whale"?48:contact.visual==="ray"?34:28,
+          r=clamp(radius*zoom,12,72),a=contact.colors[0],b=contact.colors[1],
+          reduced=game.settings?.motion==="Reduced",phase=reduced?0:t*.025,low=game.settings?.graphics==="Low"||game.settings?.performanceMode==="Battery Saver";
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-.25+Math.sin(phase*.3)*.08);
+        if(!low){const glow=ctx.createRadialGradient(0,0,0,0,0,r*1.65);glow.addColorStop(0,rgba(b,.15));glow.addColorStop(1,rgba(a,0));ctx.fillStyle=glow;ctx.fillRect(-r*1.7,-r*1.7,r*3.4,r*3.4);}
+        const g=ctx.createLinearGradient(-r,-r,r,r);g.addColorStop(0,rgba(b,.85));g.addColorStop(.45,rgba(a,.7));g.addColorStop(1,rgba(a,.12));
+        ctx.fillStyle=g;ctx.strokeStyle=rgba(b,.8);ctx.lineWidth=Math.max(.7,r*.035);ctx.beginPath();
+        if(contact.visual==="whale"){
+          ctx.moveTo(-r,0);ctx.bezierCurveTo(-r*.8,-r*.65,r*.35,-r*.55,r*.68,-r*.08);ctx.lineTo(r,r*-.42);ctx.lineTo(r*.9,0);ctx.lineTo(r,r*.38);ctx.lineTo(r*.66,r*.12);ctx.bezierCurveTo(r*.25,r*.6,-r*.75,r*.45,-r,0);ctx.closePath();ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.moveTo(-r*.1,r*.14);ctx.lineTo(r*.2,r*.67);ctx.lineTo(r*.43,r*.15);ctx.closePath();ctx.fill();ctx.stroke();
+          for(let i=0;i<4;i++){ctx.beginPath();ctx.ellipse(-r*.45+i*r*.21,0,r*.075,r*.26,-.35,0,TAU);ctx.stroke();}
+        }else if(contact.visual==="ray"){
+          const flap=Math.sin(phase)*r*.14;ctx.moveTo(0,-r*.52);ctx.quadraticCurveTo(-r*.45,-r*.72,-r,-r*.13+flap);ctx.lineTo(-r*.46,r*.42);ctx.lineTo(-r*.16,r*.19);ctx.lineTo(0,r*.83);ctx.lineTo(r*.16,r*.19);ctx.lineTo(r*.46,r*.42);ctx.lineTo(r,-r*.13+flap);ctx.quadraticCurveTo(r*.45,-r*.72,0,-r*.52);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(0,-r*.45);ctx.lineTo(0,r*.8);ctx.moveTo(-r*.88,-r*.13+flap);ctx.quadraticCurveTo(0,-r*.4,r*.88,-r*.13+flap);ctx.stroke();
+        }else if(contact.visual==="medusa"){
+          ctx.moveTo(-r*.78,0);ctx.bezierCurveTo(-r*.7,-r,r*.7,-r,r*.78,0);ctx.quadraticCurveTo(0,r*.4,-r*.78,0);ctx.fill();ctx.stroke();
+          for(let i=0;i<(low?5:9);i++){const x=(i/ (low?4:8)-.5)*r*1.35;ctx.beginPath();ctx.moveTo(x,r*.08);ctx.quadraticCurveTo(x+Math.sin(phase+i)*r*.2,r*.52,x-r*.12,r*(.82+i%3*.09));ctx.stroke();}
+        }else{
+          for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,r*(.45+i*.19),r*(.22+i*.1),i*.7+phase*.15,0,TAU);ctx.stroke();}
+          ctx.beginPath();ctx.arc(0,0,r*.17,0,TAU);ctx.fill();
+        }
+        ctx.restore();
+        if(Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y)<180){ctx.save();ctx.font="500 10px system-ui";ctx.textAlign="center";ctx.fillStyle=b;ctx.fillText(contact.name,p.x,p.y+r+13);ctx.restore();}
       }
       function drawFrontierContacts(){
         const contacts=activeFrontierContacts(), theme=activeVisualTheme||sectorVisualTheme();
         for(const contact of contacts){
-          const p=screen(contact.x,contact.y);if(p.x<-35||p.y<-35||p.x>W+35||p.y>H+35)continue;
+          const p=screen(contact.x,contact.y),margin=contact.kind==="cosmic"?100:35;if(p.x<-margin||p.y<-margin||p.x>W+margin||p.y>H+margin)continue;
+          if(contact.kind==="cosmic"){drawCosmicLifeContact(contact,p);continue;}
           const r=Math.max(5,9*zoom), color=contact.kind==="anomaly"?theme.accent2:contact.kind==="crystal"?theme.accent:"#b9d1dc";
           ctx.save();ctx.translate(p.x,p.y);
           ctx.strokeStyle=rgba(color,.72);ctx.fillStyle=rgba(color,.22);ctx.lineWidth=1.15;
@@ -20715,7 +20751,7 @@
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
         const contact=nearestFrontierContact();
-        if(contact&&contact.d<=100)return {label:"Recover "+contact.contact.name,run:recoverFrontierContact,show:true};
+        if(contact&&contact.d<=100)return {label:(contact.contact.kind==="cosmic"?"Observe ":"Recover ")+contact.contact.name,run:recoverFrontierContact,show:true};
         if(n.body)return {label:"Scan "+n.body.name,run:()=>scanPlanet(n.body.name),show:true};
         if(fuelTarget.body&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
         if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
