@@ -22320,14 +22320,15 @@
         const art=REACH_DISCOVERY_FORMS[contact?.catalogKey]||betweenLifeArt(contact),budget=betweenArtBudget(settings),a=contact.colors[0],b=contact.colors[1],
           q=budget.animate?phase:0,k=art.kind;
         c.save();c.rotate(k==="mirror"?.2:k==="braid"?-.28:0);
-        const fill=c.createLinearGradient(-r,-r,r,r);
-        fill.addColorStop(0,rgba(b,.85));fill.addColorStop(.52,rgba(a,.48));fill.addColorStop(1,rgba(a,.06));
-        c.fillStyle=fill;c.strokeStyle=rgba(b,.84);c.lineWidth=Math.max(.7,r*.035);
+        const fill=c.createRadialGradient(-r*.28,-r*.35,r*.03,0,0,r*1.15);
+        fill.addColorStop(0,rgba(light(b,.22),.95));fill.addColorStop(.25,rgba(b,.79));fill.addColorStop(.52,rgba(a,.69));fill.addColorStop(.78,rgba(dark(a,.42),.83));fill.addColorStop(1,rgba("#10131c",.62));
+        c.fillStyle=fill;c.strokeStyle=rgba(b,.25);c.lineWidth=Math.max(.5,r*.018);
         const petal=(angle,length,width,bend)=>{
           c.save();c.rotate(angle);c.beginPath();c.moveTo(r*.07,0);
           c.bezierCurveTo(length*.24,-width,length*.81,-width*(1+bend),length,0);
           c.bezierCurveTo(length*.74,width*.75,length*.28,width*.35,r*.07,0);c.closePath();c.fill();c.stroke();
-          c.beginPath();c.moveTo(r*.12,0);c.quadraticCurveTo(length*.52,-width*.25,length*.91,0);c.strokeStyle=rgba(b,.5);c.lineWidth=Math.max(.5,r*.017);c.stroke();c.restore();
+          c.save();c.clip();const membrane=c.createLinearGradient(0,-width,0,width);membrane.addColorStop(0,rgba(b,.32));membrane.addColorStop(.38,rgba(b,.04));membrane.addColorStop(1,rgba("#05080e",.50));c.fillStyle=membrane;c.fillRect(0,-width*2,length,width*4);c.restore();
+          c.beginPath();c.moveTo(r*.12,0);c.quadraticCurveTo(length*.52,-width*.25,length*.91,0);c.strokeStyle=rgba(b,.24);c.lineWidth=Math.max(.5,r*.012);c.stroke();c.restore();
         };
         if(k==="ember"||k==="prism"||k==="pilgrim"){
           for(let i=0;i<art.lobes;i++){const a=i*TAU/art.lobes+q*.045;petal(a,r*(k==="ember"?.96:k==="prism"?.85:1.08),r*(k==="prism"?.15:.21),Math.sin(q+i)*.24);}
@@ -22341,14 +22342,14 @@
           // A hollow or resonant anatomy without assigning any cosmic origin.
           for(let i=0;i<art.lobes;i++){c.save();c.rotate(i*TAU/art.lobes+q*.035);c.beginPath();c.ellipse(r*.35,0,r*.45,r*(k==="hollow"?.12:.19),.3,0,TAU);c.stroke();c.restore();}
         }
-        c.strokeStyle=rgba(b,.64);c.lineWidth=Math.max(.6,r*.022);
+        c.strokeStyle=rgba(b,.36);c.lineWidth=Math.max(.6,r*.019);
         const count=Math.min(art.limbs,budget.details);
         for(let i=0;i<count;i++){
           const a=i*TAU/count+(k==="veil"?Math.PI*.4:0),d=k==="veil"?r*.91:r*1.18;
           c.beginPath();c.moveTo(Math.cos(a)*r*.21,Math.sin(a)*r*.21);
           c.quadraticCurveTo(Math.cos(a+.32)*r*.72,Math.sin(a+.32)*r*.72,Math.cos(a+Math.sin(q+i)*.09)*d,Math.sin(a+Math.sin(q+i)*.09)*d);c.stroke();
         }
-        if(k!=="hollow"){c.fillStyle=rgba(b,.9);c.beginPath();c.arc(0,0,r*.13,0,TAU);c.fill();}
+        if(k!=="hollow"){const core=c.createRadialGradient(-r*.04,-r*.05,0,0,0,r*.19);core.addColorStop(0,rgba(light(b,.4),.9));core.addColorStop(.5,rgba(a,.8));core.addColorStop(1,rgba("#10131c",.66));c.fillStyle=core;c.beginPath();c.arc(0,0,r*.19,0,TAU);c.fill();}
         else {c.beginPath();c.arc(0,0,r*.18,0,TAU);c.stroke();}
         c.restore();
       }
@@ -22369,14 +22370,14 @@
           if(contact.kind==="cosmic"){drawCosmicLifeContact(contact,p);continue;}
           const r=Math.max(5,9*zoom), color=contact.kind==="anomaly"?theme.accent2:contact.kind==="crystal"?theme.accent:"#b9d1dc";
           ctx.save();ctx.translate(p.x,p.y);
-          ctx.strokeStyle=rgba(color,.72);ctx.fillStyle=rgba(color,.22);ctx.lineWidth=1.15;
+          const material=ctx.createLinearGradient(-r,-r,r,r);material.addColorStop(0,rgba(light(color,.28),.8));material.addColorStop(.34,rgba(color,.55));material.addColorStop(1,rgba("#10131c",.88));ctx.strokeStyle=rgba(color,.38);ctx.fillStyle=material;ctx.lineWidth=.8;
           ctx.beginPath();
           if(contact.kind==="wreck"){ctx.moveTo(-r,-r*.32);ctx.lineTo(r*.72,-r*.5);ctx.lineTo(r,r*.25);ctx.lineTo(-r*.5,r*.65);ctx.closePath();}
           else if(contact.kind==="crystal"){ctx.moveTo(0,-r);ctx.lineTo(r*.6,0);ctx.lineTo(0,r);ctx.lineTo(-r*.6,0);ctx.closePath();}
           else if(contact.kind==="pod"){ctx.ellipse(0,0,r*.75,r*.42,-.5,0,TAU);}
           else{ctx.arc(0,0,r*.75,0,TAU);}
           ctx.fill();ctx.stroke();
-          ctx.beginPath();ctx.arc(0,0,r+4,0,TAU);ctx.strokeStyle=rgba(color,.28);ctx.stroke();
+          ctx.beginPath();ctx.arc(0,0,r+4,0,TAU);ctx.strokeStyle=rgba(color,.10);ctx.stroke();
           if(Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y)<180){
             ctx.font="600 10px system-ui";ctx.textAlign="center";ctx.fillStyle=color;ctx.fillText(contact.name,0,r+15);
           }
@@ -23125,11 +23126,12 @@
 
       function paintBetweenReach(c,w,h,art,theme,settings={}){
         const s=Math.max(w,h),budget=betweenArtBudget(settings);c.save();c.translate(w*.5,h*.5);c.rotate(art.lean*.52);
-        for(let i=0;i<budget.layers;i++){
-          const q=(i-(budget.layers-1)/2)/budget.layers,y=q*s*.92,bend=s*(art.kind===6?.21:.08)*Math.sin(art.phase+i);
-          c.beginPath();c.moveTo(-s,y);c.bezierCurveTo(-s*.46,y+bend,s*.25,y-bend,s,y+bend*.3);
-          c.lineWidth=s*(.008+i*.001);c.strokeStyle=rgba(i%2?theme.accent:theme.accent2,.035);c.stroke();
-          c.lineWidth=Math.max(.6,s*.00065);c.strokeStyle=rgba(theme.accent2,.055);c.stroke();
+        for(let i=0;i<Math.min(4,budget.layers);i++){
+          const q=(i-1.5)/4,xx=q*s*.6,yy=Math.sin(art.phase+i)*s*.18;
+          c.save();c.translate(xx,yy);c.scale(1,.3);
+          const g=c.createRadialGradient(0,0,0,0,0,s*.5);
+          g.addColorStop(0,rgba(i%2?theme.accent:theme.accent2,.045));g.addColorStop(.45,rgba(theme.accent,.022));g.addColorStop(1,"rgba(0,0,0,0)");
+          c.fillStyle=g;c.fillRect(-s*.5,-s*.5,s,s);c.restore();
         }c.restore();
       }
       // BEGIN IMMERSION SKY
@@ -23140,19 +23142,77 @@
         return {index:Math.max(0,kinds.indexOf(key)),angle:(hash%6283)/1000,offset:((hash>>>8)%1000)/1000};
       }
       function paintImmersionSky(c,w,h,system,theme,settings={}){
-        const f=immersionSkyProfile(system),low=settings.graphics==="Low"||settings.performanceMode==="Battery Saver",size=Math.max(w,h);
-        c.save();c.translate(w*(.35+f.offset*.3),h*.47);c.rotate(f.angle);
-        const count=low?4:10;
-        for(let i=0;i<count;i++){
-          const q=i/(count-1),a=q*6.283,span=size*(.38+q*.36);c.beginPath();
-          if(f.index===0||f.index===4){c.moveTo(-span,(q-.5)*size*.55);c.lineTo(-span*.25,(q-.5)*size*.36);c.lineTo(span*.35,(q-.5)*size*.62);c.lineTo(span,(q-.5)*size*.45);}
-          else if(f.index===2||f.index===6){c.moveTo(Math.cos(a)*span,Math.sin(a)*span);c.lineTo(size*.04,-size*.07);c.lineTo(Math.cos(a+.65)*span,Math.sin(a+.65)*span);}
-          else if(f.index===5){c.ellipse(0,0,span,span*.12,.3+q*.2,0,Math.PI*2);}
-          else {c.moveTo(-span,(q-.5)*size*.66);c.bezierCurveTo(-span*.4,-size*.36+q*size*.4,span*.4,size*.38-q*size*.4,span,(q-.5)*size*.5);}
-          c.strokeStyle=rgba(i%3?theme.accent:theme.accent2,f.index===5?.035:.065);c.lineWidth=Math.max(1,size*(.001+q*.002));c.stroke();
-        }c.restore();
+        const f=immersionSkyProfile(system),size=Math.max(w,h);
+        c.save();c.translate(w*(.34+f.offset*.32),h*.48);c.rotate(f.angle);c.scale(1,.38);
+        const g=c.createRadialGradient(0,0,0,0,0,size*.8);
+        g.addColorStop(0,rgba(theme.accent2,.035));g.addColorStop(.4,rgba(theme.accent,.025));g.addColorStop(1,"rgba(0,0,0,0)");
+        c.fillStyle=g;c.fillRect(-size,-size,size*2,size*2);c.restore();
       }
       // END IMMERSION SKY
+      // BEGIN DIMENSIONAL ART
+      const BETWEEN_CINEMA_PALETTES=Object.freeze([
+        ["#15131a","#8e5741","#d0a171"],["#101b26","#416b85","#a8bfbf"],
+        ["#171725","#675984","#bdc7da"],["#10201e","#487b68","#b1c3a0"],
+        ["#1b1820","#8b7562","#d8c3a0"],["#101522","#414e6c","#868eac"],
+        ["#1c1425","#79567e","#c6a5be"],["#122322","#5d8d79","#dcc99a"],
+        ["#171c24","#77634a","#dbc39a"]
+      ]);
+      function dimensionalShade(nx,ny,nz,terrain,fine,kind,seed){
+        const stripe=Math.sin((ny+nx*.21)*18+terrain*5+seed%13),
+          ridges=1-Math.abs(stripe),rough=(fine-.5)*.13,
+          bevel=Math.max(0,Math.min(1,(terrain-.4)*3.1));
+        const form=kind===0||kind===4?Math.pow(ridges,3)*.25:kind===1||kind===6?Math.pow(Math.abs(Math.sin(nx*17+ny*11+terrain*6)),9)*.16:kind===2||kind===3?Math.pow(ridges,2)*.11:.08*ridges;
+        const occlusion=.68+.32*bevel;
+        return Math.max(.28,Math.min(1.34,(.62+.47*nz+rough+form)*occlusion));
+      }
+      function dimensionalPalette(system){
+        const profile=immersionSkyProfile(system);
+        return BETWEEN_CINEMA_PALETTES[profile.index]||BETWEEN_CINEMA_PALETTES[8];
+      }
+      // END DIMENSIONAL ART
+      function paintVolumetricField(c,w,h,system,settings={}){
+        const f=immersionSkyProfile(system),colors=dimensionalPalette(system).map(hex),
+          size=settings.graphics==="Low"||settings.performanceMode==="Battery Saver"?144:settings.graphics==="Medium"?224:320,
+          sw=Math.max(1,Math.round(size*w/Math.max(w,h))),sh=Math.max(1,Math.round(size*h/Math.max(w,h))),
+          seed=visualSeed(system?.seed||"threshold"),ca=Math.cos(f.angle),sa=Math.sin(f.angle);
+        const field=rasterAsset(sw,sh,data=>{
+          for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){
+            const px=(x+.5-sw*.5)/Math.max(sw,sh),py=(y+.5-sh*.5)/Math.max(sw,sh),
+              u=px*ca-py*sa,v=px*sa+py*ca,
+              warp=visualFbm(u*4+19,v*4+29,3,seed,3)-.5,
+              broad=visualFbm(u*6+warp*1.8+31,v*8+warp*2+13,8,seed+11,4),
+              fine=visualFbm(u*22+warp*3+7,v*29+19,13,seed+91,3),
+              curve=.15*Math.sin(u*4+f.offset*6)+.08*Math.sin(u*9+f.angle),
+              offset=v-curve, density=Math.exp(-offset*offset*(f.index===5?88:27)),
+              veil=Math.max(0,(broad-.36)*1.9)*density,
+              crest=Math.pow(Math.max(0,(fine-.29)*1.3),2)*veil,
+              hollow=Math.max(0,visualNoise(u*9+10,v*9+20,2,seed+63)-.47),
+              extinction=1-Math.min(.8,hollow*1.25*veil),
+              detail=Math.max(0,veil*.52+crest*.55)*extinction,
+              luminous=Math.min(.8,crest*.46),falloff=Math.max(.5,1-(px*px+py*py)*.48),
+              i=(y*sw+x)*4;
+            for(let n=0;n<3;n++){
+              const k=["r","g","b"][n];
+              data[i+n]=(colors[0][k]*.46+colors[1][k]*detail+colors[2][k]*luminous)*falloff;
+            }
+            data[i+3]=255;
+          }
+        });
+        if(!field)return false;
+        c.save();c.imageSmoothingEnabled=true;c.imageSmoothingQuality="high";c.drawImage(field,0,0,w,h);c.restore();
+        field.width=field.height=1;return true;
+      }
+      function paintFormationDepth(c,b,x,y,r){
+        if(r<6)return;
+        c.save();betweenContourPath(c,b,x,y,r);c.clip();
+        const side=c.createLinearGradient(x-r*.6,y-r,x+r*.35,y+r);
+        side.addColorStop(0,"rgba(0,0,0,0)");side.addColorStop(.45,"rgba(0,0,0,0)");side.addColorStop(.78,"rgba(3,5,12,.42)");side.addColorStop(1,"rgba(2,3,8,.86)");
+        c.fillStyle=side;c.fillRect(x-r,y-r,r*2,r*2);
+        const bevel=c.createLinearGradient(x-r*.72,y-r*.8,x+r*.6,y+r*.71);
+        bevel.addColorStop(0,"rgba(231,215,177,.48)");bevel.addColorStop(.24,"rgba(201,194,166,.12)");bevel.addColorStop(.52,"rgba(15,14,22,.04)");bevel.addColorStop(1,"rgba(0,0,0,.68)");
+        c.strokeStyle=bevel;c.lineWidth=Math.max(.6,r*.035);betweenContourPath(c,b,x,y,r*.99);c.stroke();
+        c.restore();
+      }
       function cinematicSky() {
         const kind = cinematicArtKind(), image = environmentImage(kind);
         if (!image) return null; // The procedural sky is always a usable fallback.
@@ -23161,7 +23221,7 @@
           ratio = Math.min(1, cap / Math.max(W, H)),
           width = Math.max(1, Math.round(W * ratio)), height = Math.max(1, Math.round(H * ratio)),
           seed = visualSeed(game.system?.seed || "Sol"),
-          key = [kind, width, height, seed].join(":");
+          key = [kind, width, height, seed, quality, game.settings?.performanceMode].join(":");
         if (cinematicArt.key === key && cinematicArt.frame) return cinematicArt.frame;
         const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height;
         const c = canvas.getContext("2d"); if (!c) return null;
@@ -23181,6 +23241,8 @@
           ][themeIndex];
         c.filter = kind === "deep" && !tutorial
           ? `hue-rotate(${hues[themeIndex]}deg) saturate(0.93)` : "none";
+        const volume=paintVolumetricField(c,width,height,game.system,game.settings);
+        c.globalAlpha=volume?.14:1;
         c.drawImage(image,
           (width - dw) * (kind === "parallel" ? 0.85 : composition[0]),
           (height - dh) * (kind === "deep" && !tutorial ? composition[1] : 0.25),
@@ -23252,7 +23314,7 @@
           c.strokeStyle = rgba(light(b.color, 0.75), 0.7); c.lineWidth = Math.max(1, r * 0.014);
           c.beginPath(); c.arc(0, 0, r, Math.PI * 0.92, Math.PI * 1.82); c.stroke();
         }
-        paintBetweenFacets(c,b,0,0,r); paintBetweenRelief(c,b,0,0,r,game.settings); rings(true); c.restore();
+        paintFormationDepth(c,b,0,0,r); paintBetweenRelief(c,b,0,0,r,game.settings); rings(true); c.restore();
         return !!texture;
       }
       function renderDiscoveryPortrait() {
@@ -23386,8 +23448,7 @@
       }
 
       function surfaceTexture(b, size) {
-        if (b.name === "Earth") requestEarthAlbedo();
-        const mappedEarth = b.name === "Earth" && !!earthAlbedo.pixels;
+        const mappedEarth = false; // Legacy albedo remains packaged for compatibility, never used for First Anchorage.
         const seed = visualSeed(b.name + ":" + b.featureSeed),
           key = [seed, b.pattern, b.color, b.atmosphere, b.frontierFeature?.feature, b.frontierFeature?.accent, size, mappedEarth].join(":");
         if (renderAssets.surfaces.has(key)) {
@@ -23398,11 +23459,11 @@
         // Amortize first-view work; never generate an entire system in one frame.
         if (renderAssets.builds >= 1) return null;
         renderAssets.builds++;
-        const base = hex(b.name === "Mars" ? "#be7250" : b.color),
+        const base = hex(b.name === "Earth" ? "#8e9b83" : b.name === "Mars" ? "#a56c54" : b.color),
           gas = ["bands", "rings", "storm"].includes(b.pattern),
-          ocean = b.pattern === "continents", lava = b.pattern === "lava",
+          ocean = b.pattern === "continents" && b.name!=="Earth", lava = b.pattern === "lava",
           variation = b.name==="Earth"||b.name==="Mars"?0:(seed%17-8)*.12,
-          feature=b.frontierFeature, featureAccent=feature?hex(feature.accent):null;
+          feature=b.frontierFeature, featureAccent=feature?hex(feature.accent):null,materialKind=betweenFormationProfile(b).kind;
         const image = rasterAsset(size, size, data => {
           for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
             const nx = (x + 0.5) / size * 2 - 1, ny = (y + 0.5) / size * 2 - 1,
@@ -23473,7 +23534,8 @@
               else if(f.feature==="shear belts")strength=Math.max(0,Math.sin(ny*42+terrain*5))*.22;
               if(strength)rgb=rgb.map((v,c)=>v*(1-strength)+[accent.r,accent.g,accent.b][c]*strength);
             }
-            for (let c = 0; c < 3; c++) data[i + c] = (rgb[c] * (1 - Math.min(0.8, cloud)) + 235 * Math.min(0.8, cloud)) * limb;
+            const volume=dimensionalShade(nx,ny,nz,terrain,fine,materialKind,seed), haze=b.name==="Earth"?cloud*.25:cloud, wash=Math.min(.45,Math.max(0,haze)), luminance=rgb[0]*.24+rgb[1]*.57+rgb[2]*.19;
+            for (let c = 0; c < 3; c++) data[i + c] = ((rgb[c]*.84+luminance*.16)*(1-wash)+[214,211,194][c]*wash)*limb*volume;
             data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
           }
         });
@@ -23490,9 +23552,9 @@
       function drawDetailedSurface(b, p, r) {
         if (r < 5) return;
         const quality = game.settings?.graphics || "High",
-          size = quality === "Low" ? 96 : r * DPR > 90 ? 256 : 128,
+          size = quality === "Low" ? 96 : r * DPR > 150 ? 384 : r * DPR > 62 ? 256 : 128,
           image = surfaceTexture(b, size);
-        if (!image) { drawSurface(b, p, r); return; }
+        if (!image) return; // A shaded base remains until the next cached material is available.
         ctx.save();
         ctx.drawImage(image, p.x - r, p.y - r, r * 2, r * 2);
         if (b.rarity === "Exotic" || b.rarity === "Mythic") {
@@ -23669,7 +23731,7 @@
           glow.addColorStop(0.12, rgba(galaxy.color, 0.1));
           glow.addColorStop(0.5, rgba(galaxy.color, 0.035));
           glow.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.strokeStyle=rgba(galaxy.color,.16);ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(-galaxy.rx,0);ctx.quadraticCurveTo(-galaxy.rx*.3,-galaxy.rx*.5,0,0);ctx.quadraticCurveTo(galaxy.rx*.3,galaxy.rx*.5,galaxy.rx,0);ctx.stroke();
+          const core=ctx.createRadialGradient(0,0,0,0,0,galaxy.rx*.65);core.addColorStop(0,rgba("#e1d2b5",.10));core.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=core;ctx.fillRect(-galaxy.rx,-galaxy.rx,galaxy.rx*2,galaxy.rx*2);
           ctx.fillStyle = glow; ctx.fillRect(-galaxy.rx, -galaxy.rx, galaxy.rx * 2, galaxy.rx * 2);
           ctx.restore();
         }
@@ -23686,7 +23748,7 @@
           ctx.arc(x, y, s.r, 0, TAU);
           ctx.fill();
           if (quality === "High" && s.r > 1.05 && s.a > 0.58) {
-            ctx.globalAlpha = tw * 0.12;
+            ctx.globalAlpha = tw * 0.035;
             ctx.strokeStyle = s.h;
             ctx.lineWidth = 0.55;
             ctx.beginPath();
@@ -23729,13 +23791,13 @@
           ctx.save();
           ctx.translate(a.x, a.y);
           ctx.rotate(a.spin);
-          ctx.globalAlpha = 0.06 + a.d * 0.15;
+          ctx.globalAlpha = 0.035 + a.d * 0.10;
           const rock = ctx.createRadialGradient(-a.r * 0.35, -a.r * 0.42, 0, 0, 0, a.r * 1.4);
           rock.addColorStop(0, "rgba(226,232,240,.62)");
           rock.addColorStop(0.36, "rgba(100,116,139,.48)");
           rock.addColorStop(1, "rgba(15,23,42,.5)");
           ctx.fillStyle = rock;
-          if(a.motif===1){ctx.fillStyle=rgba(theme.accent,.6);ctx.fillRect(-a.r,-a.r*.25,a.r*2,a.r*.5);}else if(a.motif===2){ctx.strokeStyle=rgba(theme.accent2,.5);ctx.strokeRect(-a.r,-a.r*.55,a.r*2,a.r*1.1);}
+          // Ambient fragments use material shading instead of geometric symbols.
           ctx.beginPath();
           for (let i = 0; i < a.pts; i++) {
             const ang = (i / a.pts) * TAU,
@@ -23864,18 +23926,17 @@
             case 5:c.moveTo(-r,yy);c.bezierCurveTo(-r*.48,yy+k*2,r*.14,yy-k*2,r,yy+k);break;
             default:c.moveTo(Math.cos(q*Math.PI*2)*r,Math.sin(q*Math.PI*2)*r);c.lineTo(k*.3,-r*.1);c.lineTo(Math.cos(q*Math.PI*2+.8)*r*.8,Math.sin(q*Math.PI*2+.8)*r*.8);
           }
-          c.strokeStyle=rgba("#10101a",.39);c.lineWidth=Math.max(.65,r*.032);c.stroke();
-          c.strokeStyle=rgba(i%3?color:"#ded0ad",.26);c.lineWidth=Math.max(.4,r*.009);c.stroke();
+          c.strokeStyle=rgba("#10101a",.16);c.lineWidth=Math.max(.5,r*.023);c.stroke();
+          c.strokeStyle=rgba(i%3?color:"#ded0ad",.075);c.lineWidth=Math.max(.3,r*.007);c.stroke();
         }c.restore();
       }
       function drawFrontierGlobe(b,p,r){
         const f=b.frontierFeature;
         ctx.save();betweenContourPath(ctx,b,p.x,p.y,r);ctx.clip();
         if(f&&f.flatten<1){ctx.translate(p.x,p.y);ctx.rotate(f.tilt);ctx.scale(f.shape==="prolate"?f.flatten:1,f.shape==="oblate"?f.flatten:1);ctx.rotate(-f.tilt);ctx.translate(-p.x,-p.y);}
-        drawPlanetBase(b,p,r);drawDetailedSurface(b,p,r);drawPlanetLighting(b,p,r);
+        drawPlanetBase(b,p,r);drawDetailedSurface(b,p,r);paintBetweenRelief(ctx,b,p.x,p.y,r,game.settings);drawPlanetLighting(b,p,r);
         ctx.restore();
-        paintBetweenFacets(ctx,b,p.x,p.y,r);
-        paintBetweenRelief(ctx,b,p.x,p.y,r,game.settings);
+        paintFormationDepth(ctx,b,p.x,p.y,r);
         if(f&&r>8&&game.settings?.graphics!=="Low"&&["dust halo","inclined rings","split rings"].includes(f.feature)&&b.pattern!=="rings"){
           ctx.save();ctx.strokeStyle=rgba(f.accent,.23);ctx.lineWidth=Math.max(.6,r*.035);ctx.beginPath();ctx.ellipse(p.x,p.y,r*1.45,r*.7,f.tilt,0,TAU);ctx.stroke();ctx.restore();
         }
@@ -23929,7 +23990,7 @@
         betweenContourPath(ctx,b,p.x,p.y,r * .98);
         ctx.stroke();
         paintBetweenFacets(ctx,b,p.x,p.y,r);
-        ctx.save();ctx.strokeStyle=rgba(light(b.color,.45),.13);ctx.lineWidth=Math.max(.6,r*.02);
+        ctx.save();ctx.strokeStyle=rgba(light(b.color,.45),.035);ctx.lineWidth=Math.max(.5,r*.012);
         for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(p.x,p.y,r*(1.3+i*.24),r*(.46+i*.09),.57+i*.74,0,TAU);ctx.stroke();}
         ctx.restore();
         if (game.settings?.graphics !== "Low") {
@@ -24005,9 +24066,9 @@
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(direction);
         ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.clip();
         const shade = ctx.createLinearGradient(-r, 0, r, 0);
-        shade.addColorStop(0, "rgba(0,2,9,.94)");
-        shade.addColorStop(0.38, "rgba(0,2,9,.74)");
-        shade.addColorStop(0.53, "rgba(0,2,9,.28)");
+        shade.addColorStop(0, "rgba(0,2,9,.89)");
+        shade.addColorStop(0.38, "rgba(0,2,9,.64)");
+        shade.addColorStop(0.53, "rgba(0,2,9,.25)");
         shade.addColorStop(0.72, "rgba(0,0,0,0)");
         shade.addColorStop(1, rgba(star?.color||"#fff4dc",.19));
         ctx.fillStyle = shade; ctx.fillRect(-r, -r, r * 2, r * 2);
