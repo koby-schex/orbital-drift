@@ -1596,7 +1596,7 @@ navQA.openSection("explore");navQA.scroll=73;navQA.openSection("planets");
 const navWorld=api.game.system.bodies.find(b=>b.type!=="star");
 navQA.openWorldDetails(navWorld.name);assert.match(navQA.currentMenuRoute().tab,/^world:/);
 assert.match(navQA.markup,/Set as Target/);
-navQA.navigateMenuBack();assert.equal(navQA.title,"Worlds");
+navQA.navigateMenuBack();assert.equal(navQA.title,"Formations");
 navQA.navigateMenuBack();assert.equal(navQA.title,"Explore");assert.equal(navQA.scroll,73);
 navQA.navigateMenuBack();assert.equal(navQA.title,"Command");assert.equal(navQA.depth,0);
 navQA.openSection("frigate");navQA.setMenuTab("frigate|fleet");navQA.setMenuTab("frigate|missions");
