@@ -20,8 +20,8 @@ assert.match(html,/\.menu-secondary-details\s*>\s*summary:focus-visible/,
   "Native disclosures must have a visible keyboard focus state");
 
 const hub=fn("renderHub","menuLabel");
-assert.match(hub,/groupHtml\("Flight & Development", core\.slice\(0, 3\)\)/);
-assert.match(hub,/groupHtml\("Pioneer & Exploration", core\.slice\(3\)\.concat\(explore\)\)/);
+assert.match(hub,/groupHtml\("Explore & manage", \[core\[1\],core\[3\],core\[0\]\]\)/);
+assert.match(hub,/secondaryDetails\("Upgrades, appearance & routes"/);
 assert.match(hub,/secondaryDetails\("Records, Settings & Help"/);
 
 const resources=fn("renderResources","resourceHint");
