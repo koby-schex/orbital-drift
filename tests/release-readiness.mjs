@@ -1395,6 +1395,51 @@ assert.equal(api.loadGame(false),true);
 
 
 
+checkpoint("orbital concord");
+api.initGame(false);api.dismissPanels();api.prepareVaultTest(626262);api.dismissPanels();
+const concordQA=vm.runInContext(`({charterConcordWorld,concordCharterReason,concordChartered,concordLocalBonus,concordLanes,recordConcordEcho,productionRate,worldControlMode,renderConcord,
+  establish(b){b.captured=true;b.discovered=true;b.developed=true;b.level=1;game.captured.add(b.name);game.discovered.add(b.name);},
+  lock(b){game.ship.orbitLocked=true;game.ship.lockBody=b.name;},
+  release(b){b.captured=false;b.developed=false;game.captured.delete(b.name);},
+  get markup(){return ui.menuContent.innerHTML}
+})`,context);
+const [portA,portB]=api.game.system.bodies.filter(b=>b.type!=="star"&&b.capturable);
+assert.ok(portA&&portB);
+concordQA.establish(portA);concordQA.establish(portB);
+api.game.resources.Alloy=100;api.game.resources.DataCores=100;
+concordQA.lock(portA);
+assert.match(concordQA.concordCharterReason(portA),/station branch/);
+portA.memory.refuels=2;portB.memory.echoes=2;
+assert.equal(concordQA.charterConcordWorld(portB.name),false,"Remote ratification is prohibited");
+assert.equal(concordQA.charterConcordWorld(portA.name),true);
+assert.equal(api.game.resources.Alloy,90);assert.equal(api.game.resources.DataCores,95);
+assert.equal(concordQA.charterConcordWorld(portA.name),false,"No repeated charter cost");
+assert.equal(api.game.resources.Alloy,90);
+concordQA.lock(portB);assert.equal(concordQA.charterConcordWorld(portB.name),true);
+const lane={system:api.game.system.name,startBody:portA.name,endBody:portB.name,quality:80,points:[{x:portB.x,y:portB.y}]};
+assert.equal(concordQA.recordConcordEcho({...lane,quality:59}),false);
+assert.equal(concordQA.recordConcordEcho({...lane,system:"Other sector"}),false);
+assert.equal(concordQA.recordConcordEcho({...lane,points:[{x:1e8,y:1e8}]}),false);
+assert.equal(concordQA.recordConcordEcho({...lane,endBody:portA.name}),false);
+assert.equal(concordQA.recordConcordEcho(lane),true);
+assert.equal(concordQA.concordLanes().length,1);
+assert.equal(concordQA.recordConcordEcho({...lane,quality:70}),false);
+assert.equal(concordQA.recordConcordEcho({...lane,quality:90}),true);
+assert.equal(concordQA.concordLanes().length,1,"Better route replaces previous route");
+assert.equal(concordQA.concordLocalBonus(portA),0,"Identical roles do not create a supply benefit");
+portA.memory.controlMode="research";portB.memory.controlMode="industry";
+assert.ok(Math.abs(concordQA.concordLocalBonus(portA)-.072)<1e-8);
+assert.ok(Math.abs(concordQA.concordLocalBonus(portB)-.072)<1e-8);
+concordQA.renderConcord();assert.match(concordQA.markup,/90% route quality/);
+const portNames=[portA.name,portB.name];
+assert.equal(api.saveGame(false),true);assert.equal(api.loadGame(false),true);
+const restoredA=api.body(portNames[0]),restoredB=api.body(portNames[1]);
+assert.ok(concordQA.concordChartered(restoredA));assert.equal(concordQA.concordLanes().length,1);
+assert.ok(Math.abs(concordQA.concordLocalBonus(restoredA)-.072)<1e-8);
+concordQA.release(restoredB);assert.equal(concordQA.concordLanes()[0].active,false);
+assert.equal(concordQA.concordLocalBonus(restoredA),0,"Released settlements cannot supply production");
+concordQA.establish(restoredB);assert.equal(concordQA.concordLanes()[0].active,true,"Historical routes reconnect without repeated rewards");
+api.initGame(false);api.dismissPanels();assert.equal(concordQA.concordLanes().length,0,"New journeys cannot inherit territory");
 checkpoint("unified menu navigation");
 api.closeMenu();api.initGame(false);api.dismissPanels();api.prepareVaultTest(626262);api.dismissPanels();
 const navQA=vm.runInContext(`({
@@ -1404,7 +1449,7 @@ const navQA=vm.runInContext(`({
   get depth(){return menuHistory.length},get backDisabled(){return ui.menuBack.disabled},
   get visible(){return ui.menu.classList.contains("open")}
 })`,context);
-const navigationPages={hub:[null],explore:[null],hangar:[null],journal:[null],resources:[null],planets:[null],echoes:[null],codex:[null],activity:[null],guide:[null],help:[null],
+const navigationPages={hub:[null],explore:[null],hangar:[null],journal:[null],resources:[null],planets:[null],echoes:[null],codex:[null],concord:[null],activity:[null],guide:[null],help:[null],
   upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","shipyard","missions","history","vault","upgrades","cosmetics"],
   system:["status","ops","daily","contracts","milestones","travel","records","achievements","reputation","collections","settings","display","audio","controls","data","privacy"],
   cosmetics:["overview","ship","frigate","trail","fleet","sets"]};
