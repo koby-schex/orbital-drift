@@ -1375,7 +1375,7 @@ assert.equal(api.saveGame(false),true);
 assert.equal(api.loadGame(false),true);
 assert.equal(frontierQA.worldControlMode(api.body(eligible.name)),"relay");
 assert.equal(frontierQA.activeFrontierContacts().some(c=>c.id===contact.id),false,"Recovered contact cannot respawn on reload");
-assert.equal(api.game.system.generationVersion,2,"New sector generator version survives save/load");
+assert.equal(api.game.system.generationVersion,3,"New sector generator version survives save/load");
 const v2Save=api.saveState();
 const legacyQA=vm.runInContext(`({prepareLegacy(){
   const sys=proc(626262,1);systems=[sol(),sys];currentSystemIndex=1;game.system=sys;updateBodies(sys);resetShip();
@@ -1468,6 +1468,50 @@ concordQA.release(restoredB);assert.equal(concordQA.concordLanes()[0].active,fal
 assert.equal(concordQA.concordLocalBonus(restoredA),0,"Released settlements cannot supply production");
 concordQA.establish(restoredB);assert.equal(concordQA.concordLanes()[0].active,true,"Historical routes reconnect without repeated rewards");
 api.initGame(false);api.dismissPanels();assert.equal(concordQA.concordLanes().length,0,"New journeys cannot inherit territory");
+checkpoint("independent civilizations");
+api.initGame(false);api.dismissPanels();
+const civQA=vm.runInContext(`({civilizationProfile,civilizationContactReason,advanceCivilizationContact,recordCivilizationEcho,drawCivilizationInfrastructure,renderCivilizations,finishCapture,raid,
+  survey(b){b.discovered=true;b.discoveryRewardClaimed=true;game.discovered.add(b.name);},
+  lock(b){game.ship.orbitLocked=true;game.ship.lockBody=b.name;},
+  markup(){return ui.menuContent.innerHTML}
+})`,context);
+let civSeed=null;const cultures=new Set();
+for(let seed=10000;seed<10200;seed++){
+ const sys=api.proc(seed,3),legacy=api.proc(seed,2);
+ if(sys.specialType)continue;
+ assert.deepEqual(sys.bodies.map(b=>b.name),legacy.bodies.map(b=>b.name));
+ assert.ok(legacy.bodies.every(b=>!b.civilization));
+ assert.ok(sys.bodies.filter(b=>b.capturable).length>=2);
+ for(const b of sys.bodies.filter(b=>b.civilization)){
+   cultures.add(b.civilization.key);assert.equal(b.capturable,false);assert.equal(b.upgradeable,false);
+   if(civSeed===null)civSeed=seed;
+ }
+}
+assert.ok(civSeed!==null);assert.equal(cultures.size,6);
+const civSystem=api.prepareVaultTest(civSeed),inhabited=civSystem.bodies.find(b=>b.civilization),destination=civSystem.bodies.find(b=>b.capturable);
+assert.ok(inhabited&&destination);
+civQA.lock(inhabited);
+assert.match(civQA.civilizationContactReason(inhabited),/survey/i);
+assert.equal(civQA.finishCapture(inhabited),false);assert.equal(civQA.raid(inhabited),false);
+civQA.survey(inhabited);civQA.survey(destination);
+assert.equal(civQA.advanceCivilizationContact(inhabited.name),true);
+const culture=civQA.civilizationProfile(inhabited);
+for(const k of Object.keys(culture.cost))api.game.resources[k]=100;
+assert.equal(civQA.advanceCivilizationContact(inhabited.name),true);
+for(const [k,v] of Object.entries(culture.cost))assert.equal(api.game.resources[k],100-v);
+assert.equal(civQA.advanceCivilizationContact(inhabited.name),false);
+const culturalEcho={system:civSystem.name,startBody:inhabited.name,endBody:destination.name,quality:80,points:[{x:destination.x,y:destination.y}]};
+assert.equal(civQA.recordCivilizationEcho({...culturalEcho,quality:59}),false);
+assert.equal(civQA.recordCivilizationEcho(culturalEcho),true);
+assert.equal(civQA.advanceCivilizationContact(inhabited.name),true);
+assert.equal(civQA.advanceCivilizationContact(inhabited.name),false);
+assert.equal(civQA.civilizationProfile(inhabited).stage,3);
+civQA.drawCivilizationInfrastructure(inhabited,{x:100,y:100},30);
+civQA.renderCivilizations();assert.match(civQA.markup(),/Accord established/);
+const inhabitedName=inhabited.name;
+assert.equal(api.saveGame(false),true);assert.equal(api.loadGame(false),true);
+assert.equal(civQA.civilizationProfile(api.body(inhabitedName)).stage,3);
+assert.equal(api.body(inhabitedName).capturable,false);assert.equal(api.game.captured.has(inhabitedName),false);
 checkpoint("unified menu navigation");
 api.closeMenu();api.initGame(false);api.dismissPanels();api.prepareVaultTest(626262);api.dismissPanels();
 const navQA=vm.runInContext(`({
@@ -1477,7 +1521,7 @@ const navQA=vm.runInContext(`({
   get depth(){return menuHistory.length},get backDisabled(){return ui.menuBack.disabled},
   get visible(){return ui.menu.classList.contains("open")}
 })`,context);
-const navigationPages={hub:[null],explore:[null],hangar:[null],journal:[null],resources:[null],planets:[null],echoes:[null],codex:[null],concord:[null],activity:[null],guide:[null],help:[null],
+const navigationPages={hub:[null],explore:[null],hangar:[null],journal:[null],resources:[null],planets:[null],echoes:[null],codex:[null],concord:[null],civilizations:[null],activity:[null],guide:[null],help:[null],
   upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","shipyard","missions","history","vault","upgrades","cosmetics"],
   system:["status","ops","daily","contracts","milestones","travel","records","achievements","reputation","collections","settings","display","audio","controls","data","privacy"],
   cosmetics:["overview","ship","frigate","trail","fleet","sets"]};
