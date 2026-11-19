@@ -1277,3 +1277,58 @@ assert.match(worker, /CORE_ASSETS\.some/, "Service worker must scope runtime cac
 console.log(
   `Orbital Drift release readiness passed: tutorial economy (${Object.keys({ thrust: 1, fuel: 1, brake: 1, accel: 1, handling: 1, cargo: 1 }).length} paths), ${visited.length} unique randomized jumps, Discovery Depth, Pioneer Vault progression, save migration/recovery, cosmetics, responsive invariants, texture determinism/LRU limits, staged sky generation, viewport culling, hidden-tab suspension, distinct spacecraft geometry, sprite budgets, all-skin preview fit, owned-fleet previews, title save protection, transactional imports, rescue reloads, input isolation, persistent sector signals, travel boundaries, title storage reads, render cadence, refresh-independent camera, audio lifecycle, and PWA assets.`,
 );
+
+
+checkpoint("frontier expansion");
+api.initGame(false);api.dismissPanels();
+const frontier=api.prepareVaultTest(626262);
+assert.ok(api.vaultCatalog.length>=56);
+assert.equal(new Set(api.vaultCatalog.map(x=>x.key)).size,api.vaultCatalog.length);
+const frontierQA=vm.runInContext(`({
+  frontierContacts,activeFrontierContacts,frontierContactKey,recoverFrontierContact,
+  vaultPerk,vaultBonus,vaultDiscoveryCandidates,vaultSpecimenArt,hydrateVault,
+  setWorldControlMode,worldControlMode,worldControlStability,planetCaptureReady,
+  selectWorld(name){selectedPlanetName=name;},
+  targetContact(){const n=nearestFrontierContact();manualTargetName="@contact:"+n.contact.id;return currentTarget();},
+  drawFrontierContacts
+})`,context);
+const eligible=frontier.bodies.find(b=>b.type!=="star"&&b.capturable);
+assert.ok(eligible,"Frontier systems must offer genuine capture opportunities");
+for(let seed=1;seed<300;seed++){
+  const system=api.proc(seed*31+7);
+  if(!system.specialType)assert.ok(system.bodies.some(b=>b.type!=="star"&&b.capturable),"Every ordinary generated sector needs a foothold");
+}
+const contacts=frontierQA.activeFrontierContacts();
+assert.ok(contacts.length>=7&&contacts.length<=14);
+assert.equal(new Set(contacts.map(c=>c.id)).size,contacts.length);
+assert.deepEqual(frontierQA.frontierContacts(),frontierQA.frontierContacts(JSON.parse(JSON.stringify({...frontier,frontierContacts:undefined}))));
+const contact=contacts[0];
+api.game.ship.x=contact.x;api.game.ship.y=contact.y;
+api.game.ship.orbitLocked=false;api.game.ship.lockBody=null;
+assert.equal(frontierQA.targetContact().id,contact.id);
+assert.equal(frontierQA.recoverFrontierContact(),true);
+const recoveredResources=JSON.stringify(api.game.resources);
+assert.equal(frontierQA.activeFrontierContacts().some(c=>c.id===contact.id),false);
+assert.equal(frontierQA.recoverFrontierContact(),false);
+assert.equal(JSON.stringify(api.game.resources),recoveredResources);
+const one=api.registerVaultDiscovery("planet","Test planet A",true);
+const two=api.registerVaultDiscovery("planet","Test planet B",true);
+assert.ok(one&&two&&one.catalogKey!==two.catalogKey);
+const count=api.vaultState().entries.length;
+api.registerVaultDiscovery("planet","Repeated known item",true,one.catalogKey);
+assert.equal(api.vaultState().entries.length,count);
+assert.equal(frontierQA.hydrateVault({entries:[one,{...one,status:"secured"}]}).entries.length,1);
+assert.equal(new Set(api.vaultCatalog.map(t=>frontierQA.vaultSpecimenArt({catalogKey:t.key}))).size,api.vaultCatalog.length);
+assert.ok(frontierQA.vaultPerk({catalogKey:"second-sun"}).value>frontierQA.vaultPerk({catalogKey:"iron-orchid"}).value);
+assert.ok(frontierQA.vaultBonus("survey")<=.22);
+api.game.ship.orbitLocked=true;api.game.ship.lockBody=eligible.name;
+assert.equal(frontierQA.planetCaptureReady().name,eligible.name);
+api.capture();
+assert.ok(api.game.captured.has(eligible.name));
+frontierQA.selectWorld(eligible.name);
+assert.equal(frontierQA.setWorldControlMode("relay"),true);
+assert.equal(frontierQA.worldControlMode(eligible),"relay");
+assert.equal(api.saveGame(false),true);
+assert.equal(api.loadGame(false),true);
+assert.equal(frontierQA.worldControlMode(api.body(eligible.name)),"relay");
+assert.equal(frontierQA.activeFrontierContacts().some(c=>c.id===contact.id),false,"Recovered contact cannot respawn on reload");
