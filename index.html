@@ -12443,7 +12443,7 @@
             b.resource === "DataCores" || b.resource === "Crystal"
               ? 0.35
               : 0.12;
-        return m*(1+Math.min(.12,crewDutyPower("systems")*.01)+vaultBonus("production"));
+        return m*(1+Math.min(.12,crewDutyPower("systems")*.01)+vaultBonus("production")+(!game.system.isTutorial&&b.memory?.controlMode==="industry"?.12:0));
       }
       function productionRate(b) {
         if (
@@ -12461,7 +12461,7 @@
         return Math.max(0,rate)*60*60*TIME_SCALE;
       }
       function researchProductionRate(b){
-        return Math.max(0,Number(b?.branches?.research)||0)*.012*rarityBonus(b);
+        return (Math.max(0,Number(b?.branches?.research)||0)*.012+(b?.memory?.controlMode==="research"?.006:0))*rarityBonus(b);
       }
       function productionPreview(b) {
         if (!b || !game.captured.has(b.name)||!b.developed) return "Not producing yet";
@@ -13022,7 +13022,7 @@
           return errorToast("Capture requires orbital lock.");
         const b = body(s.lockBody);
         if (!b || b.type === "star")
-          return errorToast("You cannot capture a star.");
+          return errorToast("Lock orbit around a planet first.");
         if (!b.capturable)
           return errorToast(b.name + " is survey-only: " + b.hazard);
         if (game.captured.has(b.name))
@@ -13059,6 +13059,7 @@
           extractorLevel: Math.max(1, b.extractorLevel),
         });
         if (!b.branches) b.branches = defaultBranches();
+        if(!game.system.isTutorial){b.memory.controlMode=b.memory.controlMode||"outpost";}
         game.captured.add(b.name);
         selectedPlanetName = b.name;
         const amount = firstCapture?Math.round(
@@ -15987,6 +15988,8 @@
             sub = orbitingFrigate() ? "Jump drive synchronized" : "Return to Pioneer orbit";
           return { title: objective.action, sub, menu: objective.menu };
         }
+        const contact=nearestFrontierContact();
+        if(contact&&contact.d<320&&!game.ship.orbitLocked)return {title:"Recover "+contact.contact.name,sub:Math.round(contact.d)+"u • teal radar marker",menu:"frigate"};
         if (game.majorThreat?.status === "active")
           return {
             title: "Prepare for " + game.majorThreat.name,
@@ -17255,8 +17258,17 @@
           "</div></div></div>" +
           restrict +
           prod +
-          branches + (owned&&!game.system.isTutorial?card("Control status",esc(b.identity||"Frontier")+" • "+(b.branches?.station||0)+" relay / "+(b.branches?.extractor||0)+" industry / "+(b.branches?.research||0)+" research. Develop the world along the path that supports your exploration."):"")
+          branches + (owned&&!game.system.isTutorial?card("World control","Active: "+esc(worldControlMode(b))+". Choose a specialization; switch freely. Industry increases output, Research adds data, Relay improves refueling.",["outpost","industry","research","relay"].map(mode=>btn(mode[0].toUpperCase()+mode.slice(1),"setWorldControlMode",mode,worldControlMode(b)!==mode)).join("")):"")
         );
+      }
+      function worldControlMode(b){return b?.memory?.controlMode||"outpost";}
+      function setWorldControlMode(mode){
+        const b=body(selectedPlanetName);
+        if(!b||game.system.isTutorial||!game.captured.has(b.name)||!["outpost","industry","research","relay"].includes(mode))return false;
+        if(!b.memory)b.memory=defaultMemory();
+        b.memory.controlMode=mode;
+        addActivity("capture",b.name+" control changed",mode);
+        saveGame(false);renderMenu();return true;
       }
       function branchHtml(b) {
         return (
@@ -20391,6 +20403,80 @@
         if(stage===6)return "Docked? Tap Jump Outward";
         return fallback;
       }
+      // Contacts are deterministic coordinates, not background sprites. Discovery keys
+      // already persist across saves and jumps, so a contact cannot pay twice.
+      function frontierContacts(system=game.system){
+        if(!system||system.isTutorial)return [];
+        if(system.frontierContacts)return system.frontierContacts;
+        const family=vaultFamily(system), seed=Number(system.seed)||1;
+        const types=({
+          innerForge:[["Forge wreck","wreck"],["Plasma fragment","crystal"],["Metallic debris","debris"]],
+          gasFrontier:[["Storm capsule","pod"],["Charged ice","crystal"],["Broken weather probe","wreck"]],
+          crystalReach:[["Prismatic fragment","crystal"],["Glass satellite","wreck"],["Resonant mote","anomaly"]],
+          bioCluster:[["Drifting seed","pod"],["Living filament","anomaly"],["Organic shell","debris"]],
+          ancientArchive:[["Ancient beacon","wreck"],["Engraved fragment","debris"],["Sealed reliquary","pod"]],
+          voidRim:[["Silent derelict","wreck"],["Dark matter mote","anomaly"],["Lost cargo","pod"]],
+          parallel:[["Mirror probe","wreck"],["Impossible fragment","anomaly"],["Inverted crystal","crystal"]],
+          cosmicSpirit:[["Pilgrim light","anomaly"],["Luminous seed","pod"],["Starlight fragment","crystal"]]
+        })[family]||[["Lost cargo","pod"],["Debris field","debris"],["Uncharted signal","anomaly"]];
+        const rings=system.bodies.filter(b=>b.type!=="star"), outer=Math.max(900,...rings.map(b=>b.orbitRadius||0));
+        return system.frontierContacts=Array.from({length:Math.min(14,Math.max(7,rings.length*2))},(_,i)=>{
+          const item=types[i%types.length], a=between(seed+i*71+991,0,TAU),
+            r=i===0?between(seed+981,470,620):between(seed+i*89+993,660,outer+170);
+          // Include the stable sector-local index in the persistent origin.
+          return {id:family+"-"+i,name:item[0],kind:item[1],origin:item[0]+" / "+(i+1),x:Math.cos(a)*r,y:Math.sin(a)*r};
+        });
+      }
+      function frontierContactKey(contact,system=game.system){
+        return String(system?.seed||system?.name||"system")+"|space|"+contact.origin;
+      }
+      function activeFrontierContacts(){
+        const keys=new Set(vaultState().discoveryKeys);
+        return frontierContacts().filter(c=>!keys.has(frontierContactKey(c)));
+      }
+      function nearestFrontierContact(){
+        if(!game.ship||!game.frigate?.built||game.system?.isTutorial)return null;
+        let best=null;
+        for(const contact of activeFrontierContacts()){
+          const d=Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y);
+          if(!best||d<best.d)best={contact,d};
+        }
+        return best;
+      }
+      function recoverFrontierContact(){
+        const n=nearestFrontierContact();
+        if(!n||n.d>100||pioneerRescue)return false;
+        const contact=n.contact, key=frontierContactKey(contact), vault=vaultState();
+        if(vault.discoveryKeys.includes(key))return false;
+        const before=vault.entries.length;
+        registerVaultDiscovery("space",contact.origin,true);
+        // The catalog can be exhausted; salvage still has value once per site.
+        if(!vault.discoveryKeys.includes(key))vault.discoveryKeys.push(key);
+        const reward=contact.kind==="crystal"?{Crystal:6,DataCores:2}:contact.kind==="pod"?{Helium3:8,BioGel:3}:contact.kind==="anomaly"?{DataCores:5,Plasma:3}:{Alloy:10,Titanium:3};
+        grantReward(reward,"Frontier recovery");
+        addActivity("discovery",contact.name+" recovered",fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
+        playSound("capture");saveGame(false);renderMenu();return true;
+      }
+      function drawFrontierContacts(){
+        const contacts=activeFrontierContacts(), theme=activeVisualTheme||sectorVisualTheme();
+        for(const contact of contacts){
+          const p=screen(contact.x,contact.y);if(p.x<-35||p.y<-35||p.x>W+35||p.y>H+35)continue;
+          const r=Math.max(5,9*zoom), color=contact.kind==="anomaly"?theme.accent2:contact.kind==="crystal"?theme.accent:"#b9d1dc";
+          ctx.save();ctx.translate(p.x,p.y);
+          ctx.strokeStyle=rgba(color,.72);ctx.fillStyle=rgba(color,.22);ctx.lineWidth=1.15;
+          ctx.beginPath();
+          if(contact.kind==="wreck"){ctx.moveTo(-r,-r*.32);ctx.lineTo(r*.72,-r*.5);ctx.lineTo(r,r*.25);ctx.lineTo(-r*.5,r*.65);ctx.closePath();}
+          else if(contact.kind==="crystal"){ctx.moveTo(0,-r);ctx.lineTo(r*.6,0);ctx.lineTo(0,r);ctx.lineTo(-r*.6,0);ctx.closePath();}
+          else if(contact.kind==="pod"){ctx.ellipse(0,0,r*.75,r*.42,-.5,0,TAU);}
+          else{ctx.arc(0,0,r*.75,0,TAU);}
+          ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.arc(0,0,r+4,0,TAU);ctx.strokeStyle=rgba(color,.28);ctx.stroke();
+          if(Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y)<180){
+            ctx.font="600 10px system-ui";ctx.textAlign="center";ctx.fillStyle=color;ctx.fillText(contact.name,0,r+15);
+          }
+          ctx.restore();
+        }
+      }
       function smartAction() {
         const n = nearestSurveyTarget(), fuelTarget=nearestRefuelTarget(),
           h = nearestEcho(),
@@ -20426,6 +20512,8 @@
           return { label: "Harvest Echo", run: harvestEcho, show: true };
         if (bh && bh.d < 140)
           return { label: "Enter Black Hole", run: enterBlackHole, show: true };
+        const contact=nearestFrontierContact();
+        if(contact&&contact.d<=100)return {label:"Recover "+contact.contact.name,run:recoverFrontierContact,show:true};
         if(n.body)return {label:"Scan "+n.body.name,run:()=>scanPlanet(n.body.name),show:true};
         if(fuelTarget.body&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
         if (ev && !ev.event.mysteryScanned && ev.d < mysteryScanRadius())
@@ -23843,6 +23931,7 @@
         drawAnomaly();
         drawBlackHole();
         drawSectorEvent();
+        drawFrontierContacts();
         drawMajorThreat();
         for (const b of game.system.bodies) drawBody(b);
         drawFrigate();
@@ -23892,8 +23981,8 @@
               : null,
           threat =
             game.majorThreat?.status === "active" ? game.majorThreat : null,
-          bodies = game.system.bodies || [],
-          all = [...bodies, frig, bh, ev, threat, game.ship].filter(Boolean),
+          bodies = game.system.bodies || [], contacts=activeFrontierContacts(),
+          all = [...bodies, ...contacts, frig, bh, ev, threat, game.ship].filter(Boolean),
           maxWorld = Math.max(
             900,
             ...all.map(
@@ -24182,6 +24271,7 @@
         c.shadowBlur = 0;
         c.restore();
         label("YOU", sp.x, sp.y + 16, "#fff");
+        for(const contact of contacts){const p=mapPoint(contact);c.fillStyle="#a6e4df";c.fillRect(p.x-1,p.y-1,2,2);}
         c.restore();
       }
       function drawCinematicLight() {
@@ -26206,6 +26296,8 @@
         setTrailSkin,
         upgradeFrigate,
         secureVaultEntry,
+        setWorldControlMode,
+        recoverFrontierContact,
         upgradePlanet,
         upgradeBranch,
         setTarget,
