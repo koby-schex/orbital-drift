@@ -5456,7 +5456,20 @@
       .title-screen .title-journey{border:0!important;border-bottom:1px solid #514638!important;background:transparent!important;border-radius:0!important;text-align:center;font-size:11px!important;padding:6px!important;margin-bottom:9px!important}
       @media(max-height:680px){.title-screen .ninefold-seal{width:36px;height:36px;margin-bottom:5px}.title-screen .title-showcase{height:23vh!important;min-height:108px!important}.title-screen .title-logo{font-size:clamp(32px,8vw,47px)!important}.title-screen .title-sub{margin:5px auto 8px!important}.title-panel-kicker{margin:3px 0 7px}}
 
-    </style>
+    
+      /* Immersion: editorial hierarchy across command surfaces. */
+      .menu .route-row{border-radius:4px!important;background:linear-gradient(110deg,#20232d,#171b24)!important;border-color:#45413c!important;min-height:70px!important}
+      .menu .route-row .route-icon{border-radius:4px!important;background:#25252d!important;color:#d6bd8a!important}
+      .menu .route-row:active{background:#31303a!important}
+      .menu .card,.menu .quest,.menu .vault-entry,.menu .settings-shell{border-radius:4px!important;border-color:#45413c!important}
+      .menu .card h4,.menu .screen-intro b{font-family:var(--nf-heading);font-weight:500!important;font-size:17px!important}
+      .menu .route-copy b{font-size:15px!important;line-height:1.3!important}
+      .menu .route-copy small{line-height:1.4!important}
+      .menu button:not(.route-row),.dialog button{border-radius:4px!important}
+      .menu .nav-context{border-bottom-color:#66563f}
+      .menu .nav-path{color:#d1c6b3!important}
+      @media(prefers-reduced-motion:reduce){.menu .route-row{transition:none!important}}
+</style>
   </head>
   <body>
     <canvas
@@ -8390,7 +8403,7 @@
           visual: "signal",
           title: "The Broken Lifeline",
           summary:
-            "A colony tender is tumbling through a failing gravity lane. Its reactor is stable, but forty-seven passengers are trapped behind a collapsed docking collar.",
+            "A shelter tender is tumbling along a collapsing passage seam. Its reactor is stable, but forty-seven passengers are trapped behind a collapsed docking collar.",
           choices: [
             {
               label: "Lead a direct rescue",
@@ -8423,7 +8436,7 @@
               desc: "Transmit the tender's position and recover its beacon for the next rescue crew.",
               outcome: {
                 result:
-                  "The beacon is relayed to Coalition space. The passengers must wait, but help now has an exact route.",
+                  "The beacon is relayed to a Coalition listening post. The passengers must wait, but help now has an exact route.",
                 reward: { DataCores: 4, Alloy: 8 },
                 reputation: { coalition: 1 },
               },
@@ -8458,7 +8471,7 @@
               requirement: { type: "frigate", key: "scanner", amount: 1 },
               outcome: {
                 result:
-                  "The ODF Pioneer isolates a harmless resonance pattern. Coalition scientists can now manufacture a treatment.",
+                  "The Pioneer isolates a harmless resonance pattern. Coalition scientists can now manufacture a treatment.",
                 reward: { DataCores: 14, Plasma: 5 },
                 reputation: { coalition: 1, echo: 2 },
               },
@@ -8482,12 +8495,12 @@
           visual: "signal",
           title: "A City Without a Sun",
           summary:
-            "A generation habitat has lost its navigation star. Thousands of residents are safe, but their maps end at the edge of this sector.",
+            "A drifting habitat has lost its reference anchor. Thousands of residents are safe, but their charts end at the edge of this reach.",
           choices: [
             {
               label: "Share a charted route",
               tag: "Coalition trust",
-              desc: "Give the habitat a verified path to the nearest stable system.",
+              desc: "Give the habitat a verified path to the nearest stable anchorage.",
               requirement: {
                 type: "reputation",
                 faction: "coalition",
@@ -8495,7 +8508,7 @@
               },
               outcome: {
                 result:
-                  "The habitat accepts your navigation authority and begins a careful burn toward Coalition space.",
+                  "The habitat accepts your navigation authority and begins a careful burn toward a Coalition relay.",
                 reward: { Helium3: 16, Alloy: 18 },
                 reputation: { coalition: 2, wayfarers: 1 },
               },
@@ -8519,7 +8532,7 @@
               desc: "Preserve the habitat's location for a future expedition.",
               outcome: {
                 result:
-                  "The coordinates enter the Captain's Log. Coalition rescue crews will eventually find the habitat.",
+                  "The coordinates enter the expedition journal. Coalition rescue crews will eventually find the habitat.",
                 reward: { DataCores: 5 },
                 reputation: { coalition: 1 },
               },
@@ -8532,7 +8545,7 @@
           visual: "derelict",
           title: "The Ship That Kept Sailing",
           summary:
-            "A century-old courier still follows its route with no crew aboard. Its navigation core repeats the same final delivery request.",
+            "A weathered courier still follows its route with no crew aboard. Its navigation core repeats the same final delivery request.",
           choices: [
             {
               label: "Complete the delivery",
@@ -8577,12 +8590,12 @@
           visual: "comet",
           title: "The Lantern Comet",
           summary:
-            "A comet burns with internal geometric light. Wayfarer prospectors are chasing it, but their ships cannot survive its gravity wake.",
+            "A drifting shard burns with internal geometric light. Wayfarer prospectors are chasing it, but their ships cannot survive its gravity wake.",
           choices: [
             {
               label: "Ride the gravity wake",
               tag: "Acceleration I",
-              desc: "Use Starling's tuned drive to skim the comet and recover a luminous sample.",
+              desc: "Use Starling's tuned drive to skim the shard and recover a luminous sample.",
               requirement: { type: "shipSystem", key: "accel", amount: 1 },
               outcome: {
                 result:
@@ -8598,7 +8611,7 @@
               requirement: { type: "frigate", key: "scanner", amount: 1 },
               outcome: {
                 result:
-                  "The prospectors reach the comet together and split the recovered material according to Guild custom.",
+                  "The prospectors reach the shard together and split the recovered material according to Guild custom.",
                 reward: { Crystal: 10, Helium3: 12, Alloy: 12 },
                 reputation: { wayfarers: 2 },
               },
@@ -8606,10 +8619,10 @@
             {
               label: "Observe from a safe orbit",
               tag: "Survey",
-              desc: "Record the comet's passage without risking your ship.",
+              desc: "Record the shard's passage without risking your ship.",
               outcome: {
                 result:
-                  "The comet disappears beyond sensor range, leaving a precise new gravity model in your archive.",
+                  "The shard disappears beyond sensor range, leaving a precise new gravity model in your archive.",
                 reward: { DataCores: 6 },
                 reputation: { echo: 1 },
               },
@@ -8627,7 +8640,7 @@
             {
               label: "Trade an Echo route",
               tag: "Requires harvested Echo",
-              desc: "Exchange route memory for the navigator's hidden sector chart.",
+              desc: "Exchange route memory for the navigator's hidden passage chart.",
               requirement: { type: "echoes", amount: 1 },
               outcome: {
                 result:
@@ -8669,7 +8682,7 @@
           visual: "ruin",
           title: "The Unopened Room",
           summary:
-            "A black geometric chamber hangs motionless between gravity wells. Its door displays a recording of Starling arriving—made decades ago.",
+            "A black geometric chamber hangs motionless between gravity wells. Its door displays a recording of Starling arriving—with an unreadable date.",
           choices: [
             {
               label: "Answer with Data Cores",
@@ -8691,7 +8704,7 @@
               requirement: { type: "frigate", key: "scanner", amount: 2 },
               outcome: {
                 result:
-                  "The scan reveals that the chamber is not predicting Starling—it remembers a version of the ship from somewhere else.",
+                  "The scan reveals that the chamber is not predicting Starling—the image resembles your vessel, but its origin cannot be established.",
                 reward: { DataCores: 16, Plasma: 7 },
                 reputation: { echo: 2 },
               },
@@ -8725,7 +8738,7 @@
               desc: "Let the Echo Collective isolate the voice and preserve its coordinates.",
               outcome: {
                 result:
-                  "The route writes itself into your archive. Its final coordinate is inside a system that has no registered star.",
+                  "The route writes itself into your archive. Its final coordinate is inside a reach with no registered anchor.",
                 reward: { DataCores: 10, Crystal: 8 },
                 reputation: { echo: 2 },
                 storyStage: 1,
@@ -8755,7 +8768,7 @@
           chapter: "Silent Choir • II",
           title: "The Starless Observatory",
           summary:
-            "The impossible coordinate leads to an observatory orbiting empty space. Inside, thousands of dormant receivers are aimed at Starling.",
+            "The impossible coordinate leads to an observatory suspended without an identifiable anchor. Inside, thousands of dormant receivers are aimed at Starling.",
           choices: [
             {
               label: "Wake the receiver array",
@@ -8765,7 +8778,7 @@
               cost: { Plasma: 6 },
               outcome: {
                 result:
-                  "Every receiver activates. The Silent Choir is not one voice—it is a network of lost expeditions calling home across different realities.",
+                  "Every receiver activates. The receivers replay overlapping distress records. Their source remains unverified.",
                 reward: { DataCores: 18, Crystal: 12 },
                 reputation: { echo: 2 },
                 storyStage: 2,
@@ -8779,7 +8792,7 @@
               requirement: { type: "fleet", amount: 1 },
               outcome: {
                 result:
-                  "The survey team finds names etched into the receivers—including the name of your fleet craft, written long before it was built.",
+                  "The survey team finds names etched into the receivers—including the name of your fleet craft, in markings of uncertain age.",
                 reward: { Titanium: 18, DataCores: 12 },
                 reputation: { wayfarers: 1, echo: 2 },
                 storyStage: 2,
@@ -8789,10 +8802,10 @@
             {
               label: "Seal the observatory",
               tag: "Coalition protocol",
-              desc: "Prevent anyone else from activating an unknown cross-reality network.",
+              desc: "Prevent anyone else from activating a network of uncertain origin.",
               outcome: {
                 result:
-                  "The doors fuse shut. As you leave, one receiver turns by itself and follows Starling across the sky.",
+                  "The doors fuse shut. As you leave, one receiver turns by itself and follows Starling along the passage.",
                 reward: { Alloy: 16 },
                 reputation: { coalition: 2, echo: -1 },
                 storyStage: 2,
@@ -8809,12 +8822,12 @@
           chapter: "Silent Choir • Finale",
           title: "The Last Note Home",
           summary:
-            "The Choir opens a temporary gravity corridor. It can carry one message to every lost expedition—or pull one impossible artifact back into your universe.",
+            "The Choir opens a temporary gravity corridor. It can carry one message to every lost expedition—or recover one unidentified artifact from beyond the seam.",
           choices: [
             {
               label: "Send the way home",
               tag: "Final decision",
-              desc: "Broadcast your safest charted routes so the lost expeditions can navigate toward familiar space.",
+              desc: "Broadcast your safest charted routes so the lost expeditions can navigate toward charted anchorages.",
               outcome: {
                 result:
                   "Across the corridor, hundreds of distant engines answer. The Choir becomes a beacon instead of a warning.",
@@ -8828,10 +8841,10 @@
             {
               label: "Recover the impossible artifact",
               tag: "Final decision",
-              desc: "Use the corridor once to retrieve a device built by a version of the ODF Pioneer that never returned.",
+              desc: "Use the corridor once to retrieve a device whose markings resemble those aboard the Pioneer.",
               outcome: {
                 result:
-                  "A cold prism crosses the corridor. It contains navigation memories from a thousand unrealized journeys.",
+                  "A cold prism crosses the corridor. It contains unfamiliar navigation records.",
                 reward: { DataCores: 30, DarkMatter: 3, Plasma: 18 },
                 reputation: { echo: 3, coalition: -1 },
                 storyStage: 3,
@@ -22560,6 +22573,27 @@
           c.lineWidth=Math.max(.6,s*.00065);c.strokeStyle=rgba(theme.accent2,.055);c.stroke();
         }c.restore();
       }
+      // BEGIN IMMERSION SKY
+      function immersionSkyProfile(system){
+        const key=system?.specialType||system?.archetype?.key||"threshold";
+        const kinds=["innerForge","gasFrontier","crystalReach","bioCluster","ancientArchive","voidRim","parallel","cosmicSpirit","threshold"];
+        let hash=2166136261;for(const ch of String(system?.seed??"threshold"))hash=Math.imul(hash^ch.charCodeAt(0),16777619)>>>0;
+        return {index:Math.max(0,kinds.indexOf(key)),angle:(hash%6283)/1000,offset:((hash>>>8)%1000)/1000};
+      }
+      function paintImmersionSky(c,w,h,system,theme,settings={}){
+        const f=immersionSkyProfile(system),low=settings.graphics==="Low"||settings.performanceMode==="Battery Saver",size=Math.max(w,h);
+        c.save();c.translate(w*(.35+f.offset*.3),h*.47);c.rotate(f.angle);
+        const count=low?4:10;
+        for(let i=0;i<count;i++){
+          const q=i/(count-1),a=q*6.283,span=size*(.38+q*.36);c.beginPath();
+          if(f.index===0||f.index===4){c.moveTo(-span,(q-.5)*size*.55);c.lineTo(-span*.25,(q-.5)*size*.36);c.lineTo(span*.35,(q-.5)*size*.62);c.lineTo(span,(q-.5)*size*.45);}
+          else if(f.index===2||f.index===6){c.moveTo(Math.cos(a)*span,Math.sin(a)*span);c.lineTo(size*.04,-size*.07);c.lineTo(Math.cos(a+.65)*span,Math.sin(a+.65)*span);}
+          else if(f.index===5){c.ellipse(0,0,span,span*.12,.3+q*.2,0,Math.PI*2);}
+          else {c.moveTo(-span,(q-.5)*size*.66);c.bezierCurveTo(-span*.4,-size*.36+q*size*.4,span*.4,size*.38-q*size*.4,span,(q-.5)*size*.5);}
+          c.strokeStyle=rgba(i%3?theme.accent:theme.accent2,f.index===5?.035:.065);c.lineWidth=Math.max(1,size*(.001+q*.002));c.stroke();
+        }c.restore();
+      }
+      // END IMMERSION SKY
       function cinematicSky() {
         const kind = cinematicArtKind(), image = environmentImage(kind);
         if (!image) return null; // The procedural sky is always a usable fallback.
@@ -22608,6 +22642,7 @@
         }
         if (!tutorial) paintEnvironmentComposition(c,width,height,environmentComposition(game.system),sectorVisualTheme());
         paintBetweenReach(c,width,height,betweenReachArt(game.system,systemVisualThemeIndex(game.system)),sectorVisualTheme(),game.settings);
+        paintImmersionSky(c,width,height,game.system,sectorVisualTheme(),game.settings);
         const vignette = c.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
         vignette.addColorStop(0, "rgba(0,3,9,0)"); vignette.addColorStop(1, "rgba(0,3,9,.4)");
         c.fillStyle = vignette; c.fillRect(0, 0, width, height);
@@ -23251,17 +23286,27 @@
         ctx.restore();
       }
 
+      function immersionReliefProfile(b,settings={}){
+        const f=betweenFormationProfile(b);return {kind:f.kind,phase:f.phase,seed:f.seed,count:betweenArtBudget(settings).details+3};
+      }
       function paintBetweenRelief(c,b,x,y,r,settings={}){
         if(r<10)return;
-        const f=betweenFormationProfile(b),budget=betweenArtBudget(settings),color=b.color||"#9ba6c6";
+        const f=immersionReliefProfile(b,settings),color=b.color||"#9ba6c6",n=f.count;
         c.save();betweenContourPath(c,b,x,y,r);c.clip();c.translate(x,y);c.rotate(f.phase);
-        const count=budget.details+3;
-        for(let i=0;i<count;i++){
-          const q=i/(count-1),yy=(q-.5)*r*1.85,k=Math.sin(i*1.27+f.phase)*r*.15;
-          c.beginPath();c.moveTo(-r,yy);c.bezierCurveTo(-r*.48,yy+k,r*.14,yy-k,r,yy+k*.64);
-          c.strokeStyle=rgba("#14101e",.27);c.lineWidth=Math.max(.65,r*.025);c.stroke();
-          c.beginPath();c.moveTo(-r,yy-r*.018);c.bezierCurveTo(-r*.48,yy+k-r*.018,r*.14,yy-k-r*.018,r,yy+k*.64-r*.018);
-          c.strokeStyle=rgba(i%3?color:"#ded0ad",.19);c.lineWidth=Math.max(.4,r*.009);c.stroke();
+        for(let i=0;i<n;i++){
+          const q=i/(n-1),yy=(q-.5)*r*1.85,k=Math.sin(i*1.27+f.phase)*r*.15;
+          c.beginPath();
+          switch(f.kind){
+            case 0:c.moveTo(-r,yy);c.lineTo(-r*.35,yy+k);c.lineTo(r*.22,yy+k);c.lineTo(r,yy-k*.5);break;
+            case 1:c.moveTo(-r,yy);c.lineTo(k,yy-r*.24);c.lineTo(r,yy+r*.18);break;
+            case 2:c.ellipse(0,-r*.38,r*(.26+q*.78),r*(.32+q*.74),q*.45,0,Math.PI*2);break;
+            case 3:c.ellipse(0,0,r*(.18+q*.8),r*(.12+q*.55),q*.7,0,Math.PI*2);break;
+            case 4:c.moveTo(-r,yy);c.lineTo(-r*.14,yy+k);c.moveTo(r*.08,yy-k-r*.12);c.lineTo(r,yy-k*.4);break;
+            case 5:c.moveTo(-r,yy);c.bezierCurveTo(-r*.48,yy+k*2,r*.14,yy-k*2,r,yy+k);break;
+            default:c.moveTo(Math.cos(q*Math.PI*2)*r,Math.sin(q*Math.PI*2)*r);c.lineTo(k*.3,-r*.1);c.lineTo(Math.cos(q*Math.PI*2+.8)*r*.8,Math.sin(q*Math.PI*2+.8)*r*.8);
+          }
+          c.strokeStyle=rgba("#10101a",.39);c.lineWidth=Math.max(.65,r*.032);c.stroke();
+          c.strokeStyle=rgba(i%3?color:"#ded0ad",.26);c.lineWidth=Math.max(.4,r*.009);c.stroke();
         }c.restore();
       }
       function drawFrontierGlobe(b,p,r){
@@ -24474,7 +24519,7 @@
           c.fillStyle=rgba("#e9faff",0.65);
           c.beginPath();c.moveTo(x,y-size*.24);c.lineTo(x-length*.62,y);c.lineTo(x,y+size*.24);c.closePath();c.fill();
         }
-        c.fillStyle="#def7ff";c.fillRect(x-0.6,y-size*0.6,1.2,size*1.2);
+        c.fillStyle="#f1ead8";c.fillRect(x-0.6,y-size*0.6,1.2,size*1.2);
         if(power>.4 && game.settings?.graphics==="High" && game.settings?.performanceMode!=="Battery Saver"){
           c.fillStyle=rgba(color,.25);c.fillRect(x-length*.23,y-size*.36,1.2,size*.72);
           c.fillRect(x-length*.42,y-size*.22,.9,size*.44);
@@ -24512,7 +24557,7 @@
           const ys=points.map(p=>p[1]),top=Math.min(...ys)-z,bottom=Math.max(...ys)-z,
             finish=c.createLinearGradient(-15,top,18,bottom);
           if(material==="glass") {
-            finish.addColorStop(0,"#a5cfdb");finish.addColorStop(0.16,"#4d8a9f");
+            finish.addColorStop(0,"#d5d6c6");finish.addColorStop(0.16,"#72919a");
             finish.addColorStop(0.4,"#17435b");finish.addColorStop(1,"#071725");
           } else {
             finish.addColorStop(0,light(color,0.44));finish.addColorStop(0.08,light(color,.16));
@@ -24544,7 +24589,7 @@
               const a=points[i],b=points[(i+1)%points.length];
               if(b[0]>a[0]){c.moveTo(a[0],a[1]-z+0.3);c.lineTo(b[0],b[1]-z+0.3);}
             }
-            c.strokeStyle="rgba(236,246,253,.48)";c.lineWidth=0.45;c.stroke();
+            c.strokeStyle="rgba(239,222,183,.55)";c.lineWidth=0.45;c.stroke();
           }
           if(material==="hull") {
             const a=points[0],b=points[1];
@@ -28497,7 +28542,7 @@
                   worker.state === "installed" &&
                   navigator.serviceWorker.controller
                 )
-                  toast("A new Orbital Drift build is ready. Reload to update.");
+                  toast("A new Between the Nine build is ready. Reload to update.");
               });
             });
           })
