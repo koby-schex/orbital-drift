@@ -17368,11 +17368,13 @@
         if(!concordEligibleSystem(game.system)||!concordActive(b)||!game.captured.has(b.name))return 0;
         // Only the single best connected, complementary supply lane counts: no stacking or passive conquest.
         let best=0;
-        for(const lane of concordLanes()){
-          if(!lane.active||!(lane.from===b.name||lane.to===b.name))continue;
-          const other=body(lane.from===b.name?lane.to:lane.from);
-          if(!other||!game.captured.has(other.name)||worldControlMode(other)===worldControlMode(b))continue;
-          best=Math.max(best,lane.quality/100*.08);
+        // One pass over the local bodies; avoid sorting/allocating a lane register every simulation frame.
+        for(const other of game.system.bodies){
+          if(other===b||!concordActive(other)||!game.captured.has(other.name)||worldControlMode(other)===worldControlMode(b))continue;
+          const from=b.name<other.name?b:other,to=from===b?other:b;
+          const lanes=from.memory?.concordLanes;
+          if(!Array.isArray(lanes))continue;
+          for(const lane of lanes)if(lane?.to===to.name&&Number.isFinite(lane.quality)&&lane.quality>=60&&lane.quality<=100)best=Math.max(best,lane.quality*.0008);
         }
         return best;
       }
