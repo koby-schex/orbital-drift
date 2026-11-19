@@ -6074,6 +6074,48 @@
       }
       // END BETWEEN PRESENTATION CONTRACT
 
+      // BEGIN BETWEEN ART PROFILES
+      // Pure, stable presentation profiles. These do not create traversable geography.
+      const BETWEEN_REACH_MOTIFS=Object.freeze([
+        "Curtain Sea","Broken Terraces","Suspended Bloom","Prism Ravine",
+        "Nested Vaults","Quiet Expanse","Inverted Seam","Veil Choir"
+      ]);
+      function betweenReachArt(sys,index=0){
+        const seed=Number(sys?.seed)||1, n=sys?.specialType==="parallel"?6:sys?.specialType==="cosmicSpirit"?7:
+          Math.max(0,Math.min(5,Math.floor(Number(index)||0)));
+        const hash=Math.imul(seed^0x4e494e45,1597334677)>>>0;
+        return {motif:BETWEEN_REACH_MOTIFS[n],kind:n,seed:hash,
+          phase:(hash%6283)/1000,lean:((hash>>>9)%1000)/1000-.5,
+          density:.72+((hash>>>18)%100)/250};
+      }
+      const BETWEEN_LIFE_FORMS=Object.freeze({
+        "ember-ray":{kind:"ember",lobes:5,limbs:4},
+        "storm-whale":{kind:"braid",lobes:4,limbs:6},
+        "prism-mantle":{kind:"prism",lobes:6,limbs:3},
+        "veil-medusa":{kind:"veil",lobes:5,limbs:8},
+        "choir-relic":{kind:"choir",lobes:7,limbs:5},
+        "null-seraph":{kind:"hollow",lobes:3,limbs:6},
+        "aurora-pilgrim":{kind:"pilgrim",lobes:5,limbs:4},
+        "mirror-leviathan":{kind:"mirror",lobes:4,limbs:4}
+      });
+      function betweenLifeArt(contact){
+        return BETWEEN_LIFE_FORMS[contact?.catalogKey]||
+          ({whale:BETWEEN_LIFE_FORMS["storm-whale"],ray:BETWEEN_LIFE_FORMS["ember-ray"],medusa:BETWEEN_LIFE_FORMS["veil-medusa"]})[contact?.visual]||
+          BETWEEN_LIFE_FORMS["choir-relic"];
+      }
+      function betweenArtBudget(settings={}){
+        const low=settings.graphics==="Low"||settings.performanceMode==="Battery Saver",
+          reduced=settings.motion==="Reduced";
+        return {layers:low?3:settings.graphics==="Medium"?5:8,details:low?3:settings.graphics==="Medium"?6:10,
+          animate:!reduced&&!low,aperture:low||reduced?0:settings.graphics==="Medium"?4:7};
+      }
+      function betweenPetalPoints(count,r,inner,phase=0){
+        const p=[];for(let i=0;i<count*2;i++){const a=i*Math.PI/count+phase,d=i%2?r*inner:r;p.push([Math.cos(a)*d,Math.sin(a)*d]);}
+        return p;
+      }
+      // END BETWEEN ART PROFILES
+
+
       const DEV_BUILD = false;
       let W = 1,
         H = 1,
@@ -21060,29 +21102,52 @@
         addActivity("discovery",contact.name+(contact.kind==="cosmic"?" observed":" recovered"),fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
         playSound("capture");saveGame(false);renderMenu();return true;
       }
+
+      function paintBetweenLife(c,contact,r,phase,settings={}){
+        const art=betweenLifeArt(contact),budget=betweenArtBudget(settings),a=contact.colors[0],b=contact.colors[1],
+          q=budget.animate?phase:0,k=art.kind;
+        c.save();c.rotate(k==="mirror"?.2:k==="braid"?-.28:0);
+        const fill=c.createLinearGradient(-r,-r,r,r);
+        fill.addColorStop(0,rgba(b,.85));fill.addColorStop(.52,rgba(a,.48));fill.addColorStop(1,rgba(a,.06));
+        c.fillStyle=fill;c.strokeStyle=rgba(b,.84);c.lineWidth=Math.max(.7,r*.035);
+        const petal=(angle,length,width,bend)=>{
+          c.save();c.rotate(angle);c.beginPath();c.moveTo(r*.07,0);
+          c.bezierCurveTo(length*.24,-width,length*.81,-width*(1+bend),length,0);
+          c.bezierCurveTo(length*.74,width*.75,length*.28,width*.35,r*.07,0);c.closePath();c.fill();c.stroke();
+          c.beginPath();c.moveTo(r*.12,0);c.quadraticCurveTo(length*.52,-width*.25,length*.91,0);c.strokeStyle=rgba(b,.5);c.lineWidth=Math.max(.5,r*.017);c.stroke();c.restore();
+        };
+        if(k==="ember"||k==="prism"||k==="pilgrim"){
+          for(let i=0;i<art.lobes;i++){const a=i*TAU/art.lobes+q*.045;petal(a,r*(k==="ember"?.96:k==="prism"?.85:1.08),r*(k==="prism"?.15:.21),Math.sin(q+i)*.24);}
+        }else if(k==="braid"||k==="mirror"){
+          for(let i=0;i<art.lobes;i++){const a=i*TAU/art.lobes+.37;petal(a,r*(i%2?.74:1.08),r*.19,Math.sin(q+i)*.3);}
+          for(let i=0;i<3;i++){c.beginPath();c.ellipse(0,0,r*(.35+i*.16),r*(.12+i*.095),i*.75+q*.025,0,TAU);c.stroke();}
+        }else if(k==="veil"){
+          c.beginPath();c.moveTo(-r*.79,0);c.bezierCurveTo(-r*.45,-r,r*.45,-r,r*.79,0);c.quadraticCurveTo(0,r*.32,-r*.79,0);c.fill();c.stroke();
+          for(let i=0;i<art.lobes;i++)petal(Math.PI*.15+i*Math.PI*.7/(art.lobes-1),r*.53,r*.085,.2);
+        }else{
+          // A hollow or resonant anatomy without assigning any cosmic origin.
+          for(let i=0;i<art.lobes;i++){c.save();c.rotate(i*TAU/art.lobes+q*.035);c.beginPath();c.ellipse(r*.35,0,r*.45,r*(k==="hollow"?.12:.19),.3,0,TAU);c.stroke();c.restore();}
+        }
+        c.strokeStyle=rgba(b,.64);c.lineWidth=Math.max(.6,r*.022);
+        const count=Math.min(art.limbs,budget.details);
+        for(let i=0;i<count;i++){
+          const a=i*TAU/count+(k==="veil"?Math.PI*.4:0),d=k==="veil"?r*.91:r*1.18;
+          c.beginPath();c.moveTo(Math.cos(a)*r*.21,Math.sin(a)*r*.21);
+          c.quadraticCurveTo(Math.cos(a+.32)*r*.72,Math.sin(a+.32)*r*.72,Math.cos(a+Math.sin(q+i)*.09)*d,Math.sin(a+Math.sin(q+i)*.09)*d);c.stroke();
+        }
+        if(k!=="hollow"){c.fillStyle=rgba(b,.9);c.beginPath();c.arc(0,0,r*.13,0,TAU);c.fill();}
+        else {c.beginPath();c.arc(0,0,r*.18,0,TAU);c.stroke();}
+        c.restore();
+      }
       function drawCosmicLifeContact(contact,p){
         const radius=contact.visual==="whale"?48:contact.visual==="ray"?34:28,
           r=clamp(radius*zoom,12,72),a=contact.colors[0],b=contact.colors[1],
-          reduced=game.settings?.motion==="Reduced",phase=reduced?0:t*.025,low=game.settings?.graphics==="Low"||game.settings?.performanceMode==="Battery Saver";
-        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-.25+Math.sin(phase*.3)*.08);
-        if(!low){const glow=ctx.createRadialGradient(0,0,0,0,0,r*1.65);glow.addColorStop(0,rgba(b,.15));glow.addColorStop(1,rgba(a,0));ctx.fillStyle=glow;ctx.fillRect(-r*1.7,-r*1.7,r*3.4,r*3.4);}
-        const g=ctx.createLinearGradient(-r,-r,r,r);g.addColorStop(0,rgba(b,.85));g.addColorStop(.45,rgba(a,.7));g.addColorStop(1,rgba(a,.12));
-        ctx.fillStyle=g;ctx.strokeStyle=rgba(b,.8);ctx.lineWidth=Math.max(.7,r*.035);ctx.beginPath();
-        if(contact.visual==="whale"){
-          ctx.moveTo(-r,0);ctx.bezierCurveTo(-r*.8,-r*.65,r*.35,-r*.55,r*.68,-r*.08);ctx.lineTo(r,r*-.42);ctx.lineTo(r*.9,0);ctx.lineTo(r,r*.38);ctx.lineTo(r*.66,r*.12);ctx.bezierCurveTo(r*.25,r*.6,-r*.75,r*.45,-r,0);ctx.closePath();ctx.fill();ctx.stroke();
-          ctx.beginPath();ctx.moveTo(-r*.1,r*.14);ctx.lineTo(r*.2,r*.67);ctx.lineTo(r*.43,r*.15);ctx.closePath();ctx.fill();ctx.stroke();
-          for(let i=0;i<4;i++){ctx.beginPath();ctx.ellipse(-r*.45+i*r*.21,0,r*.075,r*.26,-.35,0,TAU);ctx.stroke();}
-        }else if(contact.visual==="ray"){
-          const flap=Math.sin(phase)*r*.14;ctx.moveTo(0,-r*.52);ctx.quadraticCurveTo(-r*.45,-r*.72,-r,-r*.13+flap);ctx.lineTo(-r*.46,r*.42);ctx.lineTo(-r*.16,r*.19);ctx.lineTo(0,r*.83);ctx.lineTo(r*.16,r*.19);ctx.lineTo(r*.46,r*.42);ctx.lineTo(r,-r*.13+flap);ctx.quadraticCurveTo(r*.45,-r*.72,0,-r*.52);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(0,-r*.45);ctx.lineTo(0,r*.8);ctx.moveTo(-r*.88,-r*.13+flap);ctx.quadraticCurveTo(0,-r*.4,r*.88,-r*.13+flap);ctx.stroke();
-        }else if(contact.visual==="medusa"){
-          ctx.moveTo(-r*.78,0);ctx.bezierCurveTo(-r*.7,-r,r*.7,-r,r*.78,0);ctx.quadraticCurveTo(0,r*.4,-r*.78,0);ctx.fill();ctx.stroke();
-          for(let i=0;i<(low?5:9);i++){const x=(i/ (low?4:8)-.5)*r*1.35;ctx.beginPath();ctx.moveTo(x,r*.08);ctx.quadraticCurveTo(x+Math.sin(phase+i)*r*.2,r*.52,x-r*.12,r*(.82+i%3*.09));ctx.stroke();}
-        }else{
-          for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,r*(.45+i*.19),r*(.22+i*.1),i*.7+phase*.15,0,TAU);ctx.stroke();}
-          ctx.beginPath();ctx.arc(0,0,r*.17,0,TAU);ctx.fill();
-        }
+          budget=betweenArtBudget(game.settings),phase=budget.animate?t*.025:0;
+        ctx.save();ctx.translate(p.x,p.y);
+        if(budget.animate){const glow=ctx.createRadialGradient(0,0,0,0,0,r*1.65);glow.addColorStop(0,rgba(b,.12));glow.addColorStop(1,rgba(a,0));ctx.fillStyle=glow;ctx.fillRect(-r*1.7,-r*1.7,r*3.4,r*3.4);}
+        paintBetweenLife(ctx,contact,r,phase,game.settings);
         ctx.restore();
-        if(Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y)<180){ctx.save();ctx.font="500 10px system-ui";ctx.textAlign="center";ctx.fillStyle=b;ctx.fillText(contact.name,p.x,p.y+r+13);ctx.restore();}
+        if(Math.hypot(contact.x-game.ship.x,contact.y-game.ship.y)<180){ctx.save();ctx.font="500 10px system-ui";ctx.textAlign="center";ctx.fillStyle=b;ctx.fillText(betweenDisplayText(contact.name),p.x,p.y+r+13);ctx.restore();}
       }
       function drawFrontierContacts(){
         const contacts=activeFrontierContacts(), theme=activeVisualTheme||sectorVisualTheme();
@@ -21844,6 +21909,52 @@
         }
         c.restore();
       }
+
+      function paintBetweenReach(c,w,h,art,theme,settings={}){
+        // Drawn once into the existing bounded cinematic raster; no extra texture cache.
+        const s=Math.max(w,h),budget=betweenArtBudget(settings),n=art.kind;
+        c.save();c.translate(w*(.5+art.lean*.18),h*.51);c.rotate(art.lean*.65+(n===6?.55:0));
+        const color=theme.accent,other=theme.accent2;
+        const poly=(p,fill,stroke)=>{c.beginPath();p.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fillStyle=fill;c.fill();c.strokeStyle=stroke;c.lineWidth=Math.max(1,s*.0012);c.stroke();};
+        if(n===1||n===3||n===4){
+          // Monumental shelves, suspended crystal plates and nested vaults; silhouettes are not planets.
+          for(let i=0;i<budget.layers;i++){
+            const q=i/budget.layers,side=i%2?1:-1,x=side*s*(.18+q*.32),y=(q-.5)*s*.89,
+              a=s*(.09+((art.seed+i*41)%73)/380),d=n===1?.28:n===3?.85:.54;
+            const p=[[x-a,y],[x-a*.28,y-a*d],[x+a*.8,y-a*d*.42],[x+a,y+a*d*.15],[x+a*.18,y+a*d*.88],[x-a*.62,y+a*d*.38]];
+            poly(p,rgba(theme.mid,.72),rgba(other,.28));
+            poly([p[0],p[1],p[2],[x,y+a*d*.25]],rgba(color,.12),rgba(color,.18));
+            c.beginPath();c.moveTo(x-a*.7,y+a*d*.15);c.lineTo(x+a*.18,y+a*d*.62);c.lineTo(x+a*.68,y+a*d*.05);c.strokeStyle=rgba(color,.32);c.stroke();
+          }
+          if(n===4){for(let i=0;i<budget.layers;i++){
+            const q=(i+1)/(budget.layers+1),r=s*(.09+q*.45);
+            c.beginPath();c.ellipse(0,0,r,r*.58,art.phase*.2+i*.12,.18,Math.PI*1.81);
+            c.strokeStyle=rgba(i%2?color:other,.17);c.lineWidth=s*.0035;c.stroke();
+          }}
+        }else if(n===2||n===7){
+          // Enormous petal membranes and braided veils; distant objects are abstract observations.
+          for(let i=0;i<budget.layers;i++){
+            const a=i*Math.PI*2/budget.layers+art.phase,r=s*(.20+i*.037);
+            c.save();c.rotate(a);c.beginPath();c.moveTo(0,0);
+            c.bezierCurveTo(r*.42,-r*.82,r*1.19,-r*.48,r*1.35,-r*.09);
+            c.bezierCurveTo(r*.98,r*.36,r*.37,r*.25,0,0);
+            const g=c.createLinearGradient(0,0,r*1.35,0);g.addColorStop(0,rgba(color,.02));g.addColorStop(.55,rgba(i%2?color:other,.17));g.addColorStop(1,rgba(other,.035));
+            c.fillStyle=g;c.fill();c.strokeStyle=rgba(color,.23);c.lineWidth=Math.max(1,s*.0012);c.stroke();c.restore();
+          }
+        }else{
+          // Directional folds with a readable clear central lane.
+          for(let i=0;i<budget.layers;i++){
+            const q=(i-(budget.layers-1)/2)/budget.layers,y=q*s*.98,
+              a=s*(n===5?.035:n===6?.26:.12)*(i%2?1:-1);
+            c.beginPath();c.moveTo(-s,y);
+            c.bezierCurveTo(-s*.43,y+a,s*.13,y-a,s*.37,y+a*.32);c.quadraticCurveTo(s*.72,y+a*.9,s,y-a*.2);
+            c.strokeStyle=rgba(i%2?color:other,n===5?.08:.20);c.lineWidth=s*(n===6?.013:.005);c.stroke();
+            c.strokeStyle=rgba(color,n===5?.04:.18);c.lineWidth=Math.max(1,s*.0009);c.stroke();
+          }
+        }
+        c.restore();
+      }
+
       function cinematicSky() {
         const kind = cinematicArtKind(), image = environmentImage(kind);
         if (!image) return null; // The procedural sky is always a usable fallback.
@@ -21891,6 +22002,7 @@
           c.fillStyle = lightField; c.fillRect(0, 0, width, height);
         }
         if (!tutorial) paintEnvironmentComposition(c,width,height,environmentComposition(game.system),sectorVisualTheme());
+        paintBetweenReach(c,width,height,betweenReachArt(game.system,systemVisualThemeIndex(game.system)),sectorVisualTheme(),game.settings);
         const vignette = c.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
         vignette.addColorStop(0, "rgba(0,3,9,0)"); vignette.addColorStop(1, "rgba(0,3,9,.4)");
         c.fillStyle = vignette; c.fillRect(0, 0, width, height);
@@ -21941,7 +22053,7 @@
           c.strokeStyle = rgba(light(b.color, 0.75), 0.7); c.lineWidth = Math.max(1, r * 0.014);
           c.beginPath(); c.arc(0, 0, r, Math.PI * 0.92, Math.PI * 1.82); c.stroke();
         }
-        paintBetweenFacets(c,b,0,0,r); rings(true); c.restore();
+        paintBetweenFacets(c,b,0,0,r); paintBetweenRelief(c,b,0,0,r,game.settings); rings(true); c.restore();
         return !!texture;
       }
       function renderDiscoveryPortrait() {
@@ -22358,7 +22470,7 @@
           glow.addColorStop(0.12, rgba(galaxy.color, 0.1));
           glow.addColorStop(0.5, rgba(galaxy.color, 0.035));
           glow.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.strokeStyle=rgba(galaxy.color,.13);ctx.lineWidth=1.1;ctx.beginPath();ctx.ellipse(0,0,galaxy.rx,galaxy.rx*.35,.42,0,Math.PI*1.65);ctx.stroke();
+          ctx.strokeStyle=rgba(galaxy.color,.16);ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(-galaxy.rx,0);ctx.quadraticCurveTo(-galaxy.rx*.3,-galaxy.rx*.5,0,0);ctx.quadraticCurveTo(galaxy.rx*.3,galaxy.rx*.5,galaxy.rx,0);ctx.stroke();
           ctx.fillStyle = glow; ctx.fillRect(-galaxy.rx, -galaxy.rx, galaxy.rx * 2, galaxy.rx * 2);
           ctx.restore();
         }
@@ -22533,6 +22645,35 @@
         }
         ctx.restore();
       }
+
+      function paintBetweenRelief(c,b,x,y,r,settings={}){
+        if(r<8)return;
+        const f=betweenFormationProfile(b),budget=betweenArtBudget(settings),color=b.color||"#9ba6c6";
+        c.save();betweenContourPath(c,b,x,y,r);c.clip();c.translate(x,y);c.rotate(f.phase);
+        const stroke=(path,shade,alpha,width)=>{c.beginPath();path();c.strokeStyle=rgba(shade,alpha);c.lineWidth=Math.max(.55,r*width);c.stroke();};
+        if(f.kind===0||f.kind===4){
+          for(let i=0;i<budget.details;i++){
+            let yy=(i/budget.details-.5)*r*1.65,k=(i%3-1)*r*.12;
+            stroke(()=>{c.moveTo(-r,yy);c.lineTo(-r*.4,yy+k);c.lineTo(r*.12,yy-k*.55);c.lineTo(r,yy+k*.8);},"#e5d6bb",.27,.018);
+          }
+        }else if(f.kind===1||f.kind===6){
+          for(let i=0;i<budget.details;i++){
+            const a=i*Math.PI*2/budget.details;
+            stroke(()=>{c.moveTo(0,0);c.lineTo(Math.cos(a)*r*.48,Math.sin(a)*r*.48);c.lineTo(Math.cos(a+.12)*r,Math.sin(a+.12)*r);},"#d9f7e7",.33,.018);
+          }
+          const g=c.createRadialGradient(0,0,0,0,0,r*.52);g.addColorStop(0,rgba("#fff0c9",.54));g.addColorStop(1,rgba(color,0));c.fillStyle=g;c.fillRect(-r,-r,r*2,r*2);
+        }else if(f.kind===2||f.kind===5){
+          for(let i=0;i<budget.details;i++){
+            const a=i*Math.PI*2/budget.details;
+            stroke(()=>{c.moveTo(0,0);c.quadraticCurveTo(Math.cos(a+.48)*r*.58,Math.sin(a+.48)*r*.58,Math.cos(a)*r,Math.sin(a)*r);},"#d4e9ce",.31,.013);
+          }
+          for(let i=1;i<=3;i++)stroke(()=>{c.ellipse(0,0,r*.23*i,r*.16*i,.32,0,TAU);},"#cab6e2",.26,.013);
+        }else{
+          for(let i=0;i<budget.details;i++)stroke(()=>{c.ellipse(0,0,r*(.14+i*.09),r*(.09+i*.055),i*.24,Math.PI*.25,Math.PI*1.92);},"#caeddc",.28,.019);
+        }
+        c.restore();
+      }
+
       function drawFrontierGlobe(b,p,r){
         const f=b.frontierFeature;
         ctx.save();betweenContourPath(ctx,b,p.x,p.y,r);ctx.clip();
@@ -22540,6 +22681,7 @@
         drawPlanetBase(b,p,r);drawDetailedSurface(b,p,r);drawPlanetLighting(b,p,r);
         ctx.restore();
         paintBetweenFacets(ctx,b,p.x,p.y,r);
+        paintBetweenRelief(ctx,b,p.x,p.y,r,game.settings);
         if(f&&r>8&&game.settings?.graphics!=="Low"&&["dust halo","inclined rings","split rings"].includes(f.feature)&&b.pattern!=="rings"){
           ctx.save();ctx.strokeStyle=rgba(f.accent,.23);ctx.lineWidth=Math.max(.6,r*.035);ctx.beginPath();ctx.ellipse(p.x,p.y,r*1.45,r*.7,f.tilt,0,TAU);ctx.stroke();ctx.restore();
         }
@@ -22703,14 +22845,31 @@
         }
         ctx.restore();
       }
+
       function drawOrbitalStation(x, y, scale, angle) {
-        ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.scale(scale, scale);
-        ctx.fillStyle="#213543";ctx.fillRect(-14,-7,10,14);ctx.fillRect(4,-7,10,14);
-        ctx.strokeStyle="#7198a7";ctx.lineWidth=.65;ctx.strokeRect(-14,-7,10,14);ctx.strokeRect(4,-7,10,14);
-        ctx.fillStyle="#17222c";ctx.fillRect(-4,-3,8,6);
-        ctx.fillStyle="#c6d6db";ctx.fillRect(-2,-6,4,10);
-        ctx.fillStyle="#acdfe5";ctx.fillRect(-1,-7,2,2);
-        ctx.restore();
+        ctx.save(); ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);
+        ctx.lineWidth=.8;ctx.strokeStyle="#a6d5cb";
+        // Open ceramic threshold architecture, not a conventional satellite.
+        for(const side of [-1,1]){
+          ctx.save();ctx.scale(1,side);ctx.beginPath();ctx.moveTo(-15,1);ctx.lineTo(-10,-9);ctx.lineTo(2,-12);ctx.lineTo(14,-5);ctx.lineTo(10,-1);ctx.lineTo(1,-7);ctx.lineTo(-7,-5);ctx.lineTo(-10,1);ctx.closePath();ctx.fillStyle="#a18d75";ctx.fill();ctx.stroke();
+          ctx.beginPath();ctx.moveTo(-9,-7);ctx.lineTo(2,-10);ctx.lineTo(11,-5);ctx.strokeStyle="#e8d4a5";ctx.stroke();ctx.restore();
+        }
+        ctx.fillStyle="#2c2843";ctx.beginPath();ctx.moveTo(-7,0);ctx.lineTo(0,-5);ctx.lineTo(7,0);ctx.lineTo(0,5);ctx.closePath();ctx.fill();ctx.stroke();
+        ctx.fillStyle="#b8ffe7";ctx.fillRect(-1,-2,2,4);ctx.restore();
+      }
+      function paintBetweenDistrict(c,x,y,size,color,style,seed,settings={}){
+        if(size<1.3)return;
+        const detail=betweenArtBudget(settings).details;
+        c.save();c.translate(x,y);c.rotate((seed%19-9)*.10);
+        c.strokeStyle=rgba(color,.66);c.fillStyle=rgba("#27253b",.84);c.lineWidth=Math.max(.45,size*.045);
+        const n=style==="research"||style==="listeners"?5:style==="industry"||style==="keepers"?4:6;
+        c.beginPath();betweenPetalPoints(n,size,.63,.2).forEach(([a,b],i)=>i?c.lineTo(a,b):c.moveTo(a,b));c.closePath();c.fill();c.stroke();
+        for(let i=0;i<Math.min(n,detail);i++){
+          const a=i*TAU/n,xx=Math.cos(a)*size*.62,yy=Math.sin(a)*size*.62;
+          c.beginPath();c.moveTo(xx,yy);c.lineTo(xx*.28,yy*.28);c.stroke();
+          c.fillStyle=rgba(color,.85);c.fillRect(xx-size*.065,yy-size*.065,Math.max(.5,size*.13),Math.max(.5,size*.13));
+        }
+        c.fillStyle=rgba(color,.8);c.beginPath();c.arc(0,0,Math.max(.6,size*.13),0,TAU);c.fill();c.restore();
       }
       function drawFactory(p, r) {
         const angle = game.settings?.motion === "Reduced" ? -.8 : t * .003 - .8;
@@ -22720,11 +22879,12 @@
         const c=civilizationProfile(b);if(!c||r<6)return;
         const low=game.settings?.graphics==="Low"||game.settings?.performanceMode==="Battery Saver",
           seed=b.featureSeed||1,phase=game.settings?.motion==="Reduced"?seed%6:t*.0012+seed%6;
-        ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,r*.94,0,TAU);ctx.clip();
+        ctx.save();betweenContourPath(ctx,b,p.x,p.y,r*.94);ctx.clip();
         const star=game.system.bodies.find(o=>o.type==="star"),night=(star?Math.atan2(star.y-b.y,star.x-b.x):0)+Math.PI;
         for(let i=0;i<(low?4:8);i++){
           const angle=night+(rand(seed+i*31)-.5)*2.3,rr=r*(.25+rand(seed+i*47)*.56),x=p.x+Math.cos(angle)*rr,y=p.y+Math.sin(angle)*rr;
           ctx.fillStyle=rgba(c.color,.16);ctx.beginPath();ctx.ellipse(x,y,r*.14,r*.075,angle,0,TAU);ctx.fill();
+          paintBetweenDistrict(ctx,x,y,r*.12,c.color,c.key,seed+i*43,game.settings);
           for(let j=0;j<(low?4:10);j++){ctx.fillStyle=rgba(c.color,.5+rand(seed+i*19+j*7)*.4);ctx.fillRect(x+(rand(seed+j*61+i)-.5)*r*.22,y+(rand(seed+j*71+i)-.5)*r*.12,Math.max(.65,r*.016),Math.max(.65,r*.013));}
         }
         ctx.restore();ctx.save();ctx.translate(p.x,p.y);ctx.rotate(phase*.2);
@@ -22745,10 +22905,11 @@
         const seed=b.featureSeed||1,quality=game.settings?.graphics||"High",low=quality==="Low"||game.settings?.performanceMode==="Battery Saver",
           star=game.system.bodies.find(o=>o.type==="star"),sun=star?Math.atan2(star.y-b.y,star.x-b.x):-2.4,
           clusters=1+profile.stage*2,role=worldControlMode(b);
-        ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,r*.95,0,TAU);ctx.clip();
+        ctx.save();betweenContourPath(ctx,b,p.x,p.y,r*.95);ctx.clip();
         for(let i=0;i<clusters;i++){
           const a=sun+Math.PI+(rand(seed+i*43)-.5)*1.8,rr=r*(.3+rand(seed+i*67)*.45),x=p.x+Math.cos(a)*rr,y=p.y+Math.sin(a)*rr;
           ctx.fillStyle=rgba(profile.color,.13);ctx.beginPath();ctx.ellipse(x,y,r*.12,r*.065,a,0,TAU);ctx.fill();
+          paintBetweenDistrict(ctx,x,y,r*(.08+profile.stage*.025),profile.color,role,seed+i*17,game.settings);
           const n=low?5:8+profile.stage*3;
           for(let j=0;j<n;j++){
             const dx=(rand(seed+i*101+j*7)-.5)*r*.21,dy=(rand(seed+i*103+j*11)-.5)*r*.13;
@@ -23684,6 +23845,12 @@
         part([[left,-1.2],[left+span*.12,-3.4],[right,-1.6],[right+span*.055,0],[right,1.5],[left+span*.12,3.4],[left,1.2]],"pearl",keel,1);
         mirror([[left,halfWidth*.34],[left+span*.15,halfWidth*.68],[right,halfWidth*.45],[right-span*.13,halfWidth*.31]],"metal",keel,1);
         mirror([[left+span*.14,halfWidth*.51],[right-span*.05,halfWidth*.39],[right-span*.13,halfWidth*.33],[left+span*.08,halfWidth*.44]],"energy2",keel+.35,0);
+        const arch=kind==="frigate"?.86:kind==="fleet"?.74:.78;
+        for(const side of [-1,1]){
+          const y=side*halfWidth;
+          part([[minX+span*.24,y*.36],[minX+span*.36,y*arch],[minX+span*.68,y*arch*.87],[minX+span*.79,y*.47],[minX+span*.69,y*.57],[minX+span*.40,y*.71]],"pearl",keel+.55,1);
+          part([[minX+span*.38,y*.70],[minX+span*.65,y*.65],[minX+span*.70,y*.56],[minX+span*.43,y*.61]],"energy",keel+.85,0);
+        }
         if(spacecraftModels.size>=96) spacecraftModels.delete(spacecraftModels.keys().next().value);
         spacecraftModels.set(key,model); return model;
       }
@@ -25038,14 +25205,12 @@
         ctx.save();
         if(frame.rays){
           ctx.globalCompositeOperation="screen";
-          for(let i=0;i<frame.rays;i++){
-            const a=i*TAU/frame.rays+.31,
-              near=span*(.05+frame.progress*.34),far=near+span*(.22+frame.progress*.12);
-            const x=Math.cos(a),y=Math.sin(a);
-            const g=ctx.createLinearGradient(cx+x*near,cy+y*near,cx+x*far,cy+y*far);
-            g.addColorStop(0,"rgba(0,0,0,0)");g.addColorStop(.72,rgba(theme.accent2,.16*frame.fade));g.addColorStop(1,rgba(theme.accent,.30*frame.fade));
-            ctx.strokeStyle=g;ctx.lineWidth=1.1;
-            ctx.beginPath();ctx.moveTo(cx+x*near,cy+y*near);ctx.lineTo(cx+x*far,cy+y*far);ctx.stroke();
+          const count=betweenArtBudget(game.settings).aperture;
+          for(let i=0;i<count;i++){
+            const r=span*(.08+frame.progress*.43+i*.043),tilt=.51+i*.15;
+            ctx.save();ctx.translate(cx,cy);ctx.rotate(tilt);
+            ctx.strokeStyle=rgba(i%2?theme.accent:theme.accent2,frame.fade*(.38-i*.025));ctx.lineWidth=Math.max(1,span*.0025);
+            ctx.beginPath();ctx.moveTo(-r,0);ctx.bezierCurveTo(-r*.38,-r*.54,r*.42,-r*.48,r,0);ctx.bezierCurveTo(r*.38,r*.54,-r*.42,r*.48,-r,0);ctx.stroke();ctx.restore();
           }
         }
         ctx.globalCompositeOperation="source-over";
@@ -25095,12 +25260,13 @@
         ctx.restore();
       }
       function drawTitleMobileBackdrop(c, w, h) {
-        c.fillStyle = "#030a12"; c.fillRect(0, 0, w, h);
+        c.fillStyle = "#110e21"; c.fillRect(0, 0, w, h);
         const image = environmentImage("deep");
         if (image) {
           const scale = Math.max(w / image.width, h / image.height);
           c.drawImage(image, (w-image.width*scale)*0.42, (h-image.height*scale)*0.25, image.width*scale, image.height*scale);
         }
+        paintBetweenReach(c,w,h,betweenReachArt({seed:1},4),{mid:"#382e50",accent:"#a7ded0",accent2:"#e0bd89"}, {graphics:"Medium",motion:"Reduced"});
       }
       function drawTitleMobilePlanet(c, w, h) {
         const earth = game.system.bodies.find(b => b.name === "Earth") ||

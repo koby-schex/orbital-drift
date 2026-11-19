@@ -4,6 +4,9 @@ Explore the uncertain crossing environments between the Nine Worlds. Your expedi
 
 This conversion preserves the established gameplay and save identities of the former Orbital Drift build. Historical implementation names remain in the engine for compatibility. See [setting and art direction](docs/BETWEEN_THE_NINE.md) for production boundaries. This is a major visual and presentation foundation; actual iPhone visual and usability review is still required.
 
+## Pass 40 — Art of the Between
+Eight reach motifs, formation-specific relief, distinctive life observations, threshold architecture and crossing aperture effects. All existing progression and save keys remain intact. See the production contract for canon boundaries.
+
 ---
 
 ## Historical development record

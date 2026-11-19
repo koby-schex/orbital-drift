@@ -11,3 +11,6 @@ Do not rename persisted body IDs (Earth, Mars, etc.), generator versions, factio
 
 ## Release checks
 Run full existing gameplay validation and native iOS simulator workflow. Check all tutorial steps, both old and fresh save files, menu navigation and action labels, all cosmetic previews, formation legibility, atlas and Codex, independent culture protection, charter growth, Echo lanes and agreements on a real device. The presentation layer is transitional: audit template wording, custom player-name handling, and remaining generic art/UI details before public release. Continue the civilization network expansion once the conversion is stable.
+
+## Pass 40: Art of the Between
+Eight presentation motifs (Curtain Sea, Broken Terraces, Suspended Bloom, Prism Ravine, Nested Vaults, Quiet Expanse, Inverted Seam, Veil Choir) describe the visible environment, not new cosmological layers or confirmed origins. Eight existing field-observation entries receive distinctive non-terrestrial anatomy; their IDs, reward eligibility and discovery mechanics remain unchanged. Settlement and vessel geometry is game-local, not a depiction of any established faction's canon technology. Crossings unfold as aperture shapes, with no change to travel restrictions or duration. No new franchise lore is locked by art.
