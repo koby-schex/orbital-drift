@@ -5202,6 +5202,13 @@
       .pioneer-primary-actions .pioneer-deck-link { display:flex; flex-direction:column; gap:5px; min-height:72px; background:#102430; }
       .pioneer-deck-link small { color:#afc4cc; font-size:11px; font-weight:400; line-height:1.4; }
       /* Frontier collection and simpler navigation */
+      .toast-wrap {top:calc(150px + var(--safeTop));max-height:38px;}
+      .toast {background:transparent!important;border:0!important;box-shadow:none!important;animation:none!important;font-size:11px;color:#c5dce5;text-shadow:0 1px 3px #000;padding:2px 4px;}
+      body.menu-open .toast-wrap {top:calc(58px + var(--safeTop));}
+      .vault-specimen svg {width:100%;height:126px;display:block;position:relative;z-index:2;}
+      .vault-specimen:has(svg)::before,.vault-specimen:has(svg)::after {display:none;}
+      .vault-entry .vault-origin {opacity:.85;}
+      .vault-entry-copy>span {line-height:1.35;}
       .hub-btn {min-height:64px!important;padding:10px!important;text-align:left!important;}
       .hub-btn small {display:none!important;}
       .hub-btn .hub-symbol {font-size:16px!important;}
@@ -9649,6 +9656,11 @@
           archetype: parallelArchetype(),
         };
       }
+      function frontierPlanetColor(seed,i,family){
+        const groups={innerForge:["#b35632","#ed8856","#80566c","#cead72","#844e39"],gasFrontier:["#799fb6","#ceb7a2","#8091c7","#9bbba7","#e2bb85"],crystalReach:["#6b8acd","#c79bdc","#83c9c9","#9e86bc","#e0cadc"],bioCluster:["#307b75","#94b87a","#6290b5","#c4b467","#627aa8"],ancientArchive:["#a6977d","#c8b69e","#818b9a","#ba8c65","#977c9e"],voidRim:["#577487","#7a6b9d","#a2b3c1","#695d71","#416d7a"]};
+        const pool=groups[family]||palettes, base=pool[Math.floor(rand(seed+i*43+6)*pool.length)],q=rand(seed+i*101+701);
+        return q>.52?light(base,(q-.52)*.32):dark(base,(.52-q)*.32);
+      }
       function ensureFrontierCapture(system) {
         if(!system||system.isTutorial||system.specialType)return system;
         const planets=system.bodies.filter(b=>b.type!=="star");
@@ -9699,11 +9711,11 @@
             res = pickFrom(arch.resources, seed + i * 20 + 3),
             pattern = pickFrom(arch.patterns, seed + i * 20 + 13),
             isOuterGiant =
-              arch.key === "gasFrontier" &&
+              i!==0 && arch.key === "gasFrontier" &&
               radius > 26 &&
               rand(seed + i * 20 + 16) > 0.45,
             isSurveyRelic =
-              arch.key === "ancientArchive" && rand(seed + i * 20 + 17) > 0.72;
+              i!==0 && arch.key === "ancientArchive" && rand(seed + i * 20 + 17) > 0.72;
           b.push(
             makeBody({
               name: uniquePlanetName(seed, i, used),
@@ -9711,8 +9723,7 @@
               mass,
               orbitRadius: orbit,
               orbitSpeed: Math.sqrt(star.mass / Math.pow(orbit, 3)) * 0.12,
-              color:
-                palettes[Math.floor(rand(seed + i * 20 + 6) * palettes.length)],
+              color: frontierPlanetColor(seed,i,arch.key),
               resource: res,
               richness:
                 between(seed + i * 20 + 7, 1, 5.5) *
@@ -9730,7 +9741,7 @@
                 (isOuterGiant ? 1.18 : 1),
               capturable: isOuterGiant || isSurveyRelic
                 ? false
-                : rand(seed + i * 20 + 11) < arch.capturable,
+                : i===0 || rand(seed + i * 20 + 11) < arch.capturable,
               upgradeable:
                 isOuterGiant || isSurveyRelic
                   ? false
@@ -10783,7 +10794,7 @@
               ? "Earth"
               : game.system.bodies.find((b) => b.type !== "star")?.name ||
                 game.system.bodies[0].name;
-          manualTargetName = body(d.manualTargetName)
+          manualTargetName = body(d.manualTargetName)||d.manualTargetName==="__FRIGATE__"||(typeof d.manualTargetName==="string"&&d.manualTargetName.startsWith("@contact:"))
             ? d.manualTargetName
             : null;
           zoom = d.zoom || 0.68;
@@ -12595,7 +12606,7 @@
               fmt(filtered) +
               ".",
           );
-        } else
+        } else if(game.system.isTutorial)
           toast("Survey reward: " + b.name + " yielded " + fmt(filtered) + ".");
         registerVaultDiscovery("planet", b.name);
         trackExpeditionProgress("survey", 1);
@@ -12682,7 +12693,7 @@
         return nearbyPlanet(b=>!b.discoveryRewardClaimed,()=>230);
       }
       function nearestRefuelTarget() {
-        return nearbyPlanet(b=>game.captured.has(b.name),b=>visualRadius(b)+120);
+        return nearbyPlanet(b=>game.captured.has(b.name),b=>visualRadius(b)+120+(b.memory?.controlMode==="relay"?100:0));
       }
       function nearestLockTarget() {
         if (!game.ship || !game.system) return { body: null, d: Infinity };
@@ -12966,11 +12977,7 @@
             if (["Exotic", "Mythic"].includes(n.body.rarity))
               game.captainLog.exoticDiscoveries++;
             recordCodex(n.body, "detected");
-            toast(
-              "World detected: " +
-                n.body.name +
-                ". Scan nearby for full survey data.",
-            );
+            if(game.system.isTutorial)toast("World detected: "+n.body.name+". Scan nearby for full survey data.");
             addActivity(
               "discovery",
               n.body.name + " detected",
@@ -13966,7 +13973,7 @@
           template.name + " discovered",
           vaultKindLabel(template.kind) + " • " + vaultThreatLabel(template.threat) + " • " + stateText,
         );
-        toast("New " + vaultKindLabel(template.kind).toLowerCase() + ": " + template.name + " • " + stateText + ".");
+        // Unsolicited discovery notices live in the Captain Log and Vault.
         if (canSecure) {
           checkDiscoveryCollections();
           unlockVaultSkin(true);
@@ -15835,6 +15842,9 @@
             const f = frigatePosition();
             if (f) return f;
           }
+          if(typeof manualTargetName==="string"&&manualTargetName.startsWith("@contact:")){
+            const c=activeFrontierContacts().find(x=>x.id===manualTargetName.slice(9));if(c)return c;
+          }
           const m = body(manualTargetName);
           if (m) return m;
         }
@@ -16906,7 +16916,7 @@
           ) +
           groupHtml("Flight & Development", core.slice(0, 3)) +
           groupHtml("Pioneer & Exploration", core.slice(3).concat(explore)) +
-          (game.frigate.built?card("Discoveries", "Secure finds and review your collection.",btn("Vault","openFrigateTab","vault")+btn("Adventures","openFrigateTab","expeditions")):"") +
+          (game.frigate.built?card("Discoveries",activeFrontierContacts().length+" drifting contacts in this system. Recover them for salvage and Vault finds.",btn("Track closest contact","trackFrontierContact",null,!!nearestFrontierContact())+btn("Vault","openFrigateTab","vault")+btn("Adventures","openFrigateTab","expeditions")):"") +
           secondaryDetails("Records, Settings & Help", groupHtml("Records & Help", support));
       }
       function menuLabel(k) {
@@ -20424,15 +20434,17 @@
           const item=types[i%types.length], a=between(seed+i*71+991,0,TAU),
             r=i===0?between(seed+981,470,620):between(seed+i*89+993,660,outer+170);
           // Include the stable sector-local index in the persistent origin.
-          return {id:family+"-"+i,name:item[0],kind:item[1],origin:item[0]+" / "+(i+1),x:Math.cos(a)*r,y:Math.sin(a)*r};
+          return {id:family+"-"+i,name:item[0],kind:item[1],type:"contact",radius:5,origin:item[0]+" / "+(i+1),x:Math.cos(a)*r,y:Math.sin(a)*r};
         });
       }
       function frontierContactKey(contact,system=game.system){
         return String(system?.seed||system?.name||"system")+"|space|"+contact.origin;
       }
       function activeFrontierContacts(){
-        const keys=new Set(vaultState().discoveryKeys);
-        return frontierContacts().filter(c=>!keys.has(frontierContactKey(c)));
+        const keys=vaultState().discoveryKeys,system=game.system,prev=activeFrontierContacts.cache;
+        if(prev?.system===system&&prev.keys===keys&&prev.count===keys.length)return prev.contacts;
+        const seen=new Set(keys),contacts=frontierContacts().filter(c=>!seen.has(frontierContactKey(c)));
+        activeFrontierContacts.cache={system,keys,count:keys.length,contacts};return contacts;
       }
       function nearestFrontierContact(){
         if(!game.ship||!game.frigate?.built||game.system?.isTutorial)return null;
@@ -20442,6 +20454,10 @@
           if(!best||d<best.d)best={contact,d};
         }
         return best;
+      }
+      function trackFrontierContact(){
+        const n=nearestFrontierContact();if(!n)return toast("All nearby contacts recovered. Jump to another sector.");
+        manualTargetName="@contact:"+n.contact.id;closeMenu();saveGame(false);
       }
       function recoverFrontierContact(){
         const n=nearestFrontierContact();
@@ -20453,6 +20469,7 @@
         // The catalog can be exhausted; salvage still has value once per site.
         if(!vault.discoveryKeys.includes(key))vault.discoveryKeys.push(key);
         const reward=contact.kind==="crystal"?{Crystal:6,DataCores:2}:contact.kind==="pod"?{Helium3:8,BioGel:3}:contact.kind==="anomaly"?{DataCores:5,Plasma:3}:{Alloy:10,Titanium:3};
+        if(manualTargetName==="@contact:"+contact.id)manualTargetName=null;
         grantReward(reward,"Frontier recovery");
         addActivity("discovery",contact.name+" recovered",fmt(reward)+(vault.entries.length>before?" • New Vault discovery":""));
         playSound("capture");saveGame(false);renderMenu();return true;
@@ -20805,6 +20822,7 @@
       }
       function showUpgradePanel(title, summary, rows = []) {
         if (!ui.upgradeOverlay) return;
+        if(!game.system?.isTutorial){addActivity("upgrade",title,summary+" • "+rows.map(([k,v])=>k+": "+v).join(" • "));return;}
         cleanControlButtons();
         paused = true;
         modalFreeze = true;
@@ -20828,6 +20846,7 @@
       }
       function showMissionPanel(title, summary, rows = []) {
         if (!ui.missionOverlay) return;
+        if(!game.system?.isTutorial){addActivity("system",title,summary+" • "+rows.map(([k,v])=>k+": "+v).join(" • "));return;}
         // Never interrupt a major reward or active flight with an advertisement.
         cleanControlButtons();
         paused = true;
@@ -26298,6 +26317,7 @@
         secureVaultEntry,
         setWorldControlMode,
         recoverFrontierContact,
+        trackFrontierContact,
         upgradePlanet,
         upgradeBranch,
         setTarget,
