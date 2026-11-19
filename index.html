@@ -5301,7 +5301,7 @@
       </button>
     </div>
     <div class="menu-scrim" id="menuScrim" aria-hidden="true"></div>
-    <div class="menu" id="menu">
+    <div class="menu" id="menu" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
       <div class="menu-head">
         <button class="menu-back" id="menuBack" type="button">Back</button>
         <h3 id="menuTitle">Menu</h3>
@@ -16162,8 +16162,7 @@
           : null;
       }
       function openObjectiveAction() {
-        const m = nextBestAction().menu || "hub";
-        openMenu(m);
+        openRecommendedMenu();
       }
       function feedbackPulse(kind = "action") {
         if (!ui.feedbackFlash) return;
@@ -16346,7 +16345,7 @@
       }
       function btn(label, fn, arg = null, en = true) {
         return (
-          '<button type="button" ' +
+          '<button type="button" class="'+(["openSection","openFrigateTab","setMenuTab","openRecommendedMenu","backToMainMenu"].includes(fn)?"nav-link":"game-action")+'" ' +
           (en ? "" : "disabled") +
           ' data-action="' +
           esc(fn) +
@@ -16494,6 +16493,9 @@
         if (name === "flight") return game.frigate?.built ? "frigate" : "planets";
         const allowed = new Set([
           "hub",
+          "explore",
+          "hangar",
+          "journal",
           "resources",
           "planets",
           "upgrades",
@@ -16508,41 +16510,51 @@
         ]);
         return allowed.has(name) ? name : "hub";
       }
-      function openSection(name = "hub") {
-        const opening = !ui.menu.classList.contains("open");
-        if (opening) {
-          menuWasPaused = !!(paused || modalFreeze || titleOpen || titleMenuMode);
-          paused = true;
-          keys.clear();
-          cleanControlButtons();
-        }
-        activeMenu = normalizeMenuName(name);
+      // Navigation is a stack of full-screen destinations, not a collection of independent toggles.
+      const menuHistory=[];
+      const menuDefaults={upgrades:"ship",frigate:"overview",system:"status",cosmetics:"overview"};
+      function currentMenuRoute(){
+        return {section:activeMenu||"hub",tab:menuTabs[activeMenu]||null,scroll:Math.max(0,ui.menu.scrollTop||0)};
+      }
+      function sameMenuRoute(a,b){return a.section===b.section&&a.tab===b.tab;}
+      function applyMenuRoute(route){
+        activeMenu=route.section;
+        if(route.tab)menuTabs[route.section]=route.tab;
         ui.menu.classList.remove("closing");
         ui.menu.classList.add("open");
-        document
-          .querySelectorAll(".dock button")
-          .forEach((b) =>
-            b.classList.toggle("active", b.dataset.menu === activeMenu),
-          );
-        syncMenuChrome();
-        renderMenu();
-        requestAnimationFrame(() => {
-          if (ui.menu) ui.menu.scrollTop = 0;
-        });
+        document.querySelectorAll(".dock button").forEach(b=>b.classList.toggle("active",b.dataset.menu===activeMenu));
+        syncMenuChrome();renderMenu();
+        ui.menu.scrollTop=route.scroll||0;
       }
-      function openMenu(name = "hub") {
-        if (activeMenu === name && ui.menu.classList.contains("open")) {
-          closeMenu();
-          return;
+      function openSection(name="hub",tab=null){
+        const section=normalizeMenuName(name),route={section,tab:tab||menuDefaults[section]||null,scroll:0};
+        const opening=!ui.menu.classList.contains("open");
+        if(opening){
+          menuHistory.length=0;
+          menuWasPaused=!!(paused||modalFreeze||titleOpen||titleMenuMode);
+          paused=true;keys.clear();cleanControlButtons();
+          if(section!=="hub"&&!titleMenuMode)menuHistory.push({section:"hub",tab:null,scroll:0});
+        }else if(section==="hub"){
+          menuHistory.length=0;
+        }else{
+          const current=currentMenuRoute();
+          if(sameMenuRoute(current,route))return;
+          menuHistory.push(current);
+          if(menuHistory.length>32)menuHistory.splice(1,1);
         }
-        if (!ui.menu.classList.contains("open") && name !== "hub")
-          activeMenu = null;
-        openSection(name);
+        applyMenuRoute(route);
+      }
+      function openMenu(name="hub"){openSection(name);}
+      function navigateMenuBack(){
+        const route=menuHistory.pop();
+        if(route)applyMenuRoute(route);
+        else closeMenu();
       }
       function closeMenu() {
         const shouldResume = !menuWasPaused && !titleMenuMode && !titleOpen;
         if(!ui.menu.classList.contains("open"))return;
         activeMenu = null;
+        menuHistory.length=0;
         renderMenu.lastSection=null;
         layoutDrag = null;
         ui.menu.classList.add("closing");
@@ -16578,25 +16590,17 @@
         if (!activeMenu || !ui.menu.classList.contains("open")) return;
         activeMenu = normalizeMenuName(activeMenu);
         ui.menu.dataset.section = activeMenu;
-        ui.menuTitle.textContent =
-          {
-            hub: game.frigate?.built ? "Pioneer Command" : "Command Menu",
-            resources: "Resources",
-            planets: "Planet Network",
-            upgrades: "Upgrade Center",
-            frigate: "Pioneer Base",
-            cosmetics: "Cosmetic Hangar",
-            system: "Operations",
-            echoes: "Orbital Echoes",
-            codex: "Planet Codex",
-            activity: "Captain Log",
-            guide: "Pilot Manual",
-            help: "Help / Glossary",
-          }[activeMenu] || "Command Menu";
-        ui.menuNav.innerHTML = "";
+        ui.menuTitle.textContent = menuRouteTitle(currentMenuRoute());
+        ui.menuBack.textContent="Back";
+        ui.menuBack.disabled=menuHistory.length===0&&!titleMenuMode;
+        ui.menuClose.textContent=titleMenuMode?"Title":"Flight";
+        ui.menuNav.innerHTML = menuNavigationHtml();
         (
           ({
             hub: renderHub,
+            explore: renderExploreDirectory,
+            hangar: renderHangarDirectory,
+            journal: renderJournalDirectory,
             resources: renderResources,
             planets: renderPlanets,
             upgrades: renderUpgrades,
@@ -16620,30 +16624,16 @@
         }
         queueSkinPreviews();
       }
-      function menuNavigationHtml() {
-        const sections = [
-          ["hub", "⌂", "Home"],
-          ["planets", "●", "Worlds"],
-          ["resources", "◆", "Cargo"],
-          ["upgrades", "▲", "Upgrades"],
-          ["frigate", "▰", "Pioneer"],
-          ["cosmetics", "◇", "Style"],
-          ["system", "◎", "Records"],
-        ];
-        return sections
-          .map(
-            (section) =>
-              '<button type="button" class="' +
-              (activeMenu === section[0] ? "active" : "") +
-              '" data-action="openSection" data-arg="' +
-              esc(JSON.stringify(section[0])) +
-              '"><span>' +
-              section[1] +
-              "</span>" +
-              esc(section[2]) +
-              "</button>",
-          )
-          .join("");
+      function menuRouteTitle(route){
+        const labels={hub:"Command",explore:"Explore",hangar:"Ship & designs",journal:"Journey",resources:"Cargo",planets:"Worlds",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"System",echoes:"Orbital Echoes",codex:"Planet Codex",activity:"Captain Log",guide:"Pilot Manual",help:"Help"};
+        const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",travel:"Travel & atlas",records:"Journey records",settings:"Settings"},upgrades:{ship:"Ship upgrades",planet:"World upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
+        return sub[route.section]?.[route.tab]||labels[route.section]||"Command";
+      }
+      function menuNavigationHtml(){
+        if(activeMenu==="hub")return "";
+        const path=menuHistory.filter(r=>r.section!=="hub").map(menuRouteTitle);
+        const label=path.length?path.slice(-2).join(" / "):"Command";
+        return '<div class="nav-context"><button type="button" data-action="backToMainMenu" data-arg="" class="nav-home">Home</button><span aria-hidden="true">/</span><span class="nav-path">'+esc(label==="Command"?menuRouteTitle(currentMenuRoute()):label+" / "+menuRouteTitle(currentMenuRoute()))+'</span></div>';
       }
       function addMobileMenuFooter() {
         if (
@@ -16662,15 +16652,11 @@
       function closeMenuAction() {
         closeMenu();
       }
-      function openRecommendedMenu() {
-        const next = nextBestAction()?.menu || "hub",
-          target = next;
-        if (target === activeMenu) {
-          const title = nextBestAction()?.title || "Recommended action";
-          toast(title + " is already open.");
-          return;
-        }
-        openSection(target);
+      function openRecommendedMenu(){
+        const next=nextBestAction(), section=next?.menu||"hub";
+        const title=String(next?.title||"").toLowerCase();
+        const tab=section==="frigate"?(title.includes("fleet")?"fleet":title.includes("adventure")?"expeditions":"overview"):section==="system"?"travel":section==="upgrades"?(title.includes("planet")||String(next?.sub||"").toLowerCase().includes("planet")?"planet":"ship"):null;
+        openSection(section,tab);
       }
       function hydrateSettingsControls() {
         if (!$("graphicsSelect")) return;
@@ -16701,49 +16687,24 @@
         upgrades: "ship",
         frigate: "overview",
         system: "status",
+        cosmetics:"overview",
       };
       function activeTab(menu, fallback) {
         menuTabs[menu] = menuTabs[menu] || fallback;
         return menuTabs[menu];
       }
-      function tabBar(menu, tabs) {
-        const current = activeTab(menu, tabs[0]?.key || "overview");
-        return (
-          '<div class="section-tabs" role="tablist">' +
-          tabs
-            .map(
-              (t) =>
-                '<button type="button" class="' +
-                (current === t.key ? "active" : "") +
-                '" role="tab" aria-selected="' + String(current === t.key) + '" data-action="setMenuTab" data-arg="' +
-                esc(menu + "|" + t.key) +
-                '">' +
-                esc(t.label) +
-                (t.count
-                  ? '<span class="tab-count">' + esc(t.count) + "</span>"
-                  : "") +
-                "</button>",
-            )
-            .join("") +
-          "</div>"
-        );
+      function tabBar(menu,tabs){
+        const current=activeTab(menu,tabs[0]?.key||"overview");
+        // These links always navigate to another page. Counts are not unread notifications.
+        return '<div class="route-list">'+tabs.filter(t=>t.key!==current).map(t=>routeRow(t.label,t.desc||"","setMenuTab",menu+"|"+t.key,t.icon||"layers")).join("")+'</div>';
       }
-      function setMenuTab(v) {
-        const parts = String(v || "").split("|"),
-          menu = parts[0],
-          tab = parts[1];
-        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","vault","upgrades","cosmetics"],system:["status","ops","travel","records","settings"]};
-        if (!allowed[menu]?.includes(tab)) return;
-        menuTabs[menu] = tab;
-        renderMenu();
-        requestAnimationFrame(() => {
-          if (ui.menu) ui.menu.scrollTop = 0;
-        });
+      function setMenuTab(v){
+        const [menu,tab]=String(v||"").split("|");
+        const allowed={upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","vault","upgrades","cosmetics"],system:["status","ops","travel","records","settings"],cosmetics:["overview","ship","frigate","trail","fleet","sets"]};
+        if(!allowed[menu]?.includes(tab))return;
+        openSection(menu,tab);
       }
-      function openFrigateTab(tab = "overview") {
-        menuTabs.frigate = tab;
-        openSection("frigate");
-      }
+      function openFrigateTab(tab="overview"){setMenuTab("frigate|"+tab);}
       function tabIntro(title, desc, chips = "") {
         return (
           '<div class="card section-summary"><div class="section-focus-title"><h4>' +
@@ -16793,149 +16754,63 @@
           "</div></div>"
         );
       }
-      function renderHub() {
-        const rs = readyState(),
-          nba = nextBestAction(),
-          surveyBodies = (game.system?.bodies || []).filter(
-            (b) => b.type !== "star",
-          ),
-          surveyKnown = surveyBodies.filter(
-            (b) => bodySurveyed(b),
-          ).length,
-          surveyProgress = surveyBodies.length
-            ? Math.round((surveyKnown / surveyBodies.length) * 100)
-            : 0,
-          core = [
-            [
-              "resources",
-              "◆",
-              "Resources",
-              "Gather colony output and inspect cargo.",
-              rs.resources,
-            ],
-            [
-              "planets",
-              "●",
-              "Worlds",
-              "Target, scan, capture, and develop planets.",
-              rs.planets,
-            ],
-            [
-              "upgrades",
-              "▲",
-              "Ship & World Upgrades",
-              "Improve the Starling and captured worlds.",
-              rs.upgrades,
-            ],
-            [
-              "frigate",
-              "▰",
-              game.frigate?.built ? "Pioneer Base" : "Pioneer Project",
-              "Crew, fleet, adventures, systems, and travel.",
-              rs.frigate,
-            ],
-            [
-              "cosmetics",
-              "◇",
-              "Appearance",
-              "Preview and equip hull, fleet, and trail designs.",
-              0,
-            ],
-          ],
-          explore = [
-            [
-              "echoes",
-              "〰",
-              "Echoes",
-              "Review saved slingshot routes.",
-              rs.echoes,
-            ],
-            [
-              "codex",
-              "☉",
-              "Codex",
-              "Browse surveyed worlds and discoveries.",
-              0,
-            ],
-          ],
-          support = [
-            [
-              "system",
-              "◎",
-              "Operations",
-              "Assignments, atlas, records, save, and settings.",
-              rs.system,
-            ],
-            [
-              "activity",
-              "≡",
-              "Captain Log",
-              "Review the journey so far.",
-              0,
-            ],
-            [
-              "guide",
-              "△",
-              "Pilot Manual",
-              "Guidance for every major system.",
-              0,
-            ],
-            ["help", "?", "Glossary", "Quick definitions and gameplay help.", 0],
-          ];
-        const groupHtml = (title, items) =>
-          '<div class="card"><h4>' +
-          esc(title) +
-          '</h4><div class="grid">' +
-          items
-            .map(
-              (s) =>
-                '<button class="hub-btn" type="button" data-action="openSection" data-arg="' +
-                esc(JSON.stringify(s[0])) +
-                '">' +
-                (s[4]
-                  ? '<em class="menu-card-ready">' +
-                    (s[4] > 99 ? "99+" : s[4]) +
-                    "</em>"
-                  : "") +
-                '<span class="hub-symbol">' +
-                s[1] +
-                "</span><b>" +
-                esc(s[2]) +
-                '</b><small style="display:block;color:var(--muted);margin-top:4px">' +
-                esc(s[3]) +
-                "</small></button>",
-            )
-            .join("") +
-          "</div></div>";
-        ui.menuContent.innerHTML =
-          guidedTutorialCard() +
-          '<div class="command-vista"><span class="command-kicker">Current Expedition</span><h4>' +
-          esc(game.system?.name || "Uncharted System") +
-          '</h4><p>' +
-          surveyKnown +
-          " of " +
-          surveyBodies.length +
-          ' worlds catalogued in this system.</p><div class="command-meter" style="--commandProgress:' +
-          surveyProgress +
-          '%"><span></span></div></div>' +
-          card(
-            "Recommended Next Action",
-            esc(nba.title) +
-              '<br><span style="color:var(--muted)">' +
-              esc(nba.sub) +
-              "</span>",
-            btn("Open " + menuLabel(nba.menu), "openSection", nba.menu),
-          ) +
-          groupHtml("Explore & manage", [core[1],core[3],core[0]]) +
-          (game.frigate.built?card("Discoveries",activeFrontierContacts().length+" drifting contacts in this system. Recover them for salvage and Vault finds.",btn("Track closest contact","trackFrontierContact",null,!!nearestFrontierContact())+btn("Vault","openFrigateTab","vault")+btn("Adventures","openFrigateTab","expeditions")):"") +
-          secondaryDetails("Upgrades, appearance & routes",groupHtml("Ship & journey",[core[2],core[4],...explore])) +
-          secondaryDetails("Records, Settings & Help", groupHtml("Records & Help", support));
+      function navIcon(name){
+        const paths={explore:'<circle cx="12" cy="12" r="8"/><ellipse cx="12" cy="12" rx="3.5" ry="8"/><path d="M4 12h16"/>',pioneer:'<path d="M12 3l8 14-8-3-8 3 8-14zM12 14v7"/>',cargo:'<path d="M4 7l8-4 8 4v10l-8 4-8-4zM4 7l8 4 8-4M12 11v10"/>',ship:'<path d="M12 3l5 5 3 11-8-4-8 4 3-11zM10 8h4"/>',journal:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4M5 5l3 3m8 8 3 3M5 19l3-3m8-8 3-3"/>',vault:'<path d="M12 3l8 5v8l-8 5-8-5V8zM12 3v18M4 8l16 8M20 8L4 16"/>',route:'<circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 5h8a4 4 0 010 8H9a3 3 0 000 6h8"/>',signal:'<circle cx="12" cy="12" r="2"/><circle cx="12" cy="12" r="6"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>',layers:'<path d="M12 3l9 5-9 5-9-5zM3 12l9 5 9-5M3 16l9 5 9-5"/>',crew:'<circle cx="12" cy="7" r="3"/><path d="M5 21v-3a7 7 0 0114 0v3"/>',fleet:'<path d="M12 3l4 8-4-2-4 2zM5 12l4 8-4-2-4 2zM19 12l4 8-4-2-4 2z"/>',help:'<circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 116 0c0 2-3 2-3 4m0 3v.2"/>'};
+        return '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(paths[name]||paths.layers)+'</svg>';
+      }
+      function routeRow(label,desc,action,arg,icon="layers"){
+        return '<button type="button" class="route-row" data-action="'+esc(action)+'" data-arg="'+esc(JSON.stringify(arg))+'"><span class="route-icon">'+navIcon(icon)+'</span><span class="route-copy"><b>'+esc(label)+'</b>'+(desc?'<small>'+esc(desc)+'</small>':'')+'</span><svg class="route-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 3 5 5-5 5"/></svg></button>';
+      }
+      function routeDirectory(rows){return '<div class="route-list">'+rows.map(r=>routeRow(...r)).join("")+'</div>';}
+      function renderHub(){
+        const nba=nextBestAction(),worlds=(game.system?.bodies||[]).filter(b=>b.type!=="star"),
+          scanned=worlds.filter(bodySurveyed).length;
+        ui.menuContent.innerHTML=guidedTutorialCard()+
+          '<section class="command-status"><span class="screen-eyebrow">CURRENT SYSTEM</span><h2>'+esc(game.system?.name||"Uncharted")+'</h2><p>'+scanned+' of '+worlds.length+' worlds surveyed</p><div class="command-meter" style="--commandProgress:'+Math.round(scanned/Math.max(1,worlds.length)*100)+'%"><span></span></div></section>'+
+          '<section class="next-action"><span class="screen-eyebrow">NEXT STEP</span>'+routeRow(nba.title,nba.sub,"openRecommendedMenu",null,"route")+'</section>'+
+          '<h4 class="directory-heading">Command directory</h4>'+
+          routeDirectory([
+            ["Explore","Worlds, signals, discoveries and travel","openSection","explore","explore"],
+            [game.frigate?.built?"Pioneer":"Pioneer project","Fleet, crew, Vault and adventures","openSection","frigate","pioneer"],
+            ["Cargo","Resources and production","openSection","resources","cargo"],
+            ["Ship & designs","Upgrade and customize your spacecraft","openSection","hangar","ship"],
+            ["Journey","Tasks, records, Echoes and help","openSection","journal","journal"],
+            ["Settings","Controls, audio, display and save data","setMenuTab","system|settings","settings"]
+          ]);
+      }
+      function renderExploreDirectory(){
+        const n=nearestFrontierContact();
+        ui.menuContent.innerHTML=routeDirectory([
+          ["Worlds","Survey, capture and manage planets","openSection","planets","explore"],
+          ["Travel & atlas","Jump, visit systems and investigate anomalies","setMenuTab","system|travel","route"],
+          ["Planet Codex","Your surveyed worlds and collections","openSection","codex","journal"],
+          ...(game.frigate.built?[["Vault","Unique discoveries and passive bonuses","openFrigateTab","vault","vault"]]:[])
+        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track closest contact","trackFrontierContact",null,!!n)):"");
+      }
+      function renderHangarDirectory(){
+        ui.menuContent.innerHTML=routeDirectory([
+          ["Ship upgrades","Thrust, fuel, braking and other systems","setMenuTab","upgrades|ship","ship"],
+          ["World upgrades","Improve your captured worlds","setMenuTab","upgrades|planet","explore"],
+          ["Appearance","Hull designs, engine trails and fleet styles","openSection","cosmetics","layers"],
+          ...(game.frigate.built?[["Base upgrades","Pioneer capacity and systems","openFrigateTab","upgrades","pioneer"]]:[])
+        ]);
+      }
+      function renderJournalDirectory(){
+        ui.menuContent.innerHTML=routeDirectory([
+          ["Tasks","Daily operations, contracts, milestones","setMenuTab","system|ops","route"],
+          ["Journey records","Achievements, faction standing and collections","setMenuTab","system|records","journal"],
+          ["Captain Log","Recent actions and encounter decisions","openSection","activity","journal"],
+          ["Orbital Echoes","View and manage recorded flight routes","openSection","echoes","signal"],
+          ["Pilot Manual","How to use each game system","openSection","guide","help"],
+          ["Help","Quick definitions and guidance","openSection","help","help"]
+        ]);
       }
       function menuLabel(k) {
         return (
           {
-            resources: "Resources",
-            planets: "Planets",
+            explore:"Explore",hangar:"Ship & designs",journal:"Journey",
+            resources: "Cargo",
+            planets: "Worlds",
             upgrades: "Upgrades",
             frigate: game.frigate?.built ? "Pioneer Base" : "Pioneer Project",
             cosmetics: "Cosmetic Hangar",
@@ -20424,9 +20299,9 @@
             0,
           ),
           b = document.querySelector('[data-menu="resources"]');
-        b.classList.toggle("show-badge", ready > 0);
-        ui.productionBadge.textContent =
-          ready > 99 ? "99+" : String(ready || "!");
+        // Readiness belongs on the actual cargo page, not in unexplained badges.
+        b?.classList.remove("show-badge");
+        ui.productionBadge.textContent="";
         const action = smartAction();
         ui.smartBtn.textContent = action.label;
         ui.smartBtn.disabled = !!action.disabled;
@@ -26771,7 +26646,7 @@
         setHudCollapsed(!ui.hud.classList.contains("collapsed"));
       ui.menuLauncher.onclick = () => openMenu("hub");
       ui.menuClose.onclick = closeMenu;
-      ui.menuBack.onclick = backToMainMenu;
+      ui.menuBack.onclick = navigateMenuBack;
       ui.menu.addEventListener("click", (e) => {
         const b = e.target.closest("button[data-action]");
         if (b && !b.disabled) {
