@@ -1332,3 +1332,46 @@ assert.equal(api.saveGame(false),true);
 assert.equal(api.loadGame(false),true);
 assert.equal(frontierQA.worldControlMode(api.body(eligible.name)),"relay");
 assert.equal(frontierQA.activeFrontierContacts().some(c=>c.id===contact.id),false,"Recovered contact cannot respawn on reload");
+
+
+checkpoint("unified menu navigation");
+api.closeMenu();api.initGame(false);api.dismissPanels();api.prepareVaultTest(626262);api.dismissPanels();
+const navQA=vm.runInContext(`({
+  openSection,setMenuTab,openWorldDetails,navigateMenuBack,backToMainMenu,closeMenu,currentMenuRoute,
+  get title(){return ui.menuTitle.textContent},get markup(){return ui.menuContent.innerHTML},
+  get scroll(){return ui.menu.scrollTop},set scroll(v){ui.menu.scrollTop=v},
+  get depth(){return menuHistory.length},get backDisabled(){return ui.menuBack.disabled},
+  get visible(){return ui.menu.classList.contains("open")}
+})`,context);
+const navigationPages={hub:[null],explore:[null],hangar:[null],journal:[null],resources:[null],planets:[null],echoes:[null],codex:[null],activity:[null],guide:[null],help:[null],
+  upgrades:["ship","planet"],frigate:["overview","expeditions","crew","fleet","shipyard","missions","history","vault","upgrades","cosmetics"],
+  system:["status","ops","daily","contracts","milestones","travel","records","achievements","reputation","collections","settings","display","audio","controls","data","privacy"],
+  cosmetics:["overview","ship","frigate","trail","fleet","sets"]};
+for(const [section,tabs] of Object.entries(navigationPages))for(const tab of tabs){
+  navQA.openSection(section,tab);
+  assert.ok(navQA.markup.length>0,section+" / "+tab+" must render");
+  assert.doesNotMatch(navQA.markup,/class="(?:menu-card-ready|tab-count)"/,"No ambiguous notification bubbles");
+  assert.equal(navQA.currentMenuRoute().section,section);
+  if(tab)assert.equal(navQA.currentMenuRoute().tab,tab);
+}
+navQA.closeMenu();navQA.openSection("hub");
+assert.equal(navQA.backDisabled,true);
+navQA.openSection("explore");navQA.scroll=73;navQA.openSection("planets");
+const navWorld=api.game.system.bodies.find(b=>b.type!=="star");
+navQA.openWorldDetails(navWorld.name);assert.match(navQA.currentMenuRoute().tab,/^world:/);
+assert.match(navQA.markup,/Set as Target/);
+navQA.navigateMenuBack();assert.equal(navQA.title,"Worlds");
+navQA.navigateMenuBack();assert.equal(navQA.title,"Explore");assert.equal(navQA.scroll,73);
+navQA.navigateMenuBack();assert.equal(navQA.title,"Command");assert.equal(navQA.depth,0);
+navQA.openSection("frigate");navQA.setMenuTab("frigate|fleet");navQA.setMenuTab("frigate|missions");
+assert.equal(navQA.title,"Fleet missions");
+const previousDepth=navQA.depth;navQA.setMenuTab("frigate|missions");assert.equal(navQA.depth,previousDepth,"Same page must not duplicate history");
+navQA.navigateMenuBack();assert.equal(navQA.title,"Fleet");
+navQA.navigateMenuBack();assert.equal(navQA.title,"Pioneer");
+navQA.backToMainMenu();assert.equal(navQA.title,"Command");assert.equal(navQA.depth,0);
+navQA.openSection("system","audio");assert.match(navQA.markup,/id="musicVolumeSelect"/);assert.doesNotMatch(navQA.markup,/id="graphicsSelect"/);
+navQA.openSection("system","controls");assert.match(navQA.markup,/id="controlLayoutSelect"/);
+navQA.openSection("system","data");assert.match(navQA.markup,/Export Backup/);assert.match(navQA.markup,/Import Backup/);
+navQA.openSection("cosmetics","trail");assert.match(navQA.markup,/Starship Trail Designs/);
+navQA.closeMenu();assert.equal(navQA.visible,false);assert.equal(api.paused,false);
+console.log("Unified navigation: all menu pages, back history, home, scroll, focused settings and badge removal passed.");
