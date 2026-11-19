@@ -1513,7 +1513,7 @@ assert.equal(api.saveGame(false),true);assert.equal(api.loadGame(false),true);
 assert.equal(civQA.civilizationProfile(api.body(inhabitedName)).stage,3);
 assert.equal(api.body(inhabitedName).capturable,false);assert.equal(api.game.captured.has(inhabitedName),false);
 checkpoint("cultural commitments");
-const pactQA=vm.runInContext(`({culturalCommitments,culturalCommitment,chooseCulturalCommitment,recordCulturalSurvey,recordCulturalRoute,completeCulturalCommitment,culturalHarbor,culturalCard,culturalRouteTarget,refuel,
+const pactQA=vm.runInContext(`({culturalCommitments,culturalCommitment,chooseCulturalCommitment,recordCulturalSurvey,recordCulturalRoute,completeCulturalCommitment,culturalHarbor,culturalCard,culturalRouteTarget,withdrawCulturalCommitment,refuel,
   establish(b){b.discovered=true;b.discoveryRewardClaimed=true;b.memory.firstContact=3;game.discovered.add(b.name);game.ship.orbitLocked=true;game.ship.lockBody=b.name;},
   lock(b){game.ship.orbitLocked=true;game.ship.lockBody=b.name;},
   survey(b){b.discovered=true;b.discoveryRewardClaimed=true;game.discovered.add(b.name);}
@@ -1531,6 +1531,8 @@ for(let seed=10000;seed<10200&&exercised.size<3;seed++){
  const arg={world:resident.name,key:option.key};
  assert.equal(pactQA.chooseCulturalCommitment(arg),true);
  assert.equal(pactQA.chooseCulturalCommitment(arg),false);
+ assert.equal(pactQA.withdrawCulturalCommitment(resident.name),true);
+ assert.equal(pactQA.chooseCulturalCommitment(arg),true);
  assert.match(pactQA.culturalCard(resident),/In progress/);
  if(option.goal==="route"){
    pactQA.survey(other);
@@ -1554,6 +1556,7 @@ for(let seed=10000;seed<10200&&exercised.size<3;seed++){
  assert.equal(pactQA.completeCulturalCommitment(resident.name),true);
  assert.equal(pactQA.completeCulturalCommitment(resident.name),false);
  assert.equal(pactQA.culturalCommitment(resident).complete,true);
+ assert.equal(pactQA.withdrawCulturalCommitment(resident.name),false);
  if(option.service==="research")assert.equal(api.game.resources.DataCores,dataBefore+12);
  if(option.service==="harbor"){
    for(const [k,v] of Object.entries(option.cost))assert.equal(api.game.resources[k],100-v);
