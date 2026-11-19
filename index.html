@@ -9972,7 +9972,7 @@
         let changed=false;
         for(const b of game.system.bodies){
           const p=culturalCommitment(b);
-          if(!p||p.complete||p.ready||p.pact.goal!=="survey"||world===b)continue;
+          if(!p||p.complete||p.pact.goal!=="survey"||world===b||(p.ready&&!body(p.record.destination)?.captured))continue;
           p.record.ready=true;p.record.destination=world.name;changed=true;
           addActivity("discovery","Cultural observation ready",p.pact.name+" · "+world.name+". Return to the custodian.");
         }
@@ -9992,6 +9992,7 @@
         if(reason)return reason;
         if(!p||p.complete)return "No outstanding commitment.";
         if(p.pact.goal==="cargo")return canAfford(p.pact.cost)?"":"Delivery requires "+fmt(p.pact.cost)+".";
+        if(p.pact.goal==="survey"&&p.ready&&body(p.record.destination)?.captured)return "The documented world is now controlled. Survey another independent world.";
         return p.ready?"":p.pact.goal==="route"?"Complete the required orbital passage first.":"Survey a new independent world first.";
       }
       function completeCulturalCommitment(name){
@@ -10005,6 +10006,10 @@
         toast(p.pact.name+" · commitment fulfilled.");
         saveGame(false);renderMenu();return true;
       }
+      function withdrawCulturalCommitment(name){
+        const b=body(name),p=culturalCommitment(b);if(!p||p.complete||culturalLocalReason(b))return false;
+        delete b.memory.culturalCommitment;addActivity("discovery","Cultural proposal withdrawn",p.pact.name+" · no completed accord altered.");saveGame(false);renderMenu();return true;
+      }
       function culturalHarbor(b){const p=culturalCommitment(b);return !!(p?.complete&&p.pact.service==="harbor");}
       function culturalRouteTarget(name){
         const b=body(name),p=culturalCommitment(b),end=body(p?.record.destination);
@@ -10014,13 +10019,13 @@
       function culturalCard(b){
         const c=civilizationProfile(b);if(c?.stage!==3)return "";
         const p=culturalCommitment(b),reason=culturalLocalReason(b);
-        if(!p)return card("Cultural commitments","Choose one lasting agreement. Each tradition offers two paths; neither can be changed after selection. No deadline or upkeep.",(culturalCommitments[c.key]||[]).map(pact=>{
+        if(!p)return card("Cultural commitments","Choose one lasting agreement. An unfulfilled proposal may be withdrawn; a fulfilled agreement is permanent. No deadline or upkeep.",(culturalCommitments[c.key]||[]).map(pact=>{
           const surveyUnavailable=pact.goal==="survey"&&!game.system.bodies.some(w=>w!==b&&w.type!=="star"&&!bodySurveyed(w)&&!w.captured);
           return '<div class="log"><b>'+esc(pact.name)+'</b><span>'+esc(pact.desc)+'</span><span>'+esc(culturalServices[pact.service])+'</span>'+(pact.cost?costHtml(pact.cost):"")+btnWhy("Accept commitment","chooseCulturalCommitment",{world:b.name,key:pact.key},!reason&&!surveyUnavailable,reason||(surveyUnavailable?"No uncharted independent world remains.":""))+'</div>';
         }).join(""));
         const text=p.complete?p.pact.record+" "+culturalServices[p.pact.service]:p.pact.desc+(p.pact.goal==="route"?" Required quality: "+p.pact.quality+"%.":p.pact.goal==="cargo"?"":" Survey a new uncaptured world.")+(p.ready?" Evidence recorded: "+p.record.destination+".":"");
         return card(p.pact.name,(p.complete?"<b>Fulfilled</b> · ":"<b>In progress</b> · ")+esc(text)+(p.pact.cost&&!p.complete?costHtml(p.pact.cost):""),
-          p.complete?(p.pact.service==="navigation"?btnWhy("Set passage destination","culturalRouteTarget",b.name,!reason,reason):""):btnWhy("Fulfill commitment","completeCulturalCommitment",b.name,!culturalCompletionReason(b),culturalCompletionReason(b)));
+          p.complete?(p.pact.service==="navigation"?btnWhy("Set passage destination","culturalRouteTarget",b.name,!reason,reason):""):btnWhy("Fulfill commitment","completeCulturalCommitment",b.name,!culturalCompletionReason(b),culturalCompletionReason(b))+btnWhy("Withdraw proposal","withdrawCulturalCommitment",b.name,!reason,reason));
       }
       function civilizationCard(b){
         const c=civilizationProfile(b);if(!c||!bodySurveyed(b))return "";
@@ -22538,6 +22543,7 @@
         }else{
           ctx.beginPath();ctx.ellipse(0,0,r*1.32,r*.55,.3,0,TAU);ctx.stroke();
         }
+        if(culturalCommitment(b)?.complete&&!low){ctx.strokeStyle=rgba(c.color,.26);ctx.lineWidth=Math.max(.6,r*.012);ctx.beginPath();ctx.arc(0,0,r*1.64,phase*.4,phase*.4+1.6);ctx.stroke();}
         ctx.restore();
         for(let i=0;i<(low?1:3);i++){const a=phase+i*TAU/3,x=p.x+Math.cos(a)*(r+12),y=p.y+Math.sin(a)*(r+12);ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.fillStyle=rgba(c.color,.8);ctx.strokeStyle=rgba(c.color,.9);ctx.beginPath();ctx.moveTo(-5,0);ctx.lineTo(0,-4);ctx.lineTo(5,0);ctx.lineTo(0,4);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
       }
@@ -26818,6 +26824,7 @@
         chooseCulturalCommitment,
         completeCulturalCommitment,
         culturalRouteTarget,
+        withdrawCulturalCommitment,
         raidSelectedWorld,
         recoverFrontierContact,
         trackFrontierContact,
