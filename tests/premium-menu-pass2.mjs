@@ -20,10 +20,9 @@ assert.match(html,/\.menu-secondary-details\s*>\s*summary:focus-visible/,
   "Native disclosures must have a visible keyboard focus state");
 
 const hub=fn("renderHub","menuLabel");
-assert.match(hub,/groupHtml\("Explore & manage", \[core\[1\],core\[3\],core\[0\]\]\)/);
-assert.match(hub,/secondaryDetails\("Upgrades, appearance & routes"/);
-assert.match(hub,/secondaryDetails\("Records, Settings & Help"/);
-
+for(const section of ["Explore","Pioneer","Cargo","Ship & designs","Journey","Settings"])assert.ok(hub.includes(section),"Main directory must retain "+section);
+assert.match(hub,/routeDirectory\(/);
+assert.doesNotMatch(hub,/menu-card-ready|tab-count|<details class="menu-secondary-details">/);
 const resources=fn("renderResources","resourceHint");
 assert.match(resources,/secondaryDetails\("Colony Production Breakdown", rows\)/);
 assert.match(resources,/data-action="claimProduction"|claimProduction/,
@@ -36,7 +35,7 @@ assert.match(planets,/secondaryDetails\("World History", planetMemoryHtml\(s\)\)
 assert.match(planets,/secondaryDetails\("Survey & Development Details", planetDetailsHtml\(s\)\)/);
 
 const upgrades=fn("renderUpgrades","shipClassProgressHtml");
-assert.match(upgrades,/let html = tabs;/,"Upgrade deck should start with its two clear tabs");
+assert.match(upgrades,/activeTab\("upgrades","ship"\)/,"Dedicated ship and world upgrades must stay accessible");
 assert.doesNotMatch(upgrades,/Ship System Levels:/,"No repeated summary wall");
 assert.match(upgrades,/secondaryDetails\(\s*"Rename Starling"/);
 assert.match(upgrades,/shipSubsystemsHtml\(\)/,"All ship systems retained");
@@ -46,19 +45,20 @@ const cosmetics=fn("renderCosmetics","storeHtml");
 assert.match(cosmetics,/cosmeticPreviewHtml\("ship"/);
 assert.match(cosmetics,/cosmeticPreviewHtml\("frigate"/);
 assert.match(cosmetics,/cosmeticPreviewHtml\("trail"/);
-assert.match(cosmetics,/secondaryDetails\("Browse Starship and Pioneer Designs", storeHtml\(\)\)/);
-assert.match(cosmetics,/secondaryDetails\("Browse Fleet Formations", fleetSkinsHtml\(\)\)/);
+for(const section of ["ship","frigate","trail","fleet","sets"])assert.ok(cosmetics.includes("cosmetics|"+section));
+assert.match(cosmetics,/storeHtml\(tab\)/);
+assert.match(cosmetics,/fleetSkinsHtml\(\)/);
 
 const operations=fn("renderSystem","renderActivity");
-assert.match(operations,/let html = tabs;/);
+assert.match(operations,/routeDirectory\(/);
 for(const category of ["ops","travel","records","settings"]){
- assert.ok(operations.includes('tab === "'+category+'"'),"Retain Operations deck "+category);
+ assert.ok(new RegExp('tab\\s*===\\s*"'+category+'"').test(operations),"Retain Operations deck "+category);
 }
-for(const call of ["dailyOpsHtml()","atlasHtml()","settingsHtml()","saveHtml()"]){
+for(const call of ["dailyOpsHtml()","atlasHtml()","settingsHtml(tab)","saveHtml()"]){
  assert.ok(operations.includes(call),"Retain functional operations "+call);
 }
 const pioneer=fn("renderFrigate","cosmeticPreviewHtml");
 for(const tab of ["expeditions","crew","fleet","vault","upgrades","cosmetics"]){
- assert.ok(pioneer.includes('tab === "'+tab+'"'),"Preserve Pioneer "+tab);
+ assert.ok(new RegExp('tab\\s*===\\s*"'+tab+'"').test(pioneer),"Preserve Pioneer "+tab);
 }
 console.log("Premium menu pass: accessible disclosure, readable priority screens and retained gameplay controls verified.");
