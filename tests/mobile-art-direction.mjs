@@ -1,0 +1,17 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const html=readFileSync(new URL("../index.html",import.meta.url),"utf8");
+const artwork=readFileSync(new URL("../assets/threshold-vista.svg",import.meta.url),"utf8");
+const sw=readFileSync(new URL("../sw.js",import.meta.url),"utf8");
+assert.match(artwork,/viewBox="0 0 900 1400"/);
+assert.ok(artwork.split("<polygon ").length>400,"Illustration must use layered mineral geometry");
+assert.match(artwork,/feTurbulence/);
+assert.doesNotMatch(artwork,/NaN|Infinity|<script|https?:\/\/(?!www\.w3\.org)/);
+assert.match(sw,/threshold-vista\.svg/);
+assert.match(html,/#titleOverlay \.title-screen\{isolation:isolate;position:relative/);
+assert.match(html,/\.title-screen \.title-showcase\{position:absolute!important;inset:0!important/);
+assert.match(html,/class="dialog expedition-intro" data-expedition-step="0"/);
+assert.match(html,/intro\.dataset\.expeditionStep=String\(i\)/);
+for(const id of ["loadBtn","newGameBtn","howToBtn","titleSettingsBtn","skipOnboard","nextOnboard"])assert.equal(html.split('id="'+id+'"').length,2);
+assert.match(html,/SAVE_VERSION = 20/);
+console.log("Mobile art direction: full-bleed title and briefing, bundled artwork, stable controls and save schema passed.");
