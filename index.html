@@ -5243,6 +5243,85 @@
         .menu-content-enter,.feedback-flash,.fuel-hud.low { animation:none !important; }
       }
       @media(max-width:560px) { .menu .content { gap:8px; } .menu .grid { gap:8px; } .pioneer-deck-directory .pioneer-primary-actions {grid-template-columns:repeat(2,minmax(0,1fr));} }
+
+      /* Unified command interface: calm, high-contrast, native-looking navigation. */
+      .menu, .dialog {
+        --ui-bg:#091117; --ui-surface:#101c25; --ui-line:#263943;
+        --ui-text:#eaf2f5; --ui-secondary:#a2b6bf; --ui-accent:#9df2e4;
+        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+        color:var(--ui-text);
+        background:var(--ui-bg);
+        letter-spacing:0; text-shadow:none;
+      }
+      .menu { background:#091117!important; border:1px solid #263943!important; box-shadow:0 26px 80px #0009!important; border-radius:22px; }
+      .menu-head { background:#091117!important; box-shadow:none!important; border-bottom:1px solid #263943!important; padding-block:14px!important; }
+      .menu-head:before, .menu-head:after {display:none!important;}
+      .menu-head h3 {font-size:19px!important;letter-spacing:-.035em!important;font-weight:650!important;}
+      .menu-head button {background:transparent!important;border:0!important;box-shadow:none!important;text-transform:none!important;font-size:14px!important;color:#9df2e4!important;min-height:44px!important;}
+      .menu-head #menuBack {display:inline-flex!important;gap:5px;justify-content:flex-start!important;}
+      .menu-head #menuBack:before {content:"‹";font-size:25px;line-height:1;}
+      .menu-head #menuBack:disabled {visibility:hidden;}
+      .menu-head #menuClose {justify-content:flex-end!important;display:inline-flex!important;}
+      .menu .content {gap:14px!important;padding-top:8px!important;max-width:680px;margin-inline:auto;}
+      .menu .menu-nav { margin:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;border:0!important;overflow:visible!important; }
+      .nav-context {display:flex;align-items:center;gap:10px;color:#a2b6bf;font-size:12px;min-height:38px;padding-inline:3px;min-width:0;}
+      .nav-context .nav-home {border:0!important;background:transparent!important;color:#9df2e4!important;box-shadow:none!important;padding:4px 6px!important;min-height:44px!important;font-size:13px!important;}
+      .nav-path {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+      .menu .route-list {display:flex;flex-direction:column;gap:0;border:1px solid #263943;border-radius:16px;background:#101c25;overflow:hidden;}
+      .menu .route-row {display:grid!important;grid-template-columns:40px minmax(0,1fr) 17px;align-items:center;text-align:left!important;gap:12px;min-height:70px!important;width:100%;border:0!important;border-radius:0!important;border-bottom:1px solid #263943!important;padding:12px 14px!important;box-shadow:none!important;background:transparent!important;transform:none!important;text-transform:none!important;letter-spacing:0!important;}
+      .menu .route-row:last-child{border-bottom:0!important;}
+      .menu .route-row:active {background:#1b3038!important;}
+      .menu .route-row:focus-visible {outline:2px solid #9df2e4;outline-offset:-3px;}
+      .route-icon {display:grid;place-items:center;width:38px;height:38px;color:#9df2e4;background:#172d33;border-radius:11px;}
+      .route-icon svg {width:22px;height:22px;display:block;}
+      .route-copy {min-width:0;display:flex;flex-direction:column;gap:4px;}
+      .route-copy b {font-size:15px;line-height:1.25;font-weight:650;color:#edf5f7;}
+      .route-copy small {font-size:12px;line-height:1.35;font-weight:400;color:#a2b6bf;white-space:normal;}
+      .route-chevron {width:16px;height:16px;color:#7796a2;}
+      .planet-orb {width:31px;height:31px;border-radius:50%;background:radial-gradient(circle at 30% 27%,#f2f8ff88,transparent 58%),var(--orb,#7f95ac);box-shadow:inset -7px -5px 12px #0009;justify-self:center;}
+      .screen-intro {font-size:14px!important;color:#a2b6bf!important;line-height:1.5;margin:4px 0 10px;}
+      .screen-eyebrow {font-size:10px;letter-spacing:.13em;font-weight:650;color:#a2b6bf;}
+      .command-status {padding:18px 18px 16px;border:1px solid #304650;border-radius:18px;background:linear-gradient(115deg,#10242d,#101c25 75%);}
+      .command-status h2 {font-size:clamp(24px,6vw,34px);letter-spacing:-.045em;font-weight:650;margin:8px 0;color:#f1f7f8;}
+      .command-status p {font-size:13px;color:#a2b6bf;margin:0 0 10px;}
+      .command-status .command-meter {height:4px;border-radius:9px;background:#263943;}
+      .command-status .command-meter span {background:#9df2e4;}
+      .next-action {display:grid;gap:8px;}
+      .next-action .route-row {background:#142a2c!important;border:1px solid #32534f!important;border-radius:15px!important;min-height:60px!important;}
+      .directory-heading {margin:8px 0 0!important;color:#b9cbd2!important;font-size:13px!important;font-weight:650!important;letter-spacing:.015em!important;}
+      .menu .card,.menu .branch,.menu .quest,.menu .log,.menu .prod,.menu .sector,.menu .crew-card,.menu .cosmetic-card,.menu .vault-hero,.menu .vault-entry,.menu .fleet-ship-card,.menu .expedition-card,.menu .shop{
+        background:#101c25!important;border:1px solid #263943!important;border-radius:16px!important;box-shadow:none!important;animation:none!important;
+      }
+      .menu .card::before,.menu .card::after,.menu .quest::before,.menu .branch::before {display:none!important;}
+      .menu .card h4,.menu h4,.menu .crew-row-head b {font-size:16px;letter-spacing:-.015em;line-height:1.35;font-weight:650;color:#edf5f7;}
+      .menu .card-body,.menu .card p,.menu .log span,.menu .prod span,.menu .branch span,.menu .quest span,.menu .setting-row span {color:#a2b6bf;line-height:1.5;font-size:13px;}
+      .menu .chip,.menu .res,.menu .stat {background:#0c171f!important;border:1px solid #263943!important;box-shadow:none!important;border-radius:10px!important;}
+      .menu button.game-action,.menu .actions button:not(.nav-link),.dialog button:not(.pause-close) {background:#9df2e4!important;color:#0b2426!important;border:1px solid #9df2e4!important;border-radius:11px!important;font-size:13px!important;font-weight:650!important;text-transform:none!important;letter-spacing:0!important;box-shadow:none!important;}
+      .menu button.nav-link {display:inline-flex;gap:7px;align-items:center;background:#152832!important;border:1px solid #34505a!important;color:#d5f0ee!important;border-radius:11px!important;font-size:13px!important;font-weight:600!important;box-shadow:none!important;text-transform:none!important;letter-spacing:0!important;}
+      .menu button.nav-link:after {content:"›";font-size:19px;line-height:1;}
+      .menu button:disabled,.dialog button:disabled {background:#17232b!important;color:#81929b!important;border-color:#263943!important;opacity:1!important;}
+      .menu button.danger,.dialog button.danger {background:#321f25!important;color:#ffc2c5!important;border-color:#5a323b!important;}
+      .menu button:focus-visible,.dialog button:focus-visible,.menu select:focus-visible {outline:2px solid #9df2e4!important;outline-offset:2px;}
+      .menu .menu-secondary-details {border:0!important;border-top:1px solid #263943!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;}
+      .menu .menu-secondary-details > summary {padding:12px 2px!important;color:#c2d8df!important;font-size:13px!important;border:0!important;}
+      .menu .menu-secondary-details > summary:after {border:0!important;color:#9df2e4;}
+      .menu .menu-secondary-body {padding:0 2px 8px!important;}
+      .settings-form {display:flex;flex-direction:column;gap:0;}
+      .settings-form .setting-row {display:grid;grid-template-columns:minmax(0,1fr) minmax(100px,140px);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #263943;}
+      .menu select,.menu input {background:#0c171f!important;color:#edf5f7!important;border:1px solid #39515b!important;min-height:44px;font-size:14px;border-radius:9px!important;}
+      .menu .progress,.menu .milestone-meter,.menu .crew-xp,.menu .vault-progress-track {height:5px;border-radius:10px;background:#263943;box-shadow:none;}
+      .menu .progress>div,.menu .milestone-meter>div,.menu .crew-xp>div,.menu .vault-progress-track>div {background:#9df2e4;box-shadow:none;}
+      .menu-card-ready,.tab-count,.dock .ready,#productionBadge {display:none!important;}
+      .menu .pioneer-deck-directory {padding-inline:0;border:0;}
+      .menu .pioneer-flight-deck {padding-inline:0;border:0;}
+      .menu .cosmetic-loadout {gap:12px;}
+      .menu .cosmetic-preview-live,.menu .fleet-hangar-stage,.menu .vault-specimen {border-radius:12px!important;background-color:#091117!important;box-shadow:none!important;}
+      .pause-dialog,.title-screen {background:#091117!important;border:1px solid #263943!important;border-radius:22px!important;box-shadow:0 24px 80px #0009!important;}
+      .pause-dialog h2,.title-screen h2 {font-weight:650!important;letter-spacing:-.04em!important;}
+      .dialog button:not(.danger):not(.pause-close):not(#pauseResumeBtn):not(#loadBtn):not(#newGameBtn) {background:#152832!important;color:#e0efef!important;border-color:#34505a!important;}
+      @media(max-width:560px){.menu{border-radius:0!important;border:0!important;padding:calc(10px + var(--safeTop)) 16px calc(20px + var(--safeBottom))!important;}.menu-head{margin:calc(-10px - var(--safeTop)) -16px 6px!important;padding:calc(10px + var(--safeTop)) 16px 10px!important;top:calc(-10px - var(--safeTop))!important;}.menu .content{padding-bottom:calc(20px + var(--safeBottom))!important;}.menu .route-row{min-height:66px!important;padding:11px 12px!important;}}
+      @media(prefers-reduced-motion:reduce){.menu,.menu-content-enter,.route-row{animation:none!important;transition:none!important;}}
+
     </style>
   </head>
   <body>
@@ -12089,6 +12168,8 @@
         );
       }
       function scrollFleetSection(id) {
+        if(id==="fleetShipyard")return setMenuTab("frigate|shipyard");
+        if(id==="fleetMissions")return setMenuTab("frigate|missions");
         const safe = String(id).replace(/[^a-zA-Z0-9_-]/g, "");
         const el = ui.menu?.querySelector("#" + safe);
         if (el)
@@ -16011,7 +16092,7 @@
           return { title: objective.action, sub, menu: objective.menu };
         }
         const contact=nearestFrontierContact();
-        if(contact&&contact.d<320&&!game.ship.orbitLocked)return {title:"Recover "+contact.contact.name,sub:Math.round(contact.d)+"u • teal radar marker",menu:"frigate"};
+        if(contact&&contact.d<320&&!game.ship.orbitLocked)return {title:"Recover "+contact.contact.name,sub:Math.round(contact.d)+"u • teal radar marker",menu:"explore"};
         if (game.majorThreat?.status === "active")
           return {
             title: "Prepare for " + game.majorThreat.name,
@@ -16039,7 +16120,7 @@
               Number(arcStage.progress || 0) +
               "/" +
               arcStage.goal,
-            menu: "frigate",
+            menu: "frigate",tab:"expeditions",
           };
         if (h && h.d < 70 && !h.echo.harvested)
           return {
@@ -16068,8 +16149,8 @@
         if (game.frigate.built && fleetReadyCount() > 0)
           return {
             title: "Fleet Mission Ready",
-            sub: fleetReadyCount() + " mission reward ready to claim",
-            menu: "frigate",
+            sub: fleetReadyCount() + " mission rewards ready to claim",
+            menu: "frigate",tab:"missions",
           };
         if (upgradeReady().any)
           return {
@@ -16591,6 +16672,9 @@
         if (!activeMenu || !ui.menu.classList.contains("open")) return;
         activeMenu = normalizeMenuName(activeMenu);
         ui.menu.dataset.section = activeMenu;
+        const key=activeMenu+"|"+(menuTabs[activeMenu]||""),samePage=renderMenu.lastSection===key,
+          oldScroll=ui.menu.scrollTop||0,
+          expanded=samePage?Array.from(ui.menuContent.querySelectorAll("details")).map(d=>d.open):[];
         ui.menuTitle.textContent = menuRouteTitle(currentMenuRoute());
         ui.menuBack.textContent="Back";
         ui.menuBack.disabled=menuHistory.length===0&&!titleMenuMode;
@@ -16617,6 +16701,7 @@
         )();
         hydrateSettingsControls();
         wireMenuButtons();
+        if(samePage){Array.from(ui.menuContent.querySelectorAll("details")).forEach((d,i)=>{if(expanded[i])d.open=true;});ui.menu.scrollTop=oldScroll;}
         const sectionKey=activeMenu+"|"+(menuTabs[activeMenu]||"");
         if(renderMenu.lastSection!==sectionKey){
           renderMenu.lastSection=sectionKey;
@@ -16635,6 +16720,7 @@
       }
       function menuNavigationHtml(){
         if(activeMenu==="hub")return "";
+        if(titleMenuMode)return '<div class="nav-context"><span class="nav-path">Title / '+esc(menuRouteTitle(currentMenuRoute()))+'</span></div>';
         const path=menuHistory.filter(r=>r.section!=="hub").map(menuRouteTitle);
         const label=path.length?path.slice(-1).join(" / "):"Command";
         return '<div class="nav-context"><button type="button" data-action="backToMainMenu" data-arg="" class="nav-home">Home</button><span aria-hidden="true">/</span><span class="nav-path">'+esc(label==="Command"?menuRouteTitle(currentMenuRoute()):label+" / "+menuRouteTitle(currentMenuRoute()))+'</span></div>';
@@ -16662,7 +16748,7 @@
         if(section==="planets"){
           const b=planetCaptureReady()||currentTarget();if(b&&body(b.name))return openWorldDetails(b.name);
         }
-        const tab=section==="frigate"?(title.includes("fleet")?"fleet":title.includes("adventure")?"expeditions":"overview"):section==="system"?"travel":section==="upgrades"?(title.includes("planet")||String(next?.sub||"").toLowerCase().includes("planet")?"planet":"ship"):null;
+        const tab=next?.tab||(section==="frigate"?"overview":section==="system"?"travel":section==="upgrades"?(game.system.isTutorial&&game.missionStage===2||title.includes("planet")||String(next?.sub||"").toLowerCase().includes("mars")||String(next?.sub||"").toLowerCase().includes("planet")?"planet":"ship"):null);
         openSection(section,tab);
       }
       function hydrateSettingsControls() {
@@ -16791,7 +16877,7 @@
           ["Travel & atlas","Jump, visit systems and investigate anomalies","setMenuTab","system|travel","route"],
           ["Planet Codex","Your surveyed worlds and collections","openSection","codex","journal"],
           ...(game.frigate.built?[["Vault","Unique discoveries and passive bonuses","openFrigateTab","vault","vault"]]:[])
-        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track closest contact","trackFrontierContact",null,!!n)):"");
+        ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
       }
       function renderHangarDirectory(){
         ui.menuContent.innerHTML=routeDirectory([
@@ -18870,7 +18956,7 @@
               " / " +
               discoveryCollections.length +
               '</div></div><div class="actions">' +
-              btn("Open Pioneer Vault", "openSection", "frigate") +
+              btn("Open Pioneer Vault", "openFrigateTab", "vault") +
               "</div>",
           ) + discoveryCollectionsHtml()
         );
