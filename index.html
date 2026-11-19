@@ -9866,7 +9866,9 @@
               : arch.key === "gasFrontier"
                 ? 1.08
                 : 1);
-          orbit += gap;
+          // Keep legacy orbit distances intact; new charts vary their spacing pattern.
+          const layout=generationVersion===1?0:Math.floor(rand(mixSeed(seed,0x4c41594f))*4);
+          orbit += layout===1?gap*(i%3===0?1.55:.85):layout===2?gap*(.9+i*.075):layout===3?gap*(i%2===0?1.35:.85):gap;
           const radius = generationVersion===1?between(seed + i * 20 + 1, arch.size[0], arch.size[1]):between(seed+i*20+1,arch.size[0],arch.size[1])*([.68, .88, 1, 1.12, 1.25][Math.floor(rand(mixSeed(seed,i+1,97))*5)]),
             mass =
               radius *
@@ -12805,6 +12807,7 @@
           resource: surveyed ? b.resource : null,
           biome: surveyed ? displayBiome(b) : "Survey pending",
           className: surveyed ? planetClass(b) : "Unclassified world",
+          planetaryFeature: surveyed&&b.frontierFeature?frontierFeatureDescription(b):null,
           archetypeKey:
             game.system.specialType || game.system.archetype?.key || "unknown",
           archetypeName:
@@ -19479,7 +19482,7 @@
                     (e.surveyed
                       ? esc(e.biome) + " • " + esc(label(e.resource))
                       : "Close survey required for classification") +
-                    "</span><span>Status: " +
+                    "</span>"+(e.surveyed&&e.planetaryFeature?"<span>"+esc(e.planetaryFeature)+"</span>":"")+"<span>Status: " +
                     (e.captured ? "Captured" : e.surveyed ? "Surveyed" : "Detected") +
                     " • Level " +
                     (e.level || 0) +
