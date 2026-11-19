@@ -1,5 +1,9 @@
-const CACHE_NAME = "orbital-drift-v0.26.0";
+const CACHE_NAME = "orbital-drift-v0.26.0-between1";
 const CORE_ASSETS = [
+  "./assets/between-shelves.svg",
+  "./assets/between-fold.svg",
+  "./assets/between-veil.svg",
+  "./assets/between-anchorage.svg",
   "./",
   "./index.html",
   "./manifest.webmanifest",

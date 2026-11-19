@@ -1,0 +1,13 @@
+# Ninefold: Between the Nine — conversion contract
+
+## Approved premise
+The game takes place entirely in the space between the Nine Worlds. Entry is through appropriate crossing methods, not ordinary ascent through a world's atmosphere. The game is not an account of what ultimately lies Above or Below. It does not explain the origin of the Ninefold or the ultimate source of Arcana. No event in this game may resolve the established tactical game's protected storyline or overwrite the original lore. Player journeys are individual expedition histories, not automatic franchise canon.
+
+## Game-local presentation
+The tutorial begins after a crossing near the Fractured Meridian (proposed local framing; no new universal travel rule). First Reach contains protected First Anchorage, Redglass Shelf, Violet Furnace and other local formations. These are not the Nine Worlds or additional canonical worlds. Gravity knots represent observed attraction phenomena, not ordinary stars, and their cause is deliberately unspecified. Shapes include terraced shelves, prismatic cores, petal mantles, coiled lenses, split strata, woven shells and crowned lattices. Procedural geography is illustrative, and newly generated names and cultures are not automatically canon. Independent societies cannot be forcibly absorbed via player settlement claims; all existing contact protections remain.
+
+## Compatibility
+Do not rename persisted body IDs (Earth, Mars, etc.), generator versions, faction IDs, resource keys, event IDs, save slots, app bundle ID, product IDs or existing purchases. Retain orbit lock, acceleration and slingshots, production, upgrade costs, discovery, salvage, rescue, crew, fleet, expeditions, threat encounters, cosmetics, civilization charters, Echo lanes and diplomatic agreements. Present aliases on screen, not in the underlying simulation. Maintain the same physical radii and collision rules. Use the established Ninefold terms Arcana and arcanist only where their lore meaning applies; do not assert a new origin mechanism. Preserve the original archive and all approved visual masters. New designs are local and provisional until explicit lore/visual review.
+
+## Release checks
+Run full existing gameplay validation and native iOS simulator workflow. Check all tutorial steps, both old and fresh save files, menu navigation and action labels, all cosmetic previews, formation legibility, atlas and Codex, independent culture protection, charter growth, Echo lanes and agreements on a real device. The presentation layer is transitional: audit template wording, custom player-name handling, and remaining generic art/UI details before public release. Continue the civilization network expansion once the conversion is stable.

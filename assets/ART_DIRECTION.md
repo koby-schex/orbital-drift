@@ -1,3 +1,9 @@
+# Between the Nine — conversion art direction
+
+New original local vector artwork: layered crossing shelves, fractured membranes, luminous veils, an invented non-Earth anchorage texture, and the split-threshold icon. These are game-local production designs, not locked depictions of any of the Nine Worlds. Procedural silhouettes and existing bounded canvas caches drive variation; vessel geometry and cosmetic colors retain the original progression. Physical-device performance and final art review remain release gates.
+
+The earlier art direction below is historical; its original assets stay bundled for compatibility and may be removed after migration QA confirms they are unused.
+
 # Cinematic universe artwork — v0.26.0
 
 Original imagery generated with OpenAI image generation for this game. WebP conversion, compression and Earth-map downsampling are the only offline raster transformations. Runtime code adds spherical projection, seeded color grading, framing, lighting and parallax. These are artistic environments and an illustrative Earth map, not scientific survey data.

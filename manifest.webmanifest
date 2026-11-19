@@ -1,14 +1,14 @@
 {
-  "name": "Orbital Drift",
-  "short_name": "Orbital Drift",
-  "description": "A gravity-driven deep-space exploration game.",
+  "name": "Ninefold: Between the Nine",
+  "short_name": "Between the Nine",
+  "description": "Navigate strange environments and connect settlements between the Nine Worlds.",
   "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#030511",
-  "theme_color": "#030511",
+  "background_color": "#100d21",
+  "theme_color": "#100d21",
   "categories": [
     "games",
     "entertainment"
