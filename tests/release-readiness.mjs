@@ -1512,6 +1512,64 @@ const inhabitedName=inhabited.name;
 assert.equal(api.saveGame(false),true);assert.equal(api.loadGame(false),true);
 assert.equal(civQA.civilizationProfile(api.body(inhabitedName)).stage,3);
 assert.equal(api.body(inhabitedName).capturable,false);assert.equal(api.game.captured.has(inhabitedName),false);
+checkpoint("cultural commitments");
+const pactQA=vm.runInContext(`({culturalCommitments,culturalCommitment,chooseCulturalCommitment,recordCulturalSurvey,recordCulturalRoute,completeCulturalCommitment,culturalHarbor,culturalCard,culturalRouteTarget,withdrawCulturalCommitment,refuel,
+  establish(b){b.discovered=true;b.discoveryRewardClaimed=true;b.memory.firstContact=3;game.discovered.add(b.name);game.ship.orbitLocked=true;game.ship.lockBody=b.name;},
+  lock(b){game.ship.orbitLocked=true;game.ship.lockBody=b.name;},
+  survey(b){b.discovered=true;b.discoveryRewardClaimed=true;game.discovered.add(b.name);}
+})`,context);
+assert.equal(Object.values(pactQA.culturalCommitments).flat().length,12);
+const exercised=new Set();
+for(let seed=10000;seed<10200&&exercised.size<3;seed++){
+ const sys=api.proc(seed,3),native=sys.bodies.find(b=>b.civilization);
+ if(!native)continue;
+ const option=pactQA.culturalCommitments[native.civilization.key].find(p=>!exercised.has(p.goal));
+ if(!option)continue;
+ api.initGame(false);api.dismissPanels();const here=api.prepareVaultTest(seed);
+ const resident=here.bodies.find(b=>b.civilization),other=here.bodies.find(b=>b!==resident&&b.type!=="star"&&!b.captured);
+ pactQA.establish(resident);
+ const arg={world:resident.name,key:option.key};
+ assert.equal(pactQA.chooseCulturalCommitment(arg),true);
+ assert.equal(pactQA.chooseCulturalCommitment(arg),false);
+ assert.equal(pactQA.withdrawCulturalCommitment(resident.name),true);
+ assert.equal(pactQA.chooseCulturalCommitment(arg),true);
+ assert.match(pactQA.culturalCard(resident),/In progress/);
+ if(option.goal==="route"){
+   pactQA.survey(other);
+   const echo={system:here.name,startBody:resident.name,endBody:other.name,quality:option.quality,points:[{x:other.x,y:other.y}]};
+   assert.equal(pactQA.recordCulturalRoute({...echo,quality:option.quality-1}),false);
+   assert.equal(pactQA.recordCulturalRoute({...echo,points:[{x:1e8,y:1e8}]}),false);
+   assert.equal(pactQA.recordCulturalRoute(echo),true);
+   assert.equal(pactQA.recordCulturalRoute(echo),false);
+ }else if(option.goal==="survey"){
+   assert.equal(pactQA.completeCulturalCommitment(resident.name),false);
+   pactQA.survey(other);assert.equal(pactQA.recordCulturalSurvey(other),true);
+   assert.equal(pactQA.recordCulturalSurvey(other),false);
+ }else{
+   for(const k of Object.keys(option.cost))api.game.resources[k]=0;
+   assert.equal(pactQA.completeCulturalCommitment(resident.name),false);
+   for(const k of Object.keys(option.cost))api.game.resources[k]=100;
+ }
+ pactQA.lock(other);assert.equal(pactQA.completeCulturalCommitment(resident.name),false);
+ pactQA.lock(resident);
+ const dataBefore=api.game.resources.DataCores;
+ assert.equal(pactQA.completeCulturalCommitment(resident.name),true);
+ assert.equal(pactQA.completeCulturalCommitment(resident.name),false);
+ assert.equal(pactQA.culturalCommitment(resident).complete,true);
+ assert.equal(pactQA.withdrawCulturalCommitment(resident.name),false);
+ if(option.service==="research")assert.equal(api.game.resources.DataCores,dataBefore+12);
+ if(option.service==="harbor"){
+   for(const [k,v] of Object.entries(option.cost))assert.equal(api.game.resources[k],100-v);
+   api.game.ship.fuel=1;pactQA.refuel();assert.equal(api.game.ship.fuel,api.game.ship.maxFuel);
+ }
+ if(option.service==="navigation")assert.equal(pactQA.culturalRouteTarget(resident.name),true);
+ const name=resident.name;
+ assert.equal(api.saveGame(false),true);assert.equal(api.loadGame(false),true);
+ assert.equal(pactQA.culturalCommitment(api.body(name)).complete,true);
+ assert.equal(api.body(name).capturable,false);
+ exercised.add(option.goal);
+}
+assert.equal(exercised.size,3,"All three diplomatic objective types must be exercised");
 checkpoint("unified menu navigation");
 api.closeMenu();api.initGame(false);api.dismissPanels();api.prepareVaultTest(626262);api.dismissPanels();
 const navQA=vm.runInContext(`({
