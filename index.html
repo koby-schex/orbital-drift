@@ -9914,18 +9914,126 @@
         addActivity("echo","Cultural route recorded",c.name+" · "+e.quality+"% route quality. Return to orbit to ratify an accord.");
         return true;
       }
+      // Two distinct, irreversible cultural commitments per tradition. These are
+      // optional agreements, neither an upkeep timer nor a territory purchase.
+      const culturalCommitments={
+        weavers:[
+          {key:"open-wake",name:"Open Wake",desc:"Publish a shared flight corridor for every traveler.",goal:"route",quality:75,service:"navigation",record:"The corridor remains open to all vessels."},
+          {key:"quiet-wake",name:"Quiet Wake",desc:"Keep the original navigation record within the culture's custodianship.",goal:"survey",service:"research",record:"The route archive is held in trust."}],
+        choirs:[
+          {key:"harmonic-library",name:"Harmonic Library",desc:"Add an unrecorded world's spectrum to their shared library.",goal:"survey",service:"research",record:"The new spectrum becomes part of the living library."},
+          {key:"resonant-passage",name:"Resonant Passage",desc:"Trace a precise gravitational passage for their traveling choir.",goal:"route",quality:72,service:"navigation",record:"The passage is embedded in their harmonic charts."}],
+        keepers:[
+          {key:"hearth-reserve",name:"Hearth Reserve",desc:"Carry a one-time reserve of materials to preserve their infrastructure.",goal:"cargo",cost:{Alloy:12,Titanium:5},service:"harbor",record:"The reserve is entrusted to local stewards."},
+          {key:"unclaimed-horizon",name:"Unclaimed Horizon",desc:"Document an uncharted neighboring world without claiming it.",goal:"survey",service:"research",record:"The survey is recorded as an independent heritage site."}],
+        gardens:[
+          {key:"living-sanctuary",name:"Living Sanctuary",desc:"Survey an uncharted world without disturbing its surface.",goal:"survey",service:"research",record:"Its findings are archived under their conservation charter."},
+          {key:"seed-passage",name:"Seed Passage",desc:"Offer biological supplies for their traveling habitat gardens.",goal:"cargo",cost:{BioGel:9,Crystal:4},service:"harbor",record:"The supplies are assigned to the traveling gardens."}],
+        listeners:[
+          {key:"silent-spectrum",name:"Silent Spectrum",desc:"Return with a new planetary observation for their listening archive.",goal:"survey",service:"research",record:"The observation is added to their silent archive."},
+          {key:"measured-wake",name:"Measured Wake",desc:"Demonstrate a carefully measured gravitational route.",goal:"route",quality:78,service:"navigation",record:"The measured route is added to their precision charts."}],
+        pilgrims:[
+          {key:"lantern-harbor",name:"Lantern Harbor",desc:"Contribute supplies to a sanctuary serving passing travelers.",goal:"cargo",cost:{Helium3:12,Alloy:6},service:"harbor",record:"The sanctuary dedicates its new reserve to travelers."},
+          {key:"pilgrim-road",name:"Pilgrim Road",desc:"Chart a dependable passage to another surveyed world.",goal:"route",quality:70,service:"navigation",record:"Your route is recognized as a pilgrim passage."}]
+      };
+      const culturalServices={
+        navigation:"A navigation accord records your best passage and provides local chart access: target the agreed destination from this world.",
+        research:"A research accord grants a one-time archive of 12 Data Cores upon completion.",
+        harbor:"A harbor accord permits free local refueling while in orbit at this independent world."
+      };
+      function culturalCommitment(b){
+        const c=civilizationProfile(b),m=b?.memory;
+        if(!c||c.stage!==3||!m?.culturalCommitment)return null;
+        const pact=(culturalCommitments[c.key]||[]).find(p=>p.key===m.culturalCommitment.key);
+        if(!pact)return null;
+        const record=m.culturalCommitment;
+        return {pact,record,complete:record.complete===true,ready:record.ready===true};
+      }
+      function culturalLocalReason(b){
+        if(!game.frigate?.built||civilizationProfile(b)?.stage!==3)return "Establish an accord first.";
+        if(!game.ship?.orbitLocked||game.ship.lockBody!==b.name)return "Return to orbit to speak with the local custodians.";
+        return "";
+      }
+      function chooseCulturalCommitment(arg){
+        const b=body(arg?.world),c=civilizationProfile(b),reason=culturalLocalReason(b);
+        if(reason){toast(reason);return false;}
+        if(culturalCommitment(b))return false;
+        const pact=(culturalCommitments[c.key]||[]).find(p=>p.key===arg?.key);
+        if(!pact)return false;
+        if(pact.goal==="survey"&&!game.system.bodies.some(w=>w!==b&&w.type!=="star"&&!bodySurveyed(w)&&!w.captured)){
+          toast("No uncharted independent world remains here. Choose the other commitment.");return false;
+        }
+        b.memory.culturalCommitment={key:pact.key,ready:false,complete:false};
+        addActivity("discovery",c.name+" · "+pact.name,pact.desc);
+        saveGame(false);renderMenu();return true;
+      }
+      function recordCulturalSurvey(world){
+        if(!world||world.type==="star"||world.captured)return false;
+        let changed=false;
+        for(const b of game.system.bodies){
+          const p=culturalCommitment(b);
+          if(!p||p.complete||p.ready||p.pact.goal!=="survey"||world===b)continue;
+          p.record.ready=true;p.record.destination=world.name;changed=true;
+          addActivity("discovery","Cultural observation ready",p.pact.name+" · "+world.name+". Return to the custodian.");
+        }
+        return changed;
+      }
+      function recordCulturalRoute(e){
+        if(!e||e.system!==game.system?.name||!Number.isFinite(e.quality)||e.quality>100)return false;
+        const b=body(e.startBody),end=body(e.endBody),p=culturalCommitment(b),last=e.points?.at(-1);
+        if(!p||p.complete||p.pact.goal!=="route"||e.quality<p.pact.quality||!end||end===b||end.type==="star"||!bodySurveyed(end)||!last||!Number.isFinite(last.x)||!Number.isFinite(last.y)||dist(last,end)>visualRadius(end)+180)return false;
+        if(p.record.ready&&p.record.quality>=e.quality)return false;
+        p.record.ready=true;p.record.quality=e.quality;p.record.destination=end.name;
+        addActivity("echo","Cultural passage ready",p.pact.name+" · "+e.quality+"% route quality.");
+        return true;
+      }
+      function culturalCompletionReason(b){
+        const reason=culturalLocalReason(b),p=culturalCommitment(b);
+        if(reason)return reason;
+        if(!p||p.complete)return "No outstanding commitment.";
+        if(p.pact.goal==="cargo")return canAfford(p.pact.cost)?"":"Delivery requires "+fmt(p.pact.cost)+".";
+        return p.ready?"":p.pact.goal==="route"?"Complete the required orbital passage first.":"Survey a new independent world first.";
+      }
+      function completeCulturalCommitment(name){
+        const b=body(name),p=culturalCommitment(b),reason=culturalCompletionReason(b);
+        if(reason){toast(reason);return false;}
+        if(p.pact.goal==="cargo")spend(p.pact.cost);
+        p.record.complete=true;
+        if(p.pact.service==="research")grantReward({DataCores:12},"Cultural archive exchange");
+        recordCodex(b,"cultural commitment fulfilled");
+        addActivity("discovery",p.pact.name+" fulfilled",p.pact.record);
+        toast(p.pact.name+" · commitment fulfilled.");
+        saveGame(false);renderMenu();return true;
+      }
+      function culturalHarbor(b){const p=culturalCommitment(b);return !!(p?.complete&&p.pact.service==="harbor");}
+      function culturalRouteTarget(name){
+        const b=body(name),p=culturalCommitment(b),end=body(p?.record.destination);
+        if(!p?.complete||p.pact.service!=="navigation"||!end||culturalLocalReason(b))return false;
+        setTarget(end.name);closeMenu();return true;
+      }
+      function culturalCard(b){
+        const c=civilizationProfile(b);if(c?.stage!==3)return "";
+        const p=culturalCommitment(b),reason=culturalLocalReason(b);
+        if(!p)return card("Cultural commitments","Choose one lasting agreement. Each tradition offers two paths; neither can be changed after selection. No deadline or upkeep.",(culturalCommitments[c.key]||[]).map(pact=>{
+          const surveyUnavailable=pact.goal==="survey"&&!game.system.bodies.some(w=>w!==b&&w.type!=="star"&&!bodySurveyed(w)&&!w.captured);
+          return '<div class="log"><b>'+esc(pact.name)+'</b><span>'+esc(pact.desc)+'</span><span>'+esc(culturalServices[pact.service])+'</span>'+(pact.cost?costHtml(pact.cost):"")+btnWhy("Accept commitment","chooseCulturalCommitment",{world:b.name,key:pact.key},!reason&&!surveyUnavailable,reason||(surveyUnavailable?"No uncharted independent world remains.":""))+'</div>';
+        }).join(""));
+        const text=p.complete?p.pact.record+" "+culturalServices[p.pact.service]:p.pact.desc+(p.pact.goal==="route"?" Required quality: "+p.pact.quality+"%.":p.pact.goal==="cargo"?"":" Survey a new uncaptured world.")+(p.ready?" Evidence recorded: "+p.record.destination+".":"");
+        return card(p.pact.name,(p.complete?"<b>Fulfilled</b> · ":"<b>In progress</b> · ")+esc(text)+(p.pact.cost&&!p.complete?costHtml(p.pact.cost):""),
+          p.complete?(p.pact.service==="navigation"?btnWhy("Set passage destination","culturalRouteTarget",b.name,!reason,reason):""):btnWhy("Fulfill commitment","completeCulturalCommitment",b.name,!culturalCompletionReason(b),culturalCompletionReason(b)));
+      }
       function civilizationCard(b){
         const c=civilizationProfile(b);if(!c||!bodySurveyed(b))return "";
         const reason=civilizationContactReason(b),label=["Acknowledge signal","Offer "+c.gift,"Ratify accord","Accord established"][c.stage];
         return card(c.name,"<b>"+esc(c.stageName)+"</b> · "+esc(c.principle)+" Their settlements feature "+esc(c.architecture)+". "+(c.stage===1?costHtml(c.cost):c.stage===2?"Demonstrate shared navigation through a 60% Echo to another surveyed world.":c.stage===3?"Independent partner. Their territory remains their own.":"A local transmission awaits acknowledgment."),
-          btnWhy(label,"advanceCivilizationContact",b.name,!reason,reason));
+          (c.stage===3?"":btnWhy(label,"advanceCivilizationContact",b.name,!reason,reason)))+culturalCard(b);
       }
       function renderCivilizations(){
         const known=systems.flatMap(sys=>sys.bodies.filter(b=>b.civilization&&(b.discoveryRewardClaimed||b.memory?.firstContact)).map(b=>({sys,b,c:civilizationProfile(b)})));
         const local=known.filter(x=>x.sys===game.system),remote=known.filter(x=>x.sys!==game.system);
         ui.menuContent.innerHTML=card("Independent civilizations","Survey inhabited worlds, acknowledge local signals and earn trust through cultural exchange and shared flight paths. Their territory is protected; accords do not consume Concord capacity.")+
-          card("Local contacts",local.length?routeDirectory(local.map(({b,c})=>[b.name,c.name+" · "+c.stageName,"openWorldDetails",b.name,"signal"])):"No surveyed civilizations in this sector.",btn("Explore worlds","openSection","planets"))+
-          (remote.length?card("Distant records",remote.map(({sys,b,c})=>'<div class="log"><b>'+esc(c.name)+'</b><span>'+esc(b.name+" · "+sys.name+" · "+c.stageName)+'</span></div>').join("")):"");
+          card("Local contacts",local.length?routeDirectory(local.map(({b,c})=>[b.name,c.name+" · "+c.stageName+(culturalCommitment(b)?.complete?" · "+culturalCommitment(b).pact.name:""),"openWorldDetails",b.name,"signal"])):"No surveyed civilizations in this sector.",btn("Explore worlds","openSection","planets"))+
+          (remote.length?card("Distant records",remote.map(({sys,b,c})=>'<div class="log"><b>'+esc(c.name)+'</b><span>'+esc(b.name+" · "+sys.name+" · "+c.stageName+(culturalCommitment(b)?.complete?" · "+culturalCommitment(b).pact.name:""))+'</span></div>').join("")):"");
       }
       function proc(seed, generationVersion=3) {
         if (isCosmicSpiritRoll(seed)) return cosmicSpiritSystem(seed);
@@ -12899,6 +13007,7 @@
           className: surveyed ? planetClass(b) : "Unclassified world",
           planetaryFeature: surveyed&&b.frontierFeature?frontierFeatureDescription(b):null,
           civilization: surveyed&&b.civilization?civilizationProfile(b)?.name||null:null,
+          culturalAccord: surveyed&&culturalCommitment(b)?.complete?culturalCommitment(b).pact.name:null,
           archetypeKey:
             game.system.specialType || game.system.archetype?.key || "unknown",
           archetypeName:
@@ -13286,7 +13395,7 @@
               (b.capturable ? " • Suitable for capture" : " • Survey-only world"),
           );
         }
-        if(firstSurvey) saveGame(false);
+        if(firstSurvey){recordCulturalSurvey(b);saveGame(false);}
         if(game.system.isTutorial)showDiscovery(b, reward);
         if(ui.menu?.classList.contains("open"))renderMenu();
       }
@@ -13479,6 +13588,8 @@
           if (ui.menu?.classList.contains("open")) renderMenu();
           return;
         }
+        const harbor=game.ship?.orbitLocked?body(game.ship.lockBody):null;
+        if(culturalHarbor(harbor)){game.ship.fuel=game.ship.maxFuel;toast("Refueled at "+harbor.name+" under the harbor accord.");saveGame(false);renderMenu();return;}
         const n = nearestRefuelTarget();
         if (n.body) {
           const restored=game.ship.maxFuel-game.ship.fuel;
@@ -15517,11 +15628,11 @@
         );
         const b = body(e.startBody);
         if (b) recordPlanet(b, "echoes", 1);
-        const concordChanged=recordConcordEcho(e),civilizationChanged=recordCivilizationEcho(e);
+        const concordChanged=recordConcordEcho(e),civilizationChanged=recordCivilizationEcho(e),culturalChanged=recordCulturalRoute(e);
         echoRecorder = null;
         completeContract("echo");
         checkAchievements();
-        if(concordChanged||civilizationChanged)saveGame(false);
+        if(concordChanged||civilizationChanged||culturalChanged)saveGame(false);
       }
       function discardEcho() {
         echoRecorder = null;
@@ -19700,7 +19811,7 @@
                     (e.surveyed
                       ? esc(e.biome) + " • " + esc(label(e.resource))
                       : "Close survey required for classification") +
-                    "</span>"+(e.surveyed&&e.planetaryFeature?"<span>"+esc(e.planetaryFeature)+"</span>":"")+(e.surveyed&&e.civilization?"<span>"+esc(e.civilization)+" · Independent civilization</span>":"")+"<span>Status: " +
+                    "</span>"+(e.surveyed&&e.planetaryFeature?"<span>"+esc(e.planetaryFeature)+"</span>":"")+(e.surveyed&&e.civilization?"<span>"+esc(e.civilization)+" · Independent civilization"+(e.culturalAccord?" · "+esc(e.culturalAccord):"")+"</span>":"")+"<span>Status: " +
                     (e.captured ? "Captured" : e.surveyed ? "Surveyed" : "Detected") +
                     " • Level " +
                     (e.level || 0) +
@@ -20823,7 +20934,8 @@
         if (game.ship.orbitLocked && game.ship.lockBody) {
           const b=body(game.ship.lockBody);
           if(b&&b.type!=="star"){
-            if(b.civilization&&bodySurveyed(b)&&civilizationProfile(b)?.stage<3)return {label:"Contact "+b.name,run:()=>openWorldDetails(b.name),show:true};
+            if(culturalHarbor(b)&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel at "+b.name,run:refuel,show:true};
+            if(b.civilization&&bodySurveyed(b)&&(civilizationProfile(b)?.stage<3||!culturalCommitment(b)?.complete))return {label:"Contact "+b.name,run:()=>openWorldDetails(b.name),show:true};
             if(!b.discoveryRewardClaimed&&!game.captured.has(b.name)&&dist(game.ship,b)-visualRadius(b)<=230)return {label:"Scan "+b.name,run:()=>scanPlanet(b.name),show:true};
             if(b.capturable&&!game.captured.has(b.name))return {label:"Capture "+b.name,run:capture,show:true};
             if(game.captured.has(b.name)&&game.ship.fuel<game.ship.maxFuel*.94)return {label:"Refuel",run:refuel,show:true};
@@ -26703,6 +26815,9 @@
         setWorldControlMode,
         charterConcordWorld,
         advanceCivilizationContact,
+        chooseCulturalCommitment,
+        completeCulturalCommitment,
+        culturalRouteTarget,
         raidSelectedWorld,
         recoverFrontierContact,
         trackFrontierContact,
