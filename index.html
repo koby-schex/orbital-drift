@@ -6115,6 +6115,629 @@
       }
       // END BETWEEN ART PROFILES
 
+      // BEGIN BETWEEN FIELD ARCHIVE
+      const BETWEEN_NATIVE_RECORDS=[
+  {
+    "key": "cinder-loom",
+    "name": "Cinder Loom",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "innerForge"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "tablet",
+    "colors": [
+      "#bf693e",
+      "#f6d69b"
+    ],
+    "entry": "A ceramic lattice that draws warm impurities into thin usable plates. Its maker and intended application remain unconfirmed."
+  },
+  {
+    "key": "ember-filament",
+    "name": "Ember Filament",
+    "kind": "lifeform",
+    "source": "space",
+    "families": [
+      "innerForge"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "tendrils",
+    "colors": [
+      "#d06c43",
+      "#ffcea3"
+    ],
+    "entry": "A branching thread that contracts around heat gradients. Remotely recorded shed filaments continue cycling warmth without visible combustion."
+  },
+  {
+    "key": "fold-bell",
+    "name": "Fold Bell",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "gasFrontier"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "lantern",
+    "colors": [
+      "#6d8ca7",
+      "#ded1ff"
+    ],
+    "entry": "A hollow pressure instrument whose chime changes as a vessel approaches a crossing. Its markings describe local routes only."
+  },
+  {
+    "key": "curtain-brood",
+    "name": "Curtain Brood",
+    "kind": "lifeform",
+    "source": "space",
+    "families": [
+      "gasFrontier"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "jelly",
+    "colors": [
+      "#709eb3",
+      "#c7e9e8"
+    ],
+    "entry": "A network of translucent chambers suspended in a moving membrane. Observed offspring separate only where two currents meet."
+  },
+  {
+    "key": "facet-suture",
+    "name": "Facet Suture",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "crystalReach"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "spindle",
+    "colors": [
+      "#8d75b2",
+      "#aaf1e5"
+    ],
+    "entry": "Interlocking mineral splinters that seal hairline fractures when precisely aligned. The crew cannot determine whether they grew or were manufactured."
+  },
+  {
+    "key": "prismatic-wake",
+    "name": "Prismatic Wake",
+    "kind": "phenomenon",
+    "source": "space",
+    "families": [
+      "crystalReach"
+    ],
+    "threat": 4,
+    "rarity": "Exotic",
+    "visual": "halo",
+    "colors": [
+      "#9d74c9",
+      "#e5d1ff"
+    ],
+    "entry": "A narrow fringe of differently refracted images that follows a recent crossing. Repeat observations show correlation, not an explanation of its cause."
+  },
+  {
+    "key": "root-veil",
+    "name": "Root Veil",
+    "kind": "lifeform",
+    "source": "planet",
+    "families": [
+      "bioCluster"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "fern",
+    "colors": [
+      "#477e68",
+      "#cce7a8"
+    ],
+    "entry": "A delicate web of branching tissue rooted in a suspended shelf. Shed strands respond to approaching vibration; the rooted organism is left untouched."
+  },
+  {
+    "key": "hush-pollen",
+    "name": "Hush Pollen",
+    "kind": "phenomenon",
+    "source": "space",
+    "families": [
+      "bioCluster"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "swarm",
+    "colors": [
+      "#719d8a",
+      "#e7d6a0"
+    ],
+    "entry": "A cloud of luminous motes that dampens nearby sensor noise. Protected samples disperse when exposed to strong thrust."
+  },
+  {
+    "key": "unclaimed-seal",
+    "name": "Unclaimed Seal",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "ancientArchive"
+    ],
+    "threat": 2,
+    "rarity": "Rare",
+    "visual": "disc",
+    "colors": [
+      "#9f8057",
+      "#f5ddb2"
+    ],
+    "entry": "A worn custody mark with repeated geometric impressions. No known culture has identified its signatories; the archive records location without attributing an origin."
+  },
+  {
+    "key": "palimpsest-frame",
+    "name": "Palimpsest Frame",
+    "kind": "artifact",
+    "source": "space",
+    "families": [
+      "ancientArchive"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "reliquary",
+    "colors": [
+      "#8a788d",
+      "#e9ca98"
+    ],
+    "entry": "A fractured frame bearing several overlaid route diagrams. Their local geometry is readable; the dates and intended destinations remain uncertain."
+  },
+  {
+    "key": "still-skin",
+    "name": "Still Skin",
+    "kind": "lifeform",
+    "source": "planet",
+    "families": [
+      "voidRim"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "shell",
+    "colors": [
+      "#536981",
+      "#ade2d7"
+    ],
+    "entry": "A nearly motionless layered organism living inside a dark formation. Small detached flakes shift color when nearby attraction changes."
+  },
+  {
+    "key": "hollow-thread",
+    "name": "Hollow Thread",
+    "kind": "phenomenon",
+    "source": "space",
+    "families": [
+      "voidRim"
+    ],
+    "threat": 4,
+    "rarity": "Exotic",
+    "visual": "halo",
+    "colors": [
+      "#48607e",
+      "#c1abeb"
+    ],
+    "entry": "Sensors locate an apparent thread where optical instruments see nothing. The two readings remain reproducible and incompatible."
+  },
+  {
+    "key": "paired-witness",
+    "name": "Paired Witness",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "parallel"
+    ],
+    "threat": 4,
+    "rarity": "Exotic",
+    "visual": "disc",
+    "colors": [
+      "#a064b4",
+      "#a9e7e7"
+    ],
+    "entry": "Two matching tablets cast different outlines under identical illumination. The crew catalogs the discrepancy without inferring alternate histories."
+  },
+  {
+    "key": "offset-skein",
+    "name": "Offset Skein",
+    "kind": "phenomenon",
+    "source": "space",
+    "families": [
+      "parallel"
+    ],
+    "threat": 5,
+    "rarity": "Exotic",
+    "visual": "tendrils",
+    "colors": [
+      "#986ebd",
+      "#f4afc9"
+    ],
+    "entry": "A woven disturbance whose projected edges shift at unequal rates. Navigation marks a safe distance; its deeper nature remains unknown."
+  },
+  {
+    "key": "veil-censer",
+    "name": "Veil Censer",
+    "kind": "artifact",
+    "source": "planet",
+    "families": [
+      "cosmicSpirit"
+    ],
+    "threat": 3,
+    "rarity": "Rare",
+    "visual": "lantern",
+    "colors": [
+      "#81a995",
+      "#f2db9b"
+    ],
+    "entry": "An open vessel that holds luminous particulate matter without a visible lid. Its function beyond local containment is uncertain."
+  },
+  {
+    "key": "lantern-weave",
+    "name": "Lantern Weave",
+    "kind": "lifeform",
+    "source": "space",
+    "families": [
+      "cosmicSpirit"
+    ],
+    "threat": 4,
+    "rarity": "Exotic",
+    "visual": "bloom",
+    "colors": [
+      "#6cae99",
+      "#ffe7ad"
+    ],
+    "entry": "Interlinked luminous membranes drift along a quiet fold. A detached tissue record preserves the pattern; no living colony is removed."
+  }
+];
+      const BETWEEN_LIVING_EVENTS=[
+  {
+    "key": "shelf-procession",
+    "name": "Shelf Procession",
+    "desc": "Several vast formations are shedding thin drifting plates across a local passage.",
+    "color": "#e1bb90",
+    "visual": "crystalMotes",
+    "choices": [
+      {
+        "label": "Mark the clear lane",
+        "result": "The crew publishes a route around the moving fragments.",
+        "reward": {
+          "DataCores": 10,
+          "Helium3": 12
+        }
+      },
+      {
+        "label": "Recover detached plates",
+        "result": "Collectors recover loose mineral plates without touching the parent formations.",
+        "reward": {
+          "Crystal": 14,
+          "Alloy": 12
+        }
+      }
+    ]
+  },
+  {
+    "key": "breathing-fold",
+    "name": "Breathing Fold",
+    "desc": "A luminous membrane repeatedly opens and closes across a minor crossing.",
+    "color": "#b7a2e3",
+    "visual": "prismaticTide",
+    "choices": [
+      {
+        "label": "Measure the interval",
+        "result": "The archive records the observed timing without assuming an origin.",
+        "reward": {
+          "DataCores": 15,
+          "Crystal": 8
+        }
+      },
+      {
+        "label": "Guide stranded vessels",
+        "result": "The Pioneer coordinates safe passage during the open interval.",
+        "reward": {
+          "Helium3": 16,
+          "Alloy": 12
+        }
+      }
+    ]
+  },
+  {
+    "key": "quiet-brood",
+    "name": "Quiet Brood",
+    "desc": "A drifting brood has clustered near the expedition's warm wake.",
+    "color": "#94d5ba",
+    "visual": "auroraTide",
+    "choices": [
+      {
+        "label": "Slow and observe",
+        "result": "The crew records a complete dispersal sequence without disturbing the brood.",
+        "reward": {
+          "DataCores": 12,
+          "BioGel": 12
+        }
+      },
+      {
+        "label": "Escort the brood",
+        "result": "The brood reaches a quieter current; shed tissue is collected.",
+        "reward": {
+          "BioGel": 18,
+          "Crystal": 7
+        }
+      }
+    ]
+  },
+  {
+    "key": "unanswered-lanterns",
+    "name": "Unanswered Lanterns",
+    "desc": "A chain of abandoned lantern markers flickers along an uncharted local route.",
+    "color": "#f1d29e",
+    "visual": "spiritChoir",
+    "choices": [
+      {
+        "label": "Record each marker",
+        "result": "The charts preserve the sequence; its makers remain unidentified.",
+        "reward": {
+          "DataCores": 16,
+          "Crystal": 8
+        }
+      },
+      {
+        "label": "Restore the nearest beacon",
+        "result": "Passing vessels can now navigate the surveyed segment.",
+        "reward": {
+          "Alloy": 18,
+          "Helium3": 12
+        }
+      }
+    ]
+  },
+  {
+    "key": "fracture-suture",
+    "name": "Fracture Suture",
+    "desc": "Two mineral shelves begin to interlock, narrowing the nearby corridor.",
+    "color": "#b7d1e6",
+    "visual": "ionLightning",
+    "choices": [
+      {
+        "label": "Chart an alternate passage",
+        "result": "The route is marked before the shelves meet.",
+        "reward": {
+          "DataCores": 12,
+          "Helium3": 12
+        }
+      },
+      {
+        "label": "Recover loose material",
+        "result": "The crew harvests only fragments separated from the shelves.",
+        "reward": {
+          "Titanium": 14,
+          "Crystal": 12
+        }
+      }
+    ]
+  },
+  {
+    "key": "borrowed-harbor",
+    "name": "Borrowed Harbor",
+    "desc": "A temporary sanctuary offers shelter to travelers during a rough local current.",
+    "color": "#e4be97",
+    "visual": "crystalMotes",
+    "choices": [
+      {
+        "label": "Exchange route records",
+        "result": "The sanctuary shares its local charts and reserves.",
+        "reward": {
+          "DataCores": 10,
+          "Helium3": 14
+        }
+      },
+      {
+        "label": "Assist with repairs",
+        "result": "The crew completes a small repair and receives material stock.",
+        "reward": {
+          "Alloy": 18,
+          "Titanium": 10
+        }
+      }
+    ]
+  },
+  {
+    "key": "incomplete-signal",
+    "name": "Incomplete Signal",
+    "desc": "Instruments register an unexplained pattern that resembles neither ordinary telemetry nor a confirmed Arcana effect.",
+    "color": "#c2abd9",
+    "visual": "prismaticTide",
+    "choices": [
+      {
+        "label": "Preserve raw observations",
+        "result": "The archive labels the measurements inconclusive for future comparison.",
+        "reward": {
+          "DataCores": 18,
+          "Crystal": 6
+        }
+      },
+      {
+        "label": "Isolate the receivers",
+        "result": "The crew protects its instruments and recovers usable components.",
+        "reward": {
+          "Alloy": 14,
+          "Plasma": 10
+        }
+      }
+    ]
+  },
+  {
+    "key": "mantle-gathering",
+    "name": "Mantle Gathering",
+    "desc": "Several prism-like living forms arrange their membranes around a suspended mineral shelf.",
+    "color": "#a2d9ce",
+    "visual": "auroraTide",
+    "choices": [
+      {
+        "label": "Observe from a distance",
+        "result": "Their changing arrangement is recorded without approaching the gathering.",
+        "reward": {
+          "DataCores": 14,
+          "BioGel": 10
+        }
+      },
+      {
+        "label": "Warn nearby travelers",
+        "result": "Local vessels avoid the gathering and contribute supplies.",
+        "reward": {
+          "Helium3": 16,
+          "Titanium": 8
+        }
+      }
+    ]
+  }
+];
+      const BETWEEN_CULTURE_NOTES=Object.freeze({
+  "weavers": {
+    "title": "Wake Weavers",
+    "history": "Communities maintain braided guidance lines around the crossings they inhabit. No single assembly claims ownership over all their routes.",
+    "custom": "A visitor offers a verified route record before asking for passage; unpublished records remain with their custodians.",
+    "boundary": "Never mark an unverified wake as safe."
+  },
+  "choirs": {
+    "title": "Resonance Choirs",
+    "history": "Local collectives preserve observations in layered harmonic sequences, carried between independent resonant halls.",
+    "custom": "Visitors provide unedited readings before proposing an interpretation. A disagreement may be recorded without being settled.",
+    "boundary": "A silent chamber is not an invitation to enter."
+  },
+  "keepers": {
+    "title": "Ember Keepers",
+    "history": "Formation shelters are built around stable thermal gradients. Keepers maintain reserves and trade practical techniques for repair.",
+    "custom": "An offered material sample is documented with its recovery site and condition before exchange.",
+    "boundary": "Do not draw from a communal reserve without agreement."
+  },
+  "gardens": {
+    "title": "Living Gardens",
+    "history": "Habitat stewards maintain linked living shelves and monitor the migration of membrane organisms through local currents.",
+    "custom": "Visitors contribute observations or detached biological material, never uprooted specimens.",
+    "boundary": "Living habitats are not claimable salvage."
+  },
+  "listeners": {
+    "title": "Quiet Listeners",
+    "history": "Dispersed observatories collect conflicting signals and protect the distinction between measured evidence and interpretation.",
+    "custom": "An unanswered signal remains unanswered until local observers consent to transmission.",
+    "boundary": "No broadcast into a marked listening enclosure."
+  },
+  "pilgrims": {
+    "title": "Horizon Pilgrims",
+    "history": "Independent route sanctuaries support travelers and preserve memories of successful local crossings without claiming the surrounding reach.",
+    "custom": "Guests share an account of a safe passage or offer practical supplies for the next traveler.",
+    "boundary": "Emergency shelter imposes no permanent allegiance."
+  }
+});
+      const BETWEEN_RESOURCE_NOTES=Object.freeze({
+  "Helium3": [
+    "Anchor Flux",
+    "A collected local energetic medium used to replenish traversal drives; this is a functional description, not a claim about the origin of Arcana."
+  ],
+  "Alloy": [
+    "Alloy",
+    "Refined structural stock for repairs, frames and ordinary construction."
+  ],
+  "Titanium": [
+    "Titanium",
+    "High-strength structural material used in durable hull assemblies."
+  ],
+  "Crystal": [
+    "Crystal",
+    "Stable mineral components used in guidance, measurement and containment assemblies."
+  ],
+  "BioGel": [
+    "Biogel",
+    "Prepared biological support material used in habitat and crew systems."
+  ],
+  "Plasma": [
+    "Plasma",
+    "Contained energetic material for high-demand machinery."
+  ],
+  "DataCores": [
+    "Data Cores",
+    "Verified expedition records and compact technical datasets used for research and upgrades."
+  ],
+  "DarkMatter": [
+    "Veil Residue",
+    "An operational name for rare samples with poorly understood measurements; no claim about their ultimate nature."
+  ]
+});
+      const BETWEEN_FIELD_NOTES=Object.freeze({
+  "ember-ray": [
+    "Ember Filament Array",
+    "A five-lobed silicon-rich structure pulls warm motes through branching membranes. Remote measurements record contraction in response to heat gradients."
+  ],
+  "storm-whale": [
+    "Storm Braid",
+    "Interwoven chambers rotate around a cool center and extend six flexible sheaths. Detached material and pressure recordings are collected from a safe distance."
+  ],
+  "prism-mantle": [
+    "Prism Mantle",
+    "Overlapping refractive lobes gather mineral grains; three trailing filaments stabilize the form as it drifts."
+  ],
+  "veil-medusa": [
+    "Veil Mantle",
+    "A translucent canopy carries long independent filaments. The crew retains only already-detached membrane fragments."
+  ],
+  "choir-relic": [
+    "Resonant Frame",
+    "A seven-part suspended assembly emits harmonics when exposed to local signals. It is recorded as an artifact, not a confirmed organism."
+  ],
+  "null-seraph": [
+    "Hollow Lattice",
+    "A dark open structure outlined by six narrow projections. Remote measurements reveal weak thermal contrast; a live capture is not attempted."
+  ],
+  "aurora-pilgrim": [
+    "Lantern Pilgrim",
+    "A radial living membrane sheds brief pulses of light along local currents. Its behavior is recorded without attributing a purpose to it."
+  ],
+  "mirror-leviathan": [
+    "Offset Mantle",
+    "Four interlinked lobes register incompatible orientations on different instruments. Observation remains remote; no explanation of the discrepancy is claimed."
+  ]
+});
+      const BETWEEN_FAMILY_STUDIES=Object.freeze({
+  "innerForge": [
+    "Thermal material study",
+    "Map heat gradients across exposed seams; detached samples reveal composition, not the source of the reach."
+  ],
+  "gasFrontier": [
+    "Membrane pressure study",
+    "Record pressure differences where suspended membranes bend; avoid interpreting them as an ordinary planetary atmosphere."
+  ],
+  "crystalReach": [
+    "Resonant mineral study",
+    "Compare mineral alignment with passing wakes; preserve contradictory measurements alongside consistent ones."
+  ],
+  "bioCluster": [
+    "Living habitat study",
+    "Record rooted and drifting forms separately; collect only detached tissue and avoid disturbance."
+  ],
+  "ancientArchive": [
+    "Local inscription study",
+    "Document markings and construction seams without assigning an unknown maker or era."
+  ],
+  "voidRim": [
+    "Low-signal study",
+    "Compare independent instruments to distinguish a real observation from a missing reading."
+  ],
+  "parallel": [
+    "Offset observation study",
+    "Retain both incompatible measurements; a local contradiction does not establish an alternate cosmology."
+  ],
+  "cosmicSpirit": [
+    "Luminous membrane study",
+    "Observe recurring light patterns without assuming agency, morality or an ultimate cause."
+  ]
+});
+      function betweenFieldRecord(key){return BETWEEN_FIELD_NOTES[key]||null;}
+      function betweenStudy(family){return BETWEEN_FAMILY_STUDIES[family]||null;}
+      function betweenCultureNote(key){return BETWEEN_CULTURE_NOTES[key]||null;}
+      // END BETWEEN FIELD ARCHIVE
+
+
 
       const DEV_BUILD = false;
       let W = 1,
@@ -7572,6 +8195,7 @@
           "Reality-Bending",
         ],
         vaultCatalog = [
+          ...BETWEEN_NATIVE_RECORDS,
           { key: "ember-reliquary", name: "Ember Reliquary", kind: "artifact", source: "planet", families: ["innerForge"], threat: 2, rarity: "Unusual", colors: ["#fb923c", "#fde68a"], visual: "reliquary", entry: "A heat-blackened casket whose inner rings remain aligned with a star that no longer exists. It warms whenever the Pioneer changes course." },
           { key: "foundry-heart", name: "Foundry Heart", kind: "artifact", source: "space", families: ["innerForge"], threat: 4, rarity: "Rare", colors: ["#ef4444", "#fbbf24"], visual: "core", entry: "A self-heating alloy engine recovered between worlds. Its chambers forge microscopic tools, then dismantle them before anyone can learn their purpose." },
           { key: "cinder-mite", name: "Cinder Mite Colony", kind: "lifeform", source: "planet", families: ["innerForge"], threat: 3, rarity: "Rare", colors: ["#f97316", "#fef3c7"], visual: "swarm", entry: "Silicate organisms that swim through molten metal. The colony arranges itself into tiny constellations when exposed to engine vibration." },
@@ -7628,21 +8252,21 @@
           {"key":"fractured-seal","name":"Fractured Seal","kind":"artifact","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"tablet","entry":"A broken tablet whose edges occasionally align with an unseen matching surface. The alignment occurs only when nearby instruments record incompatible spatial readings.","perk":"fuel"},
           {"key":"counter-clock","name":"Counter Clock","kind":"artifact","source":"space","families":["parallel"],"threat":2,"rarity":"Rare","colors":["#e879f9","#67e8f9"],"visual":"disc","entry":"An intact chronometer that synchronizes with an arrival which has not yet occurred. Its movement changes whenever the Pioneer revises its planned route.","perk":"fleet"},
           {"key":"unwritten-star","name":"Unwritten Star","kind":"phenomenon","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#e879f9","#67e8f9"],"visual":"halo","entry":"A stellar image that resolves only when projected against an anticipated flight path. Observed fluctuations have enabled the navigation team to refine fleet routes.","perk":"fleet"},
-          {"key":"ember-ray","name":"Ember Ray","kind":"lifeform","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#e06e35","#ffe0a0"],"visual":"ray","entry":"A broad silicon-based swimmer travels along stellar magnetic currents. Its translucent fins channel charged dust into branching luminous veins."},
+          {"key":"ember-ray","name":"Ember Filament Array","kind":"lifeform","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#e06e35","#ffe0a0"],"visual":"ray","entry":"A five-lobed silicon-rich structure pulls warm motes through branching membranes. Remote measurements record contraction in response to heat gradients."},
           {"key":"forge-heart","name":"Forge Heart","kind":"artifact","source":"planet","families":["innerForge"],"threat":3,"rarity":"Rare","colors":["#993d38","#fbbf24"],"visual":"engine","entry":"A layered ceramic engine recovered from a basalt chamber. Its nested rotors exchange thermal energy without making physical contact."},
-          {"key":"storm-whale","name":"Storm Whale","kind":"lifeform","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#5269bd","#a6edff"],"visual":"whale","entry":"A vast gas-feeding organism follows charged plasma streams above giant worlds. The Pioneer archives shed tissue and acoustic readings rather than the living animal."},
+          {"key":"storm-whale","name":"Storm Braid","kind":"lifeform","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#5269bd","#a6edff"],"visual":"whale","entry":"Interwoven chambers rotate around a cool center and extend six flexible sheaths. Detached material and pressure recordings are collected from a safe distance."},
           {"key":"pressure-bloom","name":"Pressure Bloom","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#427a97","#a2ece7"],"visual":"bloom","entry":"A colony of inflated membranes survives intense atmospheric pressure. Each chamber changes color in response to local fluctuations in density."},
-          {"key":"prism-mantle","name":"Prism Mantle","kind":"lifeform","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#9e6bc7","#9be6ee"],"visual":"ray","entry":"A thin mineral membrane glides through dust lanes, collecting grains across its refractive fins. Shed fragments preserve its precise optical structure."},
+          {"key":"prism-mantle","name":"Prism Mantle","kind":"lifeform","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#9e6bc7","#9be6ee"],"visual":"ray","entry":"Overlapping refractive lobes gather mineral grains; three trailing filaments stabilize the form as it drifts."},
           {"key":"facet-loom","name":"Facet Loom","kind":"artifact","source":"planet","families":["crystalReach"],"threat":3,"rarity":"Rare","colors":["#7651aa","#f3c8ff"],"visual":"engine","entry":"An interlocking array of crystal rollers produces thin sheets of patterned mineral. The original purpose of the woven lattice remains unknown."},
-          {"key":"veil-medusa","name":"Veil Medusa","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#319c90","#b7f7c3"],"visual":"medusa","entry":"A transparent vacuum organism trails long filaments that collect ionized particles. The crew retrieves a detached membrane while leaving the organism undisturbed."},
+          {"key":"veil-medusa","name":"Veil Mantle","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#319c90","#b7f7c3"],"visual":"medusa","entry":"A translucent canopy carries long independent filaments. The crew retains only already-detached membrane fragments."},
           {"key":"root-archive","name":"Root Archive","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#487b43","#e0df94"],"visual":"fern","entry":"A root network stores chemical traces of successive seasons. Its oldest surviving branch predates all recognizable organisms in the surrounding survey area."},
-          {"key":"choir-relic","name":"Choir Relic","kind":"artifact","source":"space","families":["ancientArchive"],"threat":3,"rarity":"Rare","colors":["#917342","#ffdfa1"],"visual":"engine","entry":"Three concentric resonators emit harmonics when exposed to ancient transmissions. Their inscriptions resemble architectural plans for an unidentified orbital sanctuary."},
+          {"key":"choir-relic","name":"Resonant Frame","kind":"artifact","source":"space","families":["ancientArchive"],"threat":3,"rarity":"Rare","colors":["#917342","#ffdfa1"],"visual":"engine","entry":"A seven-part suspended assembly emits harmonics when exposed to local signals. It is recorded as an artifact, not a confirmed organism."},
           {"key":"pilgrim-mask","name":"Pilgrim Mask","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":2,"rarity":"Rare","colors":["#9a7959","#e8d8b7"],"visual":"mask","entry":"A ceremonial faceplate made from fine overlapping metallic leaves. Wear patterns indicate generations of careful repair rather than a single owner."},
-          {"key":"null-seraph","name":"Null Seraph","kind":"lifeform","source":"space","families":["voidRim"],"threat":5,"rarity":"Exotic","colors":["#26394d","#82e6ff"],"visual":"ray","entry":"A near-black organism absorbs passing light except along the edges of its six fins. Remote observation records a shed scale with an unusually low thermal signature."},
+          {"key":"null-seraph","name":"Hollow Lattice","kind":"lifeform","source":"space","families":["voidRim"],"threat":5,"rarity":"Exotic","colors":["#26394d","#82e6ff"],"visual":"ray","entry":"A dark open structure outlined by six narrow projections. Remote measurements reveal weak thermal contrast; a live capture is not attempted."},
           {"key":"dark-bell","name":"Dark Bell","kind":"artifact","source":"planet","families":["voidRim"],"threat":3,"rarity":"Rare","colors":["#34384d","#b3a8e9"],"visual":"bell","entry":"A hollow metallic chamber responds to gravitational disturbances with low-frequency vibrations. Its surface carries no visible seams or manufacturing marks."},
-          {"key":"aurora-pilgrim","name":"Aurora Pilgrim","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":4,"rarity":"Exotic","colors":["#9bd6b3","#fff0bc"],"visual":"medusa","entry":"A luminous traveler moves slowly along nebular filaments. Its drifting membranes release particles that retain the spectrum of nearby stars for hours."},
+          {"key":"aurora-pilgrim","name":"Lantern Pilgrim","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":4,"rarity":"Exotic","colors":["#9bd6b3","#fff0bc"],"visual":"medusa","entry":"A radial living membrane sheds brief pulses of light along local currents. Its behavior is recorded without attributing a purpose to it."},
           {"key":"dawn-reliquary","name":"Dawn Reliquary","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":3,"rarity":"Exotic","colors":["#c3e2b9","#fff4d4"],"visual":"bell","entry":"A small vessel opens only under a narrow band of pale light. Inside, layered translucent material traces the outline of a vanished stellar nursery."},
-          {"key":"mirror-leviathan","name":"Mirror Leviathan","kind":"lifeform","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#a45ce2","#67e8f9"],"visual":"whale","entry":"A massive drifting form is visible in two incompatible orientations. The Pioneer records remote spectral samples while avoiding the unstable boundary around its body."},
+          {"key":"mirror-leviathan","name":"Offset Mantle","kind":"lifeform","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#a45ce2","#67e8f9"],"visual":"whale","entry":"Four interlinked lobes register incompatible orientations on different instruments. Observation remains remote; no explanation of the discrepancy is claimed."},
           {"key":"fracture-lens","name":"Fracture Lens","kind":"artifact","source":"planet","families":["parallel"],"threat":4,"rarity":"Exotic","colors":["#b76fb5","#8ce0ec"],"visual":"mask","entry":"A segmented lens produces images of the same terrain at conflicting angles. No observed position accounts for all of its simultaneous projections."},
         ];
       const crewUniforms = ["#164e63", "#312e81", "#713f12", "#14532d", "#4c1d95"],
@@ -7669,6 +8293,7 @@
           { key: "pilgrim-mirrors", family: "diplomacy", name: "The Pilgrim Mirrors", hook: "Luminous travelers are leaving gifts at worlds where your earlier choices helped strangers.", color: "#d9f99d", leadRole: "Expedition Envoy", stages: [["encounter",1,"Answer a pilgrim contact"],["vault",1,"Preserve a luminous gift"],["jump",2,"Follow the shadowless path"],["threat",1,"Shield the pilgrims from the Memory Tide"]], threat: "memory-tempest", reward: { Crystal: 48, BioGel: 36, DataCores: 32 }, vaultKey: "memory-tide", rewardText: "pilgrim knowledge, restorative cultures, and the Memory Tide" },
         ],
         livingEventTemplates = [
+          ...BETWEEN_LIVING_EVENTS,
           { key: "comet-migration", name: "Comet Migration", desc: "A bright family of comets is crossing the inhabited orbital lanes.", color: "#bae6fd", visual: "cometTrail", choices: [{ label: "Chart a safe passage", result: "The Pioneer publishes a clean route through the procession.", reward: { DataCores: 9, Helium3: 12 } }, { label: "Harvest the outer tails", result: "Fleet collectors skim rare ice without disturbing the migration.", reward: { Crystal: 12, BioGel: 7 } }] },
           { key: "aurora-spawning", name: "Aurora Spawning", desc: "Magnetic lifeforms are gathering inside a planet-wide aurora.", color: "#4ade80", visual: "auroraTide", choices: [{ label: "Observe quietly", result: "The spawning pattern becomes a new xenology reference.", reward: { DataCores: 12, BioGel: 10 } }, { label: "Stabilize the field", result: "The Pioneer prevents a magnetic collapse and recovers charged crystals.", reward: { Crystal: 14, Plasma: 8 } }] },
           { key: "relay-market", name: "Wayfarer Relay Market", desc: "A temporary market has assembled around an old communications relay.", color: "#fde68a", visual: "crystalMotes", choices: [{ label: "Trade expedition charts", result: "Fresh route intelligence reaches the bridge.", reward: { Helium3: 16, DataCores: 8 } }, { label: "Restock the fleet", result: "The quarterdeck secures useful hull stock and repair metal.", reward: { Alloy: 22, Titanium: 10 } }] },
@@ -10262,14 +10887,14 @@
       }
       function civilizationCard(b){
         const c=civilizationProfile(b);if(!c||!bodySurveyed(b))return "";
-        const reason=civilizationContactReason(b),label=["Acknowledge signal","Offer "+c.gift,"Ratify accord","Accord established"][c.stage];
+        const note=betweenCultureNote(c.key),reason=civilizationContactReason(b),label=["Acknowledge signal","Offer "+c.gift,"Ratify accord","Accord established"][c.stage];
         return card(c.name,"<b>"+esc(c.stageName)+"</b> · "+esc(c.principle)+" Their settlements feature "+esc(c.architecture)+". "+(c.stage===1?costHtml(c.cost):c.stage===2?"Demonstrate shared navigation through a 60% Echo to another surveyed world.":c.stage===3?"Independent partner. Their territory remains their own.":"A local transmission awaits acknowledgment."),
-          (c.stage===3?"":btnWhy(label,"advanceCivilizationContact",b.name,!reason,reason)))+culturalCard(b);
+          (c.stage===3?"":btnWhy(label,"advanceCivilizationContact",b.name,!reason,reason)))+(note?secondaryDetails("Local cultural record",card("Customs and history",esc(note.history),'<div class="log"><b>Exchange custom</b><span>'+esc(note.custom)+'</span></div><div class="log"><b>Respectful conduct</b><span>'+esc(note.boundary)+'</span></div>')):"")+culturalCard(b);
       }
       function renderCivilizations(){
         const known=systems.flatMap(sys=>sys.bodies.filter(b=>b.civilization&&(b.discoveryRewardClaimed||b.memory?.firstContact)).map(b=>({sys,b,c:civilizationProfile(b)})));
         const local=known.filter(x=>x.sys===game.system),remote=known.filter(x=>x.sys!==game.system);
-        ui.menuContent.innerHTML=card("Independent civilizations","Survey inhabited worlds, acknowledge local signals and earn trust through cultural exchange and shared flight paths. Their territory is protected; accords do not consume Concord capacity.")+
+        ui.menuContent.innerHTML=card("Independent civilizations","The Between contains local communities with distinct customs. Their origins are not assumed; none represents an established faction of the Nine Worlds. Survey, acknowledge signals and earn trust through cultural exchange and shared routes. Their territory is protected; accords do not consume Concord capacity.")+
           card("Local contacts",local.length?routeDirectory(local.map(({b,c})=>[b.name,c.name+" · "+c.stageName+(culturalCommitment(b)?.complete?" · "+culturalCommitment(b).pact.name:""),"openWorldDetails",b.name,"signal"])):"No surveyed civilizations in this sector.",btn("Explore worlds","openSection","planets"))+
           (remote.length?card("Distant records",remote.map(({sys,b,c})=>'<div class="log"><b>'+esc(c.name)+'</b><span>'+esc(b.name+" · "+sys.name+" · "+c.stageName+(culturalCommitment(b)?.complete?" · "+culturalCommitment(b).pact.name:""))+'</span></div>').join("")):"");
       }
@@ -13278,7 +13903,7 @@
       function updateIdentity(b) {
         const m = b.memory || defaultMemory();
         if (
-          (b.hazard && b.hazard !== "Protected homeworld" && m.upgrades >= 2) ||
+          (b.hazard && !["Protected homeworld","Protected expedition anchorage"].includes(b.hazard) && m.upgrades >= 2) ||
           m.hazards >= 3
         )
           b.identity = "Fortress";
@@ -17587,6 +18212,7 @@
             .map(([k, v]) => Math.floor(v) + " " + label(k))
             .join(" • ") || "Nothing ready yet";
         ui.menuContent.innerHTML =
+          secondaryDetails("Material reference",card("Expedition materials","Operational names and research notes; costs, inventory and production are unchanged.",Object.values(BETWEEN_RESOURCE_NOTES).map(([name,desc])=>'<div class="log"><b>'+esc(name)+'</b><span>'+esc(desc)+'</span></div>').join(""))) +
           card(
             "Colony Output",
             "Captured worlds in this system supply your expedition during active flight. Rates are estimated per real minute at normal game speed.",
@@ -17747,6 +18373,7 @@
           '</div><div class="chip">Level: ' +
           b.level +
           "</div></div></div>" +
+          (betweenStudy(vaultFamily())?secondaryDetails("Local field study",card(esc(betweenStudy(vaultFamily())[0]),esc(betweenStudy(vaultFamily())[1]))):"") +
           restrict +
           prod +
           branches + (owned&&!game.system.isTutorial?card("World control","Active: "+esc(worldControlMode(b))+" • "+worldControlStability(b)+"% stability. Industry increases output, Research adds data, Relay extends refuel range by 100u and improves stability. Station upgrades consolidate control.",["outpost","industry","research","relay"].map(mode=>btn(mode[0].toUpperCase()+mode.slice(1),"setWorldControlMode",mode,worldControlMode(b)!==mode)).join("")):"")
@@ -18372,7 +18999,7 @@
           ";--vaultAccent:" +
           esc(colors[1] || colors[0]) +
           '" role="img" aria-label="Contained visual record of ' +
-          esc(entry.name) +
+          esc(vaultCatalog.find(item=>item.key===entry.catalogKey)?.name||entry.name) +
           '">' + vaultSpecimenArt(entry) + '</div>'
         );
       }
@@ -18390,7 +19017,7 @@
           '">' +
           vaultVisualHtml(entry) +
           '<div class="vault-entry-copy"><b>' +
-          esc(entry.name) +
+          esc(vaultCatalog.find(item=>item.key===entry.catalogKey)?.name||entry.name) +
           '</b><span class="vault-origin">' +
           esc(entry.system + " • " + entry.origin) +
           "</span><span class=\"vault-field-note\">"+esc(vaultCatalog.find(item=>item.key===entry.catalogKey)?.entry||entry.entry)+"</span>" +
@@ -20022,8 +20649,9 @@
         ui.menuContent.innerHTML =
           card(
             "Planet Codex",
-            "Discovered worlds are permanently archived with their system family, rarity, resources, and expedition history.",
+            "Discovered formations are permanently archived with their reach family, rarity, resources, and expedition history. Field studies distinguish observations from unresolved explanations.",
           ) +
+          secondaryDetails("Field research methods",card("Observation protocols","Arcana is an established part of the Ninefold. A strange instrument reading is not by itself evidence of Arcana, and no field study resolves its ultimate source.",Object.values(BETWEEN_FAMILY_STUDIES).map(([title,desc])=>'<div class="log"><b>'+esc(title)+'</b><span>'+esc(desc)+'</span></div>').join(""))) +
           mysteryArchiveHtml() +
           discoveryCollectionsHtml() +
           (entries.length
