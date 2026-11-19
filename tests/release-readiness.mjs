@@ -1350,7 +1350,7 @@ const patterns=["bands","continents","craters","lava","crystal","storm","rings",
 const fieldNotes=patterns.map(p=>fieldQA.lore("Test frontier","Alloy",true,p));
 assert.equal(new Set(fieldNotes).size,patterns.length,"Survey language must distinguish visible terrain");
 assert.ok(fieldNotes.every(note=>note.includes("Alloy")&&!note.includes("Newly charted world")));
-assert.equal(fieldQA.lore("Test frontier","Alloy",true,"star"),"A stellar body anchors the local orbital network.");
+assert.equal(fieldQA.lore("Test frontier","Alloy",true,"star"),"A concentrated gravitational anchor shapes local passage routes.");
 const legacy={...one,entry:"Legacy specimen note"};
 const refreshed=api.vaultCatalog.find(t=>t.key===one.catalogKey);
 assert.ok(fieldQA.vaultEntryHtml(legacy).includes(refreshed.entry.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"))||!fieldQA.vaultEntryHtml(legacy).includes("Legacy specimen note"),"Existing finds display updated field notes");
