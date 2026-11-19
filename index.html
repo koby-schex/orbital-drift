@@ -12640,7 +12640,7 @@
         )
           return 0;
         // Keep the established tutorial economy; modestly improve frontier output.
-        return Math.max(0.02, productionMult(b) * 0.022 * (game.system.isTutorial?1:1.12));
+        return Math.max(0.02, productionMult(b) * 0.022 * (game.system.isTutorial?1:1.12)*(1+concordLocalBonus(b)));
       }
       function productionPerMinute(rate){
         // Simulation dt is measured in 60Hz frame units, not seconds.
@@ -15425,9 +15425,11 @@
         );
         const b = body(e.startBody);
         if (b) recordPlanet(b, "echoes", 1);
+        const concordChanged=recordConcordEcho(e);
         echoRecorder = null;
         completeContract("echo");
         checkAchievements();
+        if(concordChanged)saveGame(false);
       }
       function discardEcho() {
         echoRecorder = null;
@@ -16681,6 +16683,7 @@
           "system",
           "echoes",
           "codex",
+          "concord",
           "activity",
           "guide",
           "help",
@@ -16792,6 +16795,7 @@
             system: renderSystem,
             echoes: renderEchoes,
             codex: renderCodex,
+            concord: renderConcord,
             activity: renderActivity,
             guide: renderGuide,
             help: renderHelp,
@@ -16809,7 +16813,7 @@
         queueSkinPreviews();
       }
       function menuRouteTitle(route){
-        const labels={hub:"Command",explore:"Explore",hangar:"Ship & designs",journal:"Journey",resources:"Cargo",planets:"Worlds",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"System",echoes:"Orbital Echoes",codex:"Planet Codex",activity:"Captain Log",guide:"Pilot Manual",help:"Help"};
+        const labels={hub:"Command",explore:"Explore",hangar:"Ship & designs",journal:"Journey",resources:"Cargo",planets:"Worlds",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"System",echoes:"Orbital Echoes",codex:"Planet Codex",concord:"Orbital Concord",activity:"Captain Log",guide:"Pilot Manual",help:"Help"};
         const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",shipyard:"Shipyard",missions:"Fleet missions",history:"Fleet history",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",daily:"Daily tasks",contracts:"Contracts",milestones:"Milestones",travel:"Travel & atlas",records:"Journey records",settings:"Settings",display:"Display & performance",audio:"Audio & feedback",controls:"Flight controls",data:"Save data",privacy:"Purchases & privacy",achievements:"Achievements",reputation:"Reputation & encounters",collections:"Collections & statistics"},upgrades:{ship:"Ship upgrades",planet:"World upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
         if(route.section==="planets"&&route.tab?.startsWith("world:")){
           const world=body(route.tab.slice(6));return world&&(world.discovered||game.discovered.has(world.name)||world.type==="star")?world.name:"Unknown world";
@@ -16974,6 +16978,7 @@
           ["Worlds","Survey worlds, establish control and develop outposts","openSection","planets","explore"],
           ["Travel & atlas","Chart jump routes and investigate anomalies","setMenuTab","system|travel","route"],
           ["Planet Codex","Archived planetary surveys and discovery collections","openSection","codex","journal"],
+          ...(game.frigate.built?[["Orbital Concord","Charter settlements and chart supply lanes through flight","openSection","concord","route"]]:[]),
           ...(game.frigate.built?[["Vault","Archive discoveries and exceptional research breakthroughs","openFrigateTab","vault","vault"]]:[])
         ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
       }
@@ -17212,6 +17217,7 @@
                 actionReason("planetUpgrade", s),
               ),
           ) +
+          concordWorldCard(s) +
           secondaryDetails("World History", planetMemoryHtml(s)) +
           secondaryDetails("Survey & Development Details", planetDetailsHtml(s));
         if(!s)ui.menuContent.innerHTML=card("World unavailable","This world is not in the current system.",btn("Worlds","openSection","planets"));
@@ -17303,6 +17309,92 @@
         );
       }
       function raidSelectedWorld(){const b=body(selectedPlanetName);if(!b||game.system.isTutorial)return false;return raid(b);}
+      // The Concord is a pilot-built network, not an idle empire: actual flight establishes its lanes.
+      const concordCharterCost=Object.freeze({Alloy:10,DataCores:5});
+      function concordEligibleSystem(sys){return !!sys&&!sys.isTutorial&&!sys.nonReturnable;}
+      function concordChartered(b){return b?.memory?.concordCharter===true;}
+      function concordActive(b){return !!b&&b.type!=="star"&&!!b.captured&&concordChartered(b);}
+      function concordCharterReason(b){
+        if(!concordEligibleSystem(game.system)||!game.frigate?.built)return "Build the Pioneer and reach a returnable frontier sector.";
+        if(!b||!b.captured||!game.captured.has(b.name))return "Establish control of this world first.";
+        if(concordChartered(b))return "Charter already recorded.";
+        if(!game.ship?.orbitLocked||game.ship.lockBody!==b.name)return "Lock orbit here to ratify the charter.";
+        const m=b.memory||{};
+        if(!(b.branches?.station>=1||m.refuels>=2||m.echoes>=2))return "Build a station branch or log two substantial refuels or two Orbital Echoes here.";
+        if(!canAfford(concordCharterCost))return "Charter supplies required: "+fmt(concordCharterCost)+".";
+        return "";
+      }
+      function charterConcordWorld(name){
+        const b=body(name),reason=concordCharterReason(b);
+        if(reason){toast(reason);return false;}
+        spend(concordCharterCost);
+        if(!b.memory)b.memory=defaultMemory();
+        b.memory.concordCharter=true;
+        addActivity("capture",b.name+" charter ratified","The settlement joins the Orbital Concord. Fly between chartered worlds to chart a supply lane.");
+        toast(b.name+" · Concord charter ratified.");
+        saveGame(false);renderMenu();return true;
+      }
+      function concordLanes(sys=game.system){
+        if(!concordEligibleSystem(sys))return [];
+        const best=new Map();
+        for(const b of sys.bodies){
+          if(!concordChartered(b)||!Array.isArray(b.memory.concordLanes))continue;
+          for(const lane of b.memory.concordLanes){
+            if(!lane||typeof lane.to!=="string"||!Number.isFinite(lane.quality)||lane.quality<60||lane.quality>100)continue;
+            const other=systemBody(sys,lane.to);
+            if(!other||other===b||!concordChartered(other))continue;
+            const names=[b.name,other.name].sort(),key=JSON.stringify(names);
+            const prior=best.get(key);
+            if(!prior||prior.quality<lane.quality)best.set(key,{from:names[0],to:names[1],quality:lane.quality,active:concordActive(b)&&concordActive(other)});
+          }
+        }
+        return [...best.values()].sort((a,b)=>b.quality-a.quality||a.from.localeCompare(b.from)||a.to.localeCompare(b.to));
+      }
+      function recordConcordEcho(e){
+        if(!concordEligibleSystem(game.system)||e?.system!==game.system.name||!Number.isFinite(e.quality)||e.quality<60||e.quality>100)return false;
+        const a=body(e.startBody),b=body(e.endBody);
+        if(!a||!b||a===b||!concordActive(a)||!concordActive(b))return false;
+        // A route must actually enter the destination's flight vicinity, not simply end with its name.
+        const last=e.points?.at(-1);
+        if(!last||!Number.isFinite(last.x)||!Number.isFinite(last.y)||dist(last,b)>visualRadius(b)+180)return false;
+        const from=a.name<b.name?a:b,to=from===a?b:a,lanes=Array.isArray(from.memory.concordLanes)?from.memory.concordLanes:[];
+        const previous=lanes.find(x=>x?.to===to.name);
+        if(previous&&previous.quality>=e.quality)return false;
+        from.memory.concordLanes=[...lanes.filter(x=>x?.to!==to.name),{to:to.name,quality:e.quality}];
+        addActivity("echo",previous?"Concord lane refined":"Concord lane charted",from.name+" ↔ "+to.name+" · "+e.quality+"% route quality.");
+        return true;
+      }
+      function concordLocalBonus(b){
+        if(!concordEligibleSystem(game.system)||!concordActive(b)||!game.captured.has(b.name))return 0;
+        // Only the single best connected, complementary supply lane counts: no stacking or passive conquest.
+        let best=0;
+        for(const lane of concordLanes()){
+          if(!lane.active||!(lane.from===b.name||lane.to===b.name))continue;
+          const other=body(lane.from===b.name?lane.to:lane.from);
+          if(!other||!game.captured.has(other.name)||worldControlMode(other)===worldControlMode(b))continue;
+          best=Math.max(best,lane.quality/100*.08);
+        }
+        return best;
+      }
+      function concordWorldCard(b){
+        if(!b||!concordEligibleSystem(game.system)||!game.frigate?.built||!b.captured)return "";
+        const charter=concordChartered(b),reason=concordCharterReason(b);
+        return card("Orbital Concord",charter?
+          "Ratified charter · "+esc(worldControlMode(b))+" · "+Math.round(concordLocalBonus(b)*100)+"% linked supply output. Complementary settlements benefit from pilot-charted Echo lanes.":
+          "Optional settlement charter. Establish a station or demonstrate local flight service, then ratify from orbit. "+costHtml(concordCharterCost),
+          charter?btn("View Concord","openSection","concord"):btnWhy("Ratify charter","charterConcordWorld",b.name,!reason,reason));
+      }
+      function renderConcord(){
+        if(!game.frigate?.built){ui.menuContent.innerHTML=card("Orbital Concord","Build the Pioneer before establishing frontier charters.",btn("Pioneer project","openSection","frigate"));return;}
+        const eligible=systems.filter(concordEligibleSystem),chartered=eligible.flatMap(sys=>sys.bodies.filter(concordChartered)),
+          active=chartered.filter(concordActive),local=concordEligibleSystem(game.system)?game.system.bodies.filter(b=>b.captured&&b.type!=="star"):[],
+          lanes=concordLanes(),archived=eligible.filter(sys=>sys!==game.system&&sys.bodies.some(concordChartered));
+        ui.menuContent.innerHTML=card("A civilization traced by flight","Charter settlements and fly real Orbital Echo routes between them. Different world roles form complementary supply lanes; the best active lane adds up to 8% local output. No offline decay or mandatory management.")+
+          '<section class="command-status"><span class="screen-eyebrow">CONCORD REGISTER</span><h2>'+active.length+' active charters</h2><p>'+chartered.length+' lifetime charters · '+eligible.reduce((sum,sys)=>sum+concordLanes(sys).filter(l=>l.active).length,0)+' active lanes</p></section>'+
+          card("Current sector",local.length?"Select a controlled world to view its charter and development.":"No controlled frontier worlds in this sector.",local.length?routeDirectory(local.map(b=>[b.name,concordChartered(b)?"Chartered · "+worldControlMode(b):"Unchartered settlement","openWorldDetails",b.name,"explore"])):btn("View worlds","openSection","planets"))+
+          card("Charted Echo lanes",lanes.length?lanes.map(l=>'<div class="log"><b>'+esc(l.from)+" ↔ "+esc(l.to)+'</b><span>'+l.quality+'% route quality · '+(l.active?"Connected":"Dormant — charter control required")+'</span></div>').join(""):"Ratify two settlements, then complete an Orbital Echo from one to the other with at least 60% quality.")+
+          (archived.length?card("Distant charters",archived.map(sys=>'<div class="log"><b>'+esc(sys.name)+'</b><span>'+sys.bodies.filter(concordActive).length+' active settlements · '+concordLanes(sys).length+' charted lanes</span></div>').join("")):"");
+      }
       function worldControlMode(b){return b?.memory?.controlMode||"outpost";}
       function worldControlStability(b){return Math.round(clamp(84-(Number(b?.captureDifficulty)||1)*10+(b?.branches?.station||0)*8+(worldControlMode(b)==="relay"?12:0),50,100));}
       function setWorldControlMode(mode){
@@ -18215,7 +18307,7 @@
           ""+
           '</div></div>'+
           '<div class="pioneer-deck-directory"><h4 class="directory-heading">Pioneer directory</h4>'+
-          routeDirectory([["Adventures","Accept or review an expedition","setMenuTab","frigate|expeditions","route"],["Fleet",readyFleet?readyFleet+" mission rewards ready":"Manage escorts and deploy missions","setMenuTab","frigate|fleet","fleet"],["Crew","Recruit, train and assign specialists","setMenuTab","frigate|crew","crew"],["Vault","Secure specimens and review bonuses","setMenuTab","frigate|vault","vault"],["Base upgrades","Improve your mobile headquarters","setMenuTab","frigate|upgrades","pioneer"],["Appearance","Equip Pioneer and fleet designs","openSection","cosmetics","layers"]])+
+          routeDirectory([["Adventures","Accept or review an expedition","setMenuTab","frigate|expeditions","route"],["Fleet",readyFleet?readyFleet+" mission rewards ready":"Manage escorts and deploy missions","setMenuTab","frigate|fleet","fleet"],["Crew","Recruit, train and assign specialists","setMenuTab","frigate|crew","crew"],["Vault","Archive specimens and exceptional research","setMenuTab","frigate|vault","vault"],["Base upgrades","Improve your mobile headquarters","setMenuTab","frigate|upgrades","pioneer"],["Appearance","Equip Pioneer and fleet designs","openSection","cosmetics","layers"]])+
           '</div>' +
           '<details class="pioneer-command-details"><summary>Base details and settings</summary>' +
           '<div class="pioneer-command-metrics"><span>Base Lv. ' +
@@ -19564,6 +19656,10 @@
           [
             "Production",
             "Developed worlds generate resources over time. Transfer them from Cargo when production is ready. Factory worlds unlock major ship and frigate systems.",
+          ],
+          [
+            "Orbital Concord",
+            "Optional frontier charters connect settlements through actual flight. Ratify from orbit after establishing local service, then record a 60% or better Echo between two chartered worlds. Complementary world roles share a modest supply benefit. Released worlds retain their history but their lanes go dormant." ,
           ],
           [
             "Echoes",
@@ -26381,6 +26477,7 @@
         upgradeFrigate,
         secureVaultEntry,
         setWorldControlMode,
+        charterConcordWorld,
         raidSelectedWorld,
         recoverFrontierContact,
         trackFrontierContact,
