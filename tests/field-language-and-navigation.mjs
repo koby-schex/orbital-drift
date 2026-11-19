@@ -19,3 +19,16 @@ console.log("Field language: eight reach and formation records, seven unchanged 
 // Check authored milestone sources in addition to the initial objective array.
 for (const marker of ["Mars Captured!","Venus Survey Complete!","Upgrade Mars outpost","Travel to Venus","Return to Earth Factory","Mars Outpost Upgraded!","Capture Mars."]) assert.ok(!html.includes(marker), "Obsolete tutorial copy: "+marker);
 assert.match(html,/Redglass Shelf claimed/);assert.match(html,/Violet Furnace surveyed/);assert.match(html,/Redglass Shelf developed/);assert.match(html,/title-art-caption/);assert.match(html,/title-panel-kicker/);
+
+ // Execute the actual flight canvas drawing function, not only the source copy.
+const drawSource=html.slice(html.indexOf("function drawTargetPill("),html.indexOf("function drawRareSystemAura("));
+const rendered=[],measurements=[];
+const canvas={save(){},restore(){},measureText(s){measurements.push(s);return {width:s.length*6};},translate(){},beginPath(){},fill(){},stroke(){},fillText(s){rendered.push(s);}};
+const draw=vm.runInNewContext(source+"\n"+field+"\n"+drawSource+"\n drawTargetPill",{ctx:canvas,W:390,H:844,clamp:(v,min,max)=>Math.max(min,Math.min(max,v)),rgba:c=>c,rr(){}});
+for(const [id,display] of [["Mars","Redglass Shelf"],["Earth","First Anchorage"],["Venus","Violet Furnace"],["ODF Pioneer","Pioneer"],["Nyra Sol","Nyra Sol"]]){
+ draw(100,200,id,42,"#fff");assert.equal(rendered.at(-1),display+" • 42 km");assert.ok(measurements.some(s=>s.startsWith(display+" •")));
+}
+draw(100,200,"An unusually long custom vessel name",123456,"#fff");assert.ok(rendered.at(-1).includes("…"));
+const translate=vm.runInNewContext(source+"\n betweenDisplayText");
+for(const prefix of ["Go to ","Objective: ","Manual target set: ","Nearest: ","Survey complete: "])assert.equal(translate(prefix+"Mars"),prefix+"Redglass Shelf");
+assert.equal(translate("Nyra Sol"),"Nyra Sol");
