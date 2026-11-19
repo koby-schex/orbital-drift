@@ -5340,6 +5340,13 @@
       .menu .vault-tags .tag {font-size:10px;}
       .menu .vault-entry-copy .vault-archive-note {color:#a2b6bf;}
       .menu .vault-entry-copy .vault-perk {color:#a7e8d7!important;}
+      /* Survey plates and hangar displays share the command-deck visual language. */
+      .menu .cosmetic-preview-live,.menu .fleet-unit-preview,.menu .fleet-hangar-stage {border:1px solid #304550;overflow:hidden;position:relative;}
+      .menu .cosmetic-preview-live {min-height:168px;}
+      .menu .cosmetic-preview-label {background:#091117e8;color:#bfd5dd;border:1px solid #304550;font-size:10px;letter-spacing:.03em;max-width:calc(100% - 18px);}
+      .menu .planet-route .planet-orb {width:36px;height:36px;box-shadow:inset -9px -6px 13px #000b,0 0 9px color-mix(in srgb,var(--orb) 26%,transparent);}
+      .menu .vault-specimen svg {max-width:260px;margin-inline:auto;}
+      .menu .vault-field-note {max-width:65ch;}
     </style>
   </head>
   <body>
@@ -6254,7 +6261,7 @@
           motif: "standard",
           type: "starter",
           price: 0,
-          desc: "The standard ODF Pioneer frigate hull. Clean blue-gray starter plating, simple command lights, practical utility armor, and a starter profile that matches the base starship style.",
+          desc: "The standard ODF Pioneer frigate hull combines blue-gray alloy plating, recessed command lights and practical utility armor for extended frontier service.",
         },
         {
           key: "Spirit Voyager",
@@ -7360,34 +7367,34 @@
           {"key":"slag-lantern","name":"Slag Lantern","kind":"artifact","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"lantern","entry":"A ceramic lantern recovered beneath a cooled lava flow. Its flame consumes no measurable oxygen, and the vessel remains cool to the touch.","perk":"production"},
           {"key":"iron-orchid","name":"Iron Orchid","kind":"lifeform","source":"planet","families":["innerForge"],"threat":1,"rarity":"Unusual","colors":["#fb923c","#fde68a"],"visual":"bloom","entry":"Thin metallic petals unfold in a magnetic field. The root structure retains the alternating polarity of its native world's buried ore seams.","perk":"survey"},
           {"key":"solar-spindle","name":"Solar Spindle","kind":"artifact","source":"space","families":["innerForge"],"threat":2,"rarity":"Rare","colors":["#fb923c","#fde68a"],"visual":"spindle","entry":"A filament of apparent stellar plasma suspended in a clear spindle. The containment team has recorded no measurable heat loss since recovery.","perk":"fuel"},
-          {"key":"plasma-nest","name":"Plasma Nest","kind":"phenomenon","source":"space","families":["innerForge"],"threat":4,"rarity":"Exotic","colors":["#fb923c","#fde68a"],"visual":"swarm","entry":"A flock of magnetic vortices.","perk":"production"},
-          {"key":"aether-shell","name":"Aether Shell","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"shell","entry":"A shell containing a weather cycle.","perk":"survey"},
+          {"key":"plasma-nest","name":"Plasma Nest","kind":"phenomenon","source":"space","families":["innerForge"],"threat":4,"rarity":"Exotic","colors":["#fb923c","#fde68a"],"visual":"swarm","entry":"A cluster of magnetic vortices recovered from a stellar wake. Individual loops exchange charge without touching, maintaining a stable arrangement that resembles a nesting colony.","perk":"production"},
+          {"key":"aether-shell","name":"Aether Shell","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"shell","entry":"A translucent shell containing a miniature atmospheric circulation. Clouds form along its inner ridges and collapse into droplets that never leave the enclosure.","perk":"survey"},
           {"key":"cloud-larva","name":"Cloud Larva","kind":"lifeform","source":"planet","families":["gasFrontier"],"threat":1,"rarity":"Unusual","colors":["#60a5fa","#c4b5fd"],"visual":"serpent","entry":"A translucent organism that feeds on electrical gradients in the cloud layers. Its body contracts in anticipation of nearby discharges.","perk":"production"},
-          {"key":"cyclone-needle","name":"Cyclone Needle","kind":"artifact","source":"space","families":["gasFrontier"],"threat":2,"rarity":"Rare","colors":["#60a5fa","#c4b5fd"],"visual":"spindle","entry":"A compass measuring direction in storms.","perk":"fuel"},
-          {"key":"storm-crown","name":"Storm Crown","kind":"phenomenon","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#60a5fa","#c4b5fd"],"visual":"crown","entry":"A ring of self-sustaining lightning.","perk":"fuel"},
-          {"key":"opal-eye","name":"Opal Eye","kind":"artifact","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"orb","entry":"A polished eye refracting distant stellar spectra.","perk":"survey"},
-          {"key":"glass-fern","name":"Glass Fern","kind":"lifeform","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"fern","entry":"Mineral leaves recording gravity changes.","perk":"production"},
-          {"key":"prismatic-keel","name":"Prismatic Keel","kind":"artifact","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#c084fc","#67e8f9"],"visual":"crystal","entry":"A lost vessel's coherent crystal lattice.","perk":"survey"},
-          {"key":"spectrum-anvil","name":"Spectrum Anvil","kind":"phenomenon","source":"space","families":["crystalReach"],"threat":4,"rarity":"Exotic","colors":["#c084fc","#67e8f9"],"visual":"crown","entry":"An intersection of seven polarized beams.","perk":"production"},
-          {"key":"seed-compass","name":"Seed Compass","kind":"artifact","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"disc","entry":"An organic instrument pointing toward habitats.","perk":"survey"},
+          {"key":"cyclone-needle","name":"Cyclone Needle","kind":"artifact","source":"space","families":["gasFrontier"],"threat":2,"rarity":"Rare","colors":["#60a5fa","#c4b5fd"],"visual":"spindle","entry":"A slender instrument recovered from a derelict drifting above a gas giant. Its needle aligns with the deepest pressure front rather than the local magnetic field.","perk":"fuel"},
+          {"key":"storm-crown","name":"Storm Crown","kind":"phenomenon","source":"space","families":["gasFrontier"],"threat":4,"rarity":"Exotic","colors":["#60a5fa","#c4b5fd"],"visual":"crown","entry":"A ring of self-sustaining electrical arcs. Each discharge follows the previous one through empty space, even with the containment chamber isolated from external power.","perk":"fuel"},
+          {"key":"opal-eye","name":"Opal Eye","kind":"artifact","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"orb","entry":"A polished lens that separates distant stellar light into extraordinarily fine spectral bands. Minute fractures suggest it was part of a much larger observation instrument.","perk":"survey"},
+          {"key":"glass-fern","name":"Glass Fern","kind":"lifeform","source":"planet","families":["crystalReach"],"threat":1,"rarity":"Unusual","colors":["#c084fc","#67e8f9"],"visual":"fern","entry":"A branching mineral organism whose delicate leaves bend when local gravity shifts. Growth rings preserve a record of tidal stresses from its native world.","perk":"production"},
+          {"key":"prismatic-keel","name":"Prismatic Keel","kind":"artifact","source":"space","families":["crystalReach"],"threat":2,"rarity":"Rare","colors":["#c084fc","#67e8f9"],"visual":"crystal","entry":"A fragment of a vessel's crystalline load-bearing lattice. Internal layers distribute stress through shifting bands of color instead of conventional joints.","perk":"survey"},
+          {"key":"spectrum-anvil","name":"Spectrum Anvil","kind":"phenomenon","source":"space","families":["crystalReach"],"threat":4,"rarity":"Exotic","colors":["#c084fc","#67e8f9"],"visual":"crown","entry":"Seven polarized beams intersect within a stationary volume of vacuum. The resulting interference pattern refuses to disperse when individual beams are obstructed.","perk":"production"},
+          {"key":"seed-compass","name":"Seed Compass","kind":"artifact","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"disc","entry":"A fibrous instrument containing living rootlets. Its central growth turns toward environments with favorable biological conditions, even through the hull of a survey craft.","perk":"survey"},
           {"key":"amber-colony","name":"Amber Colony","kind":"lifeform","source":"planet","families":["bioCluster"],"threat":1,"rarity":"Unusual","colors":["#4ade80","#fef08a"],"visual":"swarm","entry":"A living microbial community sealed inside ancient resin. Microscopic channels appear to redirect nutrients between individual colonies.","perk":"production"},
-          {"key":"lantern-jelly","name":"Lantern Jelly","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#4ade80","#fef08a"],"visual":"jelly","entry":"A vacuum swimmer emitting synchronized pulses.","perk":"fuel"},
-          {"key":"living-keystone","name":"Living Keystone","kind":"artifact","source":"space","families":["bioCluster"],"threat":4,"rarity":"Exotic","colors":["#4ade80","#fef08a"],"visual":"reliquary","entry":"A living bridge component seeking its span.","perk":"production"},
-          {"key":"oath-tablet","name":"Oath Tablet","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"tablet","entry":"A record etched in an extinct alphabet.","perk":"survey"},
-          {"key":"archive-scarab","name":"Archive Scarab","kind":"lifeform","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"beetle","entry":"A mechanical organism repairing inscriptions.","perk":"survey"},
-          {"key":"silent-key","name":"Silent Key","kind":"artifact","source":"space","families":["ancientArchive"],"threat":2,"rarity":"Rare","colors":["#d6b36a","#e2e8f0"],"visual":"key","entry":"A key rotating to match unknown doors.","perk":"fuel"},
-          {"key":"epoch-dial","name":"Epoch Dial","kind":"artifact","source":"space","families":["ancientArchive"],"threat":4,"rarity":"Exotic","colors":["#d6b36a","#e2e8f0"],"visual":"disc","entry":"A device measuring the age of stars.","perk":"production"},
-          {"key":"null-pebble","name":"Null Pebble","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"crystal","entry":"A stone with no thermal signature.","perk":"fuel"},
-          {"key":"echo-compass","name":"Echo Compass","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"key","entry":"A compass following gravitational wakes.","perk":"fleet"},
-          {"key":"night-fin","name":"Night Fin","kind":"lifeform","source":"space","families":["voidRim"],"threat":2,"rarity":"Rare","colors":["#64748b","#67e8f9"],"visual":"wing","entry":"A swimmer outlined by displaced starlight.","perk":"survey"},
+          {"key":"lantern-jelly","name":"Lantern Jelly","kind":"lifeform","source":"space","families":["bioCluster"],"threat":2,"rarity":"Rare","colors":["#4ade80","#fef08a"],"visual":"jelly","entry":"A vacuum-adapted swimmer that emits synchronized pulses from translucent chambers. Its rhythmic changes appear to announce nearby organisms to the rest of its kind.","perk":"fuel"},
+          {"key":"living-keystone","name":"Living Keystone","kind":"artifact","source":"space","families":["bioCluster"],"threat":4,"rarity":"Exotic","colors":["#4ade80","#fef08a"],"visual":"reliquary","entry":"An organic structural component recovered from drifting ruins. Fresh growth repeatedly extends toward an absent neighboring segment, as if attempting to restore its original span.","perk":"production"},
+          {"key":"oath-tablet","name":"Oath Tablet","kind":"artifact","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"tablet","entry":"A weathered record inscribed in an extinct alphabet. Repeating symbols suggest a formal agreement, although the parties named in it have yet to be identified.","perk":"survey"},
+          {"key":"archive-scarab","name":"Archive Scarab","kind":"lifeform","source":"planet","families":["ancientArchive"],"threat":1,"rarity":"Unusual","colors":["#d6b36a","#e2e8f0"],"visual":"beetle","entry":"A mechanical organism that repairs damaged inscriptions with microscopic tools. It continues its work even after the material is moved far from the original ruin.","perk":"survey"},
+          {"key":"silent-key","name":"Silent Key","kind":"artifact","source":"space","families":["ancientArchive"],"threat":2,"rarity":"Rare","colors":["#d6b36a","#e2e8f0"],"visual":"key","entry":"A rotating assembly with no recognizable teeth or circuitry. It periodically locks into a precise alignment, presumably matching a door that has not yet been located.","perk":"fuel"},
+          {"key":"epoch-dial","name":"Epoch Dial","kind":"artifact","source":"space","families":["ancientArchive"],"threat":4,"rarity":"Exotic","colors":["#d6b36a","#e2e8f0"],"visual":"disc","entry":"A finely layered instrument that responds to variations in stellar spectra. The crew suspects its concentric scales were used to measure the passage of stellar lifetimes.","perk":"production"},
+          {"key":"null-pebble","name":"Null Pebble","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"crystal","entry":"A rough stone with no detectable thermal signature. Heat applied to its surface disappears from the instruments without producing any measurable external radiation.","perk":"fuel"},
+          {"key":"echo-compass","name":"Echo Compass","kind":"artifact","source":"planet","families":["voidRim"],"threat":1,"rarity":"Unusual","colors":["#64748b","#67e8f9"],"visual":"key","entry":"A compact compass recovered near a gravitational wake. Its pointer follows the residual path of a passing vessel rather than the nearest massive body.","perk":"fleet"},
+          {"key":"night-fin","name":"Night Fin","kind":"lifeform","source":"space","families":["voidRim"],"threat":2,"rarity":"Rare","colors":["#64748b","#67e8f9"],"visual":"wing","entry":"A vacuum swimmer visible only through the starlight displaced along its narrow fins. It changes direction without any detectable propulsive discharge.","perk":"survey"},
           {"key":"impossible-room","name":"Impossible Room","kind":"phenomenon","source":"space","families":["voidRim"],"threat":6,"rarity":"Mythic","colors":["#64748b","#67e8f9"],"visual":"cube","entry":"A sealed chamber with an interior volume greater than its external dimensions. Controlled reactor tests indicate that the anomaly can store otherwise wasted energy.","perk":"fuel"},
-          {"key":"mercy-lantern","name":"Mercy Lantern","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"lantern","entry":"A beacon lighting in response to distress.","perk":"fuel"},
-          {"key":"dawn-pearl","name":"Dawn Pearl","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A pearl storing a sunrise.","perk":"survey"},
-          {"key":"star-garden","name":"Star Garden","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":2,"rarity":"Rare","colors":["#bbf7d0","#fbcfe8"],"visual":"fern","entry":"Plants growing around a phantom sun.","perk":"production"},
+          {"key":"mercy-lantern","name":"Mercy Lantern","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"lantern","entry":"A beacon recovered from an abandoned shelter. It remains dark during routine transmissions but responds to distress calls with a slow, warm pulse.","perk":"fuel"},
+          {"key":"dawn-pearl","name":"Dawn Pearl","kind":"artifact","source":"planet","families":["cosmicSpirit"],"threat":1,"rarity":"Unusual","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A pearlescent sphere whose interior light shifts through the colors of sunrise. Spectral analysis suggests the same stellar horizon is repeating inside it.","perk":"survey"},
+          {"key":"star-garden","name":"Star Garden","kind":"lifeform","source":"space","families":["cosmicSpirit"],"threat":2,"rarity":"Rare","colors":["#bbf7d0","#fbcfe8"],"visual":"fern","entry":"A group of delicate vacuum flora arranged around an apparent point of light. No physical star is present, yet the leaves continue tracking its position.","perk":"production"},
           {"key":"second-sun","name":"Second Sun","kind":"phenomenon","source":"space","families":["cosmicSpirit"],"threat":6,"rarity":"Mythic","colors":["#bbf7d0","#fbcfe8"],"visual":"orb","entry":"A miniature stellar phenomenon whose radiant output exceeds every estimate of its mass. Pioneer engineers have used its stable emission profile to refine world-production systems.","perk":"production"},
-          {"key":"mirror-flower","name":"Mirror Flower","kind":"lifeform","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"bloom","entry":"Each petal reflects an alternate sky.","perk":"survey"},
-          {"key":"fractured-seal","name":"Fractured Seal","kind":"artifact","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"tablet","entry":"A seal opening only in conflicting realities.","perk":"fuel"},
-          {"key":"counter-clock","name":"Counter Clock","kind":"artifact","source":"space","families":["parallel"],"threat":2,"rarity":"Rare","colors":["#e879f9","#67e8f9"],"visual":"disc","entry":"A clock synchronized to a future arrival.","perk":"fleet"},
+          {"key":"mirror-flower","name":"Mirror Flower","kind":"lifeform","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"bloom","entry":"A flowering organism whose petals reflect different stellar backgrounds. None of the reflected constellations matches the view from the containment chamber.","perk":"survey"},
+          {"key":"fractured-seal","name":"Fractured Seal","kind":"artifact","source":"planet","families":["parallel"],"threat":1,"rarity":"Unusual","colors":["#e879f9","#67e8f9"],"visual":"tablet","entry":"A broken tablet whose edges occasionally align with an unseen matching surface. The alignment occurs only when nearby instruments record incompatible spatial readings.","perk":"fuel"},
+          {"key":"counter-clock","name":"Counter Clock","kind":"artifact","source":"space","families":["parallel"],"threat":2,"rarity":"Rare","colors":["#e879f9","#67e8f9"],"visual":"disc","entry":"An intact chronometer that synchronizes with an arrival which has not yet occurred. Its movement changes whenever the Pioneer revises its planned route.","perk":"fleet"},
           {"key":"unwritten-star","name":"Unwritten Star","kind":"phenomenon","source":"space","families":["parallel"],"threat":6,"rarity":"Mythic","colors":["#e879f9","#67e8f9"],"visual":"halo","entry":"A stellar image that resolves only when projected against an anticipated flight path. Observed fluctuations have enabled the navigation team to refine fleet routes.","perk":"fleet"},
         ];
       const crewUniforms = ["#164e63", "#312e81", "#713f12", "#14532d", "#4c1d95"],
@@ -9137,7 +9144,20 @@
           return "Cold cyan ice giant with unusual tilt and high-value deep atmospheric compounds.";
         if (n === "Neptune")
           return "Deep blue outer giant with dark storms and anomalous gravitational readings.";
-        return `Newly charted world with ${p} features and detectable ${label(r)} signatures${atm ? " beneath an active atmosphere." : " across an exposed surface."}`;
+        const terrain={
+          bands:["Long belts wrap the visible hemisphere.","Broad parallel bands mark the planet's circulation."],
+          continents:["Distinct landmasses interrupt the surface.","Wide regional boundaries are visible from orbit."],
+          craters:["Overlapping impact basins scar the visible surface.","Older craters lie beneath more recent impact marks."],
+          lava:["Bright fissures divide dark surface regions.","Thermal scans reveal extensive heated channels."],
+          crystal:["Reflective formations scatter light across the surface.","Angular mineral structures dominate the visible terrain."],
+          storm:["Large rotating disturbances dominate orbital imagery.","Irregular bands trace the world's turbulent regions."],
+          rings:["A broad debris ring surrounds the world.","Orbital debris casts shifting shadows across the world."],
+          glow:["Luminous regions remain visible on the night side.","Unusual emissions trace the visible surface."],
+          star:["A stellar body anchors the local orbital network."]
+        }[p]||["Surface readings vary considerably across the visible hemisphere."];
+        const choice=terrain[(Array.from(String(n)).reduce((sum,ch)=>sum+ch.charCodeAt(0),0))%terrain.length];
+        if(p==="star")return choice;
+        return choice+" "+(atm?"Spectral readings through the atmosphere":"Exposed-surface readings")+" indicate "+label(r)+" deposits.";
       }
       function forceTutorialCommon() {
         const solSystem = systems.find((s) => s.isTutorial);
@@ -9626,7 +9646,7 @@
                 ],
                 seed + i * 55,
               ),
-              lore: "A luminous spirit world shaped by pale green, white, and soft yellow nebula currents. No two Cosmic Spirit systems align the same way.",
+              lore: "A luminous spirit world shaped by pale green, white, and soft yellow nebula currents. The surrounding nebular currents shift independently of the world's orbit.",
             }),
           );
         }
@@ -10687,7 +10707,7 @@
             " completed at " +
             new Date().toLocaleTimeString();
           if (manual) {
-            toast("Game saved.");
+            toast("Flight record saved.");
             addActivity(
               "save",
               "Manual save completed",
@@ -10963,7 +10983,7 @@
           lastSaveMessage =
             "Loaded save from " +
             (d.savedAt ? new Date(d.savedAt).toLocaleString() : "unknown time");
-          if (manual && !titleOpen) toast("Saved game loaded.");
+          if (manual && !titleOpen) toast("Flight record restored.");
           if (recoveredBackup) {
             // A readable backup remains playable even if repairing the primary hits a quota error.
             try { localStorage.setItem(SAVE_KEY, raw); }
@@ -12079,7 +12099,7 @@
                   esc(fleetBoostSummary(m.boost, m.match)) +
                   '</span><div class="actions">' +
                   btnWhy(
-                    ready ? "Claim Reward" : "In Progress",
+                    ready ? "Receive mission report" : "Mission underway",
                     "completeFleetMission",
                     m.id,
                     ready,
@@ -12105,7 +12125,7 @@
                   esc(m.type) +
                   "</span></b><span>" +
                   esc(m.desc) +
-                  "</span><span>Base time: " +
+                  "</span><span>Estimated base duration: " +
                   (m.baseDuration || 180) +
                   "s • Reward: " +
                   esc(fmt(m.reward)) +
@@ -12680,7 +12700,7 @@
           "Deep Freeze unlocked",
           b.name + " was recorded as an ice world.",
         );
-        toast("Ice world discovered: Deep Freeze frigate skin unlocked.");
+        toast("Ice world survey logged. Deep Freeze hull configuration authorized.");
         return true;
       }
       function applyDiscoveryReward(b) {
@@ -12711,7 +12731,7 @@
               ".",
           );
         } else if(game.system.isTutorial)
-          toast("Survey reward: " + b.name + " yielded " + fmt(filtered) + ".");
+          toast("Survey complete: " + b.name + " · recovered " + fmt(filtered) + ".");
         registerVaultDiscovery("planet", b.name);
         trackExpeditionProgress("survey", 1);
         markMeaningfulMoment("survey");
@@ -13825,7 +13845,7 @@
         }
         if (hit) {
           playSound("daily");
-          toast("Daily Operation complete. Claim reward from System.");
+          toast("Daily operation complete. Review the report in Journey → Tasks.");
           addActivity(
             "system",
             "Daily Operation complete",
@@ -14015,7 +14035,7 @@
             VAULT_SKIN_GOAL + " Pioneer Vault discoveries secured.",
           );
           if (show)
-            toast("Rare hull unlocked: Astral Archaeologist.");
+            toast("Research milestone confirmed. Astral Archaeologist hull authorized.");
         }
         return locked;
       }
@@ -16889,19 +16909,19 @@
           '<h4 class="directory-heading">Command directory</h4>'+
           routeDirectory([
             ["Explore","Worlds, signals, discoveries and travel","openSection","explore","explore"],
-            [game.frigate?.built?"Pioneer":"Pioneer project","Fleet, crew, Vault and adventures","openSection","frigate","pioneer"],
-            ["Cargo","Resources and production","openSection","resources","cargo"],
-            ["Ship & designs","Upgrade and customize your spacecraft","openSection","hangar","ship"],
-            ["Journey","Tasks, records, Echoes and help","openSection","journal","journal"],
+            [game.frigate?.built?"Pioneer":"Pioneer project","Onboard personnel, fleet operations, research and expedition leads","openSection","frigate","pioneer"],
+            ["Cargo","Cargo inventory and world supply networks","openSection","resources","cargo"],
+            ["Ship & designs","Engineering systems and hull configurations","openSection","hangar","ship"],
+            ["Journey","Operations, flight records, Echoes and pilot guidance","openSection","journal","journal"],
             ["Settings","Controls, audio, display and save data","setMenuTab","system|settings","settings"]
           ]);
       }
       function renderExploreDirectory(){
         const n=nearestFrontierContact();
         ui.menuContent.innerHTML=routeDirectory([
-          ["Worlds","Survey, capture and manage planets","openSection","planets","explore"],
-          ["Travel & atlas","Jump, visit systems and investigate anomalies","setMenuTab","system|travel","route"],
-          ["Planet Codex","Your surveyed worlds and collections","openSection","codex","journal"],
+          ["Worlds","Survey worlds, establish control and develop outposts","openSection","planets","explore"],
+          ["Travel & atlas","Chart jump routes and investigate anomalies","setMenuTab","system|travel","route"],
+          ["Planet Codex","Archived planetary surveys and discovery collections","openSection","codex","journal"],
           ...(game.frigate.built?[["Vault","Archive discoveries and exceptional research breakthroughs","openFrigateTab","vault","vault"]]:[])
         ])+(game.frigate.built?card("Nearby signals",activeFrontierContacts().length+" recoverable contacts in this system.",btn("Track contact & fly","trackFrontierContact",null,!!n)):"");
       }
@@ -16919,7 +16939,7 @@
           ["Journey records","Achievements, faction standing and collections","setMenuTab","system|records","journal"],
           ["Captain Log","Recent actions and encounter decisions","openSection","activity","journal"],
           ["Orbital Echoes","View and manage recorded flight routes","openSection","echoes","signal"],
-          ["Pilot Manual","How to use each game system","openSection","guide","help"],
+          ["Pilot Manual","Flight procedures and onboard system guidance","openSection","guide","help"],
           ["Help","Quick definitions and guidance","openSection","help","help"]
         ]);
       }
@@ -17105,14 +17125,14 @@
       function renderPlanets() {
         const tab=activeTab("planets","list");
         if(!tab.startsWith("world:")){
-          ui.menuContent.innerHTML='<p class="screen-intro">Choose a world to see its survey, control and development options.</p><div class="route-list">'+planetListHtml()+"</div>";
+          ui.menuContent.innerHTML='<p class="screen-intro">Select a world to review its survey record, control status and development options.</p><div class="route-list">'+planetListHtml()+"</div>";
           return;
         }
         const s = body(selectedPlanetName),
           summary = s
             ? bodySurveyed(s)
               ? esc(s.name) +
-                " selected. " +
+                " · " +
                 esc(displayBiome(s)) +
                 ". " +
                 esc(s.lore)
@@ -17125,7 +17145,7 @@
             summary,
             btn("Set as Target", "setTarget", selectedPlanetName) +
               btn(
-                bodySurveyed(s) ? "Survey Complete" : "Scan Selected World",
+                bodySurveyed(s) ? "Survey Complete" : "Scan World",
                 "scanPlanet",
                 selectedPlanetName,
                 !!s && s.type !== "star" && !bodySurveyed(s) && scanRange <= 230,
@@ -17133,7 +17153,7 @@
               btn("Clear Target", "clearTarget") +
               (s?.capturable&&!game.captured.has(s.name)?btnWhy("Capture "+s.name,"capture",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first.")+(!game.system.isTutorial&&!s.memory?.raidRewardClaimed?btnWhy("Raid for salvage","raidSelectedWorld",null,game.ship.orbitLocked&&game.ship.lockBody===s.name,"Lock orbit around this world first."):""):"") +
               btnWhy(
-                "Upgrade Selected Planet",
+                "Upgrade World",
                 "upgradePlanet",
                 null,
                 !!s && canUpgradePlanet(s),
@@ -17684,7 +17704,20 @@
         const line=(d,width=1)=>'<path d="'+d+'" fill="none" stroke="'+b+'" stroke-opacity=".68" stroke-width="'+width+'" stroke-linecap="round"/>';
         const forms={crystal:"80,16 102,40 97,77 74,91 58,61 63,31",spindle:"80,11 94,40 85,54 94,70 80,97 66,70 75,54 66,40",cube:"80,21 107,37 108,72 80,89 52,72 52,37",tablet:"56,24 98,18 105,83 61,90",key:"62,23 98,23 107,45 90,57 91,92 72,92 72,57 53,45",reliquary:"60,20 100,20 111,49 100,85 60,85 49,49",lantern:"66,19 94,19 108,43 99,83 61,83 52,43",pod:"80,15 102,35 105,60 92,88 68,88 55,60 58,35",crown:"48,28 65,51 80,19 95,51 112,28 104,80 56,80"};
         let shape="";
-        if(forms[motif]){
+        if(item.key==="second-sun"){
+          for(let i=0;i<18;i++){const angle=i*Math.PI/9,x=80+Math.cos(angle)*29,y=54+Math.sin(angle)*29,xx=80+Math.cos(angle)*(37+i%3*3),yy=54+Math.sin(angle)*(37+i%3*3);shape+=line("M"+x+" "+y+" L"+xx+" "+yy,1.2);}
+          shape+='<circle cx="80" cy="54" r="28" fill="'+glow+'"/><circle cx="80" cy="54" r="19" fill="'+fill+'"/>'+line("M62 51 Q79 36 97 56 M64 61 Q82 73 96 57",1.4);
+        }else if(item.key==="inverted-astrolabe"||item.key==="epoch-dial"){
+          shape='<circle cx="80" cy="54" r="32" fill="#07111b" stroke="'+b+'" stroke-width="2"/>';
+          for(let i=0;i<12;i++){const angle=i*Math.PI/6;shape+=line("M"+(80+Math.cos(angle)*25)+" "+(54+Math.sin(angle)*25)+" L"+(80+Math.cos(angle)*30)+" "+(54+Math.sin(angle)*30),1.3);}
+          shape+='<ellipse cx="80" cy="54" rx="22" ry="12" fill="none" stroke="'+a+'" transform="rotate(-34 80 54)"/>'+poly("80,25 84,56 80,82 76,52",fill)+'<circle cx="80" cy="54" r="5" fill="'+b+'"/>';
+        }else if(motif==="fern"){
+          shape=line("M80 94 Q67 64 84 18",2);
+          for(let i=0;i<8;i++){const y=29+i*7,x=80-Math.sin(i*.4)*7;shape+='<path d="M'+x+' '+y+' Q'+(x-15-i)+' '+(y-14)+' '+(x-28)+' '+(y-8)+' Q'+(x-18)+' '+(y+5)+' '+x+' '+y+' M'+x+' '+y+' Q'+(x+18)+' '+(y-15)+' '+(x+27)+' '+(y-9)+' Q'+(x+15)+' '+(y+3)+' '+x+' '+y+'" fill="'+fill+'" stroke="'+b+'" stroke-width=".5"/>';}
+        }else if(motif==="beetle"){
+          shape='<ellipse cx="80" cy="55" rx="20" ry="30" fill="'+fill+'" stroke="'+b+'"/><ellipse cx="80" cy="26" rx="10" ry="8" fill="'+fill+'"/>'+line("M80 33 V84 M73 20 L61 9 M87 20 L99 9",1.5);
+          for(let i=0;i<3;i++){const y=42+i*15;shape+=line("M62 "+y+" L48 "+(y-7)+" L42 "+(y+5)+" M98 "+y+" L112 "+(y-7)+" L118 "+(y+5),2);}
+        }else if(forms[motif]){
           shape=poly(forms[motif])+line("M80 24 L80 83 M56 49 L103 49 M61 77 L98 34");
           if(motif==="cube")shape+=poly("80,21 107,37 80,54 52,37",b)+poly("80,54 107,37 108,72 80,89",a);
           if(motif==="lantern"||motif==="pod")shape+='<ellipse cx="80" cy="54" rx="12" ry="22" fill="'+glow+'"/>';
@@ -17741,7 +17774,7 @@
           esc(entry.name) +
           '</b><span class="vault-origin">' +
           esc(entry.system + " • " + entry.origin) +
-          "</span><span class=\"vault-field-note\">"+esc(entry.entry)+"</span>" +
+          "</span><span class=\"vault-field-note\">"+esc(vaultCatalog.find(item=>item.key===entry.catalogKey)?.entry||entry.entry)+"</span>" +
           '<div class="vault-tags"><span class="tag">' +
           esc(vaultKindLabel(entry.kind)) +
           '</span><span class="tag rarity-' +
@@ -18445,6 +18478,15 @@
                 size = i % 7 === 0 ? 1.3 : 0.65;
               c.fillStyle = i % 5 === 0 ? rgba(skin.accent, 0.7) : "rgba(255,255,255,.42)";
               c.fillRect(x, y, size, size);
+            }
+            // A quiet hangar reference plane gives hulls scale without changing their geometry.
+            if(kind!=="trail"){
+              c.save();c.strokeStyle="rgba(143,196,210,.12)";c.lineWidth=.7;
+              c.beginPath();c.moveTo(width*.12,height*.76);c.lineTo(width*.88,height*.76);
+              c.moveTo(width*.5,height*.22);c.lineTo(width*.5,height*.83);c.stroke();
+              c.strokeStyle="rgba(143,196,210,.22)";
+              for(let i=0;i<9;i++){const x=width*(.14+i*.09);c.beginPath();c.moveTo(x,height*.76);c.lineTo(x,height*(i===4?.81:.79));c.stroke();}
+              c.restore();
             }
             c.save();
             if (kind === "trail") {
@@ -19465,11 +19507,11 @@
           ],
           [
             "Upgrades",
-            "Use the Upgrade Center to improve your vessel and frontier worlds. Ship upgrades add visible modules; world upgrades expand stations, beacons, and surface infrastructure.",
+            "Open Ship & designs to improve your vessel and frontier worlds. Ship upgrades add visible modules; world upgrades expand stations, beacons, and surface infrastructure.",
           ],
           [
             "Production",
-            "Developed worlds generate resources over time. Gather them from Resources when production is ready. Factory worlds unlock major ship and frigate systems.",
+            "Developed worlds generate resources over time. Transfer them from Cargo when production is ready. Factory worlds unlock major ship and frigate systems.",
           ],
           [
             "Echoes",
@@ -19481,7 +19523,7 @@
           ],
           [
             "Expedition Arcs",
-            "The Pioneer offers optional, self-contained adventures rather than a single required path. Choose one lead at a time, complete its distinct field stages through normal play, and face a matching final threat. Completed or archived leads never return.",
+            "The Pioneer offers optional, self-contained adventures rather than a single required path. Choose one lead at a time, complete its field objectives during exploration, and face a matching final threat. Completed or archived leads never return.",
           ],
           [
             "Pioneer Crew",
@@ -19509,7 +19551,7 @@
           ],
           [
             "Pioneer Relic Vault",
-            "Planet surveys and decoded deep-space signals can reveal artifacts, lifeforms, and phenomena. Safe discoveries enter secure storage; dangerous or overflow finds remain in quarantine until Vault capacity and containment are upgraded. Secure 18 specimens to unlock the Rare Astral Archaeologist frigate hull.",
+            "Planet surveys and decoded deep-space signals can reveal artifacts, lifeforms, and phenomena. Safe discoveries enter secure storage; dangerous or overflow finds remain in quarantine until Vault capacity and containment are upgraded. Secure 18 distinct specimens to authorize the Astral Archaeologist research-hull refit. Only exceptional specimens provide operational research benefits.",
           ],
           [
             "Faction Reputation",
