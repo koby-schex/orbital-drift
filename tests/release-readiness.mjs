@@ -1292,6 +1292,30 @@ const frontierQA=vm.runInContext(`({
   targetContact(){const n=nearestFrontierContact();manualTargetName="@contact:"+n.contact.id;return currentTarget();},
   drawFrontierContacts
 })`,context);
+const diversityQA=vm.runInContext(`({proc,frontierWorldName,frontierFeatureDescription,frontierFeatures})`,context);
+const names=new Set(),shapes=new Set(),features=new Set(),colors=new Set();
+let total=0,minRadius=Infinity,maxRadius=0;
+for(let seed=1;seed<=100;seed++){
+  const sys=diversityQA.proc(seed*317+19,2);
+  if(sys.specialType)continue;
+  const legacy=diversityQA.proc(sys.seed,1);
+  assert.equal(legacy.generationVersion,1);
+  assert.equal(sys.generationVersion,2);
+  assert.deepEqual(sys.bodies.map(b=>b.name),diversityQA.proc(sys.seed,2).bodies.map(b=>b.name));
+  assert.equal(new Set(sys.bodies.map(b=>b.name)).size,sys.bodies.length);
+  assert.equal(legacy.bodies.length,sys.bodies.length);
+  assert.ok(legacy.bodies.slice(1).every(b=>!b.frontierFeature));
+  for(const b of sys.bodies.slice(1)){
+    total++;names.add(b.name);colors.add(b.color);shapes.add(b.frontierFeature.shape);features.add(b.frontierFeature.feature);
+    minRadius=Math.min(minRadius,b.radius);maxRadius=Math.max(maxRadius,b.radius);
+    assert.ok(b.frontierFeature.flatten>=.78&&b.frontierFeature.flatten<=1);
+    assert.ok(diversityQA.frontierFeatureDescription(b).length>15);
+    assert.ok(b.lore.includes(diversityQA.frontierFeatureDescription(b)));
+    assert.ok(Number.isFinite(b.mass)&&b.mass>0);
+  }
+}
+assert.ok(names.size>total*.65,"Names should rarely repeat across surveyed sectors");
+assert.equal(shapes.size,3);assert.ok(features.size>=12);assert.ok(colors.size>=20);assert.ok(maxRadius/minRadius>4);
 const eligible=frontier.bodies.find(b=>b.type!=="star"&&b.capturable);
 assert.ok(eligible,"Frontier systems must offer genuine capture opportunities");
 for(let seed=1;seed<300;seed++){
