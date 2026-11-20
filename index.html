@@ -5469,6 +5469,56 @@
       .menu .nav-context{border-bottom-color:#66563f}
       .menu .nav-path{color:#d1c6b3!important}
       @media(prefers-reduced-motion:reduce){.menu .route-row{transition:none!important}}
+
+      /* NINEFOLD MOBILE PRESENTATION — full-bleed launch illustration, no desktop window. */
+      #titleOverlay{padding:0!important;align-items:stretch!important;justify-content:center!important;background:#0a1019!important;overflow:hidden}
+      #titleOverlay .title-screen{isolation:isolate;position:relative;display:flex!important;flex-direction:column;justify-content:flex-start;align-items:center;width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;min-height:0!important;overflow:hidden!important;padding:calc(var(--safeTop,0px) + 25px) 24px calc(var(--safeBottom,0px) + 18px)!important;background:#0b111c!important;border-radius:0!important;border:0!important}
+      #titleOverlay .title-screen::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#0a101be8 0%,#0b111b70 22%,transparent 42%,transparent 48%,#0b111bbb 69%,#0b111b 88%)}
+      .title-screen .title-hero{display:flex!important;position:static!important;flex:1 1 auto;align-items:flex-end;justify-content:center;width:100%;min-height:0}
+      .title-screen .title-showcase{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;z-index:-2!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#0b111c url('./assets/threshold-vista.svg') center 53%/cover no-repeat!important;overflow:hidden!important}
+      .title-screen .title-showcase:after,.title-screen .title-showcase:before,.title-screen .title-hangar-vignette,.title-art-caption{display:none!important}
+      .title-screen .ninefold-seal{width:47px!important;height:47px!important;margin:0 auto 9px!important}
+      .title-screen .title-eyebrow{font-size:11px!important;letter-spacing:.34em!important;color:#d7c4a1!important;line-height:1.25}
+      .title-screen .title-logo{font-size:clamp(38px,10.6vw,76px)!important;font-weight:400!important;line-height:1.02!important;max-width:640px;margin:9px auto 8px!important;text-shadow:0 3px 24px #0009!important;letter-spacing:-.045em!important}
+      .title-screen .title-version{font-size:9px!important;color:#c5b28c!important;letter-spacing:.20em!important;margin:0!important}
+      .title-screen .title-sub{font-size:14px!important;color:#d8d2c0!important;margin:10px auto 0!important}
+      .title-screen .title-panel{position:relative;width:100%!important;max-width:440px!important;padding:0!important;margin:0 auto!important}
+      .title-screen .title-panel-kicker{letter-spacing:.24em!important;font-size:9px!important;margin:0 0 12px!important;color:#c8b18a!important}
+      .title-screen .title-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+      .title-screen .title-actions button{min-height:52px!important;border-radius:12px!important;box-shadow:none!important;text-transform:none!important;letter-spacing:0!important;font-size:14px!important;font-weight:620!important}
+      .title-screen .title-actions.has-save #loadBtn,.title-screen .title-actions:not(.has-save) #newGameBtn{grid-column:1/-1!important;min-height:58px!important;border-radius:12px!important;font-family:var(--nf-heading)!important;font-size:20px!important;font-weight:500!important;background:linear-gradient(145deg,#e0cca0,#b79863)!important;border:1px solid #ead6ac!important;color:#18191c!important;box-shadow:0 5px 22px #0006!important}
+      .title-screen .title-actions.has-save #newGameBtn{grid-column:1/-1!important;min-height:48px!important;background:#191f2aea!important;border:1px solid #766648!important}
+      .title-screen .title-actions #howToBtn,.title-screen .title-actions #titleSettingsBtn{background:#161c28e8!important;border-color:#41434b!important;color:#e7e0d0!important}
+      .title-screen .title-journey{border:0!important;font-size:11px!important;color:#d6c9ae!important;padding:3px!important;margin-bottom:8px!important}
+      #onboardingOverlay{padding:0!important;align-items:stretch!important;background:#0b111c!important}
+      #onboardingOverlay .expedition-intro{isolation:isolate;display:flex!important;position:relative;flex-direction:column;justify-content:flex-end;gap:15px;max-width:none!important;width:100%!important;height:100%!important;max-height:none!important;padding:calc(var(--safeTop,0px) + 20px) 25px calc(var(--safeBottom,0px) + 22px)!important;overflow:hidden!important;background:#0b111c!important;border:0!important;border-radius:0!important;box-shadow:none!important;text-align:left}
+      .expedition-intro .onboard-art{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-height:none!important;z-index:-2;border:0!important;border-radius:0!important;margin:0!important;background:#0b111c url('./assets/threshold-vista.svg') center 44%/cover no-repeat!important;box-shadow:none!important}
+      .expedition-intro .onboard-art::before{content:"";position:absolute;inset:0;width:auto!important;height:auto!important;border-radius:0!important;clip-path:none!important;box-shadow:none!important;background:linear-gradient(180deg,transparent 12%,#0b111b22 30%,#0b111bbd 51%,#0b111c 72%)!important;transform:none!important;animation:none!important}
+      .expedition-intro[data-expedition-step="1"] .onboard-art{background-position:38% 56%!important}
+      .expedition-intro[data-expedition-step="2"] .onboard-art{background-position:60% 56%!important}
+      .expedition-intro[data-expedition-step="3"] .onboard-art{background-position:70% 43%!important}
+      .expedition-intro[data-expedition-step="4"] .onboard-art{background-position:45% 33%!important}
+      .expedition-intro-copy,.expedition-intro .onboard-progress,.expedition-intro .actions{position:relative;width:100%;max-width:460px;margin-left:auto!important;margin-right:auto!important}
+      .expedition-kicker{display:flex;align-items:center;gap:8px;font-size:9px;letter-spacing:.2em;color:#cbb48d;font-weight:650}
+      .expedition-kicker i{height:1px;width:17px;background:#b99c6e}
+      .expedition-chapter{margin-left:auto;color:#e0caa3;letter-spacing:.12em;font-variant-numeric:tabular-nums}
+      .expedition-intro[data-expedition-step="0"] .expedition-chapter::after{content:"01 / 05"}
+      .expedition-intro[data-expedition-step="1"] .expedition-chapter::after{content:"02 / 05"}
+      .expedition-intro[data-expedition-step="2"] .expedition-chapter::after{content:"03 / 05"}
+      .expedition-intro[data-expedition-step="3"] .expedition-chapter::after{content:"04 / 05"}
+      .expedition-intro[data-expedition-step="4"] .expedition-chapter::after{content:"05 / 05"}
+      @media(max-height:540px){#titleOverlay .title-screen,#onboardingOverlay .expedition-intro{overflow-y:auto!important;justify-content:flex-start}.expedition-intro-copy{margin-top:auto!important}.title-screen .title-hero{flex-shrink:0}}
+      #onboardingOverlay #onboardTitle{font-family:var(--nf-heading)!important;color:#f3e9d5!important;font-size:clamp(31px,8vw,49px)!important;font-weight:400!important;line-height:1.07!important;margin:10px 0 12px!important;letter-spacing:-.035em}
+      #onboardingOverlay #onboardText{font-size:16px!important;line-height:1.62!important;color:#ddd7ca!important;margin:0!important;text-wrap:pretty;max-width:none!important}
+      .expedition-intro .onboard-progress{height:3px!important;border:0!important;background:#3b3a41!important;box-shadow:none!important;margin-top:8px!important}
+      .expedition-intro .onboard-progress div{background:#d7bd8b!important;box-shadow:none!important}
+      .expedition-intro .actions{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:10px;margin-top:6px!important}
+      .expedition-intro .actions button{min-height:54px!important;border-radius:12px!important;font-size:14px!important}
+      #onboardingOverlay #nextOnboard{background:linear-gradient(145deg,#e1cca3,#b99b65)!important;color:#17191c!important;border:1px solid #e5d0a7!important;font-weight:650!important}
+      #onboardingOverlay #skipOnboard{background:#171d27!important;border:1px solid #494746!important;color:#e2dccf!important}
+      @media(max-height:650px){#titleOverlay .title-screen{padding-top:calc(var(--safeTop,0px) + 9px)!important;padding-bottom:calc(var(--safeBottom,0px) + 10px)!important}.title-screen .ninefold-seal{width:30px!important;height:30px!important;margin-bottom:4px!important}.title-screen .title-logo{font-size:clamp(30px,8.2vw,46px)!important;margin:5px auto!important}.title-screen .title-sub{display:none!important}.title-screen .title-actions button{min-height:44px!important}.title-screen .title-actions.has-save #loadBtn,.title-screen .title-actions:not(.has-save) #newGameBtn{min-height:48px!important}.title-screen .title-panel-kicker{margin-bottom:6px!important}.expedition-intro{gap:9px!important}.expedition-intro #onboardText{font-size:14px!important;line-height:1.46!important}}
+      @media(min-width:700px){#titleOverlay .title-screen{padding-top:calc(var(--safeTop,0px) + 40px)!important}.title-screen .title-showcase{background-position:center 52%!important}.title-screen .title-panel{max-width:490px!important}}
+      @media(prefers-reduced-motion:reduce){#titleOverlay *,#onboardingOverlay *{animation:none!important;transition:none!important}}
 </style>
   </head>
   <body>
@@ -5599,13 +5649,13 @@
         <div class="title-logo">Between the Nine</div>
         <div class="title-version">THE PASSAGES BETWEEN WORLDS</div>
         <p class="title-sub">
-          Beyond the known paths, the Between awaits.
+          Beyond the known paths.
         </p>
         <div class="title-hero">
           <div
             class="title-showcase"
             role="img"
-            aria-label="Traversal vessels approaching a fractured formation in a crossing environment"
+            aria-label="An illustrated expedition vessel traversing the suspended shelves of Threshold Anchorage"
           >
             <canvas class="title-render-canvas" id="titleCanvas"></canvas>
             <div class="title-hangar-vignette"></div><div class="title-art-caption"><i></i><span>FIELD RECORD 01</span><b>Threshold Anchorage</b></div>
@@ -5861,15 +5911,18 @@
         </div>
       </div>
     </div>
-    <div class="overlay onboarding" id="onboardingOverlay">
-      <div class="dialog">
-        <h2 id="onboardTitle">Welcome to Orbital Drift</h2>
-        <div class="onboard-art"></div>
-        <p id="onboardText"></p>
+    <div class="overlay onboarding" id="onboardingOverlay" role="dialog" aria-modal="true" aria-labelledby="onboardTitle" aria-describedby="onboardText">
+      <div class="dialog expedition-intro" data-expedition-step="0">
+        <div class="onboard-art" aria-hidden="true"></div>
+        <div class="expedition-intro-copy">
+          <div class="expedition-kicker">THE NINEFOLD <i></i> FIELD BRIEFING <span class="expedition-chapter" aria-hidden="true"></span></div>
+          <h2 id="onboardTitle">The Between</h2>
+          <p id="onboardText"></p>
+        </div>
         <div class="onboard-progress"><div id="onboardProgress"></div></div>
         <div class="actions">
-          <button id="skipOnboard" type="button">Skip</button
-          ><button id="nextOnboard" type="button">Next</button>
+          <button id="skipOnboard" type="button">Skip briefing</button
+          ><button id="nextOnboard" type="button">Continue</button>
         </div>
       </div>
     </div>
@@ -22446,10 +22499,12 @@
         onboardStep = i;
         ui.onboardTitle.textContent = betweenDisplayText(onboardingSteps[i][0]);
         ui.onboardText.textContent = betweenDisplayText(onboardingSteps[i][1]);
+        const intro=ui.onboardingOverlay.querySelector?.(".expedition-intro");
+        if(intro?.dataset)intro.dataset.expeditionStep=String(i);
         ui.onboardProgress.style.width =
           ((i + 1) / onboardingSteps.length) * 100 + "%";
         ui.nextOnboard.textContent =
-          i >= onboardingSteps.length - 1 ? "Start" : "Next";
+          i >= onboardingSteps.length - 1 ? "Begin flight" : "Continue";
         ui.onboardingOverlay.classList.remove("closing");
         ui.onboardingOverlay.classList.add("show");
       }
@@ -23161,8 +23216,8 @@
         const stripe=Math.sin((ny+nx*.21)*18+terrain*5+seed%13),
           ridges=1-Math.abs(stripe),rough=(fine-.5)*.13,
           bevel=Math.max(0,Math.min(1,(terrain-.4)*3.1));
-        const form=kind===0||kind===4?Math.pow(ridges,3)*.25:kind===1||kind===6?Math.pow(Math.abs(Math.sin(nx*17+ny*11+terrain*6)),9)*.16:kind===2||kind===3?Math.pow(ridges,2)*.11:.08*ridges;
-        const occlusion=.68+.32*bevel;
+        const form=kind===0||kind===4?Math.pow(ridges,3)*.30:kind===1||kind===6?Math.pow(Math.abs(Math.sin(nx*17+ny*11+terrain*6)),9)*.20:kind===2||kind===3?Math.pow(ridges,2)*.15:.11*ridges;
+        const occlusion=.60+.40*bevel;
         return Math.max(.28,Math.min(1.34,(.62+.47*nz+rough+form)*occlusion));
       }
       function dimensionalPalette(system){
@@ -23184,11 +23239,11 @@
               fine=visualFbm(u*22+warp*3+7,v*29+19,13,seed+91,3),
               curve=.15*Math.sin(u*4+f.offset*6)+.08*Math.sin(u*9+f.angle),
               offset=v-curve, density=Math.exp(-offset*offset*(f.index===5?88:27)),
-              veil=Math.max(0,(broad-.36)*1.9)*density,
+              veil=Math.max(0,(broad-.32)*1.9)*density,
               crest=Math.pow(Math.max(0,(fine-.29)*1.3),2)*veil,
               hollow=Math.max(0,visualNoise(u*9+10,v*9+20,2,seed+63)-.47),
               extinction=1-Math.min(.8,hollow*1.25*veil),
-              detail=Math.max(0,veil*.52+crest*.55)*extinction,
+              detail=Math.max(0,veil*.56+crest*.62)*extinction,
               luminous=Math.min(.8,crest*.46),falloff=Math.max(.5,1-(px*px+py*py)*.48),
               i=(y*sw+x)*4;
             for(let n=0;n<3;n++){
@@ -23242,7 +23297,7 @@
         c.filter = kind === "deep" && !tutorial
           ? `hue-rotate(${hues[themeIndex]}deg) saturate(0.93)` : "none";
         const volume=paintVolumetricField(c,width,height,game.system,game.settings);
-        c.globalAlpha=volume?.14:1;
+        c.globalAlpha=volume?.09:1;
         c.drawImage(image,
           (width - dw) * (kind === "parallel" ? 0.85 : composition[0]),
           (height - dh) * (kind === "deep" && !tutorial ? composition[1] : 0.25),
@@ -23534,8 +23589,10 @@
               else if(f.feature==="shear belts")strength=Math.max(0,Math.sin(ny*42+terrain*5))*.22;
               if(strength)rgb=rgb.map((v,c)=>v*(1-strength)+[accent.r,accent.g,accent.b][c]*strength);
             }
-            const volume=dimensionalShade(nx,ny,nz,terrain,fine,materialKind,seed), haze=b.name==="Earth"?cloud*.25:cloud, wash=Math.min(.45,Math.max(0,haze)), luminance=rgb[0]*.24+rgb[1]*.57+rgb[2]*.19;
-            for (let c = 0; c < 3; c++) data[i + c] = ((rgb[c]*.84+luminance*.16)*(1-wash)+[214,211,194][c]*wash)*limb*volume;
+            const volume=dimensionalShade(nx,ny,nz,terrain,fine,materialKind,seed), haze=b.name==="Earth"?cloud*.25:cloud, wash=Math.min(.36,Math.max(0,haze)), luminance=rgb[0]*.24+rgb[1]*.57+rgb[2]*.19,
+              stratum=materialKind===0||materialKind===4?Math.pow(Math.max(0,Math.sin((ny+nx*.18)*23+terrain*7)),5):0,
+              grain=(fine-.5)*.085, seam=materialKind===1||materialKind===6?Math.pow(Math.max(0,1-Math.abs(terrain-.51)*32),3)*.10:0;
+            for (let c = 0; c < 3; c++) data[i + c] = ((rgb[c]*.80+luminance*.20)*(1-wash)+[214,211,194][c]*wash)*limb*volume*(1+grain+stratum*.12)+[214,197,169][c]*seam;
             data[i + 3] = Math.min(255, (1 - Math.sqrt(rr)) * size * 255);
           }
         });
@@ -25117,8 +25174,8 @@
         const primary=skin.primary||"#93c5fd", secondary=skin.secondary||"#162333",
           stealth=skin.motif==="abyss";
         return {
-          hull:craftMix(primary,stealth?"#343044":"#d8cfb6",stealth?0.34:0.39),
-          metal:craftMix(primary,"#aa946e",0.52), dark:craftMix(secondary,"#201b31",0.45),
+          hull:craftMix(primary,stealth?"#343044":"#d0c5a8",stealth?0.43:0.56),
+          metal:craftMix(primary,"#b39a70",0.66), dark:craftMix(secondary,"#161824",0.57),
           paint:craftMix(primary,"#5a6672",0.12), cargo:craftMix(primary,"#be8c51",0.38),
           pearl:craftMix(primary,"#f2e7c9",0.74), solar:"#32304c", vent:"#14101e",
           glass:"#285451", energy:skin.accent||"#8ce0d0",energy2:skin.glow||"#c8b1ed"
@@ -25168,7 +25225,7 @@
             const a=points[i],b=points[(i+1)%points.length];
             if(b[0]>=a[0])continue;
             path([[a[0],a[1]-z],[b[0],b[1]-z],[b[0],b[1]-z+depth],[a[0],a[1]-z+depth]]);
-            c.fillStyle=material==="glass"?"#091d2a":"#18232f";c.fill();
+            const side=c.createLinearGradient(a[0],a[1]-z,a[0],a[1]-z+depth);side.addColorStop(0,rgba(dark(color,.25),1));side.addColorStop(.45,rgba(dark(color,.57),1));side.addColorStop(1,"#080d15");c.fillStyle=side;c.fill();
           }
           path(points,z);
           if(material==="energy"||material==="energy2") {
@@ -25180,25 +25237,33 @@
             finish.addColorStop(0,"#d5d6c6");finish.addColorStop(0.16,"#72919a");
             finish.addColorStop(0.4,"#17435b");finish.addColorStop(1,"#071725");
           } else {
-            finish.addColorStop(0,light(color,0.44));finish.addColorStop(0.08,light(color,.16));
-            finish.addColorStop(0.24,color);finish.addColorStop(0.42,light(color,0.06));finish.addColorStop(0.64,dark(color,0.16));finish.addColorStop(1,material==="vent"?"#050b11":dark(color,.46));
+            finish.addColorStop(0,light(color,.60));finish.addColorStop(.045,light(color,.31));finish.addColorStop(.16,color);finish.addColorStop(.48,light(color,.08));finish.addColorStop(.69,dark(color,.22));finish.addColorStop(.94,dark(color,.42));finish.addColorStop(1,material==="vent"?"#050b11":dark(color,.65));
           }
           c.fillStyle=finish;c.fill();
           // Fine plating, clipped to each actual hull section (cached, not per-frame).
           if (["hull","trim","metal","paint"].includes(material)) {
             c.save(); c.clip();
             const xs = points.map(p => p[0]), left = Math.min(...xs), right = Math.max(...xs);
-            c.strokeStyle = "rgba(1,6,12,.3)"; c.lineWidth = 0.28;
-            for (let row = top + 3; row < bottom; row += 5) {
+            c.strokeStyle = "rgba(1,6,12,.40)"; c.lineWidth = 0.32;
+            for (let row = top + 4; row < bottom; row += 7) {
               c.beginPath(); c.moveTo(left, row); c.lineTo(right, row); c.stroke();
               for (let col = left + 3 + (Math.round(row) % 2) * 4; col < right; col += 9) {
                 c.beginPath(); c.moveTo(col, row); c.lineTo(col, Math.min(bottom, row + 5)); c.stroke();
-                c.fillStyle = "rgba(232,243,241,.24)"; c.fillRect(col + .8, row + .8, .4, .4);
+                c.fillStyle = "rgba(232,223,199,.36)"; c.fillRect(col + .9, row + .7, .55, .3);
               }
             }
             if(right-left>12 && bottom-top>6){
-              c.fillStyle="rgba(4,12,19,.38)";c.fillRect(left+3,top+2,Math.min(9,(right-left)*.3),1.6);
-              c.fillStyle="rgba(219,235,241,.48)";c.fillRect(left+3,top+2,.65,1.6);
+              const width=Math.min(12,(right-left)*.31),x=left+3,y=top+2;
+              const recess=c.createLinearGradient(x,y,x,y+2.5);
+              recess.addColorStop(0,"#060b13");recess.addColorStop(.40,rgba(dark(color,.5),.82));recess.addColorStop(1,rgba(light(color,.38),.9));
+              c.fillStyle=recess;c.fillRect(x,y,width,2.2);
+              c.fillStyle=rgba("#e2d3b4",.55);c.fillRect(x+.3,y+1.8,width-.6,.35);
+              for(let k=1;k<width-1;k+=2.4){c.fillStyle=rgba("#0a101c",.6);c.fillRect(x+k,y+.3,.55,1.45);}
+            }
+            if((material==="hull"||material==="paint")&&right-left>20&&bottom-top>9){
+              const ridge=c.createLinearGradient(left,top,right,bottom);
+              ridge.addColorStop(0,rgba("#f1e2bd",.12));ridge.addColorStop(.42,rgba("#e7d3af",.28));ridge.addColorStop(.56,rgba("#141923",.30));ridge.addColorStop(1,rgba("#101522",.02));
+              c.fillStyle=ridge;c.beginPath();c.moveTo(left+4,top+2);c.lineTo(right-2,top+(bottom-top)*.48);c.lineTo(right-4,top+(bottom-top)*.64);c.lineTo(left+3,top+5);c.closePath();c.fill();
             }
             c.restore();
           }
@@ -25209,7 +25274,7 @@
               const a=points[i],b=points[(i+1)%points.length];
               if(b[0]>a[0]){c.moveTo(a[0],a[1]-z+0.3);c.lineTo(b[0],b[1]-z+0.3);}
             }
-            c.strokeStyle="rgba(239,222,183,.55)";c.lineWidth=0.45;c.stroke();
+            c.strokeStyle="rgba(239,222,183,.74)";c.lineWidth=0.48;c.stroke();
           }
           if(material==="hull") {
             const a=points[0],b=points[1];
@@ -26514,14 +26579,11 @@
 
         ctx.restore();
       }
-      function drawTitleMobileBackdrop(c, w, h) {
-        c.fillStyle = "#110e21"; c.fillRect(0, 0, w, h);
-        const image = environmentImage("deep");
-        if (image) {
-          const scale = Math.max(w / image.width, h / image.height);
-          c.drawImage(image, (w-image.width*scale)*0.42, (h-image.height*scale)*0.25, image.width*scale, image.height*scale);
-        }
-        paintBetweenReach(c,w,h,betweenReachArt({seed:1},4),{mid:"#382e50",accent:"#a7ded0",accent2:"#e0bd89"}, {graphics:"Medium",motion:"Reduced"});
+      function drawTitleMobileBackdrop(c,w,h){
+        // Static illustration is the full-screen CSS substrate; only a subtle atmospheric light is composited here.
+        const g=c.createRadialGradient(w*.58,h*.46,0,w*.58,h*.46,Math.max(w,h)*.55);
+        g.addColorStop(0,"rgba(220,194,147,.055)");g.addColorStop(1,"rgba(0,0,0,0)");
+        c.fillStyle=g;c.fillRect(0,0,w,h);
       }
       function drawTitleMobilePlanet(c, w, h) {
         const earth = game.system.bodies.find(b => b.name === "Earth") ||
@@ -26537,7 +26599,7 @@
         c.restore();
       }
       function drawTitleVistaVessel(c,w,h,skin){
-        const sc=clamp(Math.min(w/420,h/300),.45,1.15);c.save();c.translate(w*.58,h*.47);c.rotate(-.38);drawShipVisual(c,sc*1.9,skin,false);c.restore();
+        const sc=clamp(Math.min(w/420,h/720),.45,1.35);c.save();c.translate(w*.61,h*.42);c.rotate(-.43);drawShipVisual(c,sc*2.5,skin,false);c.restore();
       }
       function drawTitleMobileForeground(c, w, h) {
         c.save();
@@ -26554,10 +26616,7 @@
         v.addColorStop(1, "rgba(0,0,0,.54)");
         c.fillStyle = v;
         c.fillRect(0, 0, w, h);
-        c.globalAlpha = 0.025;
-        c.fillStyle = "white";
-        for (let y = 0; y < h; y += 5) c.fillRect(0, y, w, 1);
-        c.globalAlpha = 1;
+        // No scanline texture over the illustration; preserve its clean detail.
         c.restore();
       }
       function drawTitleKeyArtBackdrop(c, w, h) {
