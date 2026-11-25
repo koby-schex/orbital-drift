@@ -26,3 +26,11 @@ Seven tutorial objectives, onboarding, flight tips, both manuals, local formatio
 
 ### Follow-up
 Directly revised legacy tutorial milestones, quest and achievement objectives, training completion dialog rows, factory hints, reset prompts and dynamic HUD target names. Title uses a framed field plate, quiet typography, and clear expedition action hierarchy. Original internal body IDs remain unchanged.
+
+
+## Pass 84: Ninefold field identity and player context
+The Journey directory now offers a Ninefold Field Archive explaining how the Between relates to the Nine Worlds, what Arcana does and does not prove, and why independent cultures retain agency. It names only previously established Worlds: The Brightfall Reach, The Shattered Heights and The Fractured Meridian. A contextual interpretive note appears on the Command screen, formation discovery overlay and Field Codex. Nine reach families offer different observation methods and questions; notes are tied to current reach type rather than random exposition. These are in-game survey interpretations, not official lore unlocks.
+
+No save schema change, resource reward, difficulty curve, encounter choice mapping, faction relationship, visual master or fixed World canon is changed. The current implementation deliberately avoids assigning unapproved factions, inventing the origin of Arcana, resolving Above/Below, or declaring player-generated discoveries universal canon.
+
+Review on an actual iPhone: Command > A Ninefold Expedition > Field Archive, Journey > Ninefold Field Archive, Explore > Field Codex > Ninefold context, and each formation discovery overlay. Check legibility, back navigation, duplicate UI translation, that notes fit small screens, and whether terminology remains understandable to a new player. Test legacy saves and gameplay unaffected by the new archive.
