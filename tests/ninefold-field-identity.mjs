@@ -14,7 +14,8 @@ for(const key of families){
   const result=context.ninefoldFieldTheme(system);
   assert.equal(result.key,key);
   assert.equal(result.parts.length,3);
-  assert.ok(result.parts.every(x=>x.length>20));
+  assert.ok(result.parts[0].trim().length>=8,"Each reach needs a readable heading");
+  assert.ok(result.parts.slice(1).every(x=>x.trim().length>20),"Each reach needs substantive observations and field guidance");
 }
 assert.equal(context.ninefoldFieldTheme({archetype:{key:"missing"}}).key,"threshold");
 assert.equal(context.ninefoldFieldTheme(null).key,"threshold");
