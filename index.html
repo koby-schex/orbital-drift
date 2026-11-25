@@ -5533,6 +5533,43 @@
       .mini-map,.fuel-hud{border-radius:10px!important;background:#101923e8!important;border-color:#635744!important}
       .mini-map-label{color:#d8c7a5!important}
       @media (prefers-reduced-motion:reduce){.touch,.brake,.orbit-release,.objective-pill,.smart{transition:none!important}}
+
+      /* PASS 49 — The Between: cohesive mobile command surfaces and safe flight controls */
+      @media(max-width:900px){
+        .stick{bottom:calc(126px + var(--safeBottom));left:18px}
+        body.joystick-large .stick{bottom:calc(126px + var(--safeBottom))}
+        .fuel-hud{bottom:calc(12px + var(--safeBottom))!important;left:14px!important;width:min(140px,calc(100vw - 214px))!important;min-height:0!important;padding:8px 10px!important;border-radius:11px!important}
+        .fuel-hud .fuel-top{margin-bottom:4px!important}
+        .fuel-hud .barbox{height:6px!important}
+        .stick .knob{box-shadow:inset 0 1px #f1e1c344,0 2px 9px #0008!important}
+      }
+      .menu{background:linear-gradient(160deg,#111924,#090d16 66%,#111521)!important;color:#f1e9d9!important;border:1px solid #534b3e!important;box-shadow:0 22px 72px #000a!important}
+      .menu-head{background:linear-gradient(100deg,#161e2a,#10141f)!important;min-height:66px;align-items:center;border-bottom:1px solid #5c503c!important}
+      .menu-head h3{font-family:var(--nf-heading)!important;font-size:clamp(21px,4.5vw,27px)!important;color:#f4e9d4!important;letter-spacing:.008em}
+      #menuContent{background:linear-gradient(180deg,#10172288,transparent 170px)!important}
+      .menu .route-row{min-height:68px!important;border-radius:11px!important;background:linear-gradient(135deg,#222a36,#151c28)!important;border:1px solid #4b473e!important;box-shadow:inset 0 1px #fff1!important;padding:12px 14px!important}
+      .menu .route-row:active{background:#303544!important}
+      .menu .route-row .route-icon{border-radius:9px!important;background:linear-gradient(130deg,#393a3b,#242833)!important;border-color:#655a43!important}
+      .menu .card,.menu .quest,.menu .vault-entry,.menu .settings-shell,.menu .command-status,.menu .next-action,.menu .log{border-radius:11px!important;border-color:#514c42!important;background:linear-gradient(155deg,#1b2330,#121924)!important;box-shadow:inset 0 1px #ffffff08!important}
+      .menu .card h4,.menu .directory-heading,.dialog h2{font-family:var(--nf-heading)!important;color:#f2e5ce!important}
+      .menu .nav-context{border-bottom:1px solid #5d513e!important;gap:10px!important;padding-block:10px!important}
+      .menu button:not(.route-row),.dialog button{border-radius:10px!important;min-height:44px}
+      .menu .nav-home,.menu button.nav-link,.menu-head #menuClose,.menu-head #menuBack{border-radius:10px!important;background:#262d39!important;border-color:#5c5344!important}
+      .menu .chip,.menu .res,.menu .stat,.menu select,.menu input{border-radius:9px!important;background:#121a25!important}
+      .menu .section-tabs,.menu .menu-nav{scrollbar-width:none;overscroll-behavior-x:contain}
+      .menu .section-tabs::-webkit-scrollbar,.menu .menu-nav::-webkit-scrollbar{display:none}
+      .dialog:not(.title-screen):not(.expedition-intro){background:linear-gradient(165deg,#1c2330,#0d121d)!important;border:1px solid #6c5c43!important;border-radius:17px!important;box-shadow:0 18px 62px #000b!important}
+      .dialog .art,.dialog .discovery-stage,.dialog .encounter-visual{background-color:#111b27!important;border-color:#544c3e!important}
+      .dialog .tag,.menu .tag,.menu .badge{border-radius:8px!important}
+      .menu button:focus-visible,.dialog button:focus-visible,.touch:focus-visible,.stick:focus-visible{outline:2px solid #e1c38b!important;outline-offset:2px}
+      @media(max-width:600px){
+        .menu{border:0!important;border-radius:0!important;box-shadow:none!important}
+        .menu-head{padding-top:max(10px,var(--safeTop))!important}
+        .menu .route-row{min-height:70px!important}
+        .menu .content{padding-bottom:calc(25px + var(--safeBottom))!important}
+        .dialog:not(.title-screen):not(.expedition-intro){width:calc(100vw - 20px)!important;max-width:500px;border-radius:15px!important}
+      }
+      body.reduced-motion .menu *,body.reduced-motion .dialog *{animation:none!important;transition:none!important}
 </style>
   </head>
   <body>
@@ -23330,10 +23367,12 @@
       function drawReachDepth(){
         const profile=reachDepthProfile(game.system,game.settings),layers=buildReachDepth(W,H,game.system,game.settings),
           p=profile.parallax?backdropParallax(cam.x,cam.y,game.settings?.motion):{x:0,y:0};
-        ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+        ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.globalAlpha=.34;
         for(let i=0;i<layers.length;i++){
-          const move=.35+i*.75,pad=profile.parallax?18+i*18:0;
-          ctx.drawImage(layers[i],p.x*move-pad,p.y*move-pad,W+pad*2,H+pad*2);
+          const move=.35+i*.75,pad=profile.parallax?18+i*18:0,
+            dx=profile.parallax?Math.sin(cam.x*.00044+t*.00023+i)*(.5+i)*7:0,
+            dy=profile.parallax?Math.cos(cam.y*.0004-t*.0002+i)*(.5+i)*6:0;
+          ctx.drawImage(layers[i],p.x*move-pad+dx,p.y*move-pad+dy,W+pad*2,H+pad*2);
         }
         ctx.restore();
       }
@@ -23401,21 +23440,123 @@
         c.strokeStyle=bevel;c.lineWidth=Math.max(.6,r*.035);betweenContourPath(c,b,x,y,r*.99);c.stroke();
         c.restore();
       }
+      // BEGIN ABYSSAL REACH MOOD
+      // These are abstract local passages, not literal planets or canon world gates.
+      const ABYSS_MOODS=Object.freeze([
+        {key:"innerForge",motif:"spires",base:"#02070f",mid:"#17202a",dust:"#66554e",light:"#c29b79",focus:[.68,.24],stars:1.1,structures:5},
+        {key:"gasFrontier",motif:"arches",base:"#020711",mid:"#102331",dust:"#466476",light:"#a3c7b9",focus:[.27,.48],stars:.85,structures:4},
+        {key:"crystalReach",motif:"facets",base:"#060713",mid:"#1d1a32",dust:"#6a5a87",light:"#c5bad2",focus:[.75,.59],stars:1.15,structures:5},
+        {key:"bioCluster",motif:"veins",base:"#020b0d",mid:"#102322",dust:"#50735e",light:"#c0c7a1",focus:[.23,.22],stars:.78,structures:5},
+        {key:"ancientArchive",motif:"relics",base:"#080912",mid:"#24212b",dust:"#6d6359",light:"#d9c49b",focus:[.66,.24],stars:.9,structures:5},
+        {key:"voidRim",motif:"absence",base:"#010309",mid:"#090f1b",dust:"#1a3043",light:"#8ca2ba",focus:[.73,.72],stars:.30,structures:2},
+        {key:"parallel",motif:"split",base:"#070512",mid:"#21132e",dust:"#785b86",light:"#bfafca",focus:[.5,.35],stars:1.2,structures:5},
+        {key:"cosmicSpirit",motif:"veils",base:"#020a10",mid:"#10292a",dust:"#628d7f",light:"#e4cfa9",focus:[.57,.23],stars:1.45,structures:4},
+        {key:"threshold",motif:"shelves",base:"#050913",mid:"#171f2b",dust:"#5a636b",light:"#c9af82",focus:[.67,.35],stars:.94,structures:4}
+      ]);
+      function abyssalProfile(system,settings={}){
+        const family=system?.isTutorial?"threshold":system?.specialType||system?.archetype?.key||"threshold",
+          index=Math.max(0,ABYSS_MOODS.findIndex(m=>m.key===family)),mood=ABYSS_MOODS[index];
+        let seed=2166136261;for(const ch of String(system?.seed??"threshold")+family)seed=Math.imul(seed^ch.charCodeAt(0),16777619)>>>0;
+        const low=settings.graphics==="Low"||settings.performanceMode==="Battery Saver";
+        return {...mood,index,seed,turn:(seed%6283)/1000,shift:((seed>>>8)%1000)/1000,
+          detail:low?1:settings.graphics==="Medium"?2:3,starsCount:Math.round((low?30:settings.graphics==="Medium"?75:140)*mood.stars),
+          animate:!low&&settings.motion!=="Reduced"};
+      }
+      // END ABYSSAL REACH MOOD
+      function paintAbyssalReach(c,w,h,system,settings={}){
+        const m=abyssalProfile(system,settings),s=Math.max(w,h),
+          n=k=>{let v=Math.imul(m.seed^Math.imul(k+1,374761393),668265263)>>>0;v=Math.imul(v^(v>>>13),1274126177)>>>0;return ((v^(v>>>16))>>>0)/4294967295;},
+          light=(x,y,rx,ry,color,alpha)=>{c.save();c.translate(x,y);c.scale(rx,ry);const g=c.createRadialGradient(0,0,0,0,0,1);g.addColorStop(0,rgba(color,alpha));g.addColorStop(.34,rgba(color,alpha*.46));g.addColorStop(1,"rgba(0,0,0,0)");c.fillStyle=g;c.fillRect(-1,-1,2,2);c.restore();};
+        c.save();
+        const bg=c.createLinearGradient(0,0,w,h);bg.addColorStop(0,m.base);bg.addColorStop(.52,m.mid);bg.addColorStop(1,m.base);c.fillStyle=bg;c.fillRect(0,0,w,h);
+        light(w*m.focus[0],h*m.focus[1],s*.62,s*.38,m.dust,.36);
+        light(w*(.9-m.focus[0]*.35),h*.75,s*.38,s*.56,m.light,.085);
+        const occlusion=c.createRadialGradient(w*.48,h*.51,0,w*.52,h*.52,s*.8);
+        occlusion.addColorStop(0,m.motif==="absence"?"rgba(0,1,5,.92)":"rgba(0,2,8,.53)");occlusion.addColorStop(.4,"rgba(0,2,8,.25)");occlusion.addColorStop(1,"rgba(0,0,0,0)");
+        c.fillStyle=occlusion;c.fillRect(0,0,w,h);
+        const structure=(x,y,r,angle,i)=>{
+          c.save();c.translate(x,y);c.rotate(angle);
+          const side=c.createLinearGradient(-r,-r,r,r),kind=m.motif;
+          side.addColorStop(0,rgba(m.light,.32));side.addColorStop(.29,rgba(m.dust,.46));side.addColorStop(.72,rgba(m.mid,.95));side.addColorStop(1,m.base);
+          c.fillStyle=side;c.strokeStyle=rgba(m.light,.22);c.lineWidth=Math.max(.7,s*.001);
+          if(["arches","veils","absence"].includes(kind)){
+            for(let j=0;j<(kind==="absence"?2:4);j++){
+              c.beginPath();c.ellipse(0,0,r*(.41+j*.16),r*(.78+j*.1),.1*i,-2.2,2.2);
+              c.strokeStyle=rgba(m.light,(kind==="absence"?.07:.15)*(1-j*.13));c.lineWidth=r*(.038-j*.005);c.stroke();
+            }
+          }else if(kind==="veins"){
+            for(let j=0;j<7;j++){
+              c.beginPath();c.moveTo(-r*.91,(j-3)*r*.14);
+              c.bezierCurveTo(-r*.30,-r*(.8-j*.06),r*.4,r*(.26+j*.05),r*.89,(j-3)*r*.11);
+              c.strokeStyle=rgba(j%2?m.light:m.dust,.12+j*.015);c.lineWidth=r*(.012+j*.004);c.stroke();
+            }
+          }else{
+            const count=kind==="facets"||kind==="split"?6:kind==="shelves"?10:8;
+            c.beginPath();
+            for(let j=0;j<count;j++){
+              const a=j*TAU/count,rad=r*(.51+.43*n(i*17+j+21)),sx=Math.cos(a)*rad,
+                sy=Math.sin(a)*rad*(kind==="spires"?1.7:kind==="relics"?1.32:.85);
+              if(!j)c.moveTo(sx,sy);else c.lineTo(sx,sy);
+            }
+            c.closePath();c.fill();c.stroke();
+            c.beginPath();c.moveTo(-r*.36,-r*.48);c.lineTo(r*.12,-r*.08);c.lineTo(r*.53,-r*.32);
+            c.strokeStyle=rgba(m.light,.19);c.stroke();
+          }
+          c.restore();
+        };
+        for(let i=0;i<m.structures+(m.detail===3?1:0);i++){
+          const x=w*(i===0?m.focus[0]:.08+.82*n(i*11+3)),y=h*(i===0?m.focus[1]:.12+.76*n(i*11+5)),
+            r=s*(i===0?.38:.14+.20*n(i*11+7)),angle=m.turn+i*.88;
+          c.globalAlpha=(i===0?.55:.18+.15*n(i*11+9))*(m.motif==="absence"?.54:1);
+          structure(x,y,r,angle,i);
+        }
+        c.globalAlpha=1;
+        if(["split","veils","arches"].includes(m.motif)){
+          c.save();c.translate(w*m.focus[0],h*m.focus[1]);c.rotate(m.turn*.16-.38);
+          const seam=c.createLinearGradient(-s*.6,0,s*.6,0);
+          seam.addColorStop(0,"rgba(0,0,0,0)");seam.addColorStop(.42,rgba(m.light,.06));seam.addColorStop(.52,rgba(m.light,.42));seam.addColorStop(.75,rgba(m.dust,.08));seam.addColorStop(1,"rgba(0,0,0,0)");
+          c.strokeStyle=seam;c.lineWidth=s*.007;c.beginPath();c.moveTo(-s*.65,-s*.1);
+          c.bezierCurveTo(-s*.27,-s*.5,s*.27,s*.31,s*.65,-s*.27);c.stroke();c.restore();
+        }
+        for(let i=0;i<m.starsCount;i++){
+          const x=n(i*19+203)*w,y=n(i*19+419)*h,r=.2+n(i*13+33)*(m.detail===1?.6:1.12);
+          c.fillStyle=rgba(i%11===0?m.light:"#d5dce0",.11+n(i*17+67)*.47);
+          c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
+        }
+        const vignette=c.createRadialGradient(w*.5,h*.47,s*.12,w*.5,h*.5,s*.72);
+        vignette.addColorStop(0,"rgba(0,0,0,0)");vignette.addColorStop(.65,"rgba(0,0,0,.08)");vignette.addColorStop(1,"rgba(0,1,6,.65)");
+        c.fillStyle=vignette;c.fillRect(0,0,w,h);c.restore();
+      }
+      function drawAbyssMotion(){
+        if(!game.system)return;
+        const m=abyssalProfile(game.system,game.settings);if(!m.animate)return;
+        const x=W*m.focus[0]+Math.sin(cam.x*.00048+t*.00028+m.turn)*W*.09,
+          y=H*m.focus[1]+Math.cos(cam.y*.00037-t*.00024+m.turn)*H*.10,r=Math.max(W,H)*.3;
+        const g=ctx.createRadialGradient(x,y,0,x,y,r);
+        g.addColorStop(0,rgba(m.light,.029));g.addColorStop(.4,rgba(m.dust,.016));g.addColorStop(1,"rgba(0,0,0,0)");
+        ctx.save();ctx.globalCompositeOperation="screen";ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.restore();
+      }
+      function paintAbyssRim(c,b,x,y,r){
+        if(r<5||b.type==="star")return;
+        const m=abyssalProfile(game.system,game.settings);
+        c.save();c.strokeStyle=rgba(m.light,.15);c.lineWidth=Math.max(.6,r*.016);
+        c.beginPath();c.arc(x,y,r*.985,m.turn*.25-.85,m.turn*.25+.85);c.stroke();c.restore();
+      }
       function cinematicSky() {
         const kind = cinematicArtKind(), image = environmentImage(kind);
-        if (!image) return null; // The procedural sky is always a usable fallback.
+        // Distinct local atmosphere renders before optional bundled image assets load.
         const quality = game.settings?.graphics || "High",
           cap = quality === "Low" ? 960 : quality === "Medium" ? 1440 : 1920,
           ratio = Math.min(1, cap / Math.max(W, H)),
           width = Math.max(1, Math.round(W * ratio)), height = Math.max(1, Math.round(H * ratio)),
           seed = visualSeed(game.system?.seed || "Sol"),
-          key = [kind, width, height, seed, quality, game.settings?.performanceMode].join(":");
+          key = [kind, width, height, seed, quality, game.settings?.performanceMode, !!image].join(":");
         if (cinematicArt.key === key && cinematicArt.frame) return cinematicArt.frame;
         const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height;
         const c = canvas.getContext("2d"); if (!c) return null;
         c.imageSmoothingEnabled = true; c.imageSmoothingQuality = "high";
-        const scale = Math.max(width / image.width, height / image.height),
-          dw = image.width * scale, dh = image.height * scale,
+        const scale = image ? Math.max(width / image.width, height / image.height) : 1,
+          dw = image ? image.width * scale : width, dh = image ? image.height * scale : height,
           tutorial = game.system?.isTutorial || currentSystemIndex === 0,
           mirror = kind === "deep" && !tutorial && seed % 2;
         c.save();
@@ -23427,14 +23568,15 @@
             [0.32, 0.3], [0.68, 0.17], [0.55, 0.6],
             [0.25, 0.66], [0.75, 0.48], [0.46, 0.16],
           ][themeIndex];
-        c.filter = kind === "deep" && !tutorial
-          ? `hue-rotate(${hues[themeIndex]}deg) saturate(0.93)` : "none";
+        paintAbyssalReach(c,width,height,game.system,game.settings);
+        c.save();c.globalAlpha=.11;
         const volume=paintVolumetricField(c,width,height,game.system,game.settings);
-        c.globalAlpha=volume?.09:1;
-        c.drawImage(image,
-          (width - dw) * (kind === "parallel" ? 0.85 : composition[0]),
-          (height - dh) * (kind === "deep" && !tutorial ? composition[1] : 0.25),
-          dw, dh);
+        c.restore();
+        if(image){c.save();c.globalAlpha=.042;
+          c.filter=kind==="deep"&&!tutorial?`hue-rotate(${hues[themeIndex]}deg) saturate(.85)`:"none";
+          c.drawImage(image,(width-dw)*(kind==="parallel"?.85:composition[0]),
+            (height-dh)*(kind==="deep"&&!tutorial?composition[1]:.25),dw,dh);
+          c.restore();}
         c.restore();
         if (kind === "deep" && !tutorial) {
           // A single, cached color-light composition for each archetype.
@@ -23444,14 +23586,15 @@
               width * composition[0], height * composition[1], 0,
               width * composition[0], height * composition[1],
               Math.max(width, height) * 0.7);
-          lightField.addColorStop(0, rgba(theme.accent, 0.23));
-          lightField.addColorStop(0.45, rgba(theme.nebulas[0], 0.10));
+          lightField.addColorStop(0, rgba(theme.accent, 0.07));
+          lightField.addColorStop(0.45, rgba(theme.nebulas[0], 0.025));
           lightField.addColorStop(1, "rgba(0,0,0,0)");
           c.fillStyle = lightField; c.fillRect(0, 0, width, height);
         }
+        c.save();c.globalAlpha=.19;
         if (!tutorial) paintEnvironmentComposition(c,width,height,environmentComposition(game.system),sectorVisualTheme());
         paintBetweenReach(c,width,height,betweenReachArt(game.system,systemVisualThemeIndex(game.system)),sectorVisualTheme(),game.settings);
-        paintImmersionSky(c,width,height,game.system,sectorVisualTheme(),game.settings);
+        paintImmersionSky(c,width,height,game.system,sectorVisualTheme(),game.settings);c.restore();
         const vignette = c.createRadialGradient(width * 0.5, height * 0.5, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
         vignette.addColorStop(0, "rgba(0,3,9,0)"); vignette.addColorStop(1, "rgba(0,3,9,.4)");
         c.fillStyle = vignette; c.fillRect(0, 0, width, height);
@@ -23463,11 +23606,11 @@
         const image = cinematicSky();
         if (!image) return false;
         const reduced = game.settings?.motion === "Reduced",
-          x = reduced ? 0 : Math.sin(cam.x * 0.00012) * 16,
-          y = reduced ? 0 : Math.sin(cam.y * 0.00012) * 12;
+          x = reduced ? 0 : Math.sin(cam.x*.0007+t*.00032)*W*.06,
+          y = reduced ? 0 : Math.cos(cam.y*.00055-t*.00026)*H*.045;
         const entry = cinematicArt.images.get(cinematicArtKind()), fade = reduced ? 1 : clamp((performance.now() - (entry?.readyAt || 0)) / 700, 0, 1);
         ctx.save(); ctx.globalAlpha = 0.96 * fade;
-        ctx.drawImage(image, -20 + x, -16 + y, W + 40, H + 32);
+        ctx.drawImage(image, -30 + x, -30 + y, W + 60, H + 60);
         ctx.restore(); return true;
       }
       function paintPlanetPortrait(c, b, x, y, r) {
@@ -23502,7 +23645,7 @@
           c.strokeStyle = rgba(light(b.color, 0.75), 0.7); c.lineWidth = Math.max(1, r * 0.014);
           c.beginPath(); c.arc(0, 0, r, Math.PI * 0.92, Math.PI * 1.82); c.stroke();
         }
-        paintFormationDepth(c,b,0,0,r); paintBetweenRelief(c,b,0,0,r,game.settings); paintMineralSections(c,b,0,0,r,game.settings); rings(true); c.restore();
+        paintFormationDepth(c,b,0,0,r); paintBetweenRelief(c,b,0,0,r,game.settings); paintMineralSections(c,b,0,0,r,game.settings); paintAbyssRim(c,b,0,0,r); rings(true); c.restore();
         return !!texture;
       }
       function renderDiscoveryPortrait() {
@@ -23767,6 +23910,7 @@
         const theme = sectorVisualTheme(),
           quality = game.settings?.graphics || "High",
           layout = game.system?.isTutorial ? {density:1,rocks:1,galaxies:3} : environmentComposition(game.system),
+          mood=abyssalProfile(game.system,game.settings),
           starDiv =
             quality === "Low" ? 5400 : quality === "Medium" ? 3900 : 3100,
           nebulaBase = quality === "Low" ? 4 : quality === "Medium" ? 7 : 9,
@@ -23779,7 +23923,7 @@
           return backdropRandomState / 4294967296;
         };
         buildDeepSky();
-        for (let i = 0, c = Math.min(1000,Math.floor((W * H) / starDiv*layout.density)); i < c; i++) {
+        for (let i = 0, c = Math.min(1000,Math.floor((W * H) / starDiv*layout.density*mood.stars)); i < c; i++) {
           stars.push({
             x: random() * W,
             y: random() * H,
@@ -23914,6 +24058,7 @@
         drawCinematicEnvironment();
         ctx.restore();
         drawReachDepth();
+        drawAbyssMotion();
         for (const galaxy of distantGalaxies) {
           ctx.save(); ctx.translate(galaxy.x+parallax.x*.6, galaxy.y+parallax.y*.6); ctx.rotate(galaxy.rot);
           ctx.scale(1, galaxy.ry / galaxy.rx);
@@ -23933,7 +24078,7 @@
             x = (((s.x + sx) % W) + W) % W,
             y = (((s.y + sy) % H) + H) % H,
             tw = s.a * (motion === "Reduced" ? 0.9 : 0.78 + Math.sin(t * 0.015 + s.tw) * 0.22);
-          ctx.globalAlpha = tw*.36;
+          ctx.globalAlpha = tw*.52;
           ctx.fillStyle = s.h;
           ctx.beginPath();
           ctx.arc(x, y, s.r, 0, TAU);
@@ -24129,6 +24274,7 @@
         ctx.restore();
         paintFormationDepth(ctx,b,p.x,p.y,r);
         paintMineralSections(ctx,b,p.x,p.y,r,game.settings);
+        paintAbyssRim(ctx,b,p.x,p.y,r);
         if(f&&r>8&&game.settings?.graphics!=="Low"&&["dust halo","inclined rings","split rings"].includes(f.feature)&&b.pattern!=="rings"){
           ctx.save();ctx.strokeStyle=rgba(f.accent,.23);ctx.lineWidth=Math.max(.6,r*.035);ctx.beginPath();ctx.ellipse(p.x,p.y,r*1.45,r*.7,f.tilt,0,TAU);ctx.stroke();ctx.restore();
         }
@@ -29079,9 +29225,18 @@
           brake: ui.touchBrake,
         };
       }
+      // BEGIN CONTROL SAFE ZONES
+      // Prevent persistent custom joystick locations from covering the fuel panel.
+      function protectFuelFromJoystick(left,top,width,height,viewportWidth,viewportHeight){
+        const right=Math.min(176,Math.max(112,viewportWidth-192)),limit=viewportHeight-122;
+        if(left<right&&left+width>8&&top<viewportHeight&&top+height>limit)
+          return {left,top:Math.max(6,limit-height-12),adjusted:true};
+        return {left,top,adjusted:false};
+      }
+      // END CONTROL SAFE ZONES
       function defaultControlPositions() {
         return {
-          joystick: { left: 18, bottom: 60 },
+          joystick: { left: 18, bottom: 126 },
           thrust: { right: 14, bottom: 10 },
           release: { right: 14, bottom: 108 },
           brake: { right: 88, bottom: 10 },
@@ -29100,9 +29255,10 @@
           const w = el.offsetWidth || 80,
             h = el.offsetHeight || 80,
             left = clamp(Number(p.left ?? 0), 6, Math.max(6, W - w - 6)),
-            top = clamp(Number(p.top ?? 0), 6, Math.max(6, H - h - 6));
-          el.style.left = left + "px";
-          el.style.top = top + "px";
+            top = clamp(Number(p.top ?? 0), 6, Math.max(6, H - h - 6)),
+            safe = k==="joystick"?protectFuelFromJoystick(left,top,w,h,W,H):{left,top};
+          el.style.left = safe.left + "px";
+          el.style.top = safe.top + "px";
           el.style.right = "auto";
           el.style.bottom = "auto";
         });
@@ -29171,9 +29327,10 @@
           w = el.offsetWidth || 80,
           h = el.offsetHeight || 80,
           left = clamp(e.clientX - layoutDrag.dx, 6, Math.max(6, W - w - 6)),
-          top = clamp(e.clientY - layoutDrag.dy, 6, Math.max(6, H - h - 6));
-        el.style.left = left + "px";
-        el.style.top = top + "px";
+          top = clamp(e.clientY - layoutDrag.dy, 6, Math.max(6, H - h - 6)),
+          safe=layoutDrag.key==="joystick"?protectFuelFromJoystick(left,top,w,h,W,H):{left,top};
+        el.style.left = safe.left + "px";
+        el.style.top = safe.top + "px";
         el.style.right = "auto";
         el.style.bottom = "auto";
       }
