@@ -18440,6 +18440,7 @@
           "activity",
           "guide",
           "help",
+          "ninefold",
         ]);
         return allowed.has(name) ? name : "hub";
       }
@@ -18553,6 +18554,7 @@
             activity: renderActivity,
             guide: renderGuide,
             help: renderHelp,
+            ninefold: renderNinefoldArchive,
           })[activeMenu] || renderHub
         )();
         betweenTranslateNode(ui.menuContent);
@@ -18569,7 +18571,7 @@
         queueSkinPreviews();
       }
       function menuRouteTitle(route){
-        const labels={hub:"Command",explore:"Explore",hangar:"Vessel & designs",journal:"Journey",resources:"Cargo",planets:"Formations",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"Reach",echoes:"Orbital Echoes",codex:"Field Codex",concord:"Concord",civilizations:"Civilizations",activity:"Expedition Log",guide:"Flight Manual",help:"Help"};
+        const labels={hub:"Command",explore:"Explore",hangar:"Vessel & designs",journal:"Journey",resources:"Cargo",planets:"Formations",upgrades:"Upgrades",frigate:game.frigate?.built?"Pioneer":"Pioneer project",cosmetics:"Appearance",system:"Reach",echoes:"Orbital Echoes",codex:"Field Codex",concord:"Concord",civilizations:"Civilizations",activity:"Expedition Log",guide:"Flight Manual",help:"Help",ninefold:"Ninefold Field Archive"};
         const sub={frigate:{expeditions:"Adventures",crew:"Crew",fleet:"Fleet",shipyard:"Shipyard",missions:"Fleet missions",history:"Fleet history",vault:"Vault",upgrades:"Base upgrades",cosmetics:"Pioneer designs"},system:{ops:"Tasks",daily:"Daily tasks",contracts:"Contracts",milestones:"Milestones",travel:"Crossings & atlas",records:"Journey records",settings:"Settings",display:"Display & performance",audio:"Audio & feedback",controls:"Flight controls",data:"Save data",privacy:"Purchases & privacy",achievements:"Achievements",reputation:"Reputation & encounters",collections:"Collections & statistics"},upgrades:{ship:"Vessel upgrades",planet:"Formation upgrades"},cosmetics:{ship:"Starling designs",frigate:"Pioneer designs",trail:"Engine trails",fleet:"Fleet designs",sets:"Hull sets"}};
         if(route.section==="planets"&&route.tab?.startsWith("world:")){
           const world=body(route.tab.slice(6));return world&&(world.discovered||game.discovered.has(world.name)||world.type==="star")?fieldBodyName(world.name):"Unknown formation";
@@ -18712,19 +18714,72 @@
         return '<button type="button" class="route-row" data-action="'+esc(action)+'" data-arg="'+esc(JSON.stringify(arg))+'"><span class="route-icon">'+navIcon(icon)+'</span><span class="route-copy"><b>'+esc(label)+'</b>'+(desc?'<small>'+esc(desc)+'</small>':'')+'</span><svg class="route-chevron" aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m6 3 5 5-5 5"/></svg></button>';
       }
       function routeDirectory(rows){return '<div class="route-list">'+rows.map(r=>routeRow(...r)).join("")+'</div>';}
+      // BEGIN NINEFOLD FIELD IDENTITY
+      // The field archive is an expedition interpretation, not a new franchise canon source.
+      // All content is derived at render time: no new save keys, inventory, or world IDs.
+      const NINEFOLD_FIELD_THEMES=Object.freeze({
+        threshold:["A passage, not a sky","The Nine Worlds cannot be reached by simply climbing above a world's atmosphere. Your journey begins after a crossing into the Between.","Observe the anchorage and learn to distinguish stable routes from apparent shortcuts."],
+        innerForge:["The material memory of a reach","Heat traces and moving plates preserve local histories without revealing who shaped them.","Survey a thermal seam and compare its pattern with a second formation."],
+        gasFrontier:["Currents without an ordinary atmosphere","Suspended membranes and pressure bands form traversable terrain here. Their motion is not the weather of a conventional planet.","Use a controlled approach to chart a safe passage between the bands."],
+        crystalReach:["Resonance and restraint","Strange responses to an instrument do not automatically prove Arcana. An arcanist and a field surveyor may read the same event differently.","Record a resonant feature before deciding what it means."],
+        bioCluster:["Life beyond familiar ground","Living forms in the Between demand observation, not ownership. A useful sample is not permission to take a habitat.","Collect only detached material and keep inhabited sites independent."],
+        ancientArchive:["History with missing authors","Structures and inscriptions suggest remembered events, but the expedition has not established their makers or their age.","Preserve an undeciphered mark in the Field Codex rather than guessing its author."],
+        voidRim:["The limits of certainty","Silence in a reading is not proof of emptiness. Even the quietest reach can conceal movement or witnesses.","Compare independent readings before declaring a passage clear."],
+        parallel:["Contradictions at the seam","Some folded reaches present incompatible measurements. They reveal a dangerous local condition, not an answer to the origin of the Ninefold.","Preserve conflicting observations; plan your departure before entering a collapse gate."],
+        cosmicSpirit:["The veil and the unknown","Luminous presences can inspire wonder and dread. Their nature, intentions and relationship to Arcana remain unresolved.","Approach without presuming a benevolent or hostile intelligence."]
+      });
+      function ninefoldFieldTheme(system){
+        const key=system?.isTutorial?"threshold":system?.specialType==="parallel"?"parallel":system?.specialType==="cosmicSpirit"?"cosmicSpirit":system?.archetype?.key;
+        return {key:NINEFOLD_FIELD_THEMES[key]?key:"threshold",parts:NINEFOLD_FIELD_THEMES[key]||NINEFOLD_FIELD_THEMES.threshold};
+      }
+      function ninefoldIdentityBrief(){
+        const theme=ninefoldFieldTheme(game.system), entries=Object.keys(game.codex||{}).length;
+        return card("A Ninefold expedition",
+          '<b>Beyond the Nine Worlds</b> — this is the Between: dangerous crossings, uncertain cultures and remnants whose origins are not yet known. '+
+          'You are building a record of what your expedition actually encountered, not rewriting the history of the Worlds.'+
+          '<div class="log"><b>'+esc(theme.parts[0])+'</b><span>'+esc(theme.parts[1])+'</span><span>Field lead: '+esc(theme.parts[2])+'</span></div>'+
+          '<div class="log"><b>Field archive</b><span>'+entries+' formation records catalogued. Study the current reach and the Ninefold context in the Journey archive.</span></div>',
+          btn("Open Ninefold Field Archive","openSection","ninefold"));
+      }
+      function renderNinefoldArchive(){
+        const theme=ninefoldFieldTheme(game.system), entries=Object.keys(game.codex||{}).length;
+        const themes=Object.entries(NINEFOLD_FIELD_THEMES).map(([key,parts])=>
+          '<div class="log"><b>'+esc(parts[0])+(key===theme.key?' · Current reach':'')+'</b><span>'+esc(parts[1])+'</span><span>Field approach: '+esc(parts[2])+'</span></div>').join("");
+        ui.menuContent.innerHTML=
+          card("The Ninefold — expedition orientation",
+            "Nine Worlds exist beyond these crossings. The Brightfall Reach, the Shattered Heights, and the Fractured Meridian are names of Worlds in the wider setting; they are not names of these local formations. The crossing does not explain what lies Above or Below, and no single observation explains the source of Arcana.")+
+          card("Your account of the Between",
+            '<b>Current reach:</b> '+esc(betweenSectorName(game.system?.name||"Uncharted"))+
+            '<div class="log"><b>'+esc(theme.parts[0])+'</b><span>'+esc(theme.parts[1])+'</span><span>Next observation: '+esc(theme.parts[2])+'</span></div>'+
+            '<p>'+entries+' formation records catalogued. Your surveys, Echo routes, cultural agreements, recovered objects and expedition decisions build your own history here.</p>',
+            btn("Study surveyed formations","openSection","codex")+
+            btn("Review expedition decisions","openSection","activity"))+
+          card("Five principles of the expedition",
+            '<div class="list">'+[
+              ["Nine Worlds, one Between","Crossings connect the expedition to the wider Ninefold, but a reach is not a tenth World."],
+              ["Arcana is real, conclusions are earned","Arcanists practice Arcana. A sensor anomaly alone is not proof of its involvement."],
+              ["Encounter before conquest","Independent cultures are people with agency. Contact, trust and agreements do not make them property."],
+              ["A record, not a verdict","Discovery notes distinguish observable facts from hypotheses and preserve contradictions."],
+              ["Your journey, your account","The game records this expedition without declaring its outcomes permanent franchise history."]
+            ].map(([title,body])=>'<div class="log"><b>'+esc(title)+'</b><span>'+esc(body)+'</span></div>').join("")+'</div>')+
+          secondaryDetails("Field approaches for every reach",'<div class="list">'+themes+'</div>');
+      }
+      // END NINEFOLD FIELD IDENTITY
+
       function renderHub(){
         const nba=nextBestAction(),worlds=(game.system?.bodies||[]).filter(b=>b.type!=="star"),
           scanned=worlds.filter(bodySurveyed).length;
         ui.menuContent.innerHTML=guidedTutorialCard()+
           '<section class="command-status"><span class="screen-eyebrow">CURRENT REACH</span><h2>'+esc(betweenSectorName(game.system?.name||"Uncharted"))+'</h2><p>'+scanned+' of '+worlds.length+' formations surveyed</p><div class="command-meter" style="--commandProgress:'+Math.round(scanned/Math.max(1,worlds.length)*100)+'%"><span></span></div></section>'+
           '<section class="next-action"><span class="screen-eyebrow">NEXT STEP</span>'+routeRow(nba.title,nba.sub,"openRecommendedMenu",null,"route")+'</section>'+
+          ninefoldIdentityBrief()+
           '<h4 class="directory-heading">Command directory</h4>'+
           routeDirectory([
             ["Explore","Formations, signals, discoveries and crossings","openSection","explore","explore"],
             [game.frigate?.built?"Pioneer":"Pioneer project","Onboard personnel, fleet operations, research and expedition leads","openSection","frigate","pioneer"],
             ["Cargo","Inventory and settlement supplies","openSection","resources","cargo"],
             ["Vessel & designs","Engineering systems and hull configurations","openSection","hangar","ship"],
-            ["Journey","Operations, flight records, Echoes and pilot guidance","openSection","journal","journal"],
+            ["Journey","Ninefold Field Archive, records, Echoes and flight guidance","openSection","journal","journal"],
             ["Settings","Controls, audio, display and save data","setMenuTab","system|settings","settings"]
           ]);
       }
@@ -18748,6 +18803,7 @@
       }
       function renderJournalDirectory(){
         ui.menuContent.innerHTML=routeDirectory([
+          ["Ninefold Field Archive","The Nine Worlds, Arcana and observations from this reach","openSection","ninefold","journal"],
           ["Tasks","Daily operations, contracts, milestones","setMenuTab","system|ops","route"],
           ["Journey records","Achievements, faction standing and collections","setMenuTab","system|records","journal"],
           ["Expedition Log","Recent actions and encounter decisions","openSection","activity","journal"],
@@ -21339,6 +21395,7 @@
             "Planet Codex",
             "Discovered formations are permanently archived with their reach family, rarity, resources, and expedition history. Field studies distinguish observations from unresolved explanations.",
           ) +
+          card("Ninefold context",esc(ninefoldFieldTheme(game.system).parts[1]),btn("Read Field Archive","openSection","ninefold")) +
           secondaryDetails("Field research methods",card("Observation protocols","Arcana is an established part of the Ninefold. A strange instrument reading is not by itself evidence of Arcana, and no field study resolves its ultimate source.",Object.values(BETWEEN_FAMILY_STUDIES).map(([title,desc])=>'<div class="log"><b>'+esc(title)+'</b><span>'+esc(desc)+'</span></div>').join(""))) +
           mysteryArchiveHtml() +
           discoveryCollectionsHtml() +
@@ -22617,7 +22674,7 @@
           actual = reward || b.lastDiscoveryReward || discoveryReward(b);
         ui.discoveryTitle.textContent =
           "Survey complete: " + betweenDisplayText(b.name);
-        ui.discoveryText.textContent = betweenDisplayText(fieldObservation(b) + " " + rar.desc);
+        ui.discoveryText.textContent = betweenDisplayText(fieldObservation(b) + " " + rar.desc + " Field note: " + ninefoldFieldTheme(game.system).parts[1]);
         const visualSeed = Math.abs(Math.round((b.featureSeed || 1) * 997)),
           rarityColor = rar.color || "#7dd3fc";
         ui.discoveryOverlay.style.setProperty("--discoveryColor", rarityColor);
